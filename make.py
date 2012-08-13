@@ -117,11 +117,16 @@ class WinPythonDistribution(object):
         pydir = osp.join(self.winpydir, python_name)
         self.distribution = wppm.Distribution(pydir)
         os.mkdir(osp.join(pydir, 'Scripts'))
+
+        arch2 = 'win-amd64' if 'amd64' in distname else 'win32'
+
+        # Install pywin32
+        self.install_package('pywin32-([0-9]*[a-z]*).%s-py%s.exe'
+                             % (arch2, self.version))
         
         # Install winpython package (wppm)
-        wppm.print_box("Installing WinPython package")
-        shutil.copytree(osp.join(osp.dirname(__file__), 'winpython'),
-                        osp.join(pydir, 'Lib', 'site-packages', 'winpython'))
+        self.install_package('winpython-([0-9]*[a-z]*).%s-py%s.exe'
+                             % (arch2, self.version))
         
         # Install PyQt and PyQwt
         arch1 = 'x64' if 'amd64' in distname else 'x86'
@@ -133,11 +138,6 @@ Binaries = ./Lib/site-packages/PyQt4""")
         self.install_package(
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
                             % (self.version, arch1))
-
-        # Install pywin32
-        arch2 = 'win-amd64' if 'amd64' in distname else 'win32'
-        self.install_package('pywin32-([0-9]*).%s-py%s.exe'
-                             % (arch2, self.version))
         
         # Try to install all other packages in instdir
         for fname in os.listdir(self.instdir):
