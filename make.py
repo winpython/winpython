@@ -12,7 +12,7 @@ import subprocess
 import shutil
 
 # Local imports
-import wppm
+from winpython import wppm
 
 
 #==============================================================================
@@ -118,6 +118,10 @@ class WinPythonDistribution(object):
         self.installed_packages.append(python_fname)
         os.mkdir(osp.join(pydir, 'Scripts'))
         
+        # Install winpython package (wppm)
+        shutil.copytree(osp.join(osp.dirname(__file__), 'winpython'),
+                        osp.join(pydir, 'Lib', 'site-packages'))
+        
         # Install PyQt and PyQwt
         arch1 = 'x64' if 'amd64' in distname else 'x86'
         self.install_package(pattern='PyQt-Py%s-%s-gpl-([0-9\.\-]*).exe'
@@ -142,11 +146,14 @@ Binaries = ./Lib/site-packages/PyQt4""")
                 pass
         
         # Show stats
-        print("""
-
-*** Installed packages ***""")
+        wppm.print_box("Installed packages")
         for fname in self.installed_packages:
             print "   ", fname
+        
+        # Copy dev tools
+        wppm.print_box("Copying tools")
+        shutil.copytree(osp.join(osp.dirname(__file__), 'tools'),
+                        osp.join(self.winpydir, 'tools'))
 
         # Create batch scripts
         self.create_batch_script('cmd.bat', r"""@echo off
@@ -157,8 +164,8 @@ set WINPYDIR=%~dp0..\\""" + python_name + r"""
 set PATH=%WINPYDIR%\Lib\site-packages\pywin32_system32;%PATH%
 set PATH=%WINPYDIR%\Lib\site-packages\PyQt4;%PATH%
 set PATH=%PATH%;%WINPYDIR%\;%WINPYDIR%\DLLs;%WINPYDIR%\Scripts
-set PATH=%PATH%;%~dp0..\devtools;%~dp0..\devtools\gnuwin32\bin
-set PATH=%PATH%;%~dp0..\devtools\TortoiseHg-"""+arch1)
+set PATH=%PATH%;%~dp0..\tools;%~dp0..\tools\gnuwin32\bin
+set PATH=%PATH%;%~dp0..\tools\TortoiseHg-"""+arch1)
         self.create_batch_script('python.bat', r"""@echo off
 call %~dp0env.bat
 %WINPYDIR%\python.exe %*""")

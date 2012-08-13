@@ -46,6 +46,10 @@ Licensed under the terms of the MIT License
         PyQt4 4.5+ or PySide 1.1.1+ (PyQt4 is recommended)
         spyderlib 2.1+
 
+    Requirements
+
+        7zip (directory has to be available in PATH)
+
     Installation
     
         From the source package (see section 'Building dependencies'), you may 

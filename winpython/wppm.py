@@ -69,6 +69,12 @@ def extract_exe(fname, targetdir=None):
     if targetdir is not None:
         shutil.move(fname[:-4], osp.join(targetdir, bname[:-4]))
 
+def print_box(text):
+    """Print text in a box"""
+    line0 = "+" + ("-"*(len(text)+2)) + "+"
+    line1 = "| " + text + " |"
+    print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
+
 
 #==============================================================================
 # Package and Distribution classes
@@ -93,26 +99,26 @@ class Package(object):
         bname = osp.basename(self.fname)
         if bname.endswith('.exe'):
             # distutils bdist_wininst
-            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*).(win32|win\-amd64)', bname)
+            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)', bname)
             if match is not None:
                 self.name, self.version, arch = match.groups()
                 self.architecture = 32 if arch == 'win32' else 64
                 return
             # NSIS
-            pat = r'([a-zA-Z0-9\-]*)-Py([0-9\.]*)-x(64|32)-gpl-([0-9\.\-]*)\.exe'
+            pat = r'([a-zA-Z0-9\-]*)-Py([0-9\.]*)-x(64|32)-gpl-([0-9\.\-]*[a-z]*)\.exe'
             match = re.match(pat, bname)
             if match is not None:
                 self.name, _pyver, arch, self.version = match.groups()
                 self.architecture = int(arch)
                 return
-            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*)-py([0-9\.]*)-x(64|32)-([a-z0-9\.\-]*).exe', bname)
+            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*[a-z]*)-py([0-9\.]*)-x(64|32)-([a-z0-9\.\-]*).exe', bname)
             if match is not None:
                 self.name, self.version, _pyver, arch, _pyqt = match.groups()
                 self.architecture = int(arch)
                 return
         elif bname.endswith(('.zip', '.tar.gz')):
             # distutils sdist
-            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*).(zip|tar\.gz)', bname)
+            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)', bname)
             if match is not None:
                 self.name, self.version = match.groups()[:2]
                 return
@@ -141,9 +147,7 @@ class Package(object):
     def print_action(self, action):
         """Print action text (e.g. 'Installing') indicating progress"""
         text = " ".join([action, self.name, self.version])
-        line0 = "+" + ("-"*(len(text)+2)) + "+"
-        line1 = "| " + text + " |"
-        print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
+        print_box(text)
         
 
 class Distribution(object):
@@ -288,7 +292,8 @@ python "%~dpn0""" + ext + """" %*""")
 
 
 if __name__ == '__main__':
-    sbdir = osp.join(osp.dirname(__file__), os.pardir, 'sandbox')
+    sbdir = osp.join(osp.dirname(__file__),
+                     os.pardir, os.pardir, os.pardir, 'sandbox')
     tmpdir = osp.join(sbdir, 'tobedeleted')
     
     #for fname in os.listdir(sbdir):
@@ -299,7 +304,8 @@ if __name__ == '__main__':
             #pass
     
     #fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
-    fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
+    #fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
+    fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
     #extract_exe(fname)
     #extract_msi(osp.join(tmpdir, 'python-2.7.3.amd64.msi'))
