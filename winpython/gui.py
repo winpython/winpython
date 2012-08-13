@@ -13,7 +13,8 @@ from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
                                 QTableView, QMessageBox, QPushButton)
-from spyderlib.qt.QtCore import Qt, QAbstractTableModel, QModelIndex, SIGNAL
+from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
+                                 QThread)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
 
@@ -22,9 +23,10 @@ from spyderlib.widgets.internalshell import InternalShell
 from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
                                        get_std_icon, action2button)
 
-
 # Local imports
 from winpython import wppm
+from spyderlib.config import add_image_path, get_module_data_path, get_icon
+add_image_path(get_module_data_path('winpython', relpath='images'))
 
 
 COLUMNS = CHECK, NAME, VERSION, ACTION = range(4)
@@ -213,12 +215,22 @@ class DistributionSelector(QWidget):
             break
 
 
+class InstallationThread(QThread):
+    """Installation thread"""
+    def __init__(self, parent):
+        QThread.__init__(self, parent)
+        self.distribution = None
+        self.package = None
+    
+    def run(self):
+        self.distribution.install(self.package)
+
 class PMWindow(QMainWindow):
     NAME = 'WPPM'
     def __init__(self):
         QMainWindow.__init__(self)
 
-        self.distribution = None
+        self.thread = InstallationThread(self)
         self.packages = None
         
         self.selector = None
@@ -229,16 +241,13 @@ class PMWindow(QMainWindow):
         
         # Menus & actions
         self.install_action = None
-        self.file_menu = None
-        self.option_menu = None
-        self.view_menu = None
-        self.help_menu = None
         
         self.setup_window()
             
     def setup_window(self):
         """Setup main window"""
         self.setWindowTitle(self.NAME)
+        self.setWindowIcon(get_icon('winpython.svg'))
         
         self.selector = DistributionSelector(self)
         self.connect(self.selector, SIGNAL('selected_distribution(QString)'),
@@ -297,27 +306,28 @@ class PMWindow(QMainWindow):
         quit_action = create_action(self, "&Quit",
                                     icon=get_std_icon('DialogCloseButton'),
                                     triggered=self.close)
-        self.file_menu = self.menuBar().addMenu("&File")
-        add_actions(self.file_menu, [add_action, None, quit_action])
+        packages_menu = self.menuBar().addMenu("&Packages")
+        add_actions(packages_menu, [add_action, self.install_action,
+                                    None, quit_action])
         
         # Option menu
-        self.option_menu = self.menuBar().addMenu("&Options")
+        option_menu = self.menuBar().addMenu("&Options")
         repair_action = create_action(self, "Repair packages",
                       tip="Reinstall packages even if version is unchanged",
                       toggled=self.toggle_repair)
-        add_actions(self.option_menu, (repair_action,))
+        add_actions(option_menu, (repair_action,))
 
         # View menu
-        self.view_menu = self.menuBar().addMenu("&View")
+        view_menu = self.menuBar().addMenu("&View")
         popmenu = self.createPopupMenu()
-        add_actions(self.view_menu, popmenu.actions())
+        add_actions(view_menu, popmenu.actions())
         
         # Help menu
         about_action = create_action(self, "About %s..." % self.NAME,
                                 icon=get_std_icon('MessageBoxInformation'),
                                 triggered=self.about)
-        self.help_menu = self.menuBar().addMenu("?")
-        add_actions(self.help_menu, [about_action])
+        help_menu = self.menuBar().addMenu("?")
+        add_actions(help_menu, [about_action])
 
         # Status bar
         status = self.statusBar()
@@ -337,12 +347,14 @@ class PMWindow(QMainWindow):
     def toggle_repair(self, state):
         """Toggle repair mode"""
         self.table.repair = state
-        self.table.refresh_distribution(self.distribution)
+        self.table.refresh_distribution(self.thread.distribution)
     
     def distribution_changed(self, path):
         """Distribution path has just changed"""
-        self.distribution = wppm.Distribution(unicode(path))
-        self.table.refresh_distribution(self.distribution)
+        dist = wppm.Distribution(unicode(path))
+        self.table.refresh_distribution(dist)
+        assert not self.thread.isRunning()
+        self.thread.distribution = dist
     
     def add_packages(self):
         """Add packages"""
@@ -365,7 +377,7 @@ class PMWindow(QMainWindow):
                                     % (self.NAME, "\n".join(notsupported)),
                                     QMessageBox.Ok)
         self.install_action.setEnabled(len(self.table.model.packages) > 0)
-        self.table.refresh_distribution(self.distribution)
+        self.table.refresh_distribution(self.thread.distribution)
 
     def install_packages(self):
         """Install packages"""
@@ -374,6 +386,10 @@ class PMWindow(QMainWindow):
                     and self.table.model.actions.get(pack)]
         if not packages:
             return
+        for widget in self.children():
+            if isinstance(widget, QWidget):
+                widget.setEnabled(False)
+        status = self.statusBar()
         progress = QProgressDialog(self, Qt.FramelessWindowHint)
         progress.setMaximum(len(packages)-1)
         for index, package in enumerate(packages):
@@ -384,7 +400,13 @@ class PMWindow(QMainWindow):
                 break
             if package in self.table.model.actions:
                 try:
-                    self.distribution.install(package)
+                    self.thread.package = package
+                    self.thread.start()
+                    while self.thread.isRunning():
+                        QApplication.processEvents()
+                        if progress.wasCanceled():
+                            status.setEnabled(True)
+                            status.showMessage("Cancelling operation...")
                 except Exception, error:
                     pstr = package.name + ' ' + package.version
                     QMessageBox.critical(self, "Error",
@@ -392,6 +414,10 @@ class PMWindow(QMainWindow):
                                          "<br><br>Error message:<br>%s"
                                          % (pstr, unicode(error)))
         progress.setValue(progress.maximum())
+        status.clearMessage()
+        for widget in self.children():
+            if isinstance(widget, QWidget):
+                widget.setEnabled(True)
 
     def about(self):
         """About WPpm"""
@@ -426,10 +452,9 @@ def main():
     app = QApplication([])
     win = PMWindow()
     win.show()
-    win.basedir = osp.join(osp.dirname(__file__),
-                           os.pardir, os.pardir, os.pardir, 'sandbox')
+    #win.basedir = osp.join(osp.dirname(__file__),
+                           #os.pardir, os.pardir, os.pardir, 'sandbox')
     app.exec_()
-    print [p.name+' '+p.version for p in win.table.model.packages]
 
 
 if __name__ == "__main__":
