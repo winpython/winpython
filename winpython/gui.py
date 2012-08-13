@@ -117,6 +117,12 @@ class PackagesTable(QTableView):
         self.setModel(self.model)
         self.repair = False
     
+    def reset_model(self):
+        self.model.reset()
+        self.resizeColumnToContents(0)
+#        self.resizeRowsToContents()
+        self.horizontalHeader().setStretchLastSection(True)
+    
     def add_package(self, package):
         for pack in self.model.packages:
             if pack.fname == package.fname:
@@ -124,10 +130,16 @@ class PackagesTable(QTableView):
         self.model.packages.append(package)
         self.model.packages.sort(key=lambda x: x.name)
         self.model.checked.add(package)
-        self.model.reset()
-        self.resizeColumnToContents(0)
-#        self.resizeRowsToContents()
-        self.horizontalHeader().setStretchLastSection(True)
+        self.reset_model()
+    
+    def remove_package(self, package):
+        self.model.packages = [pack for pack in self.model.packages
+                               if pack.fname != package.fname]
+        if package in self.model.checked:
+            self.model.checked.remove(package)
+        if package in self.model.actions:
+            self.model.actions.pop(package)
+        self.reset_model()
     
     def refresh_distribution(self, dist):
         for package in self.model.packages:
@@ -407,6 +419,7 @@ class PMWindow(QMainWindow):
                         if progress.wasCanceled():
                             status.setEnabled(True)
                             status.showMessage("Cancelling operation...")
+                    self.table.remove_package(package)
                 except Exception, error:
                     pstr = package.name + ' ' + package.version
                     QMessageBox.critical(self, "Error",
