@@ -1,0 +1,13 @@
+\.pyc$
+\.pyo$
+\.settings$
+\.spyderproject$
+\.ropeproject$
+\.orig$
+\.DS_Store$
+^build/
+^dist/
+^bin/
+^winpython.egg-info/
+MANIFEST$
+\Thumbs.db

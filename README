@@ -1,0 +1,73 @@
+WinPython tools
+===============
+
+Copyright © 2012 Pierre Raybaut
+Licensed under the terms of the MIT License
+(see winpython/__init__.py for details)
+
+
+    Overview
+
+        WinPython is a portable distribution of the Python programming 
+        language for Windows.
+
+        It is a full-featured Python-based scientific environment:
+
+            Designed for:
+                Regular scientific users: interactive data processing and 
+                visualization using Python with Spyder (thanks to the 
+                integrated libraries NumPy, SciPy, Matplotlib, guiqwt, etc.)
+
+                Advanced scientific users and software developers: Python 
+                applications development with Spyder (based on the integrated 
+                libraries NumPy, SciPy, PyQt, h5py, guidata, guiqwt, etc.), 
+                version control with Mercurial and other development tools 
+                (like gettext, WinMerge, etc.)
+
+            Portable: preconfigured, it should run out of the box on any 
+            machine under Windows (without any installation requirements) 
+            and the folder containing WinPython can be moved to any location 
+            (local, network or removable drive)
+
+            Flexible: one can install (or should I write "use" as it's 
+            portable) as many WinPython versions as necessary (like isolated 
+            and self-consistent environments), even if those versions are 
+            running different versions of Python (2.7, 3.x in the near future) 
+            or different architectures (32bit or 64bit) on the same machine
+
+            Customizable: using the integrated package manager (wppm, as 
+            WinPython Package Manager), it's possible to install or uninstall 
+            any standard Python package built with distutils 
+            (e.g. "dummypackage-2.1.win-amd64-py2.7.‌exe").
+
+    Dependencies
+    
+        Python 2.6+
+        PyQt4 4.5+ or PySide 1.1.1+ (PyQt4 is recommended)
+        spyderlib 2.1+
+
+    Installation
+    
+        From the source package (see section 'Building dependencies'), you may 
+        install WinPython using the integrated setup.py script based on Python 
+        standard library `distutils` with the following command:
+            `python setup.py install`
+
+        Note that `distutils` does *not* uninstall previous versions of Python 
+        packages: it simply copies files on top of an existing installation. 
+        When using this command, it is thus highly recommended to uninstall 
+        manually any previous version of WinPython by removing the associated 
+        directory ('winpython' in your site-packages directory).
+
+        From the Python package index, you may simply install WinPython *and* 
+        upgrade an existing installation using `pip`:
+        http://pypi.python.org/pypi
+
+        But the easiest way to install the last stable release of WinPython is by using an executable installer: http://winpython.googlecode.com
+            
+    More informations
+    
+        Downloads, bug reports and feature requests:
+            http://code.google.com/p/winpython/
+        Discussions:
+            http://groups.google.com/group/winpython
