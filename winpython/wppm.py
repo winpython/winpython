@@ -11,6 +11,7 @@ import subprocess
 import shutil
 import cPickle
 import re
+import sys
 
 #==============================================================================
 # Utilities
@@ -156,6 +157,22 @@ class Distribution(object):
         self.target = target
         self.logdir = None
         self.init_log_dir()
+        self.to_be_removed = []  # list of directories to be removed later
+    
+    def clean_up(self):
+        """Remove directories which couldn't be removed when building"""
+        for path in self.to_be_removed:
+            try:
+                shutil.rmtree(path)
+            except WindowsError:
+                print >>sys.stderr, "Directory %s could not be removed" % path
+        
+    def remove_directory(self, path):
+        """Try to remove directory -- on WindowsError, remove it later"""
+        try:
+            shutil.rmtree(path)
+        except WindowsError:
+            self.to_be_removed.append(path)
 
     def init_log_dir(self):
         """Init log path"""
@@ -257,7 +274,7 @@ python "%~dpn0""" + ext + """" %*""")
         self.copy_files(package, 'SCRIPTS', 'Scripts', create_bat_files=True)
         self.copy_files(package, 'DLLs', 'DLLs')
         self.copy_files(package, 'DATA', '.')
-        shutil.rmtree(package.fname[:-4])
+        self.remove_directory(package.fname[:-4])
 
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
@@ -265,7 +282,7 @@ python "%~dpn0""" + ext + """" %*""")
         raise NotImplementedError
         package.print_action("Extracting")
         extract_msi(package.fname)
-        shutil.rmtree(package.fname[:-4])
+        self.remove_directory(package.fname[:-4])
 
     def install_sdist(self, package):
         """Install a distutils package built with the sdist option
@@ -288,7 +305,7 @@ python "%~dpn0""" + ext + """" %*""")
             # Qwt5
             outdir = osp.join('Lib', 'site-packages', 'PyQt4', 'Qwt5')
         self.copy_files(package, '$_OUTDIR', outdir)
-        shutil.rmtree(package.fname[:-4])
+        self.remove_directory(package.fname[:-4])
 
 
 if __name__ == '__main__':

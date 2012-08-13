@@ -104,23 +104,24 @@ class WinPythonDistribution(object):
         self.fullversion = '.'.join(vlst[:3])
         
         # Create the WinPython base directory
+        wppm.print_box("Creating WinPython base directory")
         self.winpydir = osp.join(self.target, distname)
         if osp.isdir(self.winpydir):
             shutil.rmtree(self.winpydir)
         os.mkdir(self.winpydir)
 
-        # Creating distribution object
-        pydir = osp.join(self.winpydir, python_name)
-        self.distribution = wppm.Distribution(pydir)
-        
-        # Extracting Python installer
+        # Extracting Python installer, creating distribution object
+        wppm.print_box("Extracting Python installer")
         wppm.extract_msi(python_fname, targetdir=self.winpydir)
         self.installed_packages.append(python_fname)
+        pydir = osp.join(self.winpydir, python_name)
+        self.distribution = wppm.Distribution(pydir)
         os.mkdir(osp.join(pydir, 'Scripts'))
         
         # Install winpython package (wppm)
+        wppm.print_box("Installing WinPython package")
         shutil.copytree(osp.join(osp.dirname(__file__), 'winpython'),
-                        osp.join(pydir, 'Lib', 'site-packages'))
+                        osp.join(pydir, 'Lib', 'site-packages', 'winpython'))
         
         # Install PyQt and PyQwt
         arch1 = 'x64' if 'amd64' in distname else 'x86'
@@ -175,6 +176,8 @@ cd %WINPYDIR%\Lib\site-packages\spyderlib
 %WINPYDIR%\python.exe spyder.py %*""")
         self.create_batch_script('spyder_light.bat', r"""@echo off
 call "%~dp0spyder.bat" --light""")
+
+        self.distribution.clean_up()
     
 
 if __name__ == '__main__':
