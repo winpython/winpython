@@ -151,6 +151,7 @@ class Package(object):
         print_box(text)
         
 
+#TODO: assert that package architecture matches distribution architecture!!!
 class Distribution(object):
     NSIS_PACKAGES = ('PyQt', 'PyQwt')  # known NSIS packages
     def __init__(self, target):

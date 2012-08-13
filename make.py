@@ -121,11 +121,15 @@ class WinPythonDistribution(object):
         arch2 = 'win-amd64' if 'amd64' in distname else 'win32'
 
         # Install pywin32
-        self.install_package('pywin32-([0-9]*[a-z]*).%s-py%s.exe'
+        self.install_package('pywin32-([0-9\.]*[a-z]*).%s-py%s.exe'
                              % (arch2, self.version))
-        
+
         # Install winpython package (wppm)
-        self.install_package('winpython-([0-9]*[a-z]*).%s-py%s.exe'
+        self.install_package('winpython-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
+                             % (arch2, self.version))
+
+        # Install spyderlib package (Spyder)
+        self.install_package('spyder(lib)?-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
                              % (arch2, self.version))
         
         # Install PyQt and PyQwt
@@ -176,6 +180,10 @@ cd %WINPYDIR%\Lib\site-packages\spyderlib
 %WINPYDIR%\python.exe spyder.py %*""")
         self.create_batch_script('spyder_light.bat', r"""@echo off
 call "%~dp0spyder.bat" --light""")
+        self.create_batch_script('wppm.bat', r"""@echo off
+call %~dp0env.bat
+cd %WINPYDIR%\Lib\site-packages\winpython
+start %WINPYDIR%\pythonw.exe gui.py %*""")
 
         self.distribution.clean_up()
     
