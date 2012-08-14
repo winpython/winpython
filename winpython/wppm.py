@@ -13,45 +13,17 @@ import cPickle
 import re
 import sys
 
+# Local imports
+from winpython import utils
+
 #==============================================================================
-# Utilities
+# Extract functions
 #==============================================================================
-
-# Exact copy of 'spyderlib.utils.programs.is_program_installed' function
-def is_program_installed(basename):
-    """Return program absolute path if installed in PATH
-    Otherwise, return None"""
-    for path in os.environ["PATH"].split(os.pathsep):
-        abspath = osp.join(path, basename)
-        if osp.isfile(abspath):
-            return abspath
-
-def create_shortcut(path, description, filename,
-                    arguments="", workdir="", iconpath="", iconindex=0):
-    """Create Windows shortcut (.lnk file)"""
-    import pythoncom
-    from win32com.shell import shell
-    ilink = pythoncom.CoCreateInstance(shell.CLSID_ShellLink, None,
-                                       pythoncom.CLSCTX_INPROC_SERVER,
-                                       shell.IID_IShellLink)
-    ilink.SetPath(path)
-    ilink.SetDescription(description)
-    if arguments:
-        ilink.SetArguments(arguments)
-    if workdir:
-        ilink.SetWorkingDirectory(workdir)
-    if iconpath or iconindex:
-        ilink.SetIconLocation(iconpath, iconindex)
-    # now save it.
-    ipf = ilink.QueryInterface(pythoncom.IID_IPersistFile)
-    ipf.Save(filename, 0)
-
-
 def extract_msi(fname, targetdir=None):
     '''Extract .msi installer to the directory of the same name    
     msiexec.exe /a "python-%PYVER%%PYARC%.msi" /qn TARGETDIR="%PYDIR%"'''
     extract = 'msiexec.exe'
-    assert is_program_installed(extract)
+    assert utils.is_program_installed(extract)
     bname = osp.basename(fname)
     args = ['/a', '%s' % bname, '/qn', 'TARGETDIR=%s' % fname[:-4]]
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
@@ -63,18 +35,12 @@ def extract_exe(fname, targetdir=None):
     '''Extract .exe archive to the directory of the same name    
     7z x -o"%1" -aos "%1.exe"'''
     extract = '7z.exe'
-    assert is_program_installed(extract)
+    assert utils.is_program_installed(extract)
     bname = osp.basename(fname)
     args = ['x', '-o%s' % bname[:-4], '-aos', bname]
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
     if targetdir is not None:
         shutil.move(fname[:-4], osp.join(targetdir, bname[:-4]))
-
-def print_box(text):
-    """Print text in a box"""
-    line0 = "+" + ("-"*(len(text)+2)) + "+"
-    line1 = "| " + text + " |"
-    print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
 
 
 #==============================================================================
@@ -92,7 +58,20 @@ class Package(object):
         self.name = None
         self.version = None
         self.architecture = None
+        self.pyversion = None
         self.extract_infos()
+    
+    def is_compatible_with(self, distribution):
+        """Return True if package is compatible with distribution in terms of
+        architecture and Python version (if applyable)"""
+        iscomp = True
+        if self.architecture is not None:
+            # Source distributions (not yet supported though)
+            iscomp = iscomp and self.architecture == distribution.architecture
+        if self.pyversion is not None:
+            # Non-pure Python package
+            iscomp = iscomp and self.pyversion == distribution.version
+        return iscomp
 
     def extract_infos(self):
         """Extract package infos (name, version, architecture)
@@ -100,29 +79,29 @@ class Package(object):
         bname = osp.basename(self.fname)
         if bname.endswith('.exe'):
             # distutils bdist_wininst
-            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)', bname)
+            match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)(-py([0-9\.]*))?(-setup)?\.exe', bname)
             if match is not None:
-                self.name, self.version, arch = match.groups()
+                self.name, self.version, arch, _t1, self.pyversion, _t2 = match.groups()
                 self.architecture = 32 if arch == 'win32' else 64
                 return
             # NSIS
-            pat = r'([a-zA-Z0-9\-]*)-Py([0-9\.]*)-x(64|32)-gpl-([0-9\.\-]*[a-z]*)\.exe'
+            pat = r'([a-zA-Z0-9\-\_]*)-Py([0-9\.]*)-x(64|32)-gpl-([0-9\.\-]*[a-z]*)\.exe'
             match = re.match(pat, bname)
             if match is not None:
-                self.name, _pyver, arch, self.version = match.groups()
+                self.name, self.pyversion, arch, self.version = match.groups()
                 self.architecture = int(arch)
                 return
-            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*[a-z]*)-py([0-9\.]*)-x(64|32)-([a-z0-9\.\-]*).exe', bname)
+            match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*)-py([0-9\.]*)-x(64|32)-([a-z0-9\.\-]*).exe', bname)
             if match is not None:
-                self.name, self.version, _pyver, arch, _pyqt = match.groups()
+                self.name, self.version, self.pyversion, arch, _pyqt = match.groups()
                 self.architecture = int(arch)
                 return
-        elif bname.endswith(('.zip', '.tar.gz')):
-            # distutils sdist
-            match = re.match(r'([a-zA-Z0-9\-]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)', bname)
-            if match is not None:
-                self.name, self.version = match.groups()[:2]
-                return
+        #elif bname.endswith(('.zip', '.tar.gz')):
+            ## distutils sdist
+            #match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)', bname)
+            #if match is not None:
+                #self.name, self.version = match.groups()[:2]
+                #return
         raise NotImplementedError, "Not supported package type %s" % bname
 
     def logpath(self, logdir):
@@ -148,10 +127,9 @@ class Package(object):
     def print_action(self, action):
         """Print action text (e.g. 'Installing') indicating progress"""
         text = " ".join([action, self.name, self.version])
-        print_box(text)
+        utils.print_box(text)
         
 
-#TODO: assert that package architecture matches distribution architecture!!!
 class Distribution(object):
     NSIS_PACKAGES = ('PyQt', 'PyQwt')  # known NSIS packages
     def __init__(self, target):
@@ -159,6 +137,7 @@ class Distribution(object):
         self.logdir = None
         self.init_log_dir()
         self.to_be_removed = []  # list of directories to be removed later
+        self.version, self.architecture = utils.get_python_infos(target)
     
     def clean_up(self):
         """Remove directories which couldn't be removed when building"""
@@ -216,11 +195,14 @@ class Distribution(object):
 python "%~dpn0""" + ext + """" %*""")
                     fd.close()
                     package.files.append(dst)
+
+    def get_installed_packages(self):
+        """Return installed packages"""
+        return [Package(logname[:-4]) for logname in os.listdir(self.logdir)]
     
     def find_package(self, name):
         """Find installed package"""
-        for logname in os.listdir(self.logdir):
-            pack = Package(logname[:-4])
+        for pack in self.get_installed_packages():
             if pack.name == name:
                 return pack
 
@@ -232,6 +214,7 @@ python "%~dpn0""" + ext + """" %*""")
     
     def install(self, package):
         """Install package in distribution"""
+        assert package.is_compatible_with(self)
         self.uninstall_existing(package)
         bname = osp.basename(package.fname)
         if bname.endswith('.exe'):
@@ -324,6 +307,7 @@ if __name__ == '__main__':
     #fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
     #fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
     fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
+    fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
     #extract_exe(fname)
     #extract_msi(osp.join(tmpdir, 'python-2.7.3.amd64.msi'))
@@ -332,5 +316,5 @@ if __name__ == '__main__':
 
     dist = Distribution(target)
     pack = Package(fname)
-    dist.install(pack)
+    #dist.install(pack)
     #dist.uninstall(pack)

@@ -12,7 +12,7 @@ import subprocess
 import shutil
 
 # Local imports
-from winpython import wppm
+from winpython import wppm, utils
 
 
 #==============================================================================
@@ -23,7 +23,7 @@ def bat_to_exe(fname, icon):
     conv = 'Bat_To_Exe_Converter.exe'
     assert fname.endswith('.bat')
     assert icon.endswith('.ico')
-    #assert wppm.is_program_installed(conv)
+    #assert utils.is_program_installed(conv)
     bname = osp.basename(fname)
     args = ['-bat', bname, '-save', bname.replace('.bat', '.exe')]#,
 #            '-icon', osp.abspath(icon)]
@@ -104,14 +104,14 @@ class WinPythonDistribution(object):
         self.fullversion = '.'.join(vlst[:3])
         
         # Create the WinPython base directory
-        wppm.print_box("Creating WinPython base directory")
+        utils.print_box("Creating WinPython base directory")
         self.winpydir = osp.join(self.target, distname)
         if osp.isdir(self.winpydir):
             shutil.rmtree(self.winpydir)
         os.mkdir(self.winpydir)
 
         # Extracting Python installer, creating distribution object
-        wppm.print_box("Extracting Python installer")
+        utils.print_box("Extracting Python installer")
         wppm.extract_msi(python_fname, targetdir=self.winpydir)
         self.installed_packages.append(python_fname)
         pydir = osp.join(self.winpydir, python_name)
@@ -151,12 +151,12 @@ Binaries = ./Lib/site-packages/PyQt4""")
                 pass
         
         # Show stats
-        wppm.print_box("Installed packages")
+        utils.print_box("Installed packages")
         for fname in self.installed_packages:
             print "   ", fname
         
         # Copy dev tools
-        wppm.print_box("Copying tools")
+        utils.print_box("Copying tools")
         shutil.copytree(osp.join(osp.dirname(__file__), 'tools'),
                         osp.join(self.winpydir, 'tools'))
 
