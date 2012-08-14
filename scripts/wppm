@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-from winpython import gui
-gui.main()
+from winpython import wppmgui
+wppmgui.main()

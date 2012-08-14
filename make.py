@@ -91,7 +91,7 @@ class WinPythonDistribution(object):
         fd = file(osp.join(scriptdir, name), 'w')
         fd.write(contents)
         fd.close()
-    
+
     def make(self):
         """Make WinPython distribution in target directory from the installers 
         located in instdir"""
@@ -143,12 +143,12 @@ Binaries = ./Lib/site-packages/PyQt4""")
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
                             % (self.version, arch1))
         
-        # Try to install all other packages in instdir
-        for fname in os.listdir(self.instdir):
-            try:
-                self.install_package(fname)
-            except NotImplementedError:
-                pass
+        ## Try to install all other packages in instdir
+        #for fname in os.listdir(self.instdir):
+            #try:
+                #self.install_package(fname)
+            #except NotImplementedError:
+                #pass
         
         # Show stats
         utils.print_box("Installed packages")
@@ -161,9 +161,6 @@ Binaries = ./Lib/site-packages/PyQt4""")
                         osp.join(self.winpydir, 'tools'))
 
         # Create batch scripts
-        self.create_batch_script('cmd.bat', r"""@echo off
-call %~dp0env.bat
-cmd.exe /k""")
         self.create_batch_script('env.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + python_name + r"""
 set PATH=%WINPYDIR%\Lib\site-packages\pywin32_system32;%PATH%
@@ -171,21 +168,40 @@ set PATH=%WINPYDIR%\Lib\site-packages\PyQt4;%PATH%
 set PATH=%PATH%;%WINPYDIR%\;%WINPYDIR%\DLLs;%WINPYDIR%\Scripts
 set PATH=%PATH%;%~dp0..\tools;%~dp0..\tools\gnuwin32\bin
 set PATH=%PATH%;%~dp0..\tools\TortoiseHg-"""+arch1)
-        self.create_batch_script('python.bat', r"""@echo off
+
+        self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
-%WINPYDIR%\python.exe %*""")
-        self.create_batch_script('spyder.bat', r"""@echo off
-call %~dp0env.bat
-cd %WINPYDIR%\Lib\site-packages\spyderlib
-%WINPYDIR%\python.exe spyder.py %*""")
-        self.create_batch_script('spyder_light.bat', r"""@echo off
-call "%~dp0spyder.bat" --light""")
-        self.create_batch_script('wppm.bat', r"""@echo off
-call %~dp0env.bat
-cd %WINPYDIR%\Lib\site-packages\winpython
-start %WINPYDIR%\pythonw.exe gui.py %*""")
+cmd.exe /k""")
+
+        self.create_python_batch('python.bat', '', '')
+        self.create_python_batch('spyder.bat', 'spyderlib', 'spyder.py')
+        self.create_python_batch('spyder_light.bat', 'spyderlib', 'spyder.py',
+                                 options='--light')
+        self.create_python_batch('wppm.bat', 'winpython', 'wppmgui.pyw')
+        self.create_python_batch('pyqt_demo.bat',
+                                 'PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')
 
         self.distribution.clean_up()
+        
+    def create_python_batch(self, name, package_dir, script_name,
+                            options=None):
+        """Create batch file to run a Python script"""
+        if package_dir:
+            package_dir = r'\Lib\site-packages\%s' % package_dir
+        if options is None:
+            options = ''
+        else:
+            options = ' ' + options
+        if script_name.endswith('.pyw'):
+            cmd = 'start %WINPYDIR%\pythonw.exe'
+        else:
+            cmd = '%WINPYDIR%\python.exe'
+        if script_name:
+            script_name = ' ' + script_name
+        self.create_batch_script(name, r"""@echo off
+call %~dp0env.bat
+cd %WINPYDIR%""" + package_dir + r"""
+""" + cmd + script_name + options + " %*")
     
 
 if __name__ == '__main__':
