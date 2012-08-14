@@ -12,16 +12,18 @@ import sys
 from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
-                                QTableView, QMessageBox, QPushButton)
+                                QTableView, QMessageBox, QPushButton, QLabel,
+                                QTextOption)
 from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
                                  QThread)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
 
 from spyderlib.widgets.internalshell import InternalShell
-
+from spyderlib.widgets.texteditor import TextEditor
 from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
-                                       get_std_icon, action2button)
+                                       get_std_icon, action2button,
+                                       mimedata2url)
 
 # Local imports
 from winpython import wppm
@@ -30,6 +32,11 @@ add_image_path(get_module_data_path('winpython', relpath='images'))
 
 
 COLUMNS = CHECK, NAME, VERSION, ACTION = range(4)
+
+INSTALL_ACTION = 'Install'
+REPAIR_ACTION = 'Repair (reinstall)'
+UPGRADE_ACTION = 'Upgrade from v'
+NONE_ACTION = 'None (Already installed)'
 
 class PackagesModel(QAbstractTableModel):
     def __init__(self):
@@ -65,13 +72,23 @@ class PackagesModel(QAbstractTableModel):
             elif column == VERSION:
                 return to_qvariant(package.version)
             elif column == ACTION:
-                return to_qvariant(self.actions.get(package, ''))
+                try:
+                    action = self.actions[package]
+                except KeyError:
+                    print package.name, package
+                    action = '???'
+                return to_qvariant(action)
         elif role == Qt.TextAlignmentRole:
             return to_qvariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-        elif role == Qt.BackgroundColorRole and package not in self.checked:
-            color = QColor(Qt.lightGray)
-            color.setAlphaF(.3)
-            return to_qvariant(color)
+        elif role == Qt.BackgroundColorRole:
+            if package in self.checked:
+                color = QColor(Qt.darkGreen)
+                color.setAlphaF(.1)
+                return to_qvariant(color)
+            else:
+                color = QColor(Qt.lightGray)
+                color.setAlphaF(.3)
+                return to_qvariant(color)
         return to_qvariant()
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
@@ -116,6 +133,9 @@ class PackagesTable(QTableView):
         self.model = PackagesModel()
         self.setModel(self.model)
         self.repair = False
+        self.resizeColumnToContents(0)
+        self.setAcceptDrops(True)
+        self.distribution = None
     
     def reset_model(self):
         self.model.reset()
@@ -125,7 +145,7 @@ class PackagesTable(QTableView):
     
     def add_package(self, package):
         for pack in self.model.packages:
-            if pack.fname == package.fname:
+            if pack.name == package.name:
                 return
         self.model.packages.append(package)
         self.model.packages.sort(key=lambda x: x.name)
@@ -142,21 +162,19 @@ class PackagesTable(QTableView):
         self.reset_model()
     
     def refresh_distribution(self, dist):
+        self.distribution = dist
         for package in self.model.packages:
             pack = dist.find_package(package.name)
             if pack is None:
-                action = 'Install'
+                action = INSTALL_ACTION
             elif pack.version == package.version:
                 if self.repair:
-                    action = 'Repair'
+                    action = REPAIR_ACTION
                 else:
-                    action = None
+                    action = NONE_ACTION
             else:
-                action = 'Upgrade from v' + pack.version
-            if action is None and package in self.model.actions:
-                self.model.actions.pop(package)
-            else:
-                self.model.actions[package] = action
+                action = UPGRADE_ACTION + pack.version
+            self.model.actions[package] = action
         self.model.reset()
     
     def select_all(self):
@@ -166,6 +184,33 @@ class PackagesTable(QTableView):
         else:
             self.model.checked = allpk
         self.model.reset()
+
+    def dragMoveEvent(self, event):
+        """Reimplement Qt method, just to avoid default drag'n drop 
+        implementation of QTableView to handle events"""
+        event.acceptProposedAction()
+
+    def dragEnterEvent(self, event):
+        """Reimplement Qt method
+        Inform Qt about the types of data that the widget accepts"""
+        source = event.mimeData()
+        if source.hasUrls() and mimedata2url(source):
+            event.acceptProposedAction()
+            
+    def dropEvent(self, event):
+        """Reimplement Qt method
+        Unpack dropped data and handle it"""
+        source = event.mimeData()
+        for path in mimedata2url(source):
+            if osp.isfile(path):
+                try:
+                    package = wppm.Package(path)
+                    if package.is_compatible_with(self.distribution):
+                        self.add_package(package)
+                except NotImplementedError:
+                    pass
+        self.emit(SIGNAL('package_added()'))
+        event.acceptProposedAction()
 
 
 def is_python_distribution(path):
@@ -180,6 +225,7 @@ class DistributionSelector(QWidget):
     def __init__(self, parent):
         super(DistributionSelector, self).__init__(parent)
         self.browse_btn = None
+        self.label = None
         self.line_edit = None
         self.console = None
         self.setup_widget()
@@ -190,15 +236,17 @@ class DistributionSelector(QWidget):
         
     def setup_widget(self):
         """Setup workspace selector widget"""
+        self.label = QLabel()
         self.line_edit = QLineEdit()
         self.line_edit.setAlignment(Qt.AlignRight)
         self.line_edit.setReadOnly(True)
-        self.line_edit.setDisabled(True)
+        #self.line_edit.setDisabled(True)
         self.browse_btn = QPushButton(get_std_icon('DirOpenIcon'), "", self)
         self.browse_btn.setToolTip(self.TITLE)
         self.connect(self.browse_btn, SIGNAL("clicked()"),
                      self.select_directory)
         layout = QHBoxLayout()
+        layout.addWidget(self.label)
         layout.addWidget(self.line_edit)
         layout.addWidget(self.browse_btn)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -251,8 +299,9 @@ class PMWindow(QMainWindow):
         
         self.basedir = None
         
-        # Menus & actions
         self.install_action = None
+        self.remove_action = None
+        self.packages_icon = get_std_icon('FileDialogContentsView')
         
         self.setup_window()
             
@@ -269,6 +318,8 @@ class PMWindow(QMainWindow):
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.verticalHeader().hide()
         self.table.setShowGrid(False)
+        self.connect(self.table, SIGNAL('package_added()'),
+                     self.refresh_install_button)
 
         self.selector.set_distribution(sys.prefix)
         self.distribution_changed(sys.prefix)
@@ -303,10 +354,15 @@ class PMWindow(QMainWindow):
         # Add the console widget to window as a dockwidget
         self.addDockWidget(Qt.BottomDockWidgetArea, console_dock)
         
-        # File menu
+        # Packages menu
         add_action = create_action(self, "&Add packages...",
                                    icon=get_std_icon('DialogOpenButton'),
                                    triggered=self.add_packages)
+        self.remove_action = create_action(self, "Remove",
+                                           shortcut=keybinding('Delete'),
+                                           icon=get_std_icon('TrashIcon'),
+                                           triggered=self.remove_packages)
+        self.remove_action.setEnabled(False)
         select_all_action = create_action(self, "(Un)Select all",
                                    shortcut=keybinding('SelectAll'),
                                    icon=get_std_icon('DialogYesButton'),
@@ -315,11 +371,16 @@ class PMWindow(QMainWindow):
                                        icon=get_std_icon('DialogApplyButton'),
                                        triggered=self.install_packages)
         self.install_action.setEnabled(False)
+        show_packages_action = create_action(self, "Show installed packages",
+                                       icon=self.packages_icon,
+                                       triggered=self.show_installed_packages)
         quit_action = create_action(self, "&Quit",
                                     icon=get_std_icon('DialogCloseButton'),
                                     triggered=self.close)
         packages_menu = self.menuBar().addMenu("&Packages")
-        add_actions(packages_menu, [add_action, self.install_action,
+        add_actions(packages_menu, [add_action, self.remove_action,
+                                    self.install_action,
+                                    None, show_packages_action,
                                     None, quit_action])
         
         # Option menu
@@ -347,7 +408,8 @@ class PMWindow(QMainWindow):
         status.showMessage("Welcome to %s!" % self.NAME, 5000)
         
         # Button layout
-        for act in (add_action, None, select_all_action, self.install_action):
+        for act in (add_action, self.remove_action, None,
+                    select_all_action, self.install_action):
             if act is None:
                 btn_layout.addStretch()
             else:
@@ -356,10 +418,17 @@ class PMWindow(QMainWindow):
         
         self.resize(400, 500)
     
+    def refresh_install_button(self):
+        """Refresh install button enable state"""
+        self.table.refresh_distribution(self.thread.distribution)
+        self.install_action.setEnabled(\
+            len(self.get_packages_to_be_installed()) > 0)
+        self.remove_action.setEnabled(len(self.get_selected_packages()) > 0)
+    
     def toggle_repair(self, state):
         """Toggle repair mode"""
         self.table.repair = state
-        self.table.refresh_distribution(self.thread.distribution)
+        self.refresh_install_button()
     
     def distribution_changed(self, path):
         """Distribution path has just changed"""
@@ -367,6 +436,8 @@ class PMWindow(QMainWindow):
         self.table.refresh_distribution(dist)
         assert not self.thread.isRunning()
         self.thread.distribution = dist
+        self.selector.label.setText('Python %s %dbit:'
+                                    % (dist.version, dist.architecture))
     
     def add_packages(self):
         """Add packages"""
@@ -376,26 +447,51 @@ class PMWindow(QMainWindow):
         if fnames:
             self.basedir = osp.dirname(fnames[0])
             notsupported = []
+            notcompatible = []
+            dist = self.thread.distribution
             for fname in fnames:
+                bname = osp.basename(fname)
                 try:
                     package = wppm.Package(fname)
+                    if package.is_compatible_with(dist):
+                        self.table.add_package(package)
+                    else:
+                        notcompatible.append(bname)
                 except NotImplementedError:
-                    notsupported.append(osp.basename(fname))
-                self.table.add_package(package)
+                    notsupported.append(bname)
+            self.refresh_install_button()
             if notsupported:
                 QMessageBox.warning(self, "Warning",
-                                    "The following packages are not (yet) "
-                                    "supported by %s:\n\n%s"
-                                    % (self.NAME, "\n".join(notsupported)),
+                                    "The following packages are <b>not (yet) "
+                                    "supported</b> by %s:\n\n%s"
+                                    % (self.NAME, "<br>".join(notsupported)),
                                     QMessageBox.Ok)
-        self.install_action.setEnabled(len(self.table.model.packages) > 0)
-        self.table.refresh_distribution(self.thread.distribution)
+            if notcompatible:
+                QMessageBox.warning(self, "Warning", "The following packages "
+                                    "are <b>not compatible</b> with "
+                                    "Python <u>%s %dbit</u>:\n\n%s"
+                                    % (dist.version, dist.architecture,
+                                       "<br>".join(notcompatible)),
+                                    QMessageBox.Ok)
+
+    def get_selected_packages(self):
+        """Return selected packages"""
+        return [pack for pack in self.table.model.packages
+                if pack in self.table.model.checked]
+
+    def get_packages_to_be_installed(self):
+        """Return packages to be installed"""
+        return [pack for pack in self.get_selected_packages()
+                if self.table.model.actions[pack] != NONE_ACTION]
+    
+    def remove_packages(self):
+        """Remove selected packages"""
+        for package in self.get_selected_packages():
+            self.table.remove_package(package)
 
     def install_packages(self):
         """Install packages"""
-        packages = [pack for pack in self.table.model.packages
-                    if pack in self.table.model.checked
-                    and self.table.model.actions.get(pack)]
+        packages = self.get_packages_to_be_installed()
         if not packages:
             return
         for widget in self.children():
@@ -431,6 +527,31 @@ class PMWindow(QMainWindow):
         for widget in self.children():
             if isinstance(widget, QWidget):
                 widget.setEnabled(True)
+    
+    def show_installed_packages(self):
+        """Show installed packages"""
+        dist = self.thread.distribution
+        if dist is None:
+            return
+        packagelist = ["%s %s" % (pack.name, pack.version)
+                       for pack in dist.get_installed_packages()]
+        text = """Python distribution:
+-------------------
+Python %s %dbit
+%s
+
+List of installed packages: (with wppm)
+--------------------------
+%s
+""" % (dist.version, dist.architecture, dist.target, "\n".join(packagelist))
+        font = QFont("Courier new")
+        font.setPointSize(8)
+        widget = TextEditor(text, parent=self, readonly=True, font=font,
+                            size=(500, 350))
+        widget.setWindowTitle('Installed packages')
+        widget.setWindowIcon(self.packages_icon)
+        widget.edit.setWordWrapMode(QTextOption.WrapAnywhere)
+        widget.exec_()
 
     def about(self):
         """About WPpm"""
@@ -465,8 +586,10 @@ def main():
     app = QApplication([])
     win = PMWindow()
     win.show()
-    #win.basedir = osp.join(osp.dirname(__file__),
-                           #os.pardir, os.pardir, os.pardir, 'sandbox')
+    win.basedir = osp.join(osp.dirname(__file__),
+                           os.pardir, os.pardir, os.pardir, 'sandbox')
+    win.table.add_package(wppm.Package(r'D:\Pierre\installers\Cython-0.16.win-amd64-py2.7.exe'))
+    win.refresh_install_button()
     app.exec_()
 
 
