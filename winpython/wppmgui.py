@@ -588,7 +588,7 @@ def main():
     win.show()
     win.basedir = osp.join(osp.dirname(__file__),
                            os.pardir, os.pardir, os.pardir, 'sandbox')
-    win.table.add_package(wppm.Package(r'D:\Pierre\installers\Cython-0.16.win-amd64-py2.7.exe'))
+    #win.table.add_package(wppm.Package(r'D:\Pierre\installers\Cython-0.16.win-amd64-py2.7.exe'))
     win.refresh_install_button()
     app.exec_()
 

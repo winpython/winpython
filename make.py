@@ -179,20 +179,18 @@ call %~dp0env.bat
 cmd.exe /k""")
 
         self.create_python_batch('python.bat', '', '')
-        self.create_python_batch('spyder.bat', 'spyderlib', 'spyder.py')
-        self.create_python_batch('spyder_light.bat', 'spyderlib', 'spyder.py',
+        self.create_python_batch('spyder.bat', r'\Scripts', 'spyder')
+        self.create_python_batch('spyder_light.bat', r'\Scripts', 'spyder',
                                  options='--light')
-        self.create_python_batch('wppm.bat', 'winpython', 'wppmgui.pyw')
+        self.create_python_batch('wppm.bat', r'\Scripts', 'wppmgui.pyw')
         self.create_python_batch('pyqt_demo.bat',
-                                 'PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')
+             r'\Lib\site-packages\PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')
 
         self.distribution.clean_up()
         
     def create_python_batch(self, name, package_dir, script_name,
                             options=None):
         """Create batch file to run a Python script"""
-        if package_dir:
-            package_dir = r'\Lib\site-packages\%s' % package_dir
         if options is None:
             options = ''
         else:

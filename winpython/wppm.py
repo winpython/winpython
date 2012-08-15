@@ -324,12 +324,12 @@ if __name__ == '__main__':
     #fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
     #fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
     #fname = osp.join(sbdir, 'PyQtdoc-4.7.2.win-amd64.exe')
+    fname = osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
     
-    #target = r'D:\Pierre\winpython-2.7.3.amd64\python-2.7.3.amd64'
+    target = r'D:\Pierre\maketest\winpython-2.7.3.amd64\python-2.7.3.amd64'
     #extract_exe(fname)
     sbdir = r'D:\Pierre\installers'
-    tmpdir = r'D:\Pierre\tobedeleted'
     #print extract_exe(osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe'), tmpdir)
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
