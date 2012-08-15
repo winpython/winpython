@@ -13,7 +13,7 @@ from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
                                 QTableView, QMessageBox, QPushButton, QLabel,
-                                QTextOption)
+                                QTextOption, QDialog)
 from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
                                  QThread)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
@@ -32,11 +32,6 @@ add_image_path(get_module_data_path('winpython', relpath='images'))
 
 
 COLUMNS = CHECK, NAME, VERSION, ACTION = range(4)
-
-INSTALL_ACTION = 'Install'
-REPAIR_ACTION = 'Repair (reinstall)'
-UPGRADE_ACTION = 'Upgrade from v'
-NONE_ACTION = 'None (Already installed)'
 
 class PackagesModel(QAbstractTableModel):
     def __init__(self):
@@ -72,11 +67,7 @@ class PackagesModel(QAbstractTableModel):
             elif column == VERSION:
                 return to_qvariant(package.version)
             elif column == ACTION:
-                try:
-                    action = self.actions[package]
-                except KeyError:
-                    print package.name, package
-                    action = '???'
+                action = self.actions[package]
                 return to_qvariant(action)
         elif role == Qt.TextAlignmentRole:
             return to_qvariant(int(Qt.AlignLeft|Qt.AlignVCenter))
@@ -127,10 +118,16 @@ class PackagesModel(QAbstractTableModel):
         return False
 
 
+INSTALL_ACTION = 'Install'
+REPAIR_ACTION = 'Repair (reinstall)'
+NO_REPAIR_ACTION = 'None (Already installed)'
+UPGRADE_ACTION = 'Upgrade from v'
+NONE_ACTION = '-'
+
 class PackagesTable(QTableView):
-    def __init__(self, parent=None):
+    def __init__(self, parent, model_class):
         QTableView.__init__(self, parent)
-        self.model = PackagesModel()
+        self.model = model_class()
         self.setModel(self.model)
         self.repair = False
         self.resizeColumnToContents(0)
@@ -171,7 +168,7 @@ class PackagesTable(QTableView):
                 if self.repair:
                     action = REPAIR_ACTION
                 else:
-                    action = NONE_ACTION
+                    action = NO_REPAIR_ACTION
             else:
                 action = UPGRADE_ACTION + pack.version
             self.model.actions[package] = action
@@ -285,13 +282,121 @@ class InstallationThread(QThread):
     def run(self):
         self.distribution.install(self.package)
 
-class PMWindow(QMainWindow):
+class UninstallationThread(InstallationThread):
+    def run(self):
+        self.distribution.uninstall(self.package)
+
+
+class PMMixin(object):
+    def get_selected_packages(self):
+        """Return selected packages"""
+        return [pack for pack in self.table.model.packages
+                if pack in self.table.model.checked]
+
+    def install_uninstall_packages(self, packages, text1, text2):
+        """Install/uninstall packages"""
+        for widget in self.children():
+            if isinstance(widget, QWidget):
+                widget.setEnabled(False)
+        try:
+            status = self.statusBar()
+        except AttributeError:
+            status = self.parent().statusBar()
+        progress = QProgressDialog(self, Qt.FramelessWindowHint)
+        progress.setMaximum(len(packages)-1)
+        for index, package in enumerate(packages):
+            progress.setValue(index)
+            progress.setLabelText("%s %s %s..."
+                                  % (text1, package.name, package.version))
+            if progress.wasCanceled():
+                break
+            if package in self.table.model.actions:
+                try:
+                    self.thread.distribution = self.distribution
+                    self.thread.package = package
+                    self.thread.start()
+                    while self.thread.isRunning():
+                        QApplication.processEvents()
+                        if progress.wasCanceled():
+                            status.setEnabled(True)
+                            status.showMessage("Cancelling operation...")
+                    self.table.remove_package(package)
+                except Exception, error:
+                    pstr = package.name + ' ' + package.version
+                    QMessageBox.critical(self, "Error",
+                                         "<b>Unable to %s <i>%s</i></b>"
+                                         "<br><br>Error message:<br>%s"
+                                         % (text2, pstr, unicode(error)))
+        progress.setValue(progress.maximum())
+        status.clearMessage()
+        for widget in self.children():
+            if isinstance(widget, QWidget):
+                widget.setEnabled(True)
+
+
+class InstalledPackagesModel(PackagesModel):
+    def columnCount(self, index=QModelIndex()):
+        return len(COLUMNS) - 1
+
+class InstalledPackagesTable(PackagesTable):
+    def refresh_distribution(self, dist):
+        self.distribution = dist
+        self.model.packages = self.distribution.get_installed_packages()
+        for package in self.model.packages:
+            self.model.actions[package] = NONE_ACTION
+        self.model.reset()
+
+class InstalledPackagesDialog(QDialog, PMMixin):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        PMMixin.__init__(self)
+        
+        self.setWindowTitle('Installed packages')
+        self.setWindowIcon(parent.packages_icon)
+        
+        self.thread = None
+        self.distribution = parent.distribution
+        
+        self.table = InstalledPackagesTable(self, InstalledPackagesModel)
+        self.table.refresh_distribution(self.distribution)
+        self.connect(self.table, SIGNAL("clicked(QModelIndex)"),
+                     lambda index: self.refresh_uninstall_button())
+        
+        self.uninstall_action = create_action(self, "&Uninstall packages",
+                                       icon=get_std_icon('DialogCancelButton'),
+                                       triggered=self.uninstall_packages)
+        self.uninstall_action.setEnabled(False)
+        
+        uninstall_btn = action2button(self.uninstall_action, autoraise=False,
+                                      text_beside_icon=True)
+        vlayout = QVBoxLayout()
+        vlayout.addWidget(self.table)
+        vlayout.addWidget(uninstall_btn)
+        self.setLayout(vlayout)
+    
+    def refresh_uninstall_button(self):
+        """Refresh uninstall button enable state"""
+        self.uninstall_action.setEnabled(len(self.get_selected_packages()) > 0)
+
+    def uninstall_packages(self):
+        """Uninstall packages"""
+        packages = self.get_selected_packages()
+        if packages:
+            self.thread = UninstallationThread(self)
+            self.install_uninstall_packages(packages,
+                                            'Uninstalling', 'uninstall')
+            self.thread = None
+
+
+class PMWindow(QMainWindow, PMMixin):
     NAME = 'WPPM'
     def __init__(self):
         QMainWindow.__init__(self)
+        PMMixin.__init__(self)
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.thread = InstallationThread(self)
-        self.packages = None
+        self.thread = None
+        self.distribution = None
         
         self.selector = None
         self.table = None
@@ -314,12 +419,14 @@ class PMWindow(QMainWindow):
         self.connect(self.selector, SIGNAL('selected_distribution(QString)'),
                      self.distribution_changed)
 
-        self.table = PackagesTable()
+        self.table = PackagesTable(self, PackagesModel)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.verticalHeader().hide()
         self.table.setShowGrid(False)
         self.connect(self.table, SIGNAL('package_added()'),
                      self.refresh_install_button)
+        self.connect(self.table, SIGNAL("clicked(QModelIndex)"),
+                     lambda index: self.refresh_install_button())
 
         self.selector.set_distribution(sys.prefix)
         self.distribution_changed(sys.prefix)
@@ -420,7 +527,7 @@ class PMWindow(QMainWindow):
     
     def refresh_install_button(self):
         """Refresh install button enable state"""
-        self.table.refresh_distribution(self.thread.distribution)
+        self.table.refresh_distribution(self.distribution)
         self.install_action.setEnabled(\
             len(self.get_packages_to_be_installed()) > 0)
         self.remove_action.setEnabled(len(self.get_selected_packages()) > 0)
@@ -434,8 +541,7 @@ class PMWindow(QMainWindow):
         """Distribution path has just changed"""
         dist = wppm.Distribution(unicode(path))
         self.table.refresh_distribution(dist)
-        assert not self.thread.isRunning()
-        self.thread.distribution = dist
+        self.distribution = dist
         self.selector.label.setText('Python %s %dbit:'
                                     % (dist.version, dist.architecture))
     
@@ -448,7 +554,7 @@ class PMWindow(QMainWindow):
             self.basedir = osp.dirname(fnames[0])
             notsupported = []
             notcompatible = []
-            dist = self.thread.distribution
+            dist = self.distribution
             for fname in fnames:
                 bname = osp.basename(fname)
                 try:
@@ -474,15 +580,11 @@ class PMWindow(QMainWindow):
                                        "<br>".join(notcompatible)),
                                     QMessageBox.Ok)
 
-    def get_selected_packages(self):
-        """Return selected packages"""
-        return [pack for pack in self.table.model.packages
-                if pack in self.table.model.checked]
-
     def get_packages_to_be_installed(self):
         """Return packages to be installed"""
         return [pack for pack in self.get_selected_packages()
-                if self.table.model.actions[pack] != NONE_ACTION]
+                if self.table.model.actions[pack]
+                not in (NO_REPAIR_ACTION, NONE_ACTION)]
     
     def remove_packages(self):
         """Remove selected packages"""
@@ -494,64 +596,17 @@ class PMWindow(QMainWindow):
         packages = self.get_packages_to_be_installed()
         if not packages:
             return
-        for widget in self.children():
-            if isinstance(widget, QWidget):
-                widget.setEnabled(False)
-        status = self.statusBar()
-        progress = QProgressDialog(self, Qt.FramelessWindowHint)
-        progress.setMaximum(len(packages)-1)
-        for index, package in enumerate(packages):
-            progress.setValue(index)
-            progress.setLabelText("Installing %s %s..."
-                                  % (package.name, package.version))
-            if progress.wasCanceled():
-                break
-            if package in self.table.model.actions:
-                try:
-                    self.thread.package = package
-                    self.thread.start()
-                    while self.thread.isRunning():
-                        QApplication.processEvents()
-                        if progress.wasCanceled():
-                            status.setEnabled(True)
-                            status.showMessage("Cancelling operation...")
-                    self.table.remove_package(package)
-                except Exception, error:
-                    pstr = package.name + ' ' + package.version
-                    QMessageBox.critical(self, "Error",
-                                         "<b>Unable to install <i>%s</i></b>"
-                                         "<br><br>Error message:<br>%s"
-                                         % (pstr, unicode(error)))
-        progress.setValue(progress.maximum())
-        status.clearMessage()
-        for widget in self.children():
-            if isinstance(widget, QWidget):
-                widget.setEnabled(True)
+        packages = self.get_selected_packages()
+        if packages:
+            self.thread = InstallationThread(self)
+            self.install_uninstall_packages(packages, 'Installing', 'install')
+            self.thread = None
     
     def show_installed_packages(self):
         """Show installed packages"""
-        dist = self.thread.distribution
-        if dist is None:
-            return
-        packagelist = ["%s %s" % (pack.name, pack.version)
-                       for pack in dist.get_installed_packages()]
-        text = """Python distribution:
--------------------
-Python %s %dbit
-%s
-
-List of installed packages: (with wppm)
---------------------------
-%s
-""" % (dist.version, dist.architecture, dist.target, "\n".join(packagelist))
-        font = QFont("Courier new")
-        font.setPointSize(8)
-        widget = TextEditor(text, parent=self, readonly=True, font=font,
-                            size=(500, 350))
-        widget.setWindowTitle('Installed packages')
-        widget.setWindowIcon(self.packages_icon)
-        widget.edit.setWordWrapMode(QTextOption.WrapAnywhere)
-        widget.exec_()
+        dlg = InstalledPackagesDialog(self)
+        dlg.exec_()
+        self.refresh_install_button()
 
     def about(self):
         """About WPpm"""
