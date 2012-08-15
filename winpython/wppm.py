@@ -132,6 +132,13 @@ class Package(object):
             raise
         self.files, self.folders = log
     
+    def remove_log(self, logdir):
+        """Remove log (after uninstalling package)"""
+        try:
+            os.remove(self.logpath(logdir))
+        except WindowsError:
+            pass
+    
     def print_action(self, action):
         """Print action text (e.g. 'Installing') indicating progress"""
         text = " ".join([action, self.name, self.version])
@@ -258,6 +265,7 @@ python "%~dpn0""" + ext + """" %*""")
                     os.rmdir(path)
             except OSError:
                 pass
+        package.remove_log(self.logdir)
     
     def install_bdist_wininst(self, package):
         """Install a distutils package built with the bdist_wininst option
