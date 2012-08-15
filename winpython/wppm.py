@@ -19,28 +19,36 @@ from winpython import utils
 #==============================================================================
 # Extract functions
 #==============================================================================
+def  _init_target_dir(targetdir, fname):
+    if targetdir is None:
+        targetdir = fname[:-4]
+    else:
+        targetdir = osp.join(targetdir, osp.basename(fname)[:-4])
+        if not osp.isdir(targetdir):
+            os.mkdir(targetdir)
+    return targetdir
+
 def extract_msi(fname, targetdir=None):
     '''Extract .msi installer to the directory of the same name    
     msiexec.exe /a "python-%PYVER%%PYARC%.msi" /qn TARGETDIR="%PYDIR%"'''
+    targetdir = _init_target_dir(targetdir, fname)
     extract = 'msiexec.exe'
     assert utils.is_program_installed(extract)
     bname = osp.basename(fname)
-    args = ['/a', '%s' % bname, '/qn', 'TARGETDIR=%s' % fname[:-4]]
+    args = ['/a', '%s' % bname, '/qn', 'TARGETDIR=%s' % targetdir]
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
-    if targetdir is not None:
-        shutil.move(fname[:-4], osp.join(targetdir, bname[:-4]))
-
+    return targetdir
 
 def extract_exe(fname, targetdir=None):
     '''Extract .exe archive to the directory of the same name    
     7z x -o"%1" -aos "%1.exe"'''
+    targetdir = _init_target_dir(targetdir, fname)
     extract = '7z.exe'
     assert utils.is_program_installed(extract)
     bname = osp.basename(fname)
-    args = ['x', '-o%s' % bname[:-4], '-aos', bname]
+    args = ['x', '-o%s' % targetdir, '-aos', bname]
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
-    if targetdir is not None:
-        shutil.move(fname[:-4], osp.join(targetdir, bname[:-4]))
+    return targetdir
 
 
 #==============================================================================
@@ -161,9 +169,10 @@ class Distribution(object):
             os.mkdir(path)
         self.logdir = path
     
-    def copy_files(self, package, srcdir, dstdir, create_bat_files=False):
+    def copy_files(self, package, targetdir,
+                   srcdir, dstdir, create_bat_files=False):
         """Add copy task"""
-        srcdir = osp.join(package.fname[:-4], srcdir)
+        srcdir = osp.join(targetdir, srcdir)
         if not osp.isdir(srcdir):
             return
         offset = len(srcdir)+len(os.pathsep)
@@ -183,7 +192,7 @@ class Distribution(object):
                 dst = osp.join(dstdir, t_fname)
                 full_dst = osp.join(self.target, dst)
                 print "file:", dst
-                shutil.copyfile(src, full_dst)
+                shutil.move(src, full_dst)
                 package.files.append(dst)
                 name, ext = osp.splitext(dst)
                 if create_bat_files and ext in ('', '.py'):
@@ -218,7 +227,7 @@ python "%~dpn0""" + ext + """" %*""")
         self.uninstall_existing(package)
         bname = osp.basename(package.fname)
         if bname.endswith('.exe'):
-            if bname.startswith(self.NSIS_PACKAGES):
+            if re.match(r'(' + ('|'.join(self.NSIS_PACKAGES)) + r')-', bname):
                 self.install_nsis_package(package)
             else:
                 self.install_bdist_wininst(package)
@@ -235,7 +244,8 @@ python "%~dpn0""" + ext + """" %*""")
         for fname in reversed(package.files):
             print "remove:", fname
             path = osp.join(self.target, fname)
-            os.remove(path)
+            if osp.exists(path):
+                os.remove(path)
             if fname.endswith('.py'):
                 for suffix in ('c', 'o'):
                     if osp.exists(path+suffix):
@@ -243,30 +253,35 @@ python "%~dpn0""" + ext + """" %*""")
         for dname in reversed(package.folders):
             try:
                 print "rmdir:", dname
-                os.rmdir(osp.join(self.target, dname))
+                path = osp.join(self.target, dname)
+                if osp.exists(path):
+                    os.rmdir(path)
             except OSError:
                 pass
-
+    
     def install_bdist_wininst(self, package):
         """Install a distutils package built with the bdist_wininst option
         (binary distribution, .exe file)"""
         package.print_action("Extracting")
-        extract_exe(package.fname)
+        targetdir = extract_exe(package.fname, targetdir=self.target)
         package.print_action("Installing")
-        self.copy_files(package, 'PURELIB', osp.join('Lib', 'site-packages'))
-        self.copy_files(package, 'PLATLIB', osp.join('Lib', 'site-packages'))
-        self.copy_files(package, 'SCRIPTS', 'Scripts', create_bat_files=True)
-        self.copy_files(package, 'DLLs', 'DLLs')
-        self.copy_files(package, 'DATA', '.')
-        self.remove_directory(package.fname[:-4])
+        self.copy_files(package, targetdir, 'PURELIB',
+                        osp.join('Lib', 'site-packages'))
+        self.copy_files(package, targetdir, 'PLATLIB',
+                        osp.join('Lib', 'site-packages'))
+        self.copy_files(package, targetdir, 'SCRIPTS', 'Scripts',
+                        create_bat_files=True)
+        self.copy_files(package, targetdir, 'DLLs', 'DLLs')
+        self.copy_files(package, targetdir, 'DATA', '.')
+        self.remove_directory(targetdir)
 
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
         (binary distribution, .msi file)"""
         raise NotImplementedError
         package.print_action("Extracting")
-        extract_msi(package.fname)
-        self.remove_directory(package.fname[:-4])
+        targetdir = extract_msi(package.fname, targetdir=self.target)
+        self.remove_directory(targetdir)
 
     def install_sdist(self, package):
         """Install a distutils package built with the sdist option
@@ -279,17 +294,17 @@ python "%~dpn0""" + ext + """" %*""")
         bname = osp.basename(package.fname)
         assert bname.startswith(self.NSIS_PACKAGES)
         package.print_action("Extracting")
-        extract_exe(package.fname)
+        targetdir = extract_exe(package.fname, targetdir=self.target)
         package.print_action("Installing")
-        self.copy_files(package, 'Lib', 'Lib')
+        self.copy_files(package, targetdir, 'Lib', 'Lib')
         if bname.startswith('PyQt'):
             # PyQt4
             outdir = osp.join('Lib', 'site-packages', 'PyQt4')
         else:
             # Qwt5
             outdir = osp.join('Lib', 'site-packages', 'PyQt4', 'Qwt5')
-        self.copy_files(package, '$_OUTDIR', outdir)
-        self.remove_directory(package.fname[:-4])
+        self.copy_files(package, targetdir, '$_OUTDIR', outdir)
+        self.remove_directory(targetdir)
 
 
 if __name__ == '__main__':
@@ -305,16 +320,21 @@ if __name__ == '__main__':
             #pass
     
     #fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
-    #fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
-    fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
-    fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
+    fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
+    #fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
+    #fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
+    #fname = osp.join(sbdir, 'PyQtdoc-4.7.2.win-amd64.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
+    
+    #target = r'D:\Pierre\winpython-2.7.3.amd64\python-2.7.3.amd64'
     #extract_exe(fname)
-    #extract_msi(osp.join(tmpdir, 'python-2.7.3.amd64.msi'))
+    sbdir = r'D:\Pierre\installers'
+    tmpdir = r'D:\Pierre\tobedeleted'
+    #print extract_exe(osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe'), tmpdir)
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 
     dist = Distribution(target)
     pack = Package(fname)
-    #dist.install(pack)
+    dist.install(pack)
     #dist.uninstall(pack)

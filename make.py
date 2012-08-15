@@ -95,7 +95,8 @@ class WinPythonDistribution(object):
     def make(self):
         """Make WinPython distribution in target directory from the installers 
         located in instdir"""
-        python_fname = self.get_package_fname(r'python-([0-9\.]*)')
+        python_fname = self.get_package_fname(
+                                    r'python-([0-9\.]*)(\.amd64)?\.msi')
         python_name = osp.basename(python_fname)[:-4]
         distname = 'win%s' % python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
@@ -139,16 +140,20 @@ class WinPythonDistribution(object):
         file(osp.join(pydir, 'qt.conf'), 'w').write("""[Paths]
 Prefix = ./Lib/site-packages/PyQt4
 Binaries = ./Lib/site-packages/PyQt4""")
+        file(osp.join(pydir, 'Lib', 'site-packages', 'PyQt4', 'qt.conf'),
+             'w').write("""[Paths]
+Prefix = .
+Binaries = .""")
         self.install_package(
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
                             % (self.version, arch1))
         
-        ## Try to install all other packages in instdir
-        #for fname in os.listdir(self.instdir):
-            #try:
-                #self.install_package(fname)
-            #except NotImplementedError:
-                #pass
+        # Try to install all other packages in instdir
+        for fname in os.listdir(self.instdir):
+            try:
+                self.install_package(fname)
+            except NotImplementedError:
+                pass
         
         # Show stats
         utils.print_box("Installed packages")
