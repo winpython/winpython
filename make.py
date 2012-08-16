@@ -11,6 +11,8 @@ import re
 import subprocess
 import shutil
 
+from guidata import disthelpers
+
 # Local imports
 from winpython import wppm, utils
 
@@ -118,6 +120,13 @@ class WinPythonDistribution(object):
         pydir = osp.join(self.winpydir, python_name)
         self.distribution = wppm.Distribution(pydir)
         os.mkdir(osp.join(pydir, 'Scripts'))
+        
+        # Adding Microsoft Visual Studio 2008 DLLs and manifest
+        print("Adding Microsoft Visual C++ 2008 DLLs with manifest""")
+        for fname in disthelpers.get_visual_studio_dlls(
+                                architecture=self.distribution.architecture,
+                                python_version=self.distribution.version):
+            shutil.copy(fname, pydir)
 
         arch2 = 'win-amd64' if 'amd64' in distname else 'win32'
 
