@@ -177,7 +177,6 @@ Binaries = .""")
         # Create batch scripts
         self.create_batch_script('env.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + python_name + r"""
-set PATH=%WINPYDIR%\Lib\site-packages\pywin32_system32;%PATH%
 set PATH=%WINPYDIR%\Lib\site-packages\PyQt4;%PATH%
 set PATH=%PATH%;%WINPYDIR%\;%WINPYDIR%\DLLs;%WINPYDIR%\Scripts
 set PATH=%PATH%;%~dp0..\tools;%~dp0..\tools\gnuwin32\bin

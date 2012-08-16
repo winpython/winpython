@@ -196,7 +196,11 @@ class Distribution(object):
             for fname in filenames:
                 t_fname = osp.join(dirpath, fname)[offset:]
                 src = osp.join(srcdir, t_fname)
-                dst = osp.join(dstdir, t_fname)
+                if dirpath.endswith('_system32'):
+                    # Files that should be copied in %WINDIR%\system32
+                    dst = fname
+                else:
+                    dst = osp.join(dstdir, t_fname)
                 full_dst = osp.join(self.target, dst)
                 print "file:", dst
                 shutil.move(src, full_dst)
