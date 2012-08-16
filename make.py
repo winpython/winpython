@@ -118,6 +118,7 @@ class WinPythonDistribution(object):
         wppm.extract_msi(python_fname, targetdir=self.winpydir)
         self.installed_packages.append(python_fname)
         pydir = osp.join(self.winpydir, python_name)
+        os.remove(osp.join(pydir, osp.basename(python_fname)))
         self.distribution = wppm.Distribution(pydir)
         os.mkdir(osp.join(pydir, 'Scripts'))
         
