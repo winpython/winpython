@@ -9,8 +9,8 @@
 ^build/
 ^dist/
 ^bin/
-^tools/TortoiseHg-x86/
-^tools/TortoiseHg-x64/
+^tools/gnuwin32/
+^tools/TortoiseHg/
 ^tools/WinMerge/
 ^winpython.egg-info/
 MANIFEST$

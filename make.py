@@ -132,8 +132,7 @@ class WinPythonDistribution(object):
     def postpath(self):
         """Return PATH contents to be append to the environment variable"""
         return ["", "DLLs", "Scripts",
-                r"..\tools", r"..\tools\gnuwin32\bin",
-                r"..\tools\TortoiseHg-%s" % self.ms_arch]
+                r"..\tools", r"..\tools\gnuwin32\bin", r"..\tools\TortoiseHg"]
         
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdir"""
@@ -142,7 +141,8 @@ class WinPythonDistribution(object):
             if match is not None:
                 return osp.abspath(osp.join(self.instdir, fname))
         else:
-            raise RuntimeError, 'Could not found required package matching %s' % pattern
+            raise RuntimeError,\
+                  'Could not found required package matching %s' % pattern
     
     def install_package(self, pattern):
         """Install package matching pattern"""
@@ -304,7 +304,7 @@ class WinPythonDistribution(object):
                              workdir='${WINPYDIR}\Scripts')
         self.create_launcher('PyQtdemo.exe', 'qt.ico', args='qtdemo.pyw',
            workdir='${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
-        thg = r'\tools\TortoiseHg-%s\thg.exe' % self.ms_arch
+        thg = r'\tools\TortoiseHg\thgw.exe'
         if osp.isfile(self.winpydir + thg):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
                                  command=r'${WINPYDIR}\..' + thg,
