@@ -300,7 +300,7 @@ class WinPythonDistribution(object):
                              args='spyder --light',
                              workdir='${WINPYDIR}\Scripts')
         self.create_launcher('WPPM.exe', 'winpython.ico',
-                             args='wppmgui.pyw',
+                             args='wppmgui',
                              workdir='${WINPYDIR}\Scripts')
         self.create_launcher('PyQtdemo.exe', 'qt.ico', args='qtdemo.pyw',
            workdir='${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')

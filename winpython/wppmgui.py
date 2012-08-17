@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2012 Pierre Raybaut
+# Copyright Â© 2012 Pierre Raybaut
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
 
@@ -18,14 +18,13 @@ from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
                                 QTableView, QMessageBox, QPushButton, QLabel,
-                                QTextOption, QDialog)
+                                QDialog)
 from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
                                  QThread)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
 
 from spyderlib.widgets.internalshell import InternalShell
-from spyderlib.widgets.texteditor import TextEditor
 from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
                                        get_std_icon, action2button,
                                        mimedata2url)
@@ -643,6 +642,9 @@ class PMWindow(QMainWindow, PMMixin):
 
         
 def main():
+    from spyderlib.spyder import set_attached_console_visible
+    set_attached_console_visible(False)
+    
     app = QApplication([])
     win = PMWindow()
     win.show()
