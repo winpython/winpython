@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+# Copyright © 2012 Pierre Raybaut
+# Licensed under the terms of the MIT License
+# (see winpython/__init__.py for details)
+
 """
 WinPython Package Manager
 
