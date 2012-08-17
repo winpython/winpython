@@ -9,36 +9,17 @@ Licensed under the terms of the MIT License
     Overview
 
         WinPython is a portable distribution of the Python programming 
-        language for Windows.
+        language for Windows (http://code.google.com/p/winpython).
+		
+		This is the `winpython` Python package, not the distribution itself.
+		It includes two main features:
 
-        It is a full-featured Python-based scientific environment:
-
-            Designed for:
-                Regular scientific users: interactive data processing and 
-                visualization using Python with Spyder (thanks to the 
-                integrated libraries NumPy, SciPy, Matplotlib, guiqwt, etc.)
-
-                Advanced scientific users and software developers: Python 
-                applications development with Spyder (based on the integrated 
-                libraries NumPy, SciPy, PyQt, h5py, guidata, guiqwt, etc.), 
-                version control with Mercurial and other development tools 
-                (like gettext, WinMerge, etc.)
-
-            Portable: preconfigured, it should run out of the box on any 
-            machine under Windows (without any installation requirements) 
-            and the folder containing WinPython can be moved to any location 
-            (local, network or removable drive)
-
-            Flexible: one can install (or should I write "use" as it's 
-            portable) as many WinPython versions as necessary (like isolated 
-            and self-consistent environments), even if those versions are 
-            running different versions of Python (2.7, 3.x in the near future) 
-            or different architectures (32bit or 64bit) on the same machine
-
-            Customizable: using the integrated package manager (wppm, as 
-            WinPython Package Manager), it's possible to install or uninstall 
-            any standard Python package built with distutils 
-            (e.g. "dummypackage-2.1.win-amd64-py2.7.‌exe").
+			The WinPython Package Manager (WPPM): let you install/uninstall 
+            to your WinPython distribution any standard Python package built 
+			with distutils (e.g. "dummypackage-2.1.win-amd64-py2.7.‌exe")
+			
+			The WinPython build toolchain: make.py is the script used to 
+			build a WinPython distribution from (almost) scratch.
 
     Dependencies
     
@@ -68,7 +49,8 @@ Licensed under the terms of the MIT License
         upgrade an existing installation using `pip`:
         http://pypi.python.org/pypi
 
-        But the easiest way to install the last stable release of WinPython is by using an executable installer: http://winpython.googlecode.com
+        But the easiest way to install the last stable release of WinPython is 
+		by using an executable installer: http://winpython.googlecode.com
             
     More informations
     
