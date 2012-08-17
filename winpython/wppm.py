@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2012 Pierre Raybaut
+# Copyright Â© 2012 Pierre Raybaut
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
 
@@ -10,9 +10,10 @@ WinPython Package Manager
 Created on Fri Aug 03 14:32:26 2012
 """
 
+from __future__ import print_function
+
 import os
 import os.path as osp
-import subprocess
 import shutil
 import cPickle
 import re
@@ -21,44 +22,6 @@ import sys
 # Local imports
 from winpython import utils
 
-#==============================================================================
-# Extract functions
-#==============================================================================
-def  _init_target_dir(targetdir, fname):
-    if targetdir is None:
-        targetdir = fname[:-4]
-    else:
-        targetdir = osp.join(targetdir, osp.basename(fname)[:-4])
-        if not osp.isdir(targetdir):
-            os.mkdir(targetdir)
-    return targetdir
-
-def extract_msi(fname, targetdir=None):
-    '''Extract .msi installer to the directory of the same name    
-    msiexec.exe /a "python-%PYVER%%PYARC%.msi" /qn TARGETDIR="%PYDIR%"'''
-    targetdir = _init_target_dir(targetdir, fname)
-    extract = 'msiexec.exe'
-    assert utils.is_program_installed(extract)
-    bname = osp.basename(fname)
-    args = ['/a', '%s' % bname, '/qn', 'TARGETDIR=%s' % targetdir]
-    subprocess.call([extract]+args, cwd=osp.dirname(fname))
-    return targetdir
-
-def extract_exe(fname, targetdir=None):
-    '''Extract .exe archive to the directory of the same name    
-    7z x -o"%1" -aos "%1.exe"'''
-    targetdir = _init_target_dir(targetdir, fname)
-    extract = '7z.exe'
-    assert utils.is_program_installed(extract)
-    bname = osp.basename(fname)
-    args = ['x', '-o%s' % targetdir, '-aos', bname]
-    subprocess.call([extract]+args, cwd=osp.dirname(fname))
-    return targetdir
-
-
-#==============================================================================
-# Package and Distribution classes
-#==============================================================================
 
 class Package(object):
     def __init__(self, fname):
@@ -143,17 +106,14 @@ class Package(object):
             os.remove(self.logpath(logdir))
         except WindowsError:
             pass
-    
-    def print_action(self, action):
-        """Print action text (e.g. 'Installing') indicating progress"""
-        text = " ".join([action, self.name, self.version])
-        utils.print_box(text)
         
 
 class Distribution(object):
     NSIS_PACKAGES = ('PyQt', 'PyQwt')  # known NSIS packages
-    def __init__(self, target):
+    def __init__(self, target, verbose=False, indent=False):
         self.target = target
+        self.verbose = verbose
+        self.indent = indent
         self.logdir = None
         self.init_log_dir()
         self.to_be_removed = []  # list of directories to be removed later
@@ -193,8 +153,9 @@ class Distribution(object):
                 t_dname = osp.join(dirpath, dname)[offset:]
                 src = osp.join(srcdir, t_dname)
                 dst = osp.join(dstdir, t_dname)
+                if self.verbose:
+                    print("mkdir: %s" % dst)
                 full_dst = osp.join(self.target, dst)
-                print "mkdir:", dst
                 if not osp.exists(full_dst):
                     os.mkdir(full_dst)
                 package.folders.append(dst)
@@ -206,20 +167,31 @@ class Distribution(object):
                     dst = fname
                 else:
                     dst = osp.join(dstdir, t_fname)
+                if self.verbose:
+                    print("file:  %s" % dst)
                 full_dst = osp.join(self.target, dst)
-                print "file:", dst
                 shutil.move(src, full_dst)
                 package.files.append(dst)
                 name, ext = osp.splitext(dst)
                 if create_bat_files and ext in ('', '.py'):
                     dst = name + '.bat'
+                    if self.verbose:
+                        print("file:  %s" % dst)
                     full_dst = osp.join(self.target, dst)
-                    print "file:", dst
                     fd = file(full_dst, 'w')
                     fd.write("""@echo off
 python "%~dpn0""" + ext + """" %*""")
                     fd.close()
                     package.files.append(dst)
+
+    def create_file(self, package, name, dstdir, contents):
+        """Generate data file -- path is relative to distribution root dir"""
+        dst = osp.join(dstdir, name)
+        if self.verbose:
+            print("create:  %s" % dst)
+        full_dst = osp.join(self.target, dst)
+        file(full_dst, 'w').write(contents)
+        package.files.append(dst)
 
     def get_installed_packages(self):
         """Return installed packages"""
@@ -251,14 +223,44 @@ python "%~dpn0""" + ext + """" %*""")
             self.install_bdist_msi(package)
         elif bname.endswith(('.tar.gz', '.zip')):
             self.install_sdist(package)
+        self.handle_specific_packages(package)
         package.save_log(self.logdir)
+
+    def handle_specific_packages(self, package):
+        """Packages requiring additional configuration"""
+        if package.name in ('PyQt', 'PyQt4'):
+            name = 'qt.conf'
+            contents = """[Paths]
+Prefix = .
+Binaries = ."""
+            self.create_file(package, name,
+                         osp.join('Lib', 'site-packages', 'PyQt4'),  contents)
+            self.create_file(package, name, '.',
+                         contents.replace('.', './Lib/site-packages/PyQt4'))
+    
+    def _print(self, package, action):
+        """Print package-related action text (e.g. 'Installing') 
+        indicating progress"""
+        text = " ".join([action, package.name, package.version])
+        if self.verbose:
+            utils.print_box(text)
+        else:
+            if self.indent:
+                text = (' '*4) + text
+            print(text + '...', end=" ")
+    
+    def _print_done(self):
+        """Print OK at the end of a process"""
+        if not self.verbose:
+            print("OK")
     
     def uninstall(self, package):
         """Uninstall package from distribution"""
-        package.print_action("Uninstalling")
+        self._print(package, "Uninstalling")
         package.load_log(self.logdir)
         for fname in reversed(package.files):
-            print "remove:", fname
+            if self.verbose:
+                print("remove: %s" % fname)
             path = osp.join(self.target, fname)
             if osp.exists(path):
                 os.remove(path)
@@ -268,20 +270,24 @@ python "%~dpn0""" + ext + """" %*""")
                         os.remove(path+suffix)
         for dname in reversed(package.folders):
             try:
-                print "rmdir:", dname
+                if self.verbose:
+                    print("rmdir:  %s" % fname)
                 path = osp.join(self.target, dname)
                 if osp.exists(path):
                     os.rmdir(path)
             except OSError:
                 pass
         package.remove_log(self.logdir)
+        self._print_done()
     
     def install_bdist_wininst(self, package):
         """Install a distutils package built with the bdist_wininst option
         (binary distribution, .exe file)"""
-        package.print_action("Extracting")
-        targetdir = extract_exe(package.fname, targetdir=self.target)
-        package.print_action("Installing")
+        self._print(package, "Extracting")
+        targetdir = utils.extract_exe(package.fname, targetdir=self.target)
+        self._print_done()
+        
+        self._print(package, "Installing")
         self.copy_files(package, targetdir, 'PURELIB',
                         osp.join('Lib', 'site-packages'))
         self.copy_files(package, targetdir, 'PLATLIB',
@@ -291,13 +297,15 @@ python "%~dpn0""" + ext + """" %*""")
         self.copy_files(package, targetdir, 'DLLs', 'DLLs')
         self.copy_files(package, targetdir, 'DATA', '.')
         self.remove_directory(targetdir)
+        self._print_done()
 
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
         (binary distribution, .msi file)"""
         raise NotImplementedError
-        package.print_action("Extracting")
-        targetdir = extract_msi(package.fname, targetdir=self.target)
+        self._print(package, "Extracting")
+        targetdir = utils.extract_msi(package.fname, targetdir=self.target)
+        self._print_done()
         self.remove_directory(targetdir)
 
     def install_sdist(self, package):
@@ -310,9 +318,11 @@ python "%~dpn0""" + ext + """" %*""")
         (binary distribution, .exe file)"""
         bname = osp.basename(package.fname)
         assert bname.startswith(self.NSIS_PACKAGES)
-        package.print_action("Extracting")
-        targetdir = extract_exe(package.fname, targetdir=self.target)
-        package.print_action("Installing")
+        self._print(package, "Extracting")
+        targetdir = utils.extract_exe(package.fname, targetdir=self.target)
+        self._print_done()
+
+        self._print(package, "Installing")
         self.copy_files(package, targetdir, 'Lib', 'Lib')
         if bname.startswith('PyQt'):
             # PyQt4
@@ -322,6 +332,7 @@ python "%~dpn0""" + ext + """" %*""")
             outdir = osp.join('Lib', 'site-packages', 'PyQt4', 'Qwt5')
         self.copy_files(package, targetdir, '$_OUTDIR', outdir)
         self.remove_directory(targetdir)
+        self._print_done()
 
 
 if __name__ == '__main__':
@@ -341,17 +352,14 @@ if __name__ == '__main__':
     #fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
     #fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
     #fname = osp.join(sbdir, 'PyQtdoc-4.7.2.win-amd64.exe')
-    fname = osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe')
+    #fname = osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
     
     target = r'D:\Pierre\maketest\winpython-2.7.3.amd64\python-2.7.3.amd64'
-    #extract_exe(fname)
     sbdir = r'D:\Pierre\installers'
-    #print extract_exe(osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe'), tmpdir)
-    #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
-    #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
+    fname = osp.join(sbdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe')
 
-    dist = Distribution(target)
+    dist = Distribution(target, verbose=False)
     pack = Package(fname)
     dist.install(pack)
     #dist.uninstall(pack)
