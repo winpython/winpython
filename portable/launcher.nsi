@@ -1,18 +1,27 @@
-; Copyright © 2012 Pierre Raybaut
-; Licensed under the terms of the MIT License
-; (see winpython/__init__.py for details)
+/*
+
+WinPython launcher template script
+
+Copyright © 2012 Pierre Raybaut
+Licensed under the terms of the MIT License
+(see winpython/__init__.py for details)
+ 
+*/
 
 !include "FileFunc.nsh"
 
-; The following lines are automatically replaced when creating launchers:
-!define WINPYDIR "$EXEDIR\python-2.7.3.amd64"
-!define COMMAND "${WINPYDIR}\python.exe"
+;================================================================
+; These lines are automatically replaced when creating launchers:
+; (see winpython/make.py)
+!define WINPYDIR ""
+!define COMMAND ""
 !define PARAMETERS ""
 !define WORKDIR ""
-!define PREPATH "${WINPYDIR}\Lib\site-packages\PyQt4"
-!define POSTPATH "${WINPYDIR}\;${WINPYDIR}\DLLs;${WINPYDIR}\Scripts;${WINPYDIR}\..\tools;${WINPYDIR}\..\tools\gnuwin32\bin;${WINPYDIR}\..\tools\TortoiseHg-x64"
-Icon "icons\python.ico"
-OutFile "python.exe"
+!define PREPATH ""
+!define POSTPATH ""
+Icon ""
+OutFile ""
+;================================================================
 
 SilentInstall silent
 AutoCloseWindow true

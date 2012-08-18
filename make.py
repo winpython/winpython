@@ -101,7 +101,10 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, target, instdir, verbose=False):
+    def __init__(self, build_number, release_level,
+                 target, instdir, verbose=False):
+        self.build_number = build_number
+        self.release_level = release_level
         self.target = target
         self.instdir = instdir
         self.verbose = verbose
@@ -162,6 +165,20 @@ class WinPythonDistribution(object):
         fd.write(contents)
         fd.close()
     
+    def build_nsis(self, srcname, dstname, data):
+        """Build NSIS script"""
+        portable_dir = osp.join(osp.dirname(__file__), 'portable')
+        shutil.copy(osp.join(portable_dir, srcname), dstname)
+        replace_in_nsis_file(dstname, data)
+        try:
+            retcode = subprocess.call('"%s" -V2 %s' % (NSIS_EXE, dstname),
+                                      shell=True)
+            if retcode < 0:
+                print >>sys.stderr, "Child was terminated by signal", -retcode
+        except OSError, e:
+            print >>sys.stderr, "Execution failed:", e
+        os.remove(dstname)
+    
     def create_launcher(self, name, icon,
                         command=None, args=None, workdir=None):
         """Create exe launcher with NSIS"""
@@ -169,8 +186,6 @@ class WinPythonDistribution(object):
         portable_dir = osp.join(osp.dirname(__file__), 'portable')
         icon_fname = osp.join(portable_dir, 'icons', icon)
         assert osp.isfile(icon_fname)
-        fname = osp.join(self.winpydir, osp.splitext(name)[0]+'.nsi')
-        shutil.copy(osp.join(portable_dir, 'launcher.nsi'), fname)
         
         # Customizing NSIS script
         conv = lambda path: ";".join(['${WINPYDIR}\\'+pth for pth in path])
@@ -185,25 +200,17 @@ class WinPythonDistribution(object):
             args = ''
         if workdir is None:
             workdir = ''
-        replace_in_nsis_file(fname,
-                        (('WINPYDIR', '$EXEDIR\%s' % self.python_name),
-                         ('COMMAND', command),
-                         ('PARAMETERS', args),
-                         ('WORKDIR', workdir),
-                         ('PREPATH', prepath),
-                         ('POSTPATH', postpath),
-                         ('Icon', icon_fname),
-                         ('OutFile', name),
-                        ))
-        
-        try:
-            retcode = subprocess.call('"%s" -V2 %s' % (NSIS_EXE, fname),
-                                      shell=True)
-            if retcode < 0:
-                print >>sys.stderr, "Child was terminated by signal", -retcode
-        except OSError, e:
-            print >>sys.stderr, "Execution failed:", e
-        os.remove(fname)
+
+        fname = osp.join(self.winpydir, osp.splitext(name)[0]+'.nsi')
+        data = (('WINPYDIR', '$EXEDIR\%s' % self.python_name),
+                ('COMMAND', command),
+                ('PARAMETERS', args),
+                ('WORKDIR', workdir),
+                ('PREPATH', prepath),
+                ('POSTPATH', postpath),
+                ('Icon', icon_fname),
+                ('OutFile', name),)
+        self.build_nsis('launcher.nsi', fname, data)
 
     def _print(self, text):
         """Print action text indicating progress"""
@@ -216,6 +223,15 @@ class WinPythonDistribution(object):
         """Print OK at the end of a process"""
         if not self.verbose:
             print("OK")
+    
+    def create_installer(self):
+        """Create installer with NSIS"""
+        portable_dir = osp.join(osp.dirname(__file__), 'portable')
+        fname = osp.join(portable_dir, 'installer-tmp.nsi')
+        data = (('DISTDIR', self.winpydir),
+                ('VERSION', '%s.%d' % (self.fullversion, self.build_number)),
+                ('RELEASELEVEL', self.release_level),)
+        self.build_nsis('installer.nsi', fname, data)
 
     def make(self):
         """Make WinPython distribution in target directory from the installers 
@@ -377,5 +393,6 @@ if __name__ == '__main__':
     instdir = osp.join(sbdir, 'installers')
     if not osp.isdir(wpdir):
         os.mkdir(wpdir)
-    dist = WinPythonDistribution(wpdir, instdir, verbose=False)
+    dist = WinPythonDistribution(0, 'beta1', wpdir, instdir, verbose=False)
     dist.make()
+    dist.create_installer()
