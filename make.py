@@ -305,11 +305,6 @@ class WinPythonDistribution(object):
         shutil.copytree(osp.join(osp.dirname(__file__), 'tools'),
                         osp.join(self.winpydir, 'tools'))
         self._print_done()
-        
-        #XXX: the USERPROFILE environment variable redirection do not work 
-        # with TortoiseHg (and maybe other programs)... but, why?
-        ## Creating settings directory
-        #os.mkdir(osp.join(self.winpydir, 'settings'))
 
         # Create launchers
         self._print("Creating launchers")
@@ -347,7 +342,6 @@ class WinPythonDistribution(object):
                                  command=r'${WINPYDIR}\..' + winmerge,
                                  workdir=r'${WINPYDIR}')
         self._print_done()
-        return
 
         # Create batch scripts
         print("Creating batch scripts")
@@ -364,6 +358,8 @@ The environment variables are set-up in 'env.bat'.""")
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
         self.create_batch_script('env.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + python_name + r"""
+set USERPROFILE=%WINPYDIR%\..\settings
+set APPDATA=%WINPYDIR%\..\settings\AppData\Roaming
 set PATH=""" + path)
         #self.create_batch_script('env.bat', """@echo off
 #set WINPYDIR=%~dp0..\\""" + python_name + r"""
@@ -403,7 +399,7 @@ cd %WINPYDIR%""" + package_dir + r"""
 """ + cmd + script_name + options + " %*")
     
 
-def make_winpython(build_number, release_level, basedir, architecture,
+def make_winpython(basedir, architecture,
                    create_installer=True, verbose=False):
     """Make WinPython distribution, assuming that `packages.win32` or/and 
     `packages.win-amd64` folders exist in *basedir* directory
@@ -418,10 +414,17 @@ def make_winpython(build_number, release_level, basedir, architecture,
         os.mkdir(builddir)
     dist = WinPythonDistribution(builddir, packdir, verbose=verbose)
     dist.make()
-    if create_installer:
-        dist.create_installer(build_number, release_level)
+    return dist
+
+
+def make_all(build_number, release_level, basedir,
+             create_installer=True, verbose=False):
+    """Make WinPython for both 32 and 64bit architectures"""
+    for architecture in (32, 64):
+        dist = make_winpython(basedir, architecture, create_installer, verbose)
+        if create_installer:
+            dist.create_installer(build_number, release_level)
 
 
 if __name__ == '__main__':
-    make_winpython(0, 'beta2', r'D:\Pierre', 64)
-    make_winpython(0, 'beta2', r'D:\Pierre', 32)
+    make_all(0, 'beta2', r'D:\Pierre', create_installer=True)

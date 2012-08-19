@@ -41,7 +41,10 @@ SetOutPath "${WORKDIR}"
 endworkdir:
 
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYDIR", "${WINPYDIR}").r0'
-; System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("USERPROFILE", "$EXEDIR\settings").r0'
+CreateDirectory "$EXEDIR\settings\AppData\Roaming"
+CreateDirectory "$EXEDIR\settings\Application Data"
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("USERPROFILE", "$EXEDIR\settings").r0'
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("APPDATA", "$EXEDIR\settings\AppData\Roaming").r0'
 ReadEnvStr $R0 "PATH"
 StrCpy $R0 "${PREPATH};$R0;${POSTPATH}"
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("PATH", R0).r0'
