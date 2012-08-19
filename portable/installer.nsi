@@ -12,6 +12,7 @@ Licensed under the terms of the MIT License
 ; These lines are automatically replaced when creating installer:
 ; (see winpython/make.py)
 !define DISTDIR "D:\Pierre\maketest\winpython-2.7.3.amd64"
+!define ARCH "16bit"
 !define VERSION "2.7.3.0"
 !define RELEASELEVEL "beta2" ; empty means final release
 ;================================================================
@@ -40,7 +41,7 @@ SetCompressorDictSize 16 ; MB
 ;-------------------------------------------------------------------------------
 
 Name "${ID} ${VERSION}${RELEASELEVEL}"
-OutFile "${DISTDIR}\..\${ID}-${VERSION}${RELEASELEVEL}.exe"
+OutFile "${DISTDIR}\..\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}.exe"
 
 InstallDir "\${ID}-${VERSION}${RELEASELEVEL}"
 BrandingText "${BRANDING}"

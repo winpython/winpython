@@ -101,10 +101,7 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, build_number, release_level,
-                 target, instdir, verbose=False):
-        self.build_number = build_number
-        self.release_level = release_level
+    def __init__(self, target, instdir, verbose=False):
         self.target = target
         self.instdir = instdir
         self.verbose = verbose
@@ -114,6 +111,11 @@ class WinPythonDistribution(object):
         self.python_name = None
         self.distribution = None
         self.installed_packages = []
+
+    @property
+    def winpy_arch(self):
+        """Return WinPython architecture"""
+        return '64bit' if 'amd64' in self.python_name else '32bit'
 
     @property
     def ms_arch(self):
@@ -224,13 +226,16 @@ class WinPythonDistribution(object):
         if not self.verbose:
             print("OK")
     
-    def create_installer(self):
+    def create_installer(self, build_number, release_level):
         """Create installer with NSIS"""
+        assert isinstance(build_number, int)
+        assert isinstance(release_level, str)
         portable_dir = osp.join(osp.dirname(__file__), 'portable')
         fname = osp.join(portable_dir, 'installer-tmp.nsi')
         data = (('DISTDIR', self.winpydir),
-                ('VERSION', '%s.%d' % (self.fullversion, self.build_number)),
-                ('RELEASELEVEL', self.release_level),)
+                ('ARCH', self.winpy_arch),
+                ('VERSION', '%s.%d' % (self.fullversion, build_number)),
+                ('RELEASELEVEL', release_level),)
         self.build_nsis('installer.nsi', fname, data)
 
     def make(self):
@@ -386,13 +391,25 @@ cd %WINPYDIR%""" + package_dir + r"""
 """ + cmd + script_name + options + " %*")
     
 
-if __name__ == '__main__':
-    sbdir = osp.join(osp.dirname(__file__), os.pardir, 'sandbox')
-    sbdir = r'D:\Pierre'
-    wpdir = osp.join(sbdir, 'maketest')
-    instdir = osp.join(sbdir, 'installers')
-    if not osp.isdir(wpdir):
-        os.mkdir(wpdir)
-    dist = WinPythonDistribution(0, 'beta1', wpdir, instdir, verbose=False)
+def make_winpython(build_number, release_level, basedir, architecture,
+                   create_installer=True, verbose=False):
+    """Make WinPython distribution, assuming that `packages.win32` or/and 
+    `packages.win-amd64` folders exist in *basedir* directory
+    
+    architecture: integer (32 or 64)"""
+    assert architecture in (32, 64)
+    suffix = '.win32' if architecture == 32 else '.win-amd64'
+    packdir = osp.join(basedir, 'packages' + suffix)
+    assert osp.isdir(packdir)
+    builddir = osp.join(basedir, 'build')
+    if not osp.isdir(builddir):
+        os.mkdir(builddir)
+    dist = WinPythonDistribution(builddir, packdir, verbose=verbose)
     dist.make()
-    dist.create_installer()
+    if create_installer:
+        dist.create_installer(build_number, release_level)
+
+
+if __name__ == '__main__':
+    make_winpython(0, 'beta2', r'D:\Pierre', 64)
+    make_winpython(0, 'beta2', r'D:\Pierre', 32)
