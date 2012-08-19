@@ -118,9 +118,9 @@ class WinPythonDistribution(object):
         return '64bit' if 'amd64' in self.python_name else '32bit'
 
     @property
-    def ms_arch(self):
-        """Return distribution architecture, in Microsoft format: x86/x64"""
-        return 'x64' if 'amd64' in self.python_name else 'x86'
+    def pyqt_arch(self):
+        """Return distribution architecture, in PyQt format: x32/x64"""
+        return 'x64' if 'amd64' in self.python_name else 'x32'
         
     @property
     def py_arch(self):
@@ -230,6 +230,7 @@ class WinPythonDistribution(object):
         """Create installer with NSIS"""
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
+        self._print("Creating WinPython installer")
         portable_dir = osp.join(osp.dirname(__file__), 'portable')
         fname = osp.join(portable_dir, 'installer-tmp.nsi')
         data = (('DISTDIR', self.winpydir),
@@ -237,6 +238,7 @@ class WinPythonDistribution(object):
                 ('VERSION', '%s.%d' % (self.fullversion, build_number)),
                 ('RELEASELEVEL', release_level),)
         self.build_nsis('installer.nsi', fname, data)
+        self._print_done()
 
     def make(self):
         """Make WinPython distribution in target directory from the installers 
@@ -285,10 +287,10 @@ class WinPythonDistribution(object):
         self.install_package('spyder(lib)?-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
                              % (self.py_arch, self.version))
         self.install_package(pattern='PyQt-Py%s-%s-gpl-([0-9\.\-]*).exe'
-                                     % (self.version, self.ms_arch))
+                                     % (self.version, self.pyqt_arch))
         self.install_package(
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
-                            % (self.version, self.ms_arch))
+                            % (self.version, self.pyqt_arch))
         
         # Try to install all other packages in instdir
         print("Installing other packages")
@@ -323,8 +325,17 @@ class WinPythonDistribution(object):
         self.create_launcher('WPPM.exe', 'winpython.ico',
                              args='wppmgui',
                              workdir='${WINPYDIR}\Scripts')
-        self.create_launcher('PyQtdemo.exe', 'qt.ico', args='qtdemo.pyw',
-           workdir='${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
+        self.create_launcher('QtDemo.exe', 'qt.ico', args='qtdemo.pyw',
+           workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
+        self.create_launcher('QtAssistant.exe', 'qtassistant.ico',
+                   command=r'${WINPYDIR}\Lib\site-packages\PyQt4\assistant.exe',
+                   workdir=r'${WINPYDIR}')
+        self.create_launcher('QtDesigner.exe', 'qtdesigner.ico',
+                   command=r'${WINPYDIR}\Lib\site-packages\PyQt4\designer.exe',
+                   workdir=r'${WINPYDIR}')
+        self.create_launcher('QtLinguist.exe', 'qtlinguist.ico',
+                   command=r'${WINPYDIR}\Lib\site-packages\PyQt4\linguist.exe',
+                   workdir=r'${WINPYDIR}')
         thg = r'\tools\TortoiseHg\thgw.exe'
         if osp.isfile(self.winpydir + thg):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -336,6 +347,7 @@ class WinPythonDistribution(object):
                                  command=r'${WINPYDIR}\..' + winmerge,
                                  workdir=r'${WINPYDIR}')
         self._print_done()
+        return
 
         # Create batch scripts
         print("Creating batch scripts")
