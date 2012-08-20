@@ -55,7 +55,7 @@ class Package(object):
         bname = osp.basename(self.fname)
         if bname.endswith('.exe'):
             # distutils bdist_wininst
-            match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)(-py([0-9\.]*))?(-setup)?\.exe', bname)
+            match = re.match(utils.WININST_PATTERN, bname)
             if match is not None:
                 self.name, self.version, arch, _t1, self.pyversion, _t2 = match.groups()
                 self.architecture = 32 if arch == 'win32' else 64
@@ -72,12 +72,12 @@ class Package(object):
                 self.name, self.version, self.pyversion, arch, _pyqt = match.groups()
                 self.architecture = int(arch)
                 return
-        #elif bname.endswith(('.zip', '.tar.gz')):
-            ## distutils sdist
-            #match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)', bname)
-            #if match is not None:
-                #self.name, self.version = match.groups()[:2]
-                #return
+        elif bname.endswith(('.zip', '.tar.gz')):
+            # distutils sdist
+            infos = utils.get_source_package_infos(bname)
+            if infos is not None:
+                self.name, self.version = infos
+                return
         raise NotImplementedError, "Not supported package type %s" % bname
 
     def logpath(self, logdir):
@@ -213,6 +213,10 @@ python "%~dpn0""" + ext + """" %*""")
         """Install package in distribution"""
         assert package.is_compatible_with(self)
         self.uninstall_existing(package)
+        if package.fname.endswith(('.tar.gz', '.zip')):
+            fname = utils.source_to_wininst(package.fname,
+                                            verbose=self.verbose)
+            package = Package(fname)
         bname = osp.basename(package.fname)
         if bname.endswith('.exe'):
             if re.match(r'(' + ('|'.join(self.NSIS_PACKAGES)) + r')-', bname):
@@ -221,8 +225,6 @@ python "%~dpn0""" + ext + """" %*""")
                 self.install_bdist_wininst(package)
         elif bname.endswith('.msi'):
             self.install_bdist_msi(package)
-        elif bname.endswith(('.tar.gz', '.zip')):
-            self.install_sdist(package)
         self.handle_specific_packages(package)
         package.save_log(self.logdir)
 
@@ -308,11 +310,6 @@ Binaries = ."""
         self._print_done()
         self.remove_directory(targetdir)
 
-    def install_sdist(self, package):
-        """Install a distutils package built with the sdist option
-        (source distribution, .tar.gz or .zip file)"""
-        raise NotImplementedError
-
     def install_nsis_package(self, package):
         """Install a Python package built with NSIS (e.g. PyQt or PyQwt)
         (binary distribution, .exe file)"""
@@ -355,9 +352,9 @@ if __name__ == '__main__':
     #fname = osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
     
-    target = r'D:\Pierre\maketest\winpython-2.7.3.amd64\python-2.7.3.amd64'
-    sbdir = r'D:\Pierre\installers'
-    fname = osp.join(sbdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe')
+    target = r'D:\Pierre\build\winpython-2.7.3\python-2.7.3'
+    sbdir = r'D:\Pierre\_test'
+    fname = osp.join(sbdir, 'xlrd-0.8.0.tar.gz')
 
     dist = Distribution(target, verbose=False)
     pack = Package(fname)

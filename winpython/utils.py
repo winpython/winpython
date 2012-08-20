@@ -14,6 +14,12 @@ import os
 import os.path as osp
 import subprocess
 import re
+import tarfile
+import zipfile
+import tempfile
+import shutil
+import atexit
+import sys
 
 
 # Exact copy of 'spyderlib.utils.programs.is_program_installed' function
@@ -123,10 +129,55 @@ def extract_exe(fname, targetdir=None, verbose=False):
         p.stdout.close()
     return targetdir
 
+def extract_archive(fname, targetdir=None, verbose=False):
+    """Extract .zip or .tar.gz archive"""
+    if targetdir is None:
+        targetdir = osp.dirname(fname)
+    if osp.splitext(fname)[1] == '.zip':
+        obj = zipfile.ZipFile(fname, mode="r")
+    elif fname.endswith('.tar.gz'):
+        obj = tarfile.open(fname, mode='r:gz')
+    else:
+        raise RuntimeError, "Unsupported archive filename %s" % fname
+    obj.extractall(path=targetdir)
+
+
+WININST_PATTERN = r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)(-py([0-9\.]*))?(-setup)?\.exe'
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)'
+
+def get_source_package_infos(fname):
+    """Return a tuple (name, version) of the Python source package"""
+    match = re.match(SOURCE_PATTERN, osp.basename(fname))
+    if match is not None:
+        return match.groups()[:2]
+    
+def source_to_wininst(fname, verbose=False):
+    """Extract source archive, build it and create a distutils installer"""
+    tmpdir = tempfile.mkdtemp(prefix='wppm_')
+    atexit.register(shutil.rmtree, tmpdir)
+    extract_archive(fname, targetdir=tmpdir)
+    root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
+    assert osp.isdir(root)
+    cmd = [sys.executable, 'setup.py', 'build', 'bdist_wininst']
+    if verbose:
+        subprocess.call(cmd, cwd=root)
+    else:
+        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE)
+        p.communicate()
+        p.stdout.close()
+    distdir = osp.join(root, 'dist')
+    distname = os.listdir(distdir)[0]
+    match = re.match(WININST_PATTERN, distname)
+    if match is None:
+        raise RuntimeError, "Installation failed: not a pure Python package?"
+    else:
+        dest_fname = osp.join(osp.dirname(fname), distname)
+        shutil.copyfile(osp.join(distdir, distname), dest_fname)
+        return dest_fname
+
 
 if __name__ == '__main__':
     print_box("Test")
-    import sys
     dname = sys.prefix
     print dname+':', '\n', get_python_infos(dname)
     dname = r'E:\winpython\sandbox\python-2.7.3'
@@ -139,3 +190,6 @@ if __name__ == '__main__':
                       tmpdir, verbose=False)
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
+
+#    path = r'D:\Pierre\_test\xlrd-0.8.0.tar.gz'
+#    source_to_wininst(path)
