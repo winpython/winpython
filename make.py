@@ -101,9 +101,12 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, target, instdir, verbose=False):
+    def __init__(self, target, instdir, toolsdirs=None, verbose=False):
         self.target = target
         self.instdir = instdir
+        if toolsdirs is None:
+            toolsdirs = []
+        self.toolsdirs = toolsdirs
         self.verbose = verbose
         self.version = None
         self.fullversion = None
@@ -302,8 +305,9 @@ class WinPythonDistribution(object):
         
         # Copy dev tools
         self._print("Copying tools")
-        shutil.copytree(osp.join(osp.dirname(__file__), 'tools'),
-                        osp.join(self.winpydir, 'tools'))
+        for dirname in [osp.join(osp.dirname(__file__),
+                                 'tools')] + self.toolsdirs:
+            shutil.copytree(dirname, osp.join(self.winpydir, 'tools'))
         self._print_done()
 
         # Create launchers
@@ -401,8 +405,13 @@ cd %WINPYDIR%""" + package_dir + r"""
 
 def make_winpython(basedir, architecture,
                    create_installer=True, verbose=False):
-    """Make WinPython distribution, assuming that `packages.win32` or/and 
-    `packages.win-amd64` folders exist in *basedir* directory
+    """Make WinPython distribution, assuming that the following folders exist
+    in *basedir* directory:
+    
+      * (required) `packages.win32`: contains distutils 32-bit packages
+      * (required) `packages.win-amd64`: contains distutils 64-bit packages
+      * (optional) `tools.win32`: contains 32-bit-specific tools
+      * (optional) `tools.win-amd64`: contains 64-bit-specific tools
     
     architecture: integer (32 or 64)"""
     assert architecture in (32, 64)
@@ -412,7 +421,10 @@ def make_winpython(basedir, architecture,
     builddir = osp.join(basedir, 'build')
     if not osp.isdir(builddir):
         os.mkdir(builddir)
-    dist = WinPythonDistribution(builddir, packdir, verbose=verbose)
+    tools = [osp.join(basedir, dname)
+             for dname in ['tools.win32', 'tools.win-amd64']
+             if osp.isdir(osp.join(basedir, dname))]
+    dist = WinPythonDistribution(builddir, packdir, tools, verbose=verbose)
     dist.make()
     return dist
 
