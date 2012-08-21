@@ -341,9 +341,9 @@ class WinPythonDistribution(object):
                    workdir=r'${WINPYDIR}')
         if osp.isfile(osp.join(scriptdir, 'ipython.exe')):
             self.create_launcher('IPython.exe', 'ipython.ico',
-                                 command='ipython.exe',
-                                 args='qtconsole --pylab=inline',
-                                 workdir='${WINPYDIR}\Scripts')
+                             command='${WINPYDIR}\pythonw.exe',
+                             args='ipython-script.py qtconsole --pylab=inline',
+                             workdir='${WINPYDIR}\Scripts')
         thg = r'\tools\TortoiseHg\thgw.exe'
         if osp.isfile(self.winpydir + thg):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -451,6 +451,6 @@ def make_all(build_number, release_level, basedir,
 
 
 if __name__ == '__main__':
-    dist = make_winpython(r'D:\Pierre', 64)
-    dist.create_installer(0, 'beta3')
-#    make_all(0, 'beta2', r'D:\Pierre', create_installer=True)
+#    dist = make_winpython(r'D:\Pierre', 64)
+#    dist.create_installer(0, 'beta3')
+    make_all(0, 'beta3', r'D:\Pierre', create_installer=True)
