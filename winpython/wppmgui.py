@@ -28,6 +28,7 @@ from spyderlib.widgets.internalshell import InternalShell
 from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
                                        get_std_icon, action2button,
                                        mimedata2url)
+from spyderlib.utils.windows import set_attached_console_visible
 
 # Local imports
 from winpython import wppm
@@ -642,7 +643,6 @@ class PMWindow(QMainWindow, PMMixin):
 
         
 def main():
-    from spyderlib.spyder import set_attached_console_visible
     set_attached_console_visible(False)
     
     app = QApplication([])
