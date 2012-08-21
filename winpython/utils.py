@@ -166,9 +166,11 @@ def source_to_wininst(fname, architecture=None, verbose=False):
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
-        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE)
+        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
         p.communicate()
         p.stdout.close()
+        p.stderr.close()
     distdir = osp.join(root, 'dist')
     distname = os.listdir(distdir)[0]
     match = re.match(WININST_PATTERN, distname)

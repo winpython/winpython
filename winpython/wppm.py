@@ -18,9 +18,13 @@ import shutil
 import cPickle
 import re
 import sys
+import atexit
 
 # Local imports
 from winpython import utils
+
+# Workaround for installing PyVISA on Windows from source:
+os.environ['HOME'] = os.environ['USERPROFILE']
 
 
 class Package(object):
@@ -222,6 +226,7 @@ python "%~dpn0""" + ext + """" %*""")
                 if not self.verbose:
                     print("Failed!")
                 raise
+            atexit.register(os.remove, fname)
             package = Package(fname)
             self._print_done()
         bname = osp.basename(package.fname)

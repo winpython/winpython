@@ -101,9 +101,11 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, target, instdir, toolsdirs=None, verbose=False):
+    def __init__(self, target, instdir, srcdir=None,
+                 toolsdirs=None, verbose=False):
         self.target = target
         self.instdir = instdir
+        self.srcdir = srcdir
         if toolsdirs is None:
             toolsdirs = []
         self.toolsdirs = toolsdirs
@@ -144,10 +146,11 @@ class WinPythonDistribution(object):
         
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdir"""
-        for fname in os.listdir(self.instdir):
-            match = re.match(pattern, fname)
-            if match is not None:
-                return osp.abspath(osp.join(self.instdir, fname))
+        for path in (self.instdir, self.srcdir):
+            for fname in os.listdir(path):
+                match = re.match(pattern, fname)
+                if match is not None:
+                    return osp.abspath(osp.join(path, fname))
         else:
             raise RuntimeError,\
                   'Could not found required package matching %s' % pattern
@@ -271,7 +274,8 @@ class WinPythonDistribution(object):
         os.remove(osp.join(pydir, osp.basename(python_fname)))
         self.distribution = wppm.Distribution(pydir, verbose=self.verbose,
                                               indent=True)
-        os.mkdir(osp.join(pydir, 'Scripts'))
+        scriptdir = osp.join(pydir, 'Scripts')
+        os.mkdir(scriptdir)
         self._print_done()
         
         # Adding Microsoft Visual Studio 2008 DLLs and manifest
@@ -297,7 +301,7 @@ class WinPythonDistribution(object):
         
         # Try to install all other packages in instdir
         print("Installing other packages")
-        for fname in os.listdir(self.instdir):
+        for fname in os.listdir(self.srcdir) + os.listdir(self.instdir):
             try:
                 self.install_package(fname)
             except NotImplementedError:
@@ -335,6 +339,11 @@ class WinPythonDistribution(object):
         self.create_launcher('QtLinguist.exe', 'qtlinguist.ico',
                    command=r'${WINPYDIR}\Lib\site-packages\PyQt4\linguist.exe',
                    workdir=r'${WINPYDIR}')
+        if osp.isfile(osp.join(scriptdir, 'ipython.exe')):
+            self.create_launcher('IPython.exe', 'ipython.ico',
+                                 command='ipython.exe',
+                                 args='qtconsole --pylab=inline',
+                                 workdir='${WINPYDIR}\Scripts')
         thg = r'\tools\TortoiseHg\thgw.exe'
         if osp.isfile(self.winpydir + thg):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -403,13 +412,13 @@ cd %WINPYDIR%""" + package_dir + r"""
 """ + cmd + script_name + options + " %*")
     
 
-def make_winpython(basedir, architecture,
-                   create_installer=True, verbose=False):
+def make_winpython(basedir, architecture, verbose=False):
     """Make WinPython distribution, assuming that the following folders exist
     in *basedir* directory:
     
       * (required) `packages.win32`: contains distutils 32-bit packages
       * (required) `packages.win-amd64`: contains distutils 64-bit packages
+      * (optional) `packages.src`: contains distutils source distributions
       * (optional) `tools.win32`: contains 32-bit-specific tools
       * (optional) `tools.win-amd64`: contains 64-bit-specific tools
     
@@ -418,13 +427,16 @@ def make_winpython(basedir, architecture,
     suffix = '.win32' if architecture == 32 else '.win-amd64'
     packdir = osp.join(basedir, 'packages' + suffix)
     assert osp.isdir(packdir)
+    srcdir = osp.join(basedir, 'packages.src')
+    assert osp.isdir(srcdir)
     builddir = osp.join(basedir, 'build')
     if not osp.isdir(builddir):
         os.mkdir(builddir)
     tools = [osp.join(basedir, dname)
              for dname in ['tools.win32', 'tools.win-amd64']
              if osp.isdir(osp.join(basedir, dname))]
-    dist = WinPythonDistribution(builddir, packdir, tools, verbose=verbose)
+    dist = WinPythonDistribution(builddir, packdir, srcdir, tools,
+                                 verbose=verbose)
     dist.make()
     return dist
 
@@ -433,10 +445,12 @@ def make_all(build_number, release_level, basedir,
              create_installer=True, verbose=False):
     """Make WinPython for both 32 and 64bit architectures"""
     for architecture in (32, 64):
-        dist = make_winpython(basedir, architecture, create_installer, verbose)
+        dist = make_winpython(basedir, architecture, verbose)
         if create_installer:
             dist.create_installer(build_number, release_level)
 
 
 if __name__ == '__main__':
-    make_all(0, 'beta2', r'D:\Pierre', create_installer=True)
+    dist = make_winpython(r'D:\Pierre', 64)
+    dist.create_installer(0, 'beta3')
+#    make_all(0, 'beta2', r'D:\Pierre', create_installer=True)
