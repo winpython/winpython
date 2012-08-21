@@ -214,9 +214,16 @@ python "%~dpn0""" + ext + """" %*""")
         assert package.is_compatible_with(self)
         self.uninstall_existing(package)
         if package.fname.endswith(('.tar.gz', '.zip')):
-            fname = utils.source_to_wininst(package.fname,
-                                            verbose=self.verbose)
+            self._print(package, "Building")
+            try:
+                fname = utils.source_to_wininst(package.fname,
+                          architecture=self.architecture, verbose=self.verbose)
+            except RuntimeError:
+                if not self.verbose:
+                    print("Failed!")
+                raise
             package = Package(fname)
+            self._print_done()
         bname = osp.basename(package.fname)
         if bname.endswith('.exe'):
             if re.match(r'(' + ('|'.join(self.NSIS_PACKAGES)) + r')-', bname):

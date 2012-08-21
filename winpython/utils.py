@@ -151,14 +151,18 @@ def get_source_package_infos(fname):
     if match is not None:
         return match.groups()[:2]
     
-def source_to_wininst(fname, verbose=False):
+def source_to_wininst(fname, architecture=None, verbose=False):
     """Extract source archive, build it and create a distutils installer"""
     tmpdir = tempfile.mkdtemp(prefix='wppm_')
     atexit.register(shutil.rmtree, tmpdir)
     extract_archive(fname, targetdir=tmpdir)
     root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
     assert osp.isdir(root)
-    cmd = [sys.executable, 'setup.py', 'build', 'bdist_wininst']
+    cmd = [sys.executable, 'setup.py', 'build']
+    if architecture is not None:
+        archstr = 'win32' if architecture == 32 else 'win-amd64'
+        cmd += ['--plat-name=%s' % archstr]
+    cmd += ['bdist_wininst']
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
