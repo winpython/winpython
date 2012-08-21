@@ -216,6 +216,7 @@ python "%~dpn0""" + ext + """" %*""")
     def install(self, package):
         """Install package in distribution"""
         assert package.is_compatible_with(self)
+        tmp_fname = None
         self.uninstall_existing(package)
         if package.fname.endswith(('.tar.gz', '.zip')):
             self._print(package, "Building")
@@ -226,7 +227,7 @@ python "%~dpn0""" + ext + """" %*""")
                 if not self.verbose:
                     print("Failed!")
                 raise
-            atexit.register(os.remove, fname)
+            tmp_fname = fname
             package = Package(fname)
             self._print_done()
         bname = osp.basename(package.fname)
@@ -239,6 +240,8 @@ python "%~dpn0""" + ext + """" %*""")
             self.install_bdist_msi(package)
         self.handle_specific_packages(package)
         package.save_log(self.logdir)
+        if tmp_fname is not None:
+            os.remove(tmp_fname)
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
