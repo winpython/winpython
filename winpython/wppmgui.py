@@ -31,7 +31,7 @@ from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
 from spyderlib.utils.windows import set_attached_console_visible
 
 # Local imports
-from winpython import wppm
+from winpython import wppm, associate
 from spyderlib.config import add_image_path, get_module_data_path, get_icon
 add_image_path(get_module_data_path('winpython', relpath='images'))
 
@@ -446,6 +446,13 @@ class PMWindow(QMainWindow):
                       tip="Reinstall packages even if version is unchanged",
                       toggled=self.toggle_repair)
         add_actions(option_menu, (repair_action,))
+        
+        # Advanced menu
+        option_menu = self.menuBar().addMenu("&Advanced")
+        register_action = create_action(self, "Register distribution...",
+                      tip="Register file extensions, icons and context menu",
+                      toggled=self.register_distribution)
+        add_actions(option_menu, (register_action,))
 
         # View menu
         view_menu = self.menuBar().addMenu("&View")
@@ -496,6 +503,18 @@ class PMWindow(QMainWindow):
         """Toggle repair mode"""
         self.table.repair = state
         self.refresh_install_button()
+
+    def register_distribution(self):
+        """Register distribution"""
+        answer = QMessageBox.warning(self, "Register distribution",
+            "This will associate Python file extensions, icons and "
+            "context menu with selected distribution for Windows registry. "
+            "The only way to undo this change will be to register another "
+            "Python distribution to Windows registry."
+            "\n\nDo you want to continue?",
+            QMessageBox.Yes | QMessageBox.Cancel)
+        if answer == QMessageBox.Yes:
+            associate.register(self.distribution.target)
     
     def distribution_changed(self, path):
         """Distribution path has just changed"""
