@@ -451,7 +451,7 @@ class PMWindow(QMainWindow):
         option_menu = self.menuBar().addMenu("&Advanced")
         register_action = create_action(self, "Register distribution...",
                       tip="Register file extensions, icons and context menu",
-                      toggled=self.register_distribution)
+                      triggered=self.register_distribution)
         add_actions(option_menu, (register_action,))
 
         # View menu
