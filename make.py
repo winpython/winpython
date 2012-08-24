@@ -118,25 +118,36 @@ class WinPythonDistribution(object):
         self.installed_packages = []
 
     @property
+    def architecture(self):
+        """Return an integer: 32 or 64 for 32-bit or 64-bit architectures"""
+        return 64 if 'amd64' in self.python_name else 32
+
+    @property
     def winpy_arch(self):
         """Return WinPython architecture"""
-        return '64bit' if 'amd64' in self.python_name else '32bit'
+        return '%dbit' % self.architecture
 
     @property
     def pyqt_arch(self):
         """Return distribution architecture, in PyQt format: x32/x64"""
-        return 'x64' if 'amd64' in self.python_name else 'x32'
+        return 'x%d' % self.architecture
         
     @property
     def py_arch(self):
         """Return distribution architecture, in Python distutils format:
         win-amd64 or win32"""
-        return 'win-amd64' if 'amd64' in self.python_name else 'win32'
+        if self.architecture == 64:
+            return 'win-amd64'
+        else:
+            return 'win32'
     
     @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
-        return [r"Lib\site-packages\PyQt4"]
+        path = [r"Lib\site-packages\PyQt4"]
+        if self.architecture == 32:
+            path += [r"..\tools\mingw32\bin"]
+        return path
     
     @property
     def postpath(self):
@@ -309,9 +320,16 @@ class WinPythonDistribution(object):
         
         # Copy dev tools
         self._print("Copying tools")
-        for dirname in [osp.join(osp.dirname(__file__),
-                                 'tools')] + self.toolsdirs:
-            shutil.copytree(dirname, osp.join(self.winpydir, 'tools'))
+        toolsdir = osp.join(self.winpydir, 'tools')
+        os.mkdir(toolsdir)
+        for dirname in [osp.join(osp.dirname(__file__), 'tools')
+                        ] + self.toolsdirs:
+            for name in os.listdir(dirname):
+                path = osp.join(dirname, name)
+                copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
+                copy(path, osp.join(toolsdir, name))
+                if self.verbose:
+                    print(path + ' --> ' + osp.join(toolsdir, name))
         self._print_done()
 
         # Create launchers
@@ -452,4 +470,4 @@ def make_all(build_number, release_level, basedir,
 if __name__ == '__main__':
 #    dist = make_winpython(r'D:\Pierre', 64)
 #    dist.create_installer(0, 'beta3')
-    make_all(0, 'beta3', r'D:\Pierre', create_installer=True)
+    make_all(0, 'beta3', r'C:\WinPython', create_installer=True)
