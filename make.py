@@ -371,12 +371,11 @@ The environment variables are set-up in 'env.bat'.""")
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
         self.create_batch_script('env.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + python_name + r"""
-set USERPROFILE=%WINPYDIR%\..\settings
-set APPDATA=%WINPYDIR%\..\settings\AppData\Roaming
+set HOME=%WINPYDIR%\..\settings
 set PATH=""" + path)
         #self.create_batch_script('env.bat', """@echo off
 #set WINPYDIR=%~dp0..\\""" + python_name + r"""
-#set USERPROFILE=%WINPYDIR%\..\settings
+#set HOME=%WINPYDIR%\..\settings
 #set PATH=""" + path)
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
