@@ -101,14 +101,12 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, target, instdir, srcdir=None,
-                 toolsdirs=None, verbose=False):
+    def __init__(self, target, instdir, srcdir=None, toolsdir=None,
+                 verbose=False):
         self.target = target
         self.instdir = instdir
         self.srcdir = srcdir
-        if toolsdirs is None:
-            toolsdirs = []
-        self.toolsdirs = toolsdirs
+        self.toolsdir = toolsdir
         self.verbose = verbose
         self.version = None
         self.fullversion = None
@@ -118,25 +116,20 @@ class WinPythonDistribution(object):
         self.installed_packages = []
 
     @property
-    def architecture(self):
-        """Return an integer: 32 or 64 for 32-bit or 64-bit architectures"""
-        return 64 if 'amd64' in self.python_name else 32
-
-    @property
     def winpy_arch(self):
         """Return WinPython architecture"""
-        return '%dbit' % self.architecture
+        return '%dbit' % self.distribution.architecture
 
     @property
     def pyqt_arch(self):
         """Return distribution architecture, in PyQt format: x32/x64"""
-        return 'x%d' % self.architecture
+        return 'x%d' % self.distribution.architecture
         
     @property
     def py_arch(self):
         """Return distribution architecture, in Python distutils format:
         win-amd64 or win32"""
-        if self.architecture == 64:
+        if self.distribution.architecture == 64:
             return 'win-amd64'
         else:
             return 'win32'
@@ -145,7 +138,7 @@ class WinPythonDistribution(object):
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
         path = [r"Lib\site-packages\PyQt4"]
-        if self.architecture == 32:
+        if self.distribution.architecture == 32:
             path += [r"..\tools\mingw32\bin"]
         return path
     
@@ -322,8 +315,10 @@ class WinPythonDistribution(object):
         self._print("Copying tools")
         toolsdir = osp.join(self.winpydir, 'tools')
         os.mkdir(toolsdir)
-        for dirname in [osp.join(osp.dirname(__file__), 'tools')
-                        ] + self.toolsdirs:
+        toolsdirs = [osp.join(osp.dirname(__file__), 'tools')]
+        if self.toolsdir is not None:
+            toolsdirs += [self.toolsdir]
+        for dirname in toolsdirs:
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
                 copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
@@ -455,10 +450,10 @@ def make_winpython(basedir, architecture, verbose=False):
     builddir = osp.join(basedir, 'build')
     if not osp.isdir(builddir):
         os.mkdir(builddir)
-    tools = [osp.join(basedir, dname)
-             for dname in ['tools.win32', 'tools.win-amd64']
-             if osp.isdir(osp.join(basedir, dname))]
-    dist = WinPythonDistribution(builddir, packdir, srcdir, tools,
+    toolsdir = osp.join(basedir, 'tools' + suffix)
+    if not osp.isdir(toolsdir):
+        toolsdir = None
+    dist = WinPythonDistribution(builddir, packdir, srcdir, toolsdir,
                                  verbose=verbose)
     dist.make()
     return dist
@@ -474,6 +469,6 @@ def make_all(build_number, release_level, basedir,
 
 
 if __name__ == '__main__':
-#    dist = make_winpython(r'D:\Pierre', 64)
-#    dist.create_installer(0, 'beta3')
-    make_all(0, 'beta3', r'C:\WinPython', create_installer=True)
+    dist = make_winpython(r'C:\WinPython', 64)
+    dist.create_installer(0, 'beta3')
+#    make_all(0, 'beta3', r'C:\WinPython', create_installer=True)
