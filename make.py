@@ -374,6 +374,12 @@ class WinPythonDistribution(object):
                                  workdir=r'${WINPYDIR}')
         self._print_done()
 
+        # Create settings directory
+        # (only necessary if user is starting an application with a batch 
+        #  scripts before using an executable launcher, because the latter 
+        #  is creating the directory automatically)
+        os.mkdir(osp.join(self.winpydir, 'settings'))
+
         # Create batch scripts
         print("Creating batch scripts")
         self.create_batch_script('readme.txt', \

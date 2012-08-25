@@ -41,6 +41,7 @@ SetOutPath "${WORKDIR}"
 endworkdir:
 
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYDIR", "${WINPYDIR}").r0'
+CreateDirectory "$EXEDIR\settings"
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("HOME", "$EXEDIR\settings").r0'
 ReadEnvStr $R0 "PATH"
 StrCpy $R0 "${PREPATH};$R0;${POSTPATH}"
