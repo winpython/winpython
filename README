@@ -30,7 +30,9 @@ Licensed under the terms of the MIT License
     Requirements
 
         7zip (directory has to be available in PATH)
-		NSIS "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
+        NSIS:
+          * "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
+          * with TextReplace plugin installed
 
     Installation
     
