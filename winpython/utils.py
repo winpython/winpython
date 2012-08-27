@@ -26,6 +26,7 @@ import sys
 TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
 if osp.isdir(TOOLS_DIR):
     os.environ['PATH'] += ';%s' % TOOLS_DIR
+BASE_DIR = os.environ.get('WINPYTHONBASEDIR')
 
 
 # Exact copy of 'spyderlib.utils.programs.is_program_installed' function
@@ -196,13 +197,12 @@ if __name__ == '__main__':
     #dname = r'E:\winpython\sandbox\python-2.7.3'
     #print dname+':', '\n', get_python_infos(dname)
     
-    sbdir = r'D:\WinPython'
     tmpdir = r'D:\Tests\winpython_tests'
     if not osp.isdir(tmpdir):
         os.mkdir(tmpdir)
-    print extract_archive(osp.join(sbdir, 'packages.win-amd64',
+    print extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
                                'winpython-0.3dev.win-amd64.exe'),
-                      tmpdir)
+                          tmpdir)
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 

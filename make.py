@@ -474,9 +474,11 @@ cmd.exe /k""")
             self._print_done()
             
 
-def make_winpython(basedir, architecture, verbose=False, remove_existing=True):
+def make_winpython(architecture, basedir=None,
+                   verbose=False, remove_existing=True):
     """Make WinPython distribution, assuming that the following folders exist
-    in *basedir* directory:
+    in *basedir* directory (if basedir is None, the WINPYTHONBASEDIR environ-
+    ment variable is assumed to be basedir):
     
       * (required) `packages.win32`: contains distutils 32-bit packages
       * (required) `packages.win-amd64`: contains distutils 64-bit packages
@@ -486,6 +488,8 @@ def make_winpython(basedir, architecture, verbose=False, remove_existing=True):
       * (optional) `tools.win-amd64`: contains 64-bit-specific tools
     
     architecture: integer (32 or 64)"""
+    basedir = basedir if basedir is not None else utils.BASE_DIR
+    assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
     suffix = '.win32' if architecture == 32 else '.win-amd64'
     packdir = osp.join(basedir, 'packages' + suffix)
@@ -507,16 +511,16 @@ def make_winpython(basedir, architecture, verbose=False, remove_existing=True):
     return dist
 
 
-def make_all(build_number, release_level, basedir,
+def make_all(build_number, release_level, basedir=None,
              create_installer=True, verbose=False, remove_existing=True):
     """Make WinPython for both 32 and 64bit architectures"""
     for architecture in (32, 64):
-        dist = make_winpython(basedir, architecture, verbose, remove_existing)
+        dist = make_winpython(architecture, basedir, verbose, remove_existing)
         if create_installer:
             dist.create_installer(build_number, release_level)
 
 
 if __name__ == '__main__':
-    dist = make_winpython(r'D:\winpython', 32, remove_existing=True)
-#    dist.create_installer(0, 'beta3')
-#    make_all(0, 'beta3', r'C:\WinPython', create_installer=True)
+    #dist = make_winpython(32, remove_existing=True)
+#    dist.create_installer(0, 'beta4')
+    make_all(0, 'beta4', create_installer=True)

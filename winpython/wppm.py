@@ -421,9 +421,9 @@ if __name__ == '__main__':
     #fname = osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe')
     target =osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
     
-    target = r'D:\Pierre\build\winpython-2.7.3\python-2.7.3'
-    sbdir = r'D:\Pierre\_test'
-    fname = osp.join(sbdir, 'xlrd-0.8.0.tar.gz')
+    target = osp.join(utils.BASE_DIR, 'build',
+                      'winpython-2.7.3', 'python-2.7.3')
+    fname = osp.join(utils.BASE_DIR, 'packages.src', 'Jinja2-2.6.tar.gz')
 
     dist = Distribution(target, verbose=False)
     pack = Package(fname)
