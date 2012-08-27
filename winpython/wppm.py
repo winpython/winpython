@@ -18,7 +18,7 @@ import shutil
 import cPickle
 import re
 import sys
-import atexit
+import subprocess
 
 # Local imports
 from winpython import utils
@@ -110,7 +110,49 @@ class Package(object):
             os.remove(self.logpath(logdir))
         except WindowsError:
             pass
+
+
+class WininstPackage(object):
+    def __init__(self, fname, distribution):
+        self.fname = fname  # Remove executable
+        self.logname = None
         
+        self.distribution = distribution
+        self.architecture = distribution.architecture
+        self.pyversion = distribution.version
+
+        self.name = None
+        self.version = None
+        self.extract_infos()
+
+    def extract_infos(self):
+        """Extract package infos (name, version, architecture)"""
+        match = re.match(r'Remove([a-zA-Z0-9\-\_]*)\.exe', self.fname)
+        if match is None:
+            return
+        self.name = match.groups()[0]
+        self.logname = '%s-wininst.log' % self.name
+        fd = open(osp.join(self.distribution.target, self.logname), 'U')
+        searchtxt = 'DisplayName='
+        for line in fd.readlines():
+            pos = line.find(searchtxt)
+            if pos != -1:
+                break
+        else:
+            return
+        fd.close()
+        match = re.match(r'Python %s %s-([0-9\.]*)'
+                         % (self.pyversion, self.name),
+                         line[pos+len(searchtxt):])
+        if match is None:
+            return
+        self.version = match.groups()[0]
+    
+    def uninstall(self):
+        """Uninstall package"""
+        subprocess.call([self.fname, '-u', self.logname],
+                        cwd=self.distribution.target)
+
 
 class Distribution(object):
     NSIS_PACKAGES = ('PyQt', 'PyQwt')  # known NSIS packages
@@ -199,7 +241,19 @@ python "%~dpn0""" + ext + """" %*""")
 
     def get_installed_packages(self):
         """Return installed packages"""
-        return [Package(logname[:-4]) for logname in os.listdir(self.logdir)]
+        # Packages installed with WPPM
+        wppm = [Package(logname[:-4]) for logname in os.listdir(self.logdir)]
+        # Packages installed with distutils wininst
+        wininst = []
+        for name in os.listdir(self.target):
+            if name.startswith('Remove') and name.endswith('.exe'):
+                try:
+                    pack = WininstPackage(name, self)
+                except IOError:
+                    continue
+                if pack.name is not None and pack.version is not None:
+                    wininst.append(pack)
+        return wppm + wininst
     
     def find_package(self, name):
         """Find installed package"""
@@ -274,27 +328,30 @@ Binaries = ."""
     def uninstall(self, package):
         """Uninstall package from distribution"""
         self._print(package, "Uninstalling")
-        package.load_log(self.logdir)
-        for fname in reversed(package.files):
-            if self.verbose:
-                print("remove: %s" % fname)
-            path = osp.join(self.target, fname)
-            if osp.exists(path):
-                os.remove(path)
-            if fname.endswith('.py'):
-                for suffix in ('c', 'o'):
-                    if osp.exists(path+suffix):
-                        os.remove(path+suffix)
-        for dname in reversed(package.folders):
-            try:
+        if isinstance(package, WininstPackage):
+            package.uninstall()
+        else:
+            package.load_log(self.logdir)
+            for fname in reversed(package.files):
                 if self.verbose:
-                    print("rmdir:  %s" % fname)
-                path = osp.join(self.target, dname)
+                    print("remove: %s" % fname)
+                path = osp.join(self.target, fname)
                 if osp.exists(path):
-                    os.rmdir(path)
-            except OSError:
-                pass
-        package.remove_log(self.logdir)
+                    os.remove(path)
+                if fname.endswith('.py'):
+                    for suffix in ('c', 'o'):
+                        if osp.exists(path+suffix):
+                            os.remove(path+suffix)
+            for dname in reversed(package.folders):
+                try:
+                    if self.verbose:
+                        print("rmdir:  %s" % fname)
+                    path = osp.join(self.target, dname)
+                    if osp.exists(path):
+                        os.rmdir(path)
+                except OSError:
+                    pass
+            package.remove_log(self.logdir)
         self._print_done()
     
     def install_bdist_wininst(self, package):
