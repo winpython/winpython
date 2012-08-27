@@ -514,6 +514,7 @@ def make_winpython(architecture, basedir=None,
 def make_all(build_number, release_level, basedir=None,
              create_installer=True, verbose=False, remove_existing=True):
     """Make WinPython for both 32 and 64bit architectures"""
+    subprocess.call("build_dist.bat", cwd=osp.dirname(__file__))
     for architecture in (32, 64):
         dist = make_winpython(architecture, basedir, verbose, remove_existing)
         if create_installer:
