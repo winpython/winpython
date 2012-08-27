@@ -117,6 +117,7 @@ class WinPythonDistribution(object):
         self.version = None
         self.fullversion = None
         self.winpydir = None
+        self.python_fname = None
         self.python_name = None
         self.distribution = None
         self.installed_packages = []
@@ -289,9 +290,10 @@ cd %WINPYDIR%""" + package_dir + r"""
     def _extract_python(self):
         """Extracting Python installer, creating distribution object"""
         self._print("Extracting Python installer")
-        utils.extract_msi(self.python_name, targetdir=self.winpydir)
+        os.mkdir(self.python_dir)
+        utils.extract_msi(self.python_fname, targetdir=self.python_dir)
         self.installed_packages.append(self.python_name)
-        os.remove(osp.join(self.python_dir, osp.basename(self.python_name)))
+        os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
         os.mkdir(osp.join(self.python_dir, 'Scripts'))
         self._print_done()
     
@@ -429,9 +431,9 @@ cmd.exe /k""")
         
         remove_existing=True: (default) install all from scratch
         remove_existing=False: only for test purpose (launchers/scripts)"""
-        python_fname = self.get_package_fname(
+        self.python_fname = self.get_package_fname(
                                     r'python-([0-9\.]*)(\.amd64)?\.msi')
-        self.python_name = osp.basename(python_fname)[:-4]
+        self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
                         ).groups()[0].split('.')
@@ -445,8 +447,6 @@ cmd.exe /k""")
             shutil.rmtree(self.winpydir)
         if not osp.isdir(self.winpydir):
             os.mkdir(self.winpydir)
-        self.distribution = wppm.Distribution(self.python_dir,
-                                          verbose=self.verbose, indent=True)
         if remove_existing:
             # Create settings directory
             # (only necessary if user is starting an application with a batch 
@@ -457,6 +457,10 @@ cmd.exe /k""")
 
         if remove_existing:
             self._extract_python()
+        self.distribution = wppm.Distribution(self.python_dir,
+                                          verbose=self.verbose, indent=True)
+
+        if remove_existing:
             self._add_vs2008_files()
             self._install_required_packages()
             self._install_all_other_packages()
@@ -509,6 +513,6 @@ def make_all(build_number, release_level, basedir,
 
 
 if __name__ == '__main__':
-    dist = make_winpython(r'D:\winpython', 32, remove_existing=False)
+    dist = make_winpython(r'D:\winpython', 32, remove_existing=True)
 #    dist.create_installer(0, 'beta3')
 #    make_all(0, 'beta3', r'C:\WinPython', create_installer=True)

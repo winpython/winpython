@@ -22,6 +22,12 @@ import atexit
 import sys
 
 
+# Development only
+TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
+if osp.isdir(TOOLS_DIR):
+    os.environ['PATH'] += ';%s' % TOOLS_DIR
+
+
 # Exact copy of 'spyderlib.utils.programs.is_program_installed' function
 def is_program_installed(basename):
     """Return program absolute path if installed in PATH
@@ -89,21 +95,19 @@ def get_python_infos(path):
 #==============================================================================
 # Extract functions
 #==============================================================================
-def  _init_target_dir(targetdir, fname):
-    if targetdir is None:
-        targetdir = fname[:-4]
-    else:
-        targetdir = osp.join(targetdir, osp.basename(fname)[:-4])
-        if not osp.isdir(targetdir):
-            os.mkdir(targetdir)
-    return targetdir
+def _create_temp_dir():
+    """Create a temporary directory and remove it at exit"""
+    tmpdir = tempfile.mkdtemp(prefix='wppm_')
+    atexit.register(shutil.rmtree, tmpdir)
+    return tmpdir
 
 def extract_msi(fname, targetdir=None, verbose=False):
-    '''Extract .msi installer to the directory of the same name    
-    msiexec.exe /a "python-%PYVER%%PYARC%.msi" /qn TARGETDIR="%PYDIR%"'''
-    targetdir = _init_target_dir(targetdir, fname)
+    """Extract .msi installer to a temporary directory (if targetdir 
+    is None). Return the temporary directory path"""
+    assert fname.endswith('.msi')
+    if targetdir is None:
+        targetdir = _create_temp_dir()
     extract = 'msiexec.exe'
-    assert is_program_installed(extract)
     bname = osp.basename(fname)
     args = ['/a', '%s' % bname]
     if not verbose:
@@ -113,11 +117,13 @@ def extract_msi(fname, targetdir=None, verbose=False):
     return targetdir
 
 def extract_exe(fname, targetdir=None, verbose=False):
-    '''Extract .exe archive to the directory of the same name    
-    7z x -o"%1" -aos "%1.exe"'''
-    targetdir = _init_target_dir(targetdir, fname)
+    """Extract .exe archive to a temporary directory (if targetdir 
+    is None). Return the temporary directory path"""
+    if targetdir is None:
+        targetdir = _create_temp_dir()
     extract = '7z.exe'
-    assert is_program_installed(extract)
+    assert is_program_installed(extract),\
+           "Required program '%s' was not found" % extract
     bname = osp.basename(fname)
     args = ['x', '-o%s' % targetdir, '-aos', bname]
     if verbose:
@@ -130,16 +136,19 @@ def extract_exe(fname, targetdir=None, verbose=False):
     return targetdir
 
 def extract_archive(fname, targetdir=None, verbose=False):
-    """Extract .zip or .tar.gz archive"""
+    """Extract .zip, .exe (considered to be a zip archive) or .tar.gz archive 
+    to a temporary directory (if targetdir is None).
+    Return the temporary directory path"""
     if targetdir is None:
-        targetdir = osp.dirname(fname)
-    if osp.splitext(fname)[1] == '.zip':
+        targetdir = _create_temp_dir()
+    if osp.splitext(fname)[1] in ('.zip', '.exe'):
         obj = zipfile.ZipFile(fname, mode="r")
     elif fname.endswith('.tar.gz'):
         obj = tarfile.open(fname, mode='r:gz')
     else:
         raise RuntimeError, "Unsupported archive filename %s" % fname
     obj.extractall(path=targetdir)
+    return targetdir
 
 
 WININST_PATTERN = r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)(-py([0-9\.]*))?(-setup)?\.exe'
@@ -153,9 +162,7 @@ def get_source_package_infos(fname):
     
 def source_to_wininst(fname, architecture=None, verbose=False):
     """Extract source archive, build it and create a distutils installer"""
-    tmpdir = tempfile.mkdtemp(prefix='wppm_')
-    atexit.register(shutil.rmtree, tmpdir)
-    extract_archive(fname, targetdir=tmpdir)
+    tmpdir = extract_archive(fname)
     root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
     assert osp.isdir(root)
     cmd = [sys.executable, 'setup.py', 'build']
@@ -186,14 +193,16 @@ if __name__ == '__main__':
     print_box("Test")
     dname = sys.prefix
     print dname+':', '\n', get_python_infos(dname)
-    dname = r'E:\winpython\sandbox\python-2.7.3'
-    print dname+':', '\n', get_python_infos(dname)
+    #dname = r'E:\winpython\sandbox\python-2.7.3'
+    #print dname+':', '\n', get_python_infos(dname)
     
-    sbdir = osp.join(osp.dirname(__file__),
-                     os.pardir, os.pardir, os.pardir, 'sandbox')
-    tmpdir = osp.join(sbdir, 'tobedeleted')
-    print extract_exe(osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe'),
-                      tmpdir, verbose=False)
+    sbdir = r'D:\WinPython'
+    tmpdir = r'D:\Tests\winpython_tests'
+    if not osp.isdir(tmpdir):
+        os.mkdir(tmpdir)
+    print extract_archive(osp.join(sbdir, 'packages.win-amd64',
+                               'winpython-0.3dev.win-amd64.exe'),
+                      tmpdir)
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 
