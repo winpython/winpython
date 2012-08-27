@@ -141,7 +141,7 @@ class PackagesTable(QTableView):
         self.setModel(self.model)
         self.repair = False
         self.resizeColumnToContents(0)
-        self.setAcceptDrops(True)
+        self.setAcceptDrops(process == 'install')
         self.distribution = None
 
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
