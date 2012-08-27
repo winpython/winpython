@@ -107,12 +107,14 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, target, instdir, srcdir=None, toolsdir=None,
+    def __init__(self, target, instdir, srcdir=None, toolsdirs=None,
                  verbose=False):
         self.target = target
         self.instdir = instdir
         self.srcdir = srcdir
-        self.toolsdir = toolsdir
+        if toolsdirs is None:
+            toolsdirs = []
+        self.toolsdirs = toolsdirs
         self.verbose = verbose
         self.version = None
         self.fullversion = None
@@ -334,10 +336,8 @@ cd %WINPYDIR%""" + package_dir + r"""
         self._print("Copying tools")
         toolsdir = osp.join(self.winpydir, 'tools')
         os.mkdir(toolsdir)
-        toolsdirs = [osp.join(osp.dirname(__file__), 'tools')]
-        if self.toolsdir is not None:
-            toolsdirs += [self.toolsdir]
-        for dirname in toolsdirs:
+        for dirname in [osp.join(osp.dirname(__file__), 'tools')
+                        ] + self.toolsdirs:
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
                 copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
@@ -481,6 +481,7 @@ def make_winpython(basedir, architecture, verbose=False, remove_existing=True):
       * (required) `packages.win32`: contains distutils 32-bit packages
       * (required) `packages.win-amd64`: contains distutils 64-bit packages
       * (optional) `packages.src`: contains distutils source distributions
+      * (required) `tools`: contains architecture-independent tools
       * (optional) `tools.win32`: contains 32-bit-specific tools
       * (optional) `tools.win-amd64`: contains 64-bit-specific tools
     
@@ -494,10 +495,13 @@ def make_winpython(basedir, architecture, verbose=False, remove_existing=True):
     builddir = osp.join(basedir, 'build')
     if not osp.isdir(builddir):
         os.mkdir(builddir)
-    toolsdir = osp.join(basedir, 'tools' + suffix)
-    if not osp.isdir(toolsdir):
-        toolsdir = None
-    dist = WinPythonDistribution(builddir, packdir, srcdir, toolsdir,
+    toolsdir1 = osp.join(basedir, 'tools')
+    assert osp.isdir(toolsdir1)
+    toolsdirs = [toolsdir1]
+    toolsdir2 = osp.join(basedir, 'tools' + suffix)
+    if osp.isdir(toolsdir2):
+        toolsdirs.append(toolsdir2)
+    dist = WinPythonDistribution(builddir, packdir, srcdir, toolsdirs,
                                  verbose=verbose)
     dist.make(remove_existing=remove_existing)
     return dist
