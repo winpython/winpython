@@ -135,10 +135,11 @@ UPGRADE_ACTION = 'Upgrade from v'
 NONE_ACTION = '-'
 
 class PackagesTable(QTableView):
-    def __init__(self, parent, process):
+    def __init__(self, parent, process, winname):
         QTableView.__init__(self, parent)
         self.model = PackagesModel(process)
         self.setModel(self.model)
+        self.winname = winname
         self.repair = False
         self.resizeColumnToContents(0)
         self.setAcceptDrops(process == 'install')
@@ -158,6 +159,36 @@ class PackagesTable(QTableView):
         """Return selected packages"""
         return [pack for pack in self.model.packages
                 if pack in self.model.checked]
+
+    def add_packages(self, fnames):
+        """Add packages"""
+        notsupported = []
+        notcompatible = []
+        dist = self.distribution
+        for fname in fnames:
+            bname = osp.basename(fname)
+            try:
+                package = wppm.Package(fname)
+                if package.is_compatible_with(dist):
+                    self.add_package(package)
+                else:
+                    notcompatible.append(bname)
+            except NotImplementedError:
+                notsupported.append(bname)
+        self.emit(SIGNAL('package_added()'))
+        if notsupported:
+            QMessageBox.warning(self, "Warning",
+                                "The following packages are <b>not (yet) "
+                                "supported</b> by %s:\n\n%s"
+                                % (self.winname, "<br>".join(notsupported)),
+                                QMessageBox.Ok)
+        if notcompatible:
+            QMessageBox.warning(self, "Warning", "The following packages "
+                                "are <b>not compatible</b> with "
+                                "Python <u>%s %dbit</u>:\n\n%s"
+                                % (dist.version, dist.architecture,
+                                   "<br>".join(notcompatible)),
+                                QMessageBox.Ok)
     
     def add_package(self, package):
         for pack in self.model.packages:
@@ -222,15 +253,8 @@ class PackagesTable(QTableView):
         """Reimplement Qt method
         Unpack dropped data and handle it"""
         source = event.mimeData()
-        for path in mimedata2url(source):
-            if osp.isfile(path):
-                try:
-                    package = wppm.Package(path)
-                    if package.is_compatible_with(self.distribution):
-                        self.add_package(package)
-                except NotImplementedError:
-                    pass
-        self.emit(SIGNAL('package_added()'))
+        fnames = [path for path in mimedata2url(source) if osp.isfile(path)]
+        self.add_packages(fnames)
         event.acceptProposedAction()
 
 
@@ -298,12 +322,16 @@ class DistributionSelector(QWidget):
 
 class Thread(QThread):
     """Installation/Uninstallation thread"""
-    def __init__(self, parent, callback):
+    def __init__(self, parent):
         QThread.__init__(self, parent)
-        self.callback = callback
+        self.callback = None
+        self.error = None
     
     def run(self):
-        self.callback()
+        try:
+            self.callback()
+        except Exception, error:
+            self.error = unicode(error)
 
 
 class PMWindow(QMainWindow):
@@ -312,7 +340,6 @@ class PMWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.thread = None
         self.distribution = None
         
         self.tabwidget = None
@@ -351,13 +378,13 @@ class PMWindow(QMainWindow):
         self.connect(self.selector, SIGNAL('selected_distribution(QString)'),
                      self.distribution_changed)
 
-        self.table = PackagesTable(self, 'install')
+        self.table = PackagesTable(self, 'install', self.NAME)
         self.connect(self.table, SIGNAL('package_added()'),
                      self.refresh_install_button)
         self.connect(self.table, SIGNAL("clicked(QModelIndex)"),
                      lambda index: self.refresh_install_button())
         
-        self.untable = PackagesTable(self, 'uninstall')
+        self.untable = PackagesTable(self, 'uninstall', self.NAME)
         self.connect(self.untable, SIGNAL("clicked(QModelIndex)"),
                      lambda index: self.refresh_uninstall_button())
 
@@ -383,7 +410,7 @@ class PMWindow(QMainWindow):
         font = QFont("Courier new")
         font.setPointSize(8)
         self.console = self.selector.console = cons = InternalShell(self)
-        self.console.interpreter.restore_stds()
+        #self.console.interpreter.restore_stds()
         
         # Setup the console widget
         cons.set_font(font)
@@ -504,7 +531,6 @@ class PMWindow(QMainWindow):
     
     def refresh_uninstall_button(self):
         """Refresh uninstall button enable state"""
-        self.untable.refresh_distribution(self.distribution)
         nbp = len(self.untable.get_selected_packages())
         self.uninstall_action.setEnabled(nbp > 0)
     
@@ -516,17 +542,22 @@ class PMWindow(QMainWindow):
     def register_distribution(self):
         """Register distribution"""
         answer = QMessageBox.warning(self, "Register distribution",
-            "This will associate Python file extensions, icons and "
-            "context menu with selected distribution for Windows registry. "
-            "The only way to undo this change will be to register another "
-            "Python distribution to Windows registry."
-            "\n\nDo you want to continue?",
-            QMessageBox.Yes | QMessageBox.Cancel)
+            "This will associate file extensions, icons and "
+            "Windows explorer's context menu entry ('Edit with IDLE') "
+            "with selected Python distribution in Windows registry. "
+            "<br><br><u>Warning</u>: the only way to undo this change is to "
+            "register another Python distribution to Windows registry."
+            "<br><br><u>Note</u>: these actions are exactly the same as those "
+            "performed when installing Python with the official installer "
+            "for Windows.<br><br>Do you want to continue?",
+            QMessageBox.Yes | QMessageBox.No)
         if answer == QMessageBox.Yes:
             associate.register(self.distribution.target)
     
     def distribution_changed(self, path):
         """Distribution path has just changed"""
+        for package in self.table.model.packages:
+            self.table.remove_package(package)
         dist = wppm.Distribution(unicode(path))
         self.table.refresh_distribution(dist)
         self.untable.refresh_distribution(dist)
@@ -541,33 +572,7 @@ class PMWindow(QMainWindow):
                       caption='Add packages', filters='*.exe *.zip *.tar.gz')
         if fnames:
             self.basedir = osp.dirname(fnames[0])
-            notsupported = []
-            notcompatible = []
-            dist = self.distribution
-            for fname in fnames:
-                bname = osp.basename(fname)
-                try:
-                    package = wppm.Package(fname)
-                    if package.is_compatible_with(dist):
-                        self.table.add_package(package)
-                    else:
-                        notcompatible.append(bname)
-                except NotImplementedError:
-                    notsupported.append(bname)
-            self.refresh_install_button()
-            if notsupported:
-                QMessageBox.warning(self, "Warning",
-                                    "The following packages are <b>not (yet) "
-                                    "supported</b> by %s:\n\n%s"
-                                    % (self.NAME, "<br>".join(notsupported)),
-                                    QMessageBox.Ok)
-            if notcompatible:
-                QMessageBox.warning(self, "Warning", "The following packages "
-                                    "are <b>not compatible</b> with "
-                                    "Python <u>%s %dbit</u>:\n\n%s"
-                                    % (dist.version, dist.architecture,
-                                       "<br>".join(notcompatible)),
-                                    QMessageBox.Ok)
+            self.table.add_packages(fnames)
 
     def get_packages_to_be_installed(self):
         """Return packages to be installed"""
@@ -594,7 +599,7 @@ class PMWindow(QMainWindow):
         if not packages:
             return
         func = getattr(self.distribution, action)
-        self.thread = Thread(self)
+        thread = Thread(self)
         for widget in self.children():
             if isinstance(widget, QWidget):
                 widget.setEnabled(False)
@@ -608,31 +613,36 @@ class PMWindow(QMainWindow):
             progress.setValue(index)
             progress.setLabelText("%s %s %s..."
                                   % (text, package.name, package.version))
+            QApplication.processEvents()
             if progress.wasCanceled():
                 break
             if package in table.model.actions:
                 try:
-                    self.thread.callback = lambda: func(package)
-                    self.thread.start()
-                    while self.thread.isRunning():
+                    thread.callback = lambda: func(package)
+                    thread.start()
+                    while thread.isRunning():
                         QApplication.processEvents()
                         if progress.wasCanceled():
                             status.setEnabled(True)
                             status.showMessage("Cancelling operation...")
                     table.remove_package(package)
+                    error = thread.error
                 except Exception, error:
+                    error = unicode(error)
+                if error is not None:
                     pstr = package.name + ' ' + package.version
                     QMessageBox.critical(self, "Error",
                                          "<b>Unable to %s <i>%s</i></b>"
                                          "<br><br>Error message:<br>%s"
-                                         % (action, pstr, unicode(error)))
+                                         % (action, pstr, error))
         progress.setValue(progress.maximum())
         status.clearMessage()
         for widget in self.children():
             if isinstance(widget, QWidget):
                 widget.setEnabled(True)
-        self.thread = None
-        table.refresh_distribution(self.distribution)
+        thread = None
+        for table in (self.table, self.untable):
+            table.refresh_distribution(self.distribution)
 
     def about(self):
         """About WPpm"""
