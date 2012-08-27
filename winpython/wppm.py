@@ -301,7 +301,7 @@ Binaries = ."""
         """Install a distutils package built with the bdist_wininst option
         (binary distribution, .exe file)"""
         self._print(package, "Extracting")
-        targetdir = utils.extract_exe(package.fname, targetdir=self.target)
+        targetdir = utils.extract_archive(package.fname)
         self._print_done()
         
         self._print(package, "Installing")
@@ -313,17 +313,15 @@ Binaries = ."""
                         create_bat_files=True)
         self.copy_files(package, targetdir, 'DLLs', 'DLLs')
         self.copy_files(package, targetdir, 'DATA', '.')
-        self.remove_directory(targetdir)
         self._print_done()
 
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
         (binary distribution, .msi file)"""
         raise NotImplementedError
-        self._print(package, "Extracting")
-        targetdir = utils.extract_msi(package.fname, targetdir=self.target)
-        self._print_done()
-        self.remove_directory(targetdir)
+        #self._print(package, "Extracting")
+        #targetdir = utils.extract_msi(package.fname, targetdir=self.target)
+        #self._print_done()
 
     def install_nsis_package(self, package):
         """Install a Python package built with NSIS (e.g. PyQt or PyQwt)
@@ -331,7 +329,7 @@ Binaries = ."""
         bname = osp.basename(package.fname)
         assert bname.startswith(self.NSIS_PACKAGES)
         self._print(package, "Extracting")
-        targetdir = utils.extract_exe(package.fname, targetdir=self.target)
+        targetdir = utils.extract_exe(package.fname)
         self._print_done()
 
         self._print(package, "Installing")
@@ -343,7 +341,6 @@ Binaries = ."""
             # Qwt5
             outdir = osp.join('Lib', 'site-packages', 'PyQt4', 'Qwt5')
         self.copy_files(package, targetdir, '$_OUTDIR', outdir)
-        self.remove_directory(targetdir)
         self._print_done()
 
 
