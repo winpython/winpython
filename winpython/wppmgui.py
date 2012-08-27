@@ -18,9 +18,9 @@ from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
                                 QTableView, QMessageBox, QPushButton, QLabel,
-                                QTabWidget)
+                                QTabWidget, QToolTip)
 from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
-                                 QThread)
+                                 QThread, QTimer)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
 
@@ -147,7 +147,7 @@ class PackagesTable(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.verticalHeader().hide()
         self.setShowGrid(False)
-    
+            
     def reset_model(self):
         self.model.reset()
         self.resizeColumnToContents(0)
@@ -365,6 +365,8 @@ class PMWindow(QMainWindow):
         self.distribution_changed(sys.prefix)
 
         self.tabwidget = QTabWidget()
+        self.connect(self.tabwidget, SIGNAL('currentChanged(int)'),
+                     self.current_tab_changed)
         btn_layout = self._add_table(self.table, "Install/upgrade packages",
                                      get_std_icon("ArrowDown"))
         unbtn_layout = self._add_table(self.untable, "Uninstall packages",
@@ -476,6 +478,11 @@ class PMWindow(QMainWindow):
         
         self.resize(400, 500)
     
+    def current_tab_changed(self, index):
+        """Current tab has just changed"""
+        if index == 0:
+            self.show_drop_tip()
+    
     def refresh_install_button(self):
         """Refresh install button enable state"""
         self.table.refresh_distribution(self.distribution)
@@ -484,6 +491,16 @@ class PMWindow(QMainWindow):
         nbp = len(self.table.get_selected_packages())
         for act in (self.remove_action, self.select_all_action):
             act.setEnabled(nbp > 0)
+        self.show_drop_tip()
+    
+    def show_drop_tip(self):
+        """Show drop tip on install table"""
+        callback = lambda: QToolTip.showText(
+                        self.table.mapToGlobal(self.table.pos()),
+                        '<b>Drop files here</b><br>'\
+                        'Executable installers (distutils) or source packages',
+                        self)
+        QTimer.singleShot(500, callback)
     
     def refresh_uninstall_button(self):
         """Refresh uninstall button enable state"""
