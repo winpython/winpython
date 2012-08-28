@@ -349,7 +349,7 @@ def python_distribution_infos():
 
 
 class PMWindow(QMainWindow):
-    NAME = 'WPPM'
+    NAME = 'WinPython Control Panel'
     def __init__(self):
         QMainWindow.__init__(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -693,7 +693,7 @@ Please provide any additional information below.
         QMessageBox.about(self,
             "About %s" % self.NAME,
             """<b>%s %s</b>
-            <br>WinPython Package Manager
+            <br>Package Manager and Advanced Tasks
             <p>Copyright &copy; 2012 Pierre Raybaut
             <br>Licensed under the terms of the MIT License
             <p>Created, developed and maintained by Pierre Raybaut
