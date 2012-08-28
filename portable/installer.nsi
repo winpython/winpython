@@ -40,10 +40,10 @@ SetCompressorDictSize 16 ; MB
 ; General
 ;-------------------------------------------------------------------------------
 
-Name "${ID} ${VERSION}${RELEASELEVEL}"
+Name "${ID} ${ARCH} ${VERSION}${RELEASELEVEL}"
 OutFile "${DISTDIR}\..\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}.exe"
 
-InstallDir "\${ID}-${VERSION}${RELEASELEVEL}"
+InstallDir "\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}"
 BrandingText "${BRANDING}"
 XPStyle on
 
@@ -125,10 +125,8 @@ FunctionEnd
 ;-------------------------------------------------------------------------------
 
 VIAddVersionKey "ProductName" "${ID}"
-VIAddVersionKey "Comments" ""
 VIAddVersionKey "CompanyName" "${COMPANY}"
-VIAddVersionKey "LegalTrademarks" "Pierre RAYBAUT"
-VIAddVersionKey "LegalCopyright" "© 2012"
+VIAddVersionKey "LegalCopyright" "Copyright © 2012 Pierre RAYBAUT"
 VIAddVersionKey "FileDescription" "${FILE_DESCRIPTION}"
-VIAddVersionKey "FileVersion" "1.0"
-VIProductVersion "${VERSION}.0"
+VIAddVersionKey "FileVersion" "${VERSION}"
+VIProductVersion "${VERSION}"
