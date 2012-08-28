@@ -370,9 +370,8 @@ cd %WINPYDIR%""" + package_dir + r"""
                              args='spyder --light',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
-        self.create_launcher('WPPM.exe', 'winpython.ico',
-                             args='wppmgui',
-                             workdir='${WINPYDIR}\Scripts')
+        self.create_launcher('WPControlPanel.exe', 'winpython.ico',
+                             args='wpcp', workdir='${WINPYDIR}\Scripts')
         self.create_launcher('QtDemo.exe', 'qt.ico', args='qtdemo.pyw',
            workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
         self.create_launcher('QtAssistant.exe', 'qtassistant.ico',
@@ -431,7 +430,7 @@ cmd.exe /k""")
         self.create_python_batch('spyder.bat', r'\Scripts', 'spyder')
         self.create_python_batch('spyder_light.bat', r'\Scripts', 'spyder',
                                  options='--light')
-        self.create_python_batch('wppm.bat', r'\Scripts', 'wppmgui.pyw')
+        self.create_python_batch('wpcp.bat', r'\Scripts', 'wpcp')
         self.create_python_batch('pyqt_demo.bat',
              r'\Lib\site-packages\PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')
         self._print_done()
