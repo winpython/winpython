@@ -13,16 +13,19 @@ Created on Mon Aug 13 11:40:01 2012
 import os.path as osp
 import os
 import sys
+import platform
+import urllib
 
 from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
                                 QTableView, QMessageBox, QPushButton, QLabel,
-                                QTabWidget, QToolTip)
+                                QTabWidget, QToolTip, QDesktopServices)
 from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
-                                 QThread, QTimer)
+                                 QThread, QTimer, QUrl)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
+import spyderlib.qt
 
 from spyderlib.widgets.internalshell import InternalShell
 from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
@@ -31,6 +34,7 @@ from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
 from spyderlib.utils.windows import set_attached_console_visible
 
 # Local imports
+from winpython import __version__, __project_url__, __forum_url__
 from winpython import wppm, associate
 from spyderlib.config import add_image_path, get_module_data_path, get_icon
 add_image_path(get_module_data_path('winpython', relpath='images'))
@@ -332,6 +336,16 @@ class Thread(QThread):
             self.callback()
         except Exception, error:
             self.error = unicode(error)
+
+
+def python_distribution_infos():
+    """Return Python distribution infos (not selected distribution but 
+    the one used to run this script)"""
+    winpyver = os.environ.get('WINPYVER')
+    if winpyver is None:
+        return 'Unknown Python distribution'
+    else:
+        return 'WinPython ' + winpyver
 
 
 class PMWindow(QMainWindow):
@@ -645,10 +659,7 @@ class PMWindow(QMainWindow):
             table.refresh_distribution(self.distribution)
 
     def about(self):
-        """About WPpm"""
-        import platform
-        from winpython import __version__, __project_url__, __forum_url__
-        import spyderlib.qt.QtCore
+        """About this program"""
         QMessageBox.about(self,
             "About %s" % self.NAME,
             """<b>%s %s</b>
@@ -662,11 +673,13 @@ class PMWindow(QMainWindow):
             </li><li>Discussions around the project: 
             <a href="%s">Google Group</a>
             </li></ul>
-            <p>Python %s, Qt %s, %s %s on %s"""
+            <p>This program is executed by:<br>
+            <b>%s</b><br>
+            Python %s, Qt %s, %s %s"""
             % (self.NAME, __version__, __project_url__, __forum_url__,
+               python_distribution_infos(),
                platform.python_version(), spyderlib.qt.QtCore.__version__,
-               spyderlib.qt.API_NAME, spyderlib.qt.__version__,
-               platform.system()) )
+               spyderlib.qt.API_NAME, spyderlib.qt.__version__,) )
         
     def closeEvent(self, event):
         self.console.exit_interpreter()
