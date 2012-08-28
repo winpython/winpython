@@ -27,7 +27,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-__version__ = '0.4dev'
+__version__ = '0.5dev'
 __license__ = __doc__
 __project_url__ = 'http://code.google.com/p/winpython'
 __forum_url__   = 'http://groups.google.com/group/winpython'

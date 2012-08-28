@@ -25,44 +25,6 @@ from guidata import disthelpers
 from winpython import wppm, utils
 
 
-#==============================================================================
-# The batch to exe conversion is abandoned due to false virus detection issues
-#==============================================================================
-def bat_to_exe(fname, icon):
-    """Convert .bat file to .exe using Bat_To_Exe_Converter (www.f2ko.de)"""
-    conv = 'Bat_To_Exe_Converter.exe'
-    assert fname.endswith('.bat')
-    assert icon.endswith('.ico')
-    #assert utils.is_program_installed(conv)
-    bname = osp.basename(fname)
-    args = ['-bat', bname, '-save', bname.replace('.bat', '.exe')]#,
-#            '-icon', osp.abspath(icon)]
-    print(args)
-    subprocess.call([conv]+args, cwd=osp.dirname(fname))
-
-def call_bat_from_exe(batname, targetname, icon):
-    """Call .bat file from a generated .exe file
-    Executable file is created in .bat file parent directory"""
-    assert batname.endswith('.bat')
-    assert targetname.endswith('.exe')
-    assert icon.endswith('.ico') and osp.isfile(icon)
-    exedir = osp.join(osp.dirname(batname), os.pardir)
-    exename = osp.join(exedir, targetname)
-    tmpbatname = exename.replace('.exe', '-tmp.bat')
-    tmpbat = file(tmpbatname, 'w')
-    tmpbat.write("""@echo off
-call %s""" % osp.relpath(batname, exedir))
-    tmpbat.close()
-    bat_to_exe(tmpbatname, icon)
-
-def bat_to_exe_test():
-    wpdir = osp.join(osp.dirname(__file__), os.pardir, 'sandbox',
-                     'winpython-2.7.3.amd64')
-    call_bat_from_exe(osp.join(wpdir, 'scripts', 'spyder.bat'), 'Spyder.exe',
-                      osp.join(wpdir, 'python-2.7.3.amd64',
-                               'Scripts', 'spyder.ico'))
-
-
 def get_drives():
     """Return all active drives"""
     import win32api
@@ -129,6 +91,27 @@ class WinPythonDistribution(object):
         self.installed_packages = []
     
     @property
+    def package_index_wiki(self):
+        """Return Package Index page in Wiki format"""
+        installed_tools = ('gettext 0.14.4', 'TortoiseHg 2.4.2',
+                           'WinMerge 2.12.4', '(32bit only) MinGW 4.5.2')
+        mklist = lambda seq: '\n  * '.join(sorted([name.replace('-', ' ')
+                                                   for name in seq]))
+        return """#summary WinPython %s Package Index
+
+The following packages are included in WinPython v%s.
+
+Python packages:
+
+  * %s
+
+
+Tools:
+
+  * %s""" % (self.winpyver, self.winpyver,
+         mklist(self.installed_packages), mklist(installed_tools))
+    
+    @property
     def winpyver(self):
         """Return WinPython version (with release level!)"""
         return '%s.%d%s' % (self.python_fullversion, self.build_number,
@@ -186,11 +169,11 @@ class WinPythonDistribution(object):
     def install_package(self, pattern):
         """Install package matching pattern"""
         fname = self.get_package_fname(pattern)
-        bname = osp.basename(fname)
-        if bname not in self.installed_packages:
+        name = osp.basename(fname)[:-4]
+        if name not in self.installed_packages:
             pack = wppm.Package(fname)
             self.distribution.install(pack)
-            self.installed_packages.append(bname)
+            self.installed_packages.append(name)
 
     def create_batch_script(self, name, contents):
         """Create batch script %WINPYDIR%/name"""
@@ -482,7 +465,25 @@ cmd.exe /k""")
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
-            
+        
+        # Writing package index
+        fname = osp.join(self.winpydir, os.pardir,
+                     'WinPython-%s-%s.txt' % (self.winpy_arch, self.winpyver))
+        open(fname, 'w').write(self.package_index_wiki)
+
+
+def rebuild_winpython(basedir=None, verbose=False):
+    """Rebuild winpython package from source"""
+    basedir = basedir if basedir is not None else utils.BASE_DIR
+    for architecture in (32, 64):
+        suffix = '.win32' if architecture == 32 else '.win-amd64'
+        packdir = osp.join(basedir, 'packages' + suffix)
+        for name in os.listdir(packdir):
+            if name.startswith('winpython-') and name.endswith('.exe'):
+                os.remove(osp.join(packdir, name))
+        utils.build_wininst(osp.dirname(__file__), copy_to=packdir,
+                            architecture=architecture, verbose=verbose)
+
 
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
@@ -528,13 +529,13 @@ def make_winpython(build_number, release_level, architecture,
 def make_all(build_number, release_level, basedir=None,
              create_installer=True, verbose=False, remove_existing=True):
     """Make WinPython for both 32 and 64bit architectures"""
-    subprocess.call("build_dist.bat", cwd=osp.dirname(__file__))
     for architecture in (32, 64):
         make_winpython(build_number, release_level, architecture,
                        basedir, verbose, remove_existing, create_installer)
 
 
 if __name__ == '__main__':
-    #make_winpython(0, 'beta4', 32,
+    rebuild_winpython()
+    #make_winpython(0, 'beta5', 32,
                    #remove_existing=False, create_installer=False)
-    make_all(0, 'beta4', remove_existing=False, create_installer=False)
+    make_all(0, 'beta5', remove_existing=True, create_installer=False)

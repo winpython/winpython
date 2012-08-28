@@ -160,12 +160,11 @@ def get_source_package_infos(fname):
     match = re.match(SOURCE_PATTERN, osp.basename(fname))
     if match is not None:
         return match.groups()[:2]
-    
-def source_to_wininst(fname, architecture=None, verbose=False):
-    """Extract source archive, build it and create a distutils installer"""
-    tmpdir = extract_archive(fname)
-    root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
-    assert osp.isdir(root)
+
+def build_wininst(root, copy_to=None, architecture=None, verbose=False):
+    """Build wininst installer from Python package located in *root*
+    and eventually copy it to *copy_to* folder.
+    Return wininst installer full path."""
     cmd = [sys.executable, 'setup.py', 'build']
     if architecture is not None:
         archstr = 'win32' if architecture == 32 else 'win-amd64'
@@ -180,14 +179,30 @@ def source_to_wininst(fname, architecture=None, verbose=False):
         p.stdout.close()
         p.stderr.close()
     distdir = osp.join(root, 'dist')
-    distname = os.listdir(distdir)[0]
-    match = re.match(WININST_PATTERN, distname)
-    if match is None:
-        raise RuntimeError, "Installation failed: not a pure Python package?"
+    pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
+    for distname in os.listdir(distdir):
+        match = re.match(pattern, distname)
+        if match is not None:
+            break
     else:
-        dest_fname = osp.join(osp.dirname(fname), distname)
-        shutil.copyfile(osp.join(distdir, distname), dest_fname)
-        return dest_fname
+        raise RuntimeError, "Build failed: not a pure Python package?"
+    src_fname = osp.join(distdir, distname)
+    if copy_to is None:
+        return src_fname
+    else:
+        dst_fname = osp.join(copy_to, distname)
+        shutil.move(src_fname, dst_fname)
+        if verbose:
+            print("Move: %s --> %s" % (src_fname, (dst_fname)))
+        return dst_fname
+
+def source_to_wininst(fname, architecture=None, verbose=False):
+    """Extract source archive, build it and create a distutils installer"""
+    tmpdir = extract_archive(fname)
+    root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
+    assert osp.isdir(root)
+    return build_wininst(root, copy_to=osp.dirname(fname),
+                         architecture=architecture, verbose=verbose)
 
 
 if __name__ == '__main__':
