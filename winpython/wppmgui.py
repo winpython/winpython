@@ -498,8 +498,11 @@ class PMWindow(QMainWindow):
         about_action = create_action(self, "About %s..." % self.NAME,
                                 icon=get_std_icon('MessageBoxInformation'),
                                 triggered=self.about)
+        report_action = create_action(self, "Report issue...",
+                                icon=get_icon('bug.png'),
+                                triggered=self.report_issue)
         help_menu = self.menuBar().addMenu("?")
-        add_actions(help_menu, [about_action])
+        add_actions(help_menu, [about_action, None, report_action])
 
         # Status bar
         status = self.statusBar()
@@ -657,6 +660,33 @@ class PMWindow(QMainWindow):
         thread = None
         for table in (self.table, self.untable):
             table.refresh_distribution(self.distribution)
+
+    def report_issue(self):
+        
+        issue_template = """\
+Python distribution:   %s
+Control panel version: %s
+
+Python Version:  %s
+Qt Version:      %s, %s %s
+
+What steps will reproduce the problem?
+1.
+2.
+3.
+
+What is the expected output? What do you see instead?
+
+
+Please provide any additional information below.
+""" % (python_distribution_infos(),
+       __version__, platform.python_version(),
+       spyderlib.qt.QtCore.__version__, spyderlib.qt.API_NAME,
+       spyderlib.qt.__version__)
+       
+        url = QUrl("%s/issues/entry" % __project_url__)
+        url.addEncodedQueryItem("comment", urllib.quote(issue_template))
+        QDesktopServices.openUrl(url)    
 
     def about(self):
         """About this program"""
