@@ -107,8 +107,12 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    def __init__(self, target, instdir, srcdir=None, toolsdirs=None,
-                 verbose=False):
+    def __init__(self, build_number, release_level, target, instdir,
+                 srcdir=None, toolsdirs=None, verbose=False):
+        assert isinstance(build_number, int)
+        assert isinstance(release_level, str)
+        self.build_number = build_number
+        self.release_level = release_level
         self.target = target
         self.instdir = instdir
         self.srcdir = srcdir
@@ -116,13 +120,19 @@ class WinPythonDistribution(object):
             toolsdirs = []
         self.toolsdirs = toolsdirs
         self.verbose = verbose
-        self.version = None
-        self.fullversion = None
         self.winpydir = None
         self.python_fname = None
         self.python_name = None
+        self.python_version = None
+        self.python_fullversion = None
         self.distribution = None
         self.installed_packages = []
+    
+    @property
+    def winpyver(self):
+        """Return WinPython version (with release level!)"""
+        return '%s.%d%s' % (self.python_fullversion, self.build_number,
+                            self.release_level)
 
     @property
     def python_dir(self):
@@ -232,6 +242,7 @@ class WinPythonDistribution(object):
         fname = osp.join(self.winpydir, osp.splitext(name)[0]+'.nsi')
         
         data = [('WINPYDIR', '$EXEDIR\%s' % self.python_name),
+                ('WINPYVER', self.winpyver),
                 ('COMMAND', command),
                 ('PARAMETERS', args),
                 ('WORKDIR', workdir),
@@ -263,17 +274,16 @@ call %~dp0env.bat
 cd %WINPYDIR%""" + package_dir + r"""
 """ + cmd + script_name + options + " %*")
 
-    def create_installer(self, build_number, release_level):
+    def create_installer(self):
         """Create installer with NSIS"""
-        assert isinstance(build_number, int)
-        assert isinstance(release_level, str)
         self._print("Creating WinPython installer")
         portable_dir = osp.join(osp.dirname(__file__), 'portable')
         fname = osp.join(portable_dir, 'installer-tmp.nsi')
         data = (('DISTDIR', self.winpydir),
                 ('ARCH', self.winpy_arch),
-                ('VERSION', '%s.%d' % (self.fullversion, build_number)),
-                ('RELEASELEVEL', release_level),)
+                ('VERSION', '%s.%d' % (self.python_fullversion,
+                                       self.build_number)),
+                ('RELEASELEVEL', self.release_level),)
         self.build_nsis('installer.nsi', fname, data)
         self._print_done()
 
@@ -311,16 +321,16 @@ cd %WINPYDIR%""" + package_dir + r"""
         """Installing required packages"""
         print("Installing required packages")
         self.install_package('pywin32-([0-9\.]*[a-z]*).%s-py%s.exe'
-                             % (self.py_arch, self.version))
+                             % (self.py_arch, self.python_version))
         self.install_package('winpython-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
-                             % (self.py_arch, self.version))
+                             % (self.py_arch, self.python_version))
         self.install_package('spyder(lib)?-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
-                             % (self.py_arch, self.version))
+                             % (self.py_arch, self.python_version))
         self.install_package(pattern='PyQt-Py%s-%s-gpl-([0-9\.\-]*).exe'
-                                     % (self.version, self.pyqt_arch))
+                                     % (self.python_version, self.pyqt_arch))
         self.install_package(
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
-                            % (self.version, self.pyqt_arch))
+                            % (self.python_version, self.pyqt_arch))
     
     def _install_all_other_packages(self):
         """Try to install all other packages in instdir"""
@@ -407,6 +417,7 @@ The environment variables are set-up in 'env.bat'.""")
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
         self.create_batch_script('env.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
+set WINPYVER=""" + self.winpyver + """
 set HOME=%WINPYDIR%\..\settings
 set PATH=""" + path)
         #self.create_batch_script('env.bat', """@echo off
@@ -437,8 +448,8 @@ cmd.exe /k""")
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
                         ).groups()[0].split('.')
-        self.version = '.'.join(vlst[:2])
-        self.fullversion = '.'.join(vlst[:3])
+        self.python_version = '.'.join(vlst[:2])
+        self.python_fullversion = '.'.join(vlst[:3])
 
         # Create the WinPython base directory
         self._print("Creating WinPython base directory")
@@ -474,8 +485,9 @@ cmd.exe /k""")
             self._print_done()
             
 
-def make_winpython(architecture, basedir=None,
-                   verbose=False, remove_existing=True):
+def make_winpython(build_number, release_level, architecture,
+                   basedir=None, verbose=False, remove_existing=True,
+                   create_installer=True):
     """Make WinPython distribution, assuming that the following folders exist
     in *basedir* directory (if basedir is None, the WINPYTHONBASEDIR environ-
     ment variable is assumed to be basedir):
@@ -505,9 +517,12 @@ def make_winpython(architecture, basedir=None,
     toolsdir2 = osp.join(basedir, 'tools' + suffix)
     if osp.isdir(toolsdir2):
         toolsdirs.append(toolsdir2)
-    dist = WinPythonDistribution(builddir, packdir, srcdir, toolsdirs,
+    dist = WinPythonDistribution(build_number, release_level,
+                                 builddir, packdir, srcdir, toolsdirs,
                                  verbose=verbose)
     dist.make(remove_existing=remove_existing)
+    if create_installer:
+        dist.create_installer()
     return dist
 
 
@@ -516,12 +531,11 @@ def make_all(build_number, release_level, basedir=None,
     """Make WinPython for both 32 and 64bit architectures"""
     subprocess.call("build_dist.bat", cwd=osp.dirname(__file__))
     for architecture in (32, 64):
-        dist = make_winpython(architecture, basedir, verbose, remove_existing)
-        if create_installer:
-            dist.create_installer(build_number, release_level)
+        make_winpython(build_number, release_level, architecture,
+                       basedir, verbose, remove_existing, create_installer)
 
 
 if __name__ == '__main__':
-    #dist = make_winpython(32, remove_existing=True)
-#    dist.create_installer(0, 'beta4')
-    make_all(0, 'beta4', create_installer=True)
+    #make_winpython(0, 'beta4', 32,
+                   #remove_existing=False, create_installer=False)
+    make_all(0, 'beta4', remove_existing=False, create_installer=False)
