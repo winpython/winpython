@@ -58,7 +58,7 @@ including a package manager, WPPM.""",
       packages=get_subpackages(LIBNAME),
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.mo', '.svg', '.png', '.css',
-                                               '.html', '.js')),},
+                                               '.html', '.js', '.ini')),},
       requires=["spyderlib (>=2.1.12)", "PyQt4 (>=4.5)"],
       scripts=[osp.join('scripts', fname) for fname in
                ('wppm', 'wppm.bat', 'wpcp', 'wpcp.bat')],

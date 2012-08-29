@@ -1,4 +1,4 @@
-recursive-include winpython *.svg *.png
+recursive-include winpython *.svg *.png *.ini
 recursive-include tools *.*
 include scripts/*
 include MANIFEST.in
