@@ -36,17 +36,14 @@ from spyderlib.utils.windows import set_attached_console_visible
 # Local imports
 from winpython import __version__, __project_url__, __forum_url__
 from winpython import wppm, associate
-from spyderlib.config import add_image_path, get_module_data_path, get_icon
-add_image_path(get_module_data_path('winpython', relpath='images'))
+from winpython.config import get_icon
 
 
-COLUMNS = CHECK, NAME, VERSION, ACTION = range(4)
+COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = range(5)
 
 class PackagesModel(QAbstractTableModel):
-    def __init__(self, process):
+    def __init__(self):
         QAbstractTableModel.__init__(self)
-        assert process in ('install', 'uninstall')
-        self.process = process
         self.packages = []
         self.checked = set()
         self.actions = {}
@@ -59,7 +56,7 @@ class PackagesModel(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemIsEnabled
         column = index.column()
-        if column in (NAME, VERSION, ACTION):
+        if column in (NAME, VERSION, ACTION, DESCRIPTION):
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index))
         else:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index)|
@@ -78,10 +75,16 @@ class PackagesModel(QAbstractTableModel):
             elif column == VERSION:
                 return to_qvariant(package.version)
             elif column == ACTION:
-                action = self.actions[package]
-                return to_qvariant(action)
+                action = self.actions.get(package)
+                if action is not None:
+                    return to_qvariant(action)
+            elif column == DESCRIPTION:
+                return to_qvariant(package.description)
         elif role == Qt.TextAlignmentRole:
-            return to_qvariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+            if column == ACTION:
+                return to_qvariant(int(Qt.AlignRight|Qt.AlignVCenter))
+            else:
+                return to_qvariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
             if package in self.checked:
                 color = QColor(Qt.darkGreen)
@@ -107,16 +110,15 @@ class PackagesModel(QAbstractTableModel):
                 return to_qvariant("Version")
             elif section == ACTION:
                 return to_qvariant("Action")
+            elif section == DESCRIPTION:
+                return to_qvariant("Description")
         return to_qvariant()
 
     def rowCount(self, index=QModelIndex()):
         return len(self.packages)
 
     def columnCount(self, index=QModelIndex()):
-        if self.process == 'install':
-            return len(COLUMNS)
-        else:
-            return len(COLUMNS) - 1
+        return len(COLUMNS)
     
     def setData(self, index, value, role=Qt.EditRole):
         if index.isValid() and 0 <= index.row() < len(self.packages)\
@@ -141,12 +143,16 @@ NONE_ACTION = '-'
 class PackagesTable(QTableView):
     def __init__(self, parent, process, winname):
         QTableView.__init__(self, parent)
-        self.model = PackagesModel(process)
+        assert process in ('install', 'uninstall')
+        self.process = process
+        self.model = PackagesModel()
         self.setModel(self.model)
         self.winname = winname
         self.repair = False
         self.resizeColumnToContents(0)
         self.setAcceptDrops(process == 'install')
+        if process == 'uninstall':
+            self.hideColumn(0)
         self.distribution = None
 
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -155,9 +161,9 @@ class PackagesTable(QTableView):
             
     def reset_model(self):
         self.model.reset()
-        self.resizeColumnToContents(0)
-#        self.resizeRowsToContents()
         self.horizontalHeader().setStretchLastSection(True)
+        for colnb in (ACTION, CHECK, NAME, VERSION):
+            self.resizeColumnToContents(colnb)
 
     def get_selected_packages(self):
         """Return selected packages"""
@@ -214,7 +220,7 @@ class PackagesTable(QTableView):
     
     def refresh_distribution(self, dist):
         self.distribution = dist
-        if self.model.process == 'install':
+        if self.process == 'install':
             for package in self.model.packages:
                 pack = dist.find_package(package.name)
                 if pack is None:
@@ -231,7 +237,7 @@ class PackagesTable(QTableView):
             self.model.packages = self.distribution.get_installed_packages()
             for package in self.model.packages:
                 self.model.actions[package] = NONE_ACTION
-        self.model.reset()
+        self.reset_model()
     
     def select_all(self):
         allpk = set(self.model.packages)
@@ -716,18 +722,21 @@ Please provide any additional information below.
         event.accept()
 
         
-def main():
+def main(test=False):
     set_attached_console_visible(False)
-    
     app = QApplication([])
     win = PMWindow()
     win.show()
-    win.basedir = osp.join(osp.dirname(__file__),
-                           os.pardir, os.pardir, os.pardir, 'sandbox')
-    #win.table.add_package(wppm.Package(r'D:\Pierre\installers\Cython-0.16.win-amd64-py2.7.exe'))
-    win.refresh_install_button()
+    if test:
+        return app, win
+    else:
+        app.exec_()
+
+
+def test():
+    app, win = main(test=True)
     app.exec_()
 
 
 if __name__ == "__main__":
-    main()
+    test()

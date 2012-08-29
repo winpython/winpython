@@ -19,27 +19,43 @@ import cPickle
 import re
 import sys
 import subprocess
+import ConfigParser
 
 # Local imports
 from winpython import utils
+from winpython.config import get_data_path
 
 # Workaround for installing PyVISA on Windows from source:
 os.environ['HOME'] = os.environ['USERPROFILE']
 
 
-class Package(object):
+def get_package_metadata(database, name):
+    """Extract infos (description, url) from the local database"""
+    # Note: we could use the PyPI database but this has been written on 
+    # machine which is not connected to the internet
+    db = ConfigParser.ConfigParser()
+    db.readfp(open(osp.join(get_data_path(), database)))
+    metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
+    for key in metadata:
+        name1 = name.lower()
+        for name in (name1, name1.split('-')[0]):
+            try:
+                metadata[key] = db.get(name, key)
+                break
+            except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+                pass
+    return metadata
+
+
+class BasePackage(object):
     def __init__(self, fname):
         self.fname = fname
-
-        self.files = []
-        self.folders = []
-        
-        # Package informations extracted from installer filename
         self.name = None
         self.version = None
         self.architecture = None
         self.pyversion = None
-        self.extract_infos()
+        self.description = None
+        self.url = None
     
     def is_compatible_with(self, distribution):
         """Return True if package is compatible with distribution in terms of
@@ -52,6 +68,22 @@ class Package(object):
             # Non-pure Python package
             iscomp = iscomp and self.pyversion == distribution.version
         return iscomp
+
+    def extract_optional_infos(self):
+        """Extract package optional infos (description, url)
+        from the package database"""
+        metadata = get_package_metadata('packages.ini', self.name)
+        for key, value in metadata.iteritems():
+            setattr(self, key, value)
+
+class Package(BasePackage):
+    def __init__(self, fname):
+        BasePackage.__init__(self, fname)
+        self.files = []
+        self.folders = []
+
+        self.extract_infos()
+        self.extract_optional_infos()
 
     def extract_infos(self):
         """Extract package infos (name, version, architecture)
@@ -112,18 +144,15 @@ class Package(object):
             pass
 
 
-class WininstPackage(object):
+class WininstPackage(BasePackage):
     def __init__(self, fname, distribution):
-        self.fname = fname  # Remove executable
+        BasePackage.__init__(self, fname)
         self.logname = None
-        
         self.distribution = distribution
         self.architecture = distribution.architecture
         self.pyversion = distribution.version
-
-        self.name = None
-        self.version = None
         self.extract_infos()
+        self.extract_optional_infos()
 
     def extract_infos(self):
         """Extract package infos (name, version, architecture)"""
@@ -427,5 +456,6 @@ if __name__ == '__main__':
 
     dist = Distribution(target, verbose=False)
     pack = Package(fname)
-    dist.install(pack)
+    print(pack.description)
+    #dist.install(pack)
     #dist.uninstall(pack)

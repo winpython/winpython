@@ -93,23 +93,34 @@ class WinPythonDistribution(object):
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = ('gettext 0.14.4', 'TortoiseHg 2.4.2',
-                           'WinMerge 2.12.4', '(32bit only) MinGW 4.5.2')
-        mklist = lambda seq: '\n  * '.join(sorted([name.replace('-', ' ')
-                                                   for name in seq]))
-        return """#summary WinPython %s Package Index
+        installed_tools = (('gettext', '0.14.4'),
+                           ('TortoiseHg', '2.4.2'),
+                           ('WinMerge', '2.12.4'),
+                           ('MinGW32', '4.5.2'))
+        tools = []
+        for name, ver in installed_tools:
+            metadata = wppm.get_package_metadata('tools.ini', name)
+            url, desc = metadata['url'], metadata['description']
+            tools += ['|| [%s %s] || %s || %s ||' % (url, name, ver, desc)]
+        packages = ['|| [%s %s] || %s || %s ||'
+                    % (pack.url, pack.name, pack.version, pack.description)
+                    for pack in sorted(self.installed_packages,
+                                       key=lambda p: p.name)]
+        python_desc = 'Python programming language with standard library'
+        return """== WinPython %s ==
 
 The following packages are included in WinPython v%s.
 
-Python packages:
+=== Tools ===
 
-  * %s
+%s
 
+=== Python packages ===
 
-Tools:
+|| [http://www.python.org/ Python] || %s || %s ||
 
-  * %s""" % (self.winpyver, self.winpyver,
-         mklist(self.installed_packages), mklist(installed_tools))
+%s""" % (self.winpyver, self.winpyver, '\n'.join(tools),
+         self.python_fullversion, python_desc, '\n'.join(packages))
     
     @property
     def winpyver(self):
@@ -173,7 +184,7 @@ Tools:
         if name not in self.installed_packages:
             pack = wppm.Package(fname)
             self.distribution.install(pack)
-            self.installed_packages.append(name)
+            self.installed_packages.append(pack)
 
     def create_batch_script(self, name, contents):
         """Create batch script %WINPYDIR%/name"""
@@ -287,7 +298,6 @@ cd %WINPYDIR%""" + package_dir + r"""
         self._print("Extracting Python installer")
         os.mkdir(self.python_dir)
         utils.extract_msi(self.python_fname, targetdir=self.python_dir)
-        self.installed_packages.append(self.python_name)
         os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
         os.mkdir(osp.join(self.python_dir, 'Scripts'))
         self._print_done()
@@ -468,7 +478,7 @@ cmd.exe /k""")
         
         # Writing package index
         fname = osp.join(self.winpydir, os.pardir,
-                     'WinPython-%s-%s.txt' % (self.winpy_arch, self.winpyver))
+                         'WinPython-%s.txt' % self.winpyver)
         open(fname, 'w').write(self.package_index_wiki)
 
 
@@ -538,4 +548,4 @@ if __name__ == '__main__':
     rebuild_winpython()
     #make_winpython(0, 'beta5', 32,
                    #remove_existing=False, create_installer=False)
-    make_all(0, 'beta5', remove_existing=True, create_installer=False)
+    make_all(0, 'beta5')#, remove_existing=False, create_installer=False)
