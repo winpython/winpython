@@ -329,6 +329,7 @@ python "%~dpn0""" + ext + """" %*""")
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
         if package.name in ('PyQt', 'PyQt4'):
+            # Qt configuration file (where to find Qt)
             name = 'qt.conf'
             contents = """[Paths]
 Prefix = .
@@ -337,6 +338,14 @@ Binaries = ."""
                          osp.join('Lib', 'site-packages', 'PyQt4'),  contents)
             self.create_file(package, name, '.',
                          contents.replace('.', './Lib/site-packages/PyQt4'))
+            # pyuic script
+            self.create_file(package, 'pyuic.bat', 'Scripts', '''@echo off
+python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9''')
+            # Adding missing __init__.py files (fixes Issue 8)
+            uic_path = osp.join('Lib', 'site-packages', 'PyQt4', 'uic')
+            for dirname in ('Loader', 'port_v2', 'port_v3'):
+                self.create_file(package, '__init__.py',
+                                 osp.join(uic_path, dirname), '')
     
     def _print(self, package, action):
         """Print package-related action text (e.g. 'Installing') 
@@ -453,9 +462,10 @@ if __name__ == '__main__':
     target = osp.join(utils.BASE_DIR, 'build',
                       'winpython-2.7.3', 'python-2.7.3')
     fname = osp.join(utils.BASE_DIR, 'packages.src', 'Jinja2-2.6.tar.gz')
+    fname = osp.join(utils.BASE_DIR, 'packages.win32', 'PyQt-Py2.7-x32-gpl-4.8.6-1.exe')
 
     dist = Distribution(target, verbose=False)
     pack = Package(fname)
     print(pack.description)
-    #dist.install(pack)
+    dist.install(pack)
     #dist.uninstall(pack)
