@@ -181,7 +181,7 @@ The following packages are included in WinPython v%s.
         """Install package matching pattern"""
         fname = self.get_package_fname(pattern)
         name = osp.basename(fname)[:-4]
-        if name not in self.installed_packages:
+        if name not in [p.fname for p in self.installed_packages]:
             pack = wppm.Package(fname)
             self.distribution.install(pack)
             self.installed_packages.append(pack)
