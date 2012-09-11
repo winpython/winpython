@@ -15,7 +15,6 @@ from __future__ import print_function
 import os
 import os.path as osp
 import shutil
-import cPickle
 import re
 import sys
 import subprocess
@@ -80,8 +79,7 @@ class Package(BasePackage):
     def __init__(self, fname):
         BasePackage.__init__(self, fname)
         self.files = []
-        self.folders = []
-
+        
         self.extract_infos()
         self.extract_optional_infos()
 
@@ -122,19 +120,24 @@ class Package(BasePackage):
     
     def save_log(self, logdir):
         """Save log (pickle)"""
-        log = [self.files, self.folders]
-        try:
-            cPickle.dump(log, file(self.logpath(logdir), 'w'))
-        except (IOError, OSError):
-            raise
+        header = ['# WPPM package installation log',
+                  '# ',
+                  '# Package: %s v%s' % (self.name, self.version),
+                  '']
+        file(self.logpath(logdir), 'w').write('\n'.join(header + self.files))
 
     def load_log(self, logdir):
         """Load log (pickle)"""
         try:
-            log = cPickle.loads(file(self.logpath(logdir), 'U').read())
+            data = file(self.logpath(logdir), 'U').readlines()
         except (IOError, OSError):
             raise
-        self.files, self.folders = log
+        self.files = []
+        for line in data:
+            relpath = line.strip()
+            if relpath.startswith('#') or len(relpath) == 0:
+                continue
+            self.files.append(relpath)
     
     def remove_log(self, logdir):
         """Remove log (after uninstalling package)"""
@@ -233,7 +236,7 @@ class Distribution(object):
                 full_dst = osp.join(self.target, dst)
                 if not osp.exists(full_dst):
                     os.mkdir(full_dst)
-                package.folders.append(dst)
+                package.files.append(dst)
             for fname in filenames:
                 t_fname = osp.join(dirpath, fname)[offset:]
                 src = osp.join(srcdir, t_fname)
@@ -371,24 +374,29 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         else:
             package.load_log(self.logdir)
             for fname in reversed(package.files):
-                if self.verbose:
-                    print("remove: %s" % fname)
                 path = osp.join(self.target, fname)
-                if osp.exists(path):
+                if osp.isfile(path):
+                    if self.verbose:
+                        print("remove: %s" % fname)
                     os.remove(path)
-                if fname.endswith('.py'):
-                    for suffix in ('c', 'o'):
-                        if osp.exists(path+suffix):
-                            os.remove(path+suffix)
-            for dname in reversed(package.folders):
-                try:
+                    if fname.endswith('.py'):
+                        for suffix in ('c', 'o'):
+                            if osp.exists(path+suffix):
+                                if self.verbose:
+                                    print("remove: %s" % (fname+suffix))
+                                os.remove(path+suffix)
+                elif osp.isdir(path):
                     if self.verbose:
                         print("rmdir:  %s" % fname)
-                    path = osp.join(self.target, dname)
-                    if osp.exists(path):
+                    try:
                         os.rmdir(path)
-                except OSError:
-                    pass
+                    except OSError:
+                        if self.verbose:
+                            print("unable to remove directory: %s" % fname,
+                                  file=sys.stderr)
+                else:
+                    if self.verbose:
+                        print("file not found: %s" % fname, file=sys.stderr)
             package.remove_log(self.logdir)
         self._print_done()
     
@@ -461,10 +469,10 @@ if __name__ == '__main__':
     
     target = osp.join(utils.BASE_DIR, 'build',
                       'winpython-2.7.3', 'python-2.7.3')
-    fname = osp.join(utils.BASE_DIR, 'packages.src', 'Jinja2-2.6.tar.gz')
+    #fname = osp.join(utils.BASE_DIR, 'packages.src', 'docutils-0.9.1.tar.gz')
     fname = osp.join(utils.BASE_DIR, 'packages.win32', 'PyQt-Py2.7-x32-gpl-4.8.6-1.exe')
 
-    dist = Distribution(target, verbose=False)
+    dist = Distribution(target, verbose=True)
     pack = Package(fname)
     print(pack.description)
     dist.install(pack)
