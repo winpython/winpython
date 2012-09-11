@@ -548,4 +548,4 @@ if __name__ == '__main__':
     rebuild_winpython()
     #make_winpython(0, 'beta5', 32,
                    #remove_existing=False, create_installer=False)
-    make_all(0, 'beta5')#, remove_existing=False, create_installer=False)
+    make_all(0, 'rc1')#, remove_existing=False, create_installer=False)
