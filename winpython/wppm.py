@@ -159,7 +159,7 @@ class WininstPackage(BasePackage):
 
     def extract_infos(self):
         """Extract package infos (name, version, architecture)"""
-        match = re.match(r'Remove([a-zA-Z0-9\-\_]*)\.exe', self.fname)
+        match = re.match(r'Remove([a-zA-Z0-9\-\_\.]*)\.exe', self.fname)
         if match is None:
             return
         self.name = match.groups()[0]
