@@ -152,8 +152,8 @@ def extract_archive(fname, targetdir=None, verbose=False):
     return targetdir
 
 
-WININST_PATTERN = r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)(-py([0-9\.]*))?(-setup)?\.exe'
-SOURCE_PATTERN = r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)'
+WININST_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.]*[a-z]*).(win32|win\-amd64)(-py([0-9\.]*))?(-setup)?\.exe'
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.]*[a-z]*).(zip|tar\.gz)'
 
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
