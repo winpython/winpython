@@ -20,6 +20,7 @@ import tempfile
 import shutil
 import atexit
 import sys
+import stat
 
 
 # Development only
@@ -27,6 +28,22 @@ TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
 if osp.isdir(TOOLS_DIR):
     os.environ['PATH'] += ';%s' % TOOLS_DIR
 BASE_DIR = os.environ.get('WINPYTHONBASEDIR')
+
+
+def onerror(function, path, excinfo):
+    """Error handler for `shutil.rmtree`.
+    
+    If the error is due to an access error (read-only file), it 
+    attempts to add write permission and then retries.
+    If the error is for another reason, it re-raises the error.
+    
+    Usage: `shutil.rmtree(path, onerror=onerror)"""
+    if not os.access(path, os.W_OK):
+        # Is the error an access error?
+        os.chmod(path, stat.S_IWUSR)
+        function(path)
+    else:
+        raise
 
 
 # Exact copy of 'spyderlib.utils.programs.is_program_installed' function
@@ -99,7 +116,7 @@ def get_python_infos(path):
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
     tmpdir = tempfile.mkdtemp(prefix='wppm_')
-    atexit.register(shutil.rmtree, tmpdir)
+    atexit.register(lambda path: shutil.rmtree(path, onerror=onerror), tmpdir)
     return tmpdir
 
 def extract_msi(fname, targetdir=None, verbose=False):
