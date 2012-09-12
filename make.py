@@ -447,7 +447,7 @@ cmd.exe /k""")
         self._print("Creating WinPython base directory")
         self.winpydir = osp.join(self.target, distname)
         if osp.isdir(self.winpydir) and remove_existing:
-            shutil.rmtree(self.winpydir)
+            shutil.rmtree(self.winpydir, onerror=utils.onerror)
         if not osp.isdir(self.winpydir):
             os.mkdir(self.winpydir)
         if remove_existing:

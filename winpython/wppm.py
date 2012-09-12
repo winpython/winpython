@@ -201,7 +201,7 @@ class Distribution(object):
         """Remove directories which couldn't be removed when building"""
         for path in self.to_be_removed:
             try:
-                shutil.rmtree(path)
+                shutil.rmtree(path, onerror=utils.onerror)
             except WindowsError:
                 print >>sys.stderr, "Directory %s could not be removed" % path
         
