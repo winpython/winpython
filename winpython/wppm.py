@@ -37,9 +37,9 @@ def get_package_metadata(database, name):
     metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
     for key in metadata:
         name1 = name.lower()
-        for name in (name1, name1.split('-')[0]):
+        for name2 in (name1, name1.split('-')[0]):
             try:
-                metadata[key] = db.get(name, key)
+                metadata[key] = db.get(name2, key)
                 break
             except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
                 pass
@@ -470,10 +470,13 @@ if __name__ == '__main__':
     target = osp.join(utils.BASE_DIR, 'build',
                       'winpython-2.7.3', 'python-2.7.3')
     #fname = osp.join(utils.BASE_DIR, 'packages.src', 'docutils-0.9.1.tar.gz')
-    fname = osp.join(utils.BASE_DIR, 'packages.win32', 'PyQt-Py2.7-x32-gpl-4.8.6-1.exe')
+    fname = osp.join(utils.BASE_DIR, 'packages.win32',
+                     'PyQt-Py2.7-x32-gpl-4.8.6-1.exe')
+    fname = osp.join(utils.BASE_DIR, 'packages.win32',
+                     'scikits-image-0.6.1.win32-py2.7.exe')
 
     dist = Distribution(target, verbose=True)
     pack = Package(fname)
     print(pack.description)
-    dist.install(pack)
+    #dist.install(pack)
     #dist.uninstall(pack)
