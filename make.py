@@ -69,6 +69,9 @@ def replace_in_nsis_file(fname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
+    THG_PATH = r'\tools\TortoiseHg\thgw.exe'
+    WINMERGE_PATH = r'\tools\WinMerge\WinMerge.exe'
+    
     def __init__(self, build_number, release_level, target, instdir,
                  srcdir=None, toolsdirs=None, verbose=False):
         assert isinstance(build_number, int)
@@ -93,10 +96,12 @@ class WinPythonDistribution(object):
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = (('gettext', '0.14.4'),
-                           ('TortoiseHg', '2.4.2'),
-                           ('WinMerge', '2.12.4'),
-                           ('MinGW32', '4.5.2'))
+        installed_tools = [('gettext', '0.14.4')]
+        if osp.isfile(self.winpydir + self.THG_PATH):
+            installed_tools += [('TortoiseHg', '2.4.2')]
+        if osp.isfile(self.winpydir + self.WINMERGE_PATH):
+            installed_tools += [('WinMerge', '2.12.4')]
+        installed_tools += [('MinGW32', '4.5.2')]
         tools = []
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata('tools.ini', name)
@@ -163,9 +168,11 @@ The following packages are included in WinPython v%s.
     @property
     def postpath(self):
         """Return PATH contents to be append to the environment variable"""
-        return ["", "DLLs", "Scripts",
-                r"..\tools", r"..\tools\gnuwin32\bin", r"..\tools\TortoiseHg"]
-        
+        path = ["", "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"]
+        if osp.isfile(self.winpydir + self.THG_PATH):
+            path += [r"..\tools\TortoiseHg"]
+        return path
+
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdir"""
         for path in (self.instdir, self.srcdir):
@@ -180,8 +187,7 @@ The following packages are included in WinPython v%s.
     def install_package(self, pattern):
         """Install package matching pattern"""
         fname = self.get_package_fname(pattern)
-        name = osp.basename(fname)[:-4]
-        if name not in [p.fname for p in self.installed_packages]:
+        if fname not in [p.fname for p in self.installed_packages]:
             pack = wppm.Package(fname)
             self.distribution.install(pack)
             self.installed_packages.append(pack)
@@ -381,15 +387,13 @@ cd %WINPYDIR%""" + package_dir + r"""
                              command='${WINPYDIR}\pythonw.exe',
                              args='ipython-script.py qtconsole --pylab=inline',
                              workdir='${WINPYDIR}\Scripts')
-        thg = r'\tools\TortoiseHg\thgw.exe'
-        if osp.isfile(self.winpydir + thg):
+        if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
-                                 command=r'${WINPYDIR}\..' + thg,
+                                 command=r'${WINPYDIR}\..'+self.THG_PATH,
                                  workdir=r'${WINPYDIR}')
-        winmerge = r'\tools\WinMerge\WinMerge.exe'
-        if osp.isfile(self.winpydir + winmerge):
+        if osp.isfile(self.winpydir + self.WINMERGE_PATH):
             self.create_launcher('WinMerge.exe', 'winmerge.ico',
-                                 command=r'${WINPYDIR}\..' + winmerge,
+                                 command=r'${WINPYDIR}\..'+self.WINMERGE_PATH,
                                  workdir=r'${WINPYDIR}')
         self._print_done()
     
@@ -513,6 +517,7 @@ def make_winpython(build_number, release_level, architecture,
     basedir = basedir if basedir is not None else utils.BASE_DIR
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
+    utils.print_box("Making WinPython %dbits" % architecture)
     suffix = '.win32' if architecture == 32 else '.win-amd64'
     packdir = osp.join(basedir, 'packages' + suffix)
     assert osp.isdir(packdir)
@@ -546,6 +551,6 @@ def make_all(build_number, release_level, basedir=None,
 
 if __name__ == '__main__':
     rebuild_winpython()
-    #make_winpython(0, 'beta5', 32,
+    #make_winpython(0, 'rc1', 32,
                    #remove_existing=False, create_installer=False)
     make_all(0, 'rc1')#, remove_existing=False, create_installer=False)
