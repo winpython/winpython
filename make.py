@@ -66,6 +66,22 @@ def replace_in_nsis_file(fname, data):
     fd.writelines(lines)
     fd.close()
 
+def build_nsis(srcname, dstname, data):
+    """Build NSIS script"""
+    portable_dir = osp.join(osp.dirname(__file__), 'portable')
+    shutil.copy(osp.join(portable_dir, srcname), dstname)
+    data = [('!addincludedir', osp.join(portable_dir, 'include'))
+            ] + list(data)
+    replace_in_nsis_file(dstname, data)
+    try:
+        retcode = subprocess.call('"%s" -V2 %s' % (NSIS_EXE, dstname),
+                                  shell=True, stdout=sys.stderr)
+        if retcode < 0:
+            print >>sys.stderr, "Child was terminated by signal", -retcode
+    except OSError, e:
+        print >>sys.stderr, "Execution failed:", e
+    os.remove(dstname)
+
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
@@ -200,23 +216,7 @@ The following packages are included in WinPython v%s.
         fd = file(osp.join(scriptdir, name), 'w')
         fd.write(contents)
         fd.close()
-    
-    def build_nsis(self, srcname, dstname, data):
-        """Build NSIS script"""
-        portable_dir = osp.join(osp.dirname(__file__), 'portable')
-        shutil.copy(osp.join(portable_dir, srcname), dstname)
-        data = [('!addincludedir', osp.join(portable_dir, 'include'))
-                ] + list(data)
-        replace_in_nsis_file(dstname, data)
-        try:
-            retcode = subprocess.call('"%s" -V2 %s' % (NSIS_EXE, dstname),
-                                      shell=True, stdout=sys.stderr)
-            if retcode < 0:
-                print >>sys.stderr, "Child was terminated by signal", -retcode
-        except OSError, e:
-            print >>sys.stderr, "Execution failed:", e
-        os.remove(dstname)
-    
+        
     def create_launcher(self, name, icon, command=None,
                         args=None, workdir=None, settingspath=None):
         """Create exe launcher with NSIS"""
@@ -254,7 +254,7 @@ The following packages are included in WinPython v%s.
             data += [('SETTINGSDIR', osp.dirname(settingspath)),
                      ('SETTINGSNAME', osp.basename(settingspath))]
 
-        self.build_nsis('launcher.nsi', fname, data)
+        build_nsis('launcher.nsi', fname, data)
 
     def create_python_batch(self, name, package_dir, script_name,
                             options=None):
@@ -284,7 +284,7 @@ cd %WINPYDIR%""" + package_dir + r"""
                 ('VERSION', '%s.%d' % (self.python_fullversion,
                                        self.build_number)),
                 ('RELEASELEVEL', self.release_level),)
-        self.build_nsis('installer.nsi', fname, data)
+        build_nsis('installer.nsi', fname, data)
         self._print_done()
 
     def _print(self, text):
