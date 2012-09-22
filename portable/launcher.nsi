@@ -35,6 +35,7 @@ OutFile ""
 SilentInstall silent
 AutoCloseWindow true
 ShowInstDetails nevershow
+RequestExecutionLevel user
 
 Section ""
 Call Execute

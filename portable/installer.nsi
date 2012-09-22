@@ -46,6 +46,7 @@ OutFile "${DISTDIR}\..\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}.exe"
 InstallDir "\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}"
 BrandingText "${BRANDING}"
 XPStyle on
+RequestExecutionLevel user
 
 
 ;-------------------------------------------------------------------------------
