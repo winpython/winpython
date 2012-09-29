@@ -358,28 +358,29 @@ cd %WINPYDIR%""" + package_dir + r"""
     def _create_launchers(self):
         """Create launchers"""
         self._print("Creating launchers")
-        self.create_launcher('cmd.exe', 'cmd.ico', command='$SYSDIR\cmd.exe',
+        self.create_launcher('Command prompt.exe', 'cmd.ico',
+                             command='$SYSDIR\cmd.exe',
                              args='/k', workdir='${WINPYDIR}')
-        self.create_launcher('python.exe', 'python.ico')
+        self.create_launcher('Python interpreter.exe', 'python.ico')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              args='spyder', workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
-        self.create_launcher('Spyder_Light.exe', 'spyder_light.ico',
+        self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
                              args='spyder --light',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
-        self.create_launcher('WPControlPanel.exe', 'winpython.ico',
+        self.create_launcher('WP Control Panel.exe', 'winpython.ico',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
-        self.create_launcher('QtDemo.exe', 'qt.ico', args='qtdemo.pyw',
-           workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
-        self.create_launcher('QtAssistant.exe', 'qtassistant.ico',
-                   command=r'${WINPYDIR}\Lib\site-packages\PyQt4\assistant.exe',
-                   workdir=r'${WINPYDIR}')
-        self.create_launcher('QtDesigner.exe', 'qtdesigner.ico',
+        self.create_launcher('Qt Demo.exe', 'qt.ico', args='qtdemo.pyw',
+          workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
+        self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
+                  command=r'${WINPYDIR}\Lib\site-packages\PyQt4\assistant.exe',
+                  workdir=r'${WINPYDIR}')
+        self.create_launcher('Qt Designer.exe', 'qtdesigner.ico',
                    command=r'${WINPYDIR}\Lib\site-packages\PyQt4\designer.exe',
                    workdir=r'${WINPYDIR}')
-        self.create_launcher('QtLinguist.exe', 'qtlinguist.ico',
+        self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
                    command=r'${WINPYDIR}\Lib\site-packages\PyQt4\linguist.exe',
                    workdir=r'${WINPYDIR}')
         if osp.isfile(osp.join(self.python_dir, 'Scripts', 'ipython.exe')):
