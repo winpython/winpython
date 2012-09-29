@@ -25,6 +25,27 @@ from guidata import disthelpers
 from winpython import wppm, utils
 
 
+#==============================================================================
+# How to prepare the MinGW package:
+#==============================================================================
+#
+# * download and install MinGW using the latest mingw-get-inst-YYYYMMDD.exe
+#   (the default target installation directory is C:\MinGW) and install the 
+#   C/C++/Fortran compilers
+# * create WinPython MinGW32 directory %WINPYTHONBASEDIR%\tools.win32\mingw32
+#   (where the WINPYTHONBASEDIR environment variable points to your WinPython 
+#    base directory -- see function `make_winpython` below)
+# * explore the target MinGW installation directory (default: C:\MinGW)
+# * copy the `bin`, `doc`, `include`, `lib` and `libexec` folders from 
+#   C:\MinGW to %WINPYTHONBASEDIR%\tools.win32\mingw32 (with MinGW 4.6.2, 
+#   the overall size should be around 151 MB for 1435 files and 63 folders):
+#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\bin
+#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\doc
+#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\include
+#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\lib
+#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\libexec
+
+
 def get_drives():
     """Return all active drives"""
     import win32api
@@ -87,6 +108,7 @@ class WinPythonDistribution(object):
     """WinPython distribution"""
     THG_PATH = r'\tools\TortoiseHg\thgw.exe'
     WINMERGE_PATH = r'\tools\WinMerge\WinMerge.exe'
+    MINGW32_PATH = r'\tools\mingw32\bin'
     
     def __init__(self, build_number, release_level, target, instdir,
                  srcdir=None, toolsdirs=None, verbose=False):
@@ -117,7 +139,10 @@ class WinPythonDistribution(object):
             installed_tools += [('TortoiseHg', '2.4.2')]
         if osp.isfile(self.winpydir + self.WINMERGE_PATH):
             installed_tools += [('WinMerge', '2.12.4')]
-        installed_tools += [('MinGW32', '4.5.2')]
+        gccpath = self.winpydir + self.MINGW32_PATH
+        if osp.isdir(gccpath):
+            gccver = utils.get_gcc_version(gccpath)
+            installed_tools += [('MinGW32', gccver)]
         tools = []
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata('tools.ini', name)
@@ -179,8 +204,9 @@ The following packages are included in WinPython v%s.
         path = [r"Lib\site-packages\PyQt4",
                 "",  # Python root directory (python.exe)
                 "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"]
-        if self.distribution.architecture == 32:
-            path += [r"..\tools\mingw32\bin"]
+        if self.distribution.architecture == 32 \
+           and osp.isdir(self.winpydir + self.MINGW32_PATH):
+            path += [r".." + self.MINGW32_PATH]
         return path
     
     @property
@@ -556,4 +582,4 @@ if __name__ == '__main__':
     rebuild_winpython()
     #make_winpython(0, 'rc1', 32,
                    #remove_existing=False, create_installer=False)
-    make_all(0, 'rc1')#, remove_existing=False, create_installer=False)
+    make_all(1, '')#, remove_existing=False, create_installer=False)

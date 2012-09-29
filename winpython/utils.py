@@ -92,6 +92,11 @@ def exec_shell_cmd(args, path):
     return process.stdout.read()
 
 
+def get_gcc_version(path):
+    """Return version of the GCC compiler installed in *path*"""
+    return exec_shell_cmd('gcc --version', path).splitlines()[0].split()[-1]
+
+
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
     return exec_shell_cmd('python -c "%s"' % cmd, path).splitlines()[0]
@@ -223,6 +228,9 @@ def source_to_wininst(fname, architecture=None, verbose=False):
 
 
 if __name__ == '__main__':
+    gcc = get_gcc_version(osp.join(BASE_DIR, 'tools.win32', 'mingw32', 'bin'))
+    print "gcc version: %r" % gcc
+
     print_box("Test")
     dname = sys.prefix
     print dname+':', '\n', get_python_infos(dname)
