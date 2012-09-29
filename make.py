@@ -135,8 +135,10 @@ class WinPythonDistribution(object):
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
         installed_tools = [('gettext', '0.14.4')]
-        if osp.isfile(self.winpydir + self.THG_PATH):
-            installed_tools += [('TortoiseHg', '2.4.2')]
+        thgpath = self.winpydir + self.THG_PATH
+        if osp.isfile(thgpath):
+            thgver = utils.get_thg_version(osp.dirname(thgpath))
+            installed_tools += [('TortoiseHg', thgver)]
         if osp.isfile(self.winpydir + self.WINMERGE_PATH):
             installed_tools += [('WinMerge', '2.12.4')]
         gccpath = self.winpydir + self.MINGW32_PATH
