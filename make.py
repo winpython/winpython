@@ -74,7 +74,7 @@ def build_nsis(srcname, dstname, data):
             ] + list(data)
     replace_in_nsis_file(dstname, data)
     try:
-        retcode = subprocess.call('"%s" -V2 %s' % (NSIS_EXE, dstname),
+        retcode = subprocess.call('"%s" -V2 "%s"' % (NSIS_EXE, dstname),
                                   shell=True, stdout=sys.stderr)
         if retcode < 0:
             print >>sys.stderr, "Child was terminated by signal", -retcode
