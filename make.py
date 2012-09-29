@@ -176,7 +176,9 @@ The following packages are included in WinPython v%s.
     @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
-        path = [r"Lib\site-packages\PyQt4"]
+        path = [r"Lib\site-packages\PyQt4",
+                "",  # Python root directory (python.exe)
+                "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"]
         if self.distribution.architecture == 32:
             path += [r"..\tools\mingw32\bin"]
         return path
@@ -184,7 +186,7 @@ The following packages are included in WinPython v%s.
     @property
     def postpath(self):
         """Return PATH contents to be append to the environment variable"""
-        path = ["", "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"]
+        path = []
         if osp.isfile(self.winpydir + self.THG_PATH):
             path += [r"..\tools\TortoiseHg"]
         return path
