@@ -55,6 +55,19 @@ class BasePackage(object):
         self.pyversion = None
         self.description = None
         self.url = None
+
+    def __str__(self):
+        text = "%s %s" % (self.name, self.version)
+        pytext = ""
+        if self.pyversion is not None:
+            pytext = " for Python %s" % self.pyversion
+        if self.architecture is not None:
+            if not pytext:
+                pytext = " for Python"
+            pytext += " %dbits" % self.architecture
+        text += "%s\n%s\nWebsite: %s\n[%s]" % (pytext, self.description,
+                                            self.url, osp.basename(self.fname))
+        return text
     
     def is_compatible_with(self, distribution):
         """Return True if package is compatible with distribution in terms of
