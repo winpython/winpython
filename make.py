@@ -153,7 +153,7 @@ class WinPythonDistribution(object):
         packages = ['|| [%s %s] || %s || %s ||'
                     % (pack.url, pack.name, pack.version, pack.description)
                     for pack in sorted(self.installed_packages,
-                                       key=lambda p: p.name)]
+                                       key=lambda p: p.name.lower())]
         python_desc = 'Python programming language with standard library'
         return """== WinPython %s ==
 
