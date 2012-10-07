@@ -1,0 +1,17 @@
+\.pyc$
+\.pyo$
+\.exe$
+\.settings$
+\.spyderproject$
+\.ropeproject$
+\.orig$
+\.DS_Store$
+^build/
+^dist/
+^bin/
+^tools/gnuwin32/
+^tools/TortoiseHg/
+^tools/WinMerge/
+^winpython.egg-info/
+MANIFEST$
+\Thumbs.db
