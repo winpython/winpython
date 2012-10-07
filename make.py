@@ -414,7 +414,7 @@ cd %WINPYDIR%""" + package_dir + r"""
                    command=r'${WINPYDIR}\Lib\site-packages\PyQt4\linguist.exe',
                    workdir=r'${WINPYDIR}')
         if osp.isfile(osp.join(self.python_dir, 'Scripts', 'ipython.exe')):
-            self.create_launcher('IPython.exe', 'ipython.ico',
+            self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                              command='${WINPYDIR}\pythonw.exe',
                              args='ipython-script.py qtconsole --pylab=inline',
                              workdir='${WINPYDIR}\Scripts')
