@@ -575,7 +575,7 @@ def make_winpython(build_number, release_level, architecture,
 def make_all(build_number, release_level, basedir=None,
              create_installer=True, verbose=False, remove_existing=True):
     """Make WinPython for both 32 and 64bit architectures"""
-    for architecture in (32, 64):
+    for architecture in (64, 32):
         make_winpython(build_number, release_level, architecture,
                        basedir, verbose, remove_existing, create_installer)
 
