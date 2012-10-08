@@ -55,6 +55,19 @@ class BasePackage(object):
         self.pyversion = None
         self.description = None
         self.url = None
+
+    def __str__(self):
+        text = "%s %s" % (self.name, self.version)
+        pytext = ""
+        if self.pyversion is not None:
+            pytext = " for Python %s" % self.pyversion
+        if self.architecture is not None:
+            if not pytext:
+                pytext = " for Python"
+            pytext += " %dbits" % self.architecture
+        text += "%s\n%s\nWebsite: %s\n[%s]" % (pytext, self.description,
+                                            self.url, osp.basename(self.fname))
+        return text
     
     def is_compatible_with(self, distribution):
         """Return True if package is compatible with distribution in terms of
@@ -91,7 +104,8 @@ class Package(BasePackage):
             # distutils bdist_wininst
             match = re.match(utils.WININST_PATTERN, bname)
             if match is not None:
-                self.name, self.version, arch, _t1, self.pyversion, _t2 = match.groups()
+                (self.name, self.version,
+                 _t0, _qtver, arch, _t1, self.pyversion, _t2) = match.groups()
                 self.architecture = 32 if arch == 'win32' else 64
                 return
             # NSIS
@@ -458,9 +472,13 @@ if __name__ == '__main__':
             #print fname, '--->', ins.name, ins.version, ins.architecture
         #except NotImplementedError:
             #pass
-    
+        
     #fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
     fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
+    fname = osp.join(sbdir, 'VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe')
+    fname = osp.join(sbdir, 'scikits.timeseries-0.91.3.win32-py2.7.exe')
+    print(Package(fname))
+    sys.exit()
     #fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
     #fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
     #fname = osp.join(sbdir, 'PyQtdoc-4.7.2.win-amd64.exe')
