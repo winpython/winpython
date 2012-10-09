@@ -35,7 +35,7 @@ from spyderlib.utils.windows import set_attached_console_visible
 
 # Local imports
 from winpython import __version__, __project_url__, __forum_url__
-from winpython import wppm, associate
+from winpython import wppm, associate, utils
 from winpython.config import get_icon
 
 
@@ -268,12 +268,6 @@ class PackagesTable(QTableView):
         event.acceptProposedAction()
 
 
-def is_python_distribution(path):
-    """Return True if path is a Python distribution"""
-    return osp.isfile(osp.join(path, 'python.exe'))\
-           and osp.isdir(osp.join(path, 'Lib', 'site-packages'))
-
-
 class DistributionSelector(QWidget):
     """Python distribution selector widget"""
     TITLE = 'Select a Python distribution path'
@@ -318,7 +312,7 @@ class DistributionSelector(QWidget):
             self.console.emit(SIGNAL('redirect_stdio(bool)'), True)
             if not directory:
                 break
-            if not is_python_distribution(directory):
+            if not utils.is_python_distribution(directory):
                 QMessageBox.warning(self, self.TITLE,
                     "The following directory is not a Python distribution.",
                     QMessageBox.Ok)
