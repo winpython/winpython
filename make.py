@@ -111,7 +111,7 @@ class WinPythonDistribution(object):
     MINGW32_PATH = r'\tools\mingw32\bin'
     
     def __init__(self, build_number, release_level, target, instdir,
-                 srcdir=None, toolsdirs=None, verbose=False):
+                 srcdir=None, toolsdirs=None, verbose=False, simulation=False):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
@@ -121,7 +121,7 @@ class WinPythonDistribution(object):
         self.srcdir = srcdir
         if toolsdirs is None:
             toolsdirs = []
-        self.toolsdirs = toolsdirs
+        self._toolsdirs = toolsdirs
         self.verbose = verbose
         self.winpydir = None
         self.python_fname = None
@@ -130,19 +130,30 @@ class WinPythonDistribution(object):
         self.python_fullversion = None
         self.distribution = None
         self.installed_packages = []
+        self.simulation = simulation
     
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = [('gettext', '0.14.4')]
-        thgpath = self.winpydir + self.THG_PATH
-        if osp.isfile(thgpath):
+        installed_tools = [('gettext', '0.14.4')]        
+        def get_tool_path(relpath, checkfunc):
+            if self.simulation:
+                for dirname in self.toolsdirs:
+                    path = dirname + relpath.replace(r'\tools', '')
+                    if checkfunc(path):
+                        return path
+            else:
+                path = self.winpydir + relpath
+                if checkfunc(path):
+                    return path
+        thgpath = get_tool_path(self.THG_PATH, osp.isfile)
+        if thgpath is not None:
             thgver = utils.get_thg_version(osp.dirname(thgpath))
             installed_tools += [('TortoiseHg', thgver)]
-        if osp.isfile(self.winpydir + self.WINMERGE_PATH):
+        if get_tool_path(self.WINMERGE_PATH, osp.isfile) is not None:
             installed_tools += [('WinMerge', '2.12.4')]
-        gccpath = self.winpydir + self.MINGW32_PATH
-        if osp.isdir(gccpath):
+        gccpath = get_tool_path(self.MINGW32_PATH, osp.isdir)
+        if gccpath is not None:
             gccver = utils.get_gcc_version(gccpath)
             installed_tools += [('MinGW32', gccver)]
         tools = []
@@ -219,6 +230,11 @@ The following packages are included in WinPython v%s.
             path += [r"..\tools\TortoiseHg"]
         return path
 
+    @property
+    def toolsdirs(self):
+        """Return tools directory list"""
+        return [osp.join(osp.dirname(__file__), 'tools')] + self._toolsdirs
+
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdir"""
         for path in (self.instdir, self.srcdir):
@@ -235,7 +251,11 @@ The following packages are included in WinPython v%s.
         fname = self.get_package_fname(pattern)
         if fname not in [p.fname for p in self.installed_packages]:
             pack = wppm.Package(fname)
-            self.distribution.install(pack)
+            if self.simulation:
+                self.distribution._print(pack, "Installing")
+                self.distribution._print_done()
+            else:
+                self.distribution.install(pack)
             self.installed_packages.append(pack)
 
     def create_batch_script(self, name, contents):
@@ -375,8 +395,7 @@ cd %WINPYDIR%""" + package_dir + r"""
         self._print("Copying tools")
         toolsdir = osp.join(self.winpydir, 'tools')
         os.mkdir(toolsdir)
-        for dirname in [osp.join(osp.dirname(__file__), 'tools')
-                        ] + self.toolsdirs:
+        for dirname in self.toolsdirs:
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
                 copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
@@ -474,6 +493,9 @@ call %~dp0register_python.bat --all %WINPYDIR%""")
         
         remove_existing=True: (default) install all from scratch
         remove_existing=False: only for test purpose (launchers/scripts)"""
+        if self.simulation:
+            print("WARNING: this is just a simulation!", file=sys.stderr)
+
         self.python_fname = self.get_package_fname(
                                     r'python-([0-9\.]*)(\.amd64)?\.msi')
         self.python_name = osp.basename(self.python_fname)[:-4]
@@ -486,11 +508,12 @@ call %~dp0register_python.bat --all %WINPYDIR%""")
         # Create the WinPython base directory
         self._print("Creating WinPython base directory")
         self.winpydir = osp.join(self.target, distname)
-        if osp.isdir(self.winpydir) and remove_existing:
+        if osp.isdir(self.winpydir) and remove_existing \
+           and not self.simulation:
             shutil.rmtree(self.winpydir, onerror=utils.onerror)
         if not osp.isdir(self.winpydir):
             os.mkdir(self.winpydir)
-        if remove_existing:
+        if remove_existing and not self.simulation:
             # Create settings directory
             # (only necessary if user is starting an application with a batch 
             #  scripts before using an executable launcher, because the latter 
@@ -498,20 +521,23 @@ call %~dp0register_python.bat --all %WINPYDIR%""")
             os.mkdir(osp.join(self.winpydir, 'settings'))
         self._print_done()
 
-        if remove_existing:
+        if remove_existing and not self.simulation:
             self._extract_python()
         self.distribution = wppm.Distribution(self.python_dir,
                                           verbose=self.verbose, indent=True)
 
         if remove_existing:
-            self._add_vs2008_files()
+            if not self.simulation:
+                self._add_vs2008_files()
             self._install_required_packages()
             self._install_all_other_packages()
-            self._copy_dev_tools()
-        self._create_launchers()
-        self._create_batch_scripts()
+            if not self.simulation:
+                self._copy_dev_tools()
+        if not self.simulation:
+            self._create_launchers()
+            self._create_batch_scripts()
         
-        if remove_existing:
+        if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
@@ -537,7 +563,7 @@ def rebuild_winpython(basedir=None, verbose=False):
 
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
-                   create_installer=True):
+                   create_installer=True, simulation=False):
     """Make WinPython distribution, assuming that the following folders exist
     in *basedir* directory (if basedir is None, the WINPYTHONBASEDIR environ-
     ment variable is assumed to be basedir):
@@ -570,23 +596,24 @@ def make_winpython(build_number, release_level, architecture,
         toolsdirs.append(toolsdir2)
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, packdir, srcdir, toolsdirs,
-                                 verbose=verbose)
+                                 verbose=verbose, simulation=simulation)
     dist.make(remove_existing=remove_existing)
-    if create_installer:
+    if create_installer and not simulation:
         dist.create_installer()
     return dist
 
 
-def make_all(build_number, release_level, basedir=None,
+def make_all(build_number, release_level, basedir=None, simulation=False,
              create_installer=True, verbose=False, remove_existing=True):
     """Make WinPython for both 32 and 64bit architectures"""
     for architecture in (64, 32):
         make_winpython(build_number, release_level, architecture,
-                       basedir, verbose, remove_existing, create_installer)
+                       basedir, verbose, remove_existing, create_installer,
+                       simulation)
 
 
 if __name__ == '__main__':
     rebuild_winpython()
     #make_winpython(0, 'rc1', 32,
                    #remove_existing=False, create_installer=False)
-    make_all(1, '')#, remove_existing=False, create_installer=False)
+    make_all(1, '', simulation=False)#, remove_existing=False, create_installer=False)
