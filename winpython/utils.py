@@ -84,6 +84,13 @@ def print_box(text):
     print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
 
 
+def is_python_distribution(path):
+    """Return True if path is a Python distribution"""
+    #XXX: This test could be improved but it seems to be sufficient
+    return osp.isfile(osp.join(path, 'python.exe'))\
+           and osp.isdir(osp.join(path, 'Lib', 'site-packages'))
+
+
 def exec_shell_cmd(args, path):
     """Execute shell command (*args* is a list of arguments) in *path*"""
     #print " ".join(args)

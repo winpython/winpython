@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+from winpython import associate, utils
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description="Register Python file extensions, icons "\
+                        "and Windows explorer context menu to a target "\
+                        "Python distribution.")
+parser.add_argument('target', metavar='path', type=unicode,
+                    help='path to the target Python distribution')
+parser.add_argument('--all', dest='all', action='store_const',
+                    const=True, default=False,
+                    help='register to all users, requiring administrative '\
+                         'privileges (default: register to current user only)')
+args = parser.parse_args()
+
+if utils.is_python_distribution(args.target):
+    associate.register(args.target, current=not args.all)
+else:
+    raise WindowsError, "Invalid Python distribution %s" % args.target

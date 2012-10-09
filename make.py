@@ -447,10 +447,6 @@ set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
 set WINPYVER=""" + self.winpyver + """
 set HOME=%WINPYDIR%\..\settings
 set PATH=""" + path)
-        #self.create_batch_script('env.bat', """@echo off
-#set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-#set HOME=%WINPYDIR%\..\settings
-#set PATH=""" + path)
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
 cmd.exe /k""")
@@ -458,6 +454,15 @@ cmd.exe /k""")
         self.create_python_batch('spyder.bat', r'\Scripts', 'spyder')
         self.create_python_batch('spyder_light.bat', r'\Scripts', 'spyder',
                                  options='--light')
+        self.create_python_batch('register_python.bat',
+                                 r'\Scripts', 'register_python')
+        self.create_batch_script('register_this_python.bat', r"""@echo off
+call %~dp0env.bat
+call %~dp0register_python.bat %WINPYDIR%""")
+        self.create_batch_script('register_this_python_for_all.bat',
+                                 r"""@echo off
+call %~dp0env.bat
+call %~dp0register_python.bat --all %WINPYDIR%""")
         self.create_python_batch('wpcp.bat', r'\Scripts', 'wpcp')
         self.create_python_batch('pyqt_demo.bat',
              r'\Lib\site-packages\PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')

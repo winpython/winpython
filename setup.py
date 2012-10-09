@@ -61,7 +61,7 @@ including a package manager, WPPM.""",
                                                '.html', '.js', '.ini')),},
       requires=["spyderlib (>=2.1.12)", "PyQt4 (>=4.5)"],
       scripts=[osp.join('scripts', fname) for fname in
-               ('wppm', 'wppm.bat', 'wpcp', 'wpcp.bat')],
+               ('register_python', 'register_python.bat', 'wpcp', 'wpcp.bat')],
       classifiers=['License :: OSI Approved :: MIT License',
                    'Operating System :: MacOS',
                    'Operating System :: Microsoft :: Windows',
