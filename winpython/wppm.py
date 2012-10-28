@@ -356,7 +356,7 @@ Binaries = ."""
             self.create_file(package, name, '.',
                          contents.replace('.', './Lib/site-packages/PyQt4'))
             # pyuic script
-            self.create_file(package, 'pyuic.bat', 'Scripts', '''@echo off
+            self.create_file(package, 'pyuic4.bat', 'Scripts', '''@echo off
 python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9''')
             # Adding missing __init__.py files (fixes Issue 8)
             uic_path = osp.join('Lib', 'site-packages', 'PyQt4', 'uic')
