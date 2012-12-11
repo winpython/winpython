@@ -11,8 +11,8 @@ Created on Wed Aug 29 12:23:19 2012
 """
 
 
-from spyderlib.config import add_image_path, get_module_data_path
-from spyderlib.config import get_icon  # analysis:ignore
+from guidata.configtools import add_image_path, get_module_data_path
+from guidata.configtools import get_icon  # analysis:ignore
 
 
 add_image_path(get_module_data_path('winpython', relpath='images'))
