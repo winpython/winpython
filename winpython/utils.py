@@ -166,12 +166,16 @@ def extract_exe(fname, targetdir=None, verbose=False):
     bname = osp.basename(fname)
     args = ['x', '-o%s' % targetdir, '-aos', bname]
     if verbose:
-        subprocess.call([extract]+args, cwd=osp.dirname(fname))
+        retcode = subprocess.call([extract]+args, cwd=osp.dirname(fname))
     else:
         p = subprocess.Popen([extract]+args, cwd=osp.dirname(fname),
                              stdout=subprocess.PIPE)
         p.communicate()
         p.stdout.close()
+        retcode = p.returncode
+    if retcode != 0:
+        raise RuntimeError, "Failed to extract %s (return code: %d)"\
+                            % (fname, retcode)
     return targetdir
 
 def extract_archive(fname, targetdir=None, verbose=False):
@@ -243,7 +247,7 @@ def source_to_wininst(fname, architecture=None, verbose=False):
                          architecture=architecture, verbose=verbose)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
     gcc = get_gcc_version(osp.join(BASE_DIR, 'tools.win32', 'mingw32', 'bin'))
     print "gcc version: %r" % gcc
 
