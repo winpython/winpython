@@ -616,4 +616,4 @@ if __name__ == '__main__':
     rebuild_winpython()
     #make_winpython(0, 'rc1', 32,
                    #remove_existing=False, create_installer=False)
-    make_all(1, '', simulation=False)#, remove_existing=False, create_installer=False)
+    make_all(2, '')#, simulation=True)#, remove_existing=False, create_installer=False)
