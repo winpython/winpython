@@ -16,6 +16,7 @@ from guidata.configtools import get_icon  # analysis:ignore
 
 
 add_image_path(get_module_data_path('winpython', relpath='images'))
+add_image_path(get_module_data_path('spyderlib', relpath='images'))
 
 
 def get_data_path():
