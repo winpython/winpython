@@ -32,6 +32,7 @@ from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
                                        get_std_icon, action2button,
                                        mimedata2url)
 from spyderlib.utils.windows import set_attached_console_visible
+from spyderlib.utils import encoding
 
 # Local imports
 from winpython import __version__, __project_url__, __forum_url__
@@ -335,7 +336,7 @@ class Thread(QThread):
         try:
             self.callback()
         except Exception, error:
-            self.error = unicode(error)
+            self.error = encoding.to_unicode_from_fs(str(error))
 
 
 def python_distribution_infos():
