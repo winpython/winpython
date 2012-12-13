@@ -135,7 +135,7 @@ class WinPythonDistribution(object):
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = [('gettext', '0.14.4')]        
+        installed_tools = [('gettext', '0.14.4'), ('SciTE', '3.2.3')]        
         def get_tool_path(relpath, checkfunc):
             if self.simulation:
                 for dirname in self.toolsdirs:
