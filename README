@@ -33,6 +33,11 @@ Licensed under the terms of the MIT License
         NSIS:
           * "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
           * with TextReplace plugin installed
+        Microsoft Visual C++ DLLs -- the versions have to be the same as the 
+        one used to build your Python installation. For example, when using the
+        official Python 2.7 build, you will need v9.0.21022.8:
+          * 32bit: http://www.microsoft.com/en-us/download/details.aspx?id=29
+          * 64bit: http://www.microsoft.com/en-us/download/confirmation.aspx?id=15336
 
     Installation
     
