@@ -81,7 +81,7 @@ def print_box(text):
     """Print text in a box"""
     line0 = "+" + ("-"*(len(text)+2)) + "+"
     line1 = "| " + text + " |"
-    print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
+    print(("\n\n" + "\n".join([line0, line1, line0]) + "\n"))
 
 
 def is_python_distribution(path):
@@ -174,8 +174,8 @@ def extract_exe(fname, targetdir=None, verbose=False):
         p.stdout.close()
         retcode = p.returncode
     if retcode != 0:
-        raise RuntimeError, "Failed to extract %s (return code: %d)"\
-                            % (fname, retcode)
+        raise RuntimeError("Failed to extract %s (return code: %d)"\
+                            % (fname, retcode))
     return targetdir
 
 def extract_archive(fname, targetdir=None, verbose=False):
@@ -189,7 +189,7 @@ def extract_archive(fname, targetdir=None, verbose=False):
     elif fname.endswith('.tar.gz'):
         obj = tarfile.open(fname, mode='r:gz')
     else:
-        raise RuntimeError, "Unsupported archive filename %s" % fname
+        raise RuntimeError("Unsupported archive filename %s" % fname)
     obj.extractall(path=targetdir)
     return targetdir
 
@@ -227,7 +227,7 @@ def build_wininst(root, copy_to=None, architecture=None, verbose=False):
         if match is not None:
             break
     else:
-        raise RuntimeError, "Build failed: not a pure Python package?"
+        raise RuntimeError("Build failed: not a pure Python package?")
     src_fname = osp.join(distdir, distname)
     if copy_to is None:
         return src_fname
@@ -235,7 +235,7 @@ def build_wininst(root, copy_to=None, architecture=None, verbose=False):
         dst_fname = osp.join(copy_to, distname)
         shutil.move(src_fname, dst_fname)
         if verbose:
-            print("Move: %s --> %s" % (src_fname, (dst_fname)))
+            print(("Move: %s --> %s" % (src_fname, (dst_fname))))
         return dst_fname
 
 def source_to_wininst(fname, architecture=None, verbose=False):
@@ -249,23 +249,23 @@ def source_to_wininst(fname, architecture=None, verbose=False):
 
 if __name__ == '__main__':    
     gcc = get_gcc_version(osp.join(BASE_DIR, 'tools.win32', 'mingw32', 'bin'))
-    print "gcc version: %r" % gcc
+    print("gcc version: %r" % gcc)
 
     thg = get_thg_version(osp.join(BASE_DIR, 'tools', 'tortoisehg'))
-    print "thg version: %r" % thg
+    print("thg version: %r" % thg)
 
     print_box("Test")
     dname = sys.prefix
-    print dname+':', '\n', get_python_infos(dname)
+    print(dname+':', '\n', get_python_infos(dname))
     #dname = r'E:\winpython\sandbox\python-2.7.3'
     #print dname+':', '\n', get_python_infos(dname)
     
     tmpdir = r'D:\Tests\winpython_tests'
     if not osp.isdir(tmpdir):
         os.mkdir(tmpdir)
-    print extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
+    print(extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
                                'winpython-0.3dev.win-amd64.exe'),
-                          tmpdir)
+                          tmpdir))
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 
