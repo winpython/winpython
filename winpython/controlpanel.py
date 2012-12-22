@@ -40,7 +40,7 @@ from winpython import wppm, associate, utils
 from winpython.config import get_icon
 
 
-COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = range(5)
+COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = list(range(5))
 
 class PackagesModel(QAbstractTableModel):
     def __init__(self):
@@ -335,7 +335,7 @@ class Thread(QThread):
     def run(self):
         try:
             self.callback()
-        except Exception, error:
+        except Exception as error:
             self.error = encoding.to_unicode_from_fs(str(error))
 
 
@@ -645,7 +645,7 @@ class PMWindow(QMainWindow):
                             status.showMessage("Cancelling operation...")
                     table.remove_package(package)
                     error = thread.error
-                except Exception, error:
+                except Exception as error:
                     error = unicode(error)
                 if error is not None:
                     pstr = package.name + ' ' + package.version
