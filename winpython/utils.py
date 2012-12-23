@@ -10,6 +10,8 @@ WinPython utilities
 Created on Tue Aug 14 14:08:40 2012
 """
 
+from __future__ import print_function
+
 import os
 import os.path as osp
 import subprocess
@@ -249,23 +251,23 @@ def source_to_wininst(fname, architecture=None, verbose=False):
 
 if __name__ == '__main__':    
     gcc = get_gcc_version(osp.join(BASE_DIR, 'tools.win32', 'mingw32', 'bin'))
-    print("gcc version: %r" % gcc)
+    print(("gcc version: %r" % gcc))
 
     thg = get_thg_version(osp.join(BASE_DIR, 'tools', 'tortoisehg'))
-    print("thg version: %r" % thg)
+    print(("thg version: %r" % thg))
 
     print_box("Test")
     dname = sys.prefix
-    print(dname+':', '\n', get_python_infos(dname))
+    print((dname+':', '\n', get_python_infos(dname)))
     #dname = r'E:\winpython\sandbox\python-2.7.3'
     #print dname+':', '\n', get_python_infos(dname)
     
     tmpdir = r'D:\Tests\winpython_tests'
     if not osp.isdir(tmpdir):
         os.mkdir(tmpdir)
-    print(extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
+    print((extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
                                'winpython-0.3dev.win-amd64.exe'),
-                          tmpdir))
+                          tmpdir)))
     #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
     #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 
