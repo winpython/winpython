@@ -85,7 +85,7 @@ class BasePackage(object):
         """Extract package optional infos (description, url)
         from the package database"""
         metadata = get_package_metadata('packages.ini', self.name)
-        for key, value in metadata.iteritems():
+        for key, value in metadata.items():
             setattr(self, key, value)
 
 class Package(BasePackage):
@@ -126,7 +126,7 @@ class Package(BasePackage):
             if infos is not None:
                 self.name, self.version = infos
                 return
-        raise NotImplementedError, "Not supported package type %s" % bname
+        raise NotImplementedError("Not supported package type %s" % bname)
 
     def logpath(self, logdir):
         """Return full log path"""
