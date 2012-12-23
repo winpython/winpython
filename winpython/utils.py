@@ -111,8 +111,7 @@ def get_gcc_version(path):
 def get_thg_version(path):
     """Return version of TortoiseHg installed in *path*"""
     txt = exec_shell_cmd('thg version', path).splitlines()[0]
-    match = re.match('TortoiseHg Dialogs \(version ([0-9\.]*)\), '\
-                     'Mercurial \(version ([0-9\.]*)\)', txt)
+    match = re.match('TortoiseHg Dialogs \(version ([0-9\.]*)\)', txt)
     if match is not None:
         return match.groups()[0]
 
