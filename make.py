@@ -53,10 +53,13 @@ def get_drives():
 
 def get_nsis_exe():
     """Return NSIS executable"""
+    localdir = osp.join(sys.prefix, os.pardir, os.pardir)
     for drive in get_drives():
         for dirname in (r'C:\Program Files', r'C:\Program Files (x86)',
                         drive+r'PortableApps\NSISPortableANSI',
                         drive+r'PortableApps\NSISPortable',
+                        osp.join(localdir, 'NSISPortableANSI'),
+                        osp.join(localdir, 'NSISPortable'),
                     ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(dirname, subdirname, 'NSIS', 'makensis.exe')
