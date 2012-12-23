@@ -24,6 +24,8 @@ import atexit
 import sys
 import stat
 
+from guidata.utils import decode_fs_string
+
 
 # Development only
 TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
@@ -98,7 +100,7 @@ def exec_shell_cmd(args, path):
     #print " ".join(args)
     process = subprocess.Popen(args, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, cwd=path, shell=True)
-    return process.stdout.read()
+    return decode_fs_string(process.stdout.read())
 
 
 def get_gcc_version(path):

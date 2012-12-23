@@ -68,8 +68,8 @@ def get_nsis_exe():
                    osp.isfile(osp.join(include, 'TextReplace.nsh')):
                     return exe
     else:
-        raise RuntimeError, "NSIS (with TextReplace plugin) is not installed "\
-                            "on this computer."
+        raise RuntimeError("NSIS (with TextReplace plugin) is not installed "\
+                           "on this computer.")
 
 NSIS_EXE = get_nsis_exe()
 
@@ -101,9 +101,9 @@ def build_nsis(srcname, dstname, data):
         retcode = subprocess.call('"%s" -V2 "%s"' % (NSIS_EXE, dstname),
                                   shell=True, stdout=sys.stderr)
         if retcode < 0:
-            print >>sys.stderr, "Child was terminated by signal", -retcode
-    except OSError, e:
-        print >>sys.stderr, "Execution failed:", e
+            print("Child was terminated by signal", -retcode, file=sys.stderr)
+    except OSError as e:
+        print("Execution failed:", e, file=sys.stderr)
     os.remove(dstname)
 
 
@@ -246,8 +246,8 @@ The following packages are included in WinPython v%s.
                 if match is not None:
                     return osp.abspath(osp.join(path, fname))
         else:
-            raise RuntimeError,\
-                  'Could not found required package matching %s' % pattern
+            raise RuntimeError(
+                  'Could not found required package matching %s' % pattern)
     
     def install_package(self, pattern):
         """Install package matching pattern"""
@@ -266,7 +266,7 @@ The following packages are included in WinPython v%s.
         scriptdir = osp.join(self.winpydir, 'scripts')
         if not osp.isdir(scriptdir):
             os.mkdir(scriptdir)
-        fd = file(osp.join(scriptdir, name), 'w')
+        fd = open(osp.join(scriptdir, name), 'w')
         fd.write(contents)
         fd.close()
         

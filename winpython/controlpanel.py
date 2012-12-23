@@ -14,7 +14,13 @@ import os.path as osp
 import os
 import sys
 import platform
-import urllib
+
+if sys.version[0] < '3':
+    from urllib import quote
+else:
+    # Python 3
+    unicode = str
+    from urllib.request import quote
 
 from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
@@ -306,7 +312,11 @@ class DistributionSelector(QWidget):
         """Select directory"""
         basedir = unicode(self.line_edit.text())
         if not osp.isdir(basedir):
-            basedir = os.getcwdu()
+            try:
+                basedir = os.getcwdu()
+            except AttributeError:
+                # Python 3
+                basedir = os.getcwd()
         while True:
             self.console.emit(SIGNAL('redirect_stdio(bool)'), False)
             directory = getexistingdirectory(self, self.TITLE, basedir)
@@ -686,7 +696,7 @@ Please provide any additional information below.
        spyderlib.qt.__version__)
        
         url = QUrl("%s/issues/entry" % __project_url__)
-        url.addEncodedQueryItem("comment", urllib.quote(issue_template))
+        url.addEncodedQueryItem("comment", quote(issue_template))
         QDesktopServices.openUrl(url)    
 
     def about(self):
