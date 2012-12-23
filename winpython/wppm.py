@@ -18,7 +18,11 @@ import shutil
 import re
 import sys
 import subprocess
-import ConfigParser
+try:
+    import ConfigParser as cp
+except ImportError:
+    # Python 3
+    import configparser as cp
 
 # Local imports
 from winpython import utils
@@ -32,7 +36,7 @@ def get_package_metadata(database, name):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on 
     # machine which is not connected to the internet
-    db = ConfigParser.ConfigParser()
+    db = cp.ConfigParser()
     db.readfp(open(osp.join(get_data_path(), database)))
     metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
     for key in metadata:
@@ -41,7 +45,7 @@ def get_package_metadata(database, name):
             try:
                 metadata[key] = db.get(name2, key)
                 break
-            except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+            except (cp.NoSectionError, cp.NoOptionError):
                 pass
     return metadata
 
@@ -138,12 +142,12 @@ class Package(BasePackage):
                   '# ',
                   '# Package: %s v%s' % (self.name, self.version),
                   '']
-        file(self.logpath(logdir), 'w').write('\n'.join(header + self.files))
+        open(self.logpath(logdir), 'w').write('\n'.join(header + self.files))
 
     def load_log(self, logdir):
         """Load log (pickle)"""
         try:
-            data = file(self.logpath(logdir), 'U').readlines()
+            data = open(self.logpath(logdir), 'U').readlines()
         except (IOError, OSError):
             raise
         self.files = []
@@ -270,7 +274,7 @@ class Distribution(object):
                     if self.verbose:
                         print("file:  %s" % dst)
                     full_dst = osp.join(self.target, dst)
-                    fd = file(full_dst, 'w')
+                    fd = open(full_dst, 'w')
                     fd.write("""@echo off
 python "%~dpn0""" + ext + """" %*""")
                     fd.close()
@@ -282,7 +286,7 @@ python "%~dpn0""" + ext + """" %*""")
         if self.verbose:
             print("create:  %s" % dst)
         full_dst = osp.join(self.target, dst)
-        file(full_dst, 'w').write(contents)
+        open(full_dst, 'w').write(contents)
         package.files.append(dst)
 
     def get_installed_packages(self):
@@ -356,7 +360,7 @@ Binaries = ."""
             self.create_file(package, name, '.',
                          contents.replace('.', './Lib/site-packages/PyQt4'))
             # pyuic script
-            self.create_file(package, 'pyuic4.bat', 'Scripts', '''@echo off
+            self.create_file(package, 'pyuic4.bat', 'Scripts', r'''@echo off
 python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9''')
             # Adding missing __init__.py files (fixes Issue 8)
             uic_path = osp.join('Lib', 'site-packages', 'PyQt4', 'uic')
