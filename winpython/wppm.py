@@ -18,11 +18,8 @@ import shutil
 import re
 import sys
 import subprocess
-try:
-    import ConfigParser as cp
-except ImportError:
-    # Python 3
-    import configparser as cp
+
+from guidata.py3compat import configparser as cp
 
 # Local imports
 from winpython import utils

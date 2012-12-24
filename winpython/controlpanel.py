@@ -15,12 +15,7 @@ import os
 import sys
 import platform
 
-if sys.version[0] < '3':
-    from urllib import quote
-else:
-    # Python 3
-    unicode = str
-    from urllib.request import quote
+from guidata.py3compat import getcwd, to_text_string
 
 from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
@@ -310,13 +305,9 @@ class DistributionSelector(QWidget):
     
     def select_directory(self):
         """Select directory"""
-        basedir = unicode(self.line_edit.text())
+        basedir = to_text_string(self.line_edit.text())
         if not osp.isdir(basedir):
-            try:
-                basedir = os.getcwdu()
-            except AttributeError:
-                # Python 3
-                basedir = os.getcwd()
+            basedir = getcwd()
         while True:
             self.console.emit(SIGNAL('redirect_stdio(bool)'), False)
             directory = getexistingdirectory(self, self.TITLE, basedir)
@@ -586,7 +577,7 @@ class PMWindow(QMainWindow):
         """Distribution path has just changed"""
         for package in self.table.model.packages:
             self.table.remove_package(package)
-        dist = wppm.Distribution(unicode(path))
+        dist = wppm.Distribution(to_text_string(path))
         self.table.refresh_distribution(dist)
         self.untable.refresh_distribution(dist)
         self.distribution = dist
@@ -656,7 +647,7 @@ class PMWindow(QMainWindow):
                     table.remove_package(package)
                     error = thread.error
                 except Exception as error:
-                    error = unicode(error)
+                    error = to_text_string(error)
                 if error is not None:
                     pstr = package.name + ' ' + package.version
                     QMessageBox.critical(self, "Error",
@@ -696,7 +687,7 @@ Please provide any additional information below.
        spyderlib.qt.__version__)
        
         url = QUrl("%s/issues/entry" % __project_url__)
-        url.addEncodedQueryItem("comment", quote(issue_template))
+        url.addQueryItem("comment", issue_template)
         QDesktopServices.openUrl(url)    
 
     def about(self):
