@@ -86,7 +86,7 @@ class BasePackage(object):
         """Extract package optional infos (description, url)
         from the package database"""
         metadata = get_package_metadata('packages.ini', self.name)
-        for key, value in metadata.items():
+        for key, value in list(metadata.items()):
             setattr(self, key, value)
 
 class Package(BasePackage):
