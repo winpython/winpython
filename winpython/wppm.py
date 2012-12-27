@@ -323,6 +323,7 @@ python "%~dpn0""" + ext + """" %*""")
             self._print(package, "Building")
             try:
                 fname = utils.source_to_wininst(package.fname,
+                          python_exe=osp.join(self.target, 'python.exe'),
                           architecture=self.architecture, verbose=self.verbose)
             except RuntimeError:
                 if not self.verbose:

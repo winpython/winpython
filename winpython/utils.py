@@ -206,11 +206,15 @@ def get_source_package_infos(fname):
     if match is not None:
         return match.groups()[:2]
 
-def build_wininst(root, copy_to=None, architecture=None, verbose=False):
+def build_wininst(root, python_exe=None, copy_to=None,
+                  architecture=None, verbose=False):
     """Build wininst installer from Python package located in *root*
     and eventually copy it to *copy_to* folder.
     Return wininst installer full path."""
-    cmd = [sys.executable, 'setup.py', 'build']
+    if python_exe is None:
+        python_exe = sys.executable
+    assert osp.isfile(python_exe)
+    cmd = [python_exe, 'setup.py', 'build']
     if architecture is not None:
         archstr = 'win32' if architecture == 32 else 'win-amd64'
         cmd += ['--plat-name=%s' % archstr]
@@ -241,12 +245,14 @@ def build_wininst(root, copy_to=None, architecture=None, verbose=False):
             print(("Move: %s --> %s" % (src_fname, (dst_fname))))
         return dst_fname
 
-def source_to_wininst(fname, architecture=None, verbose=False):
+def source_to_wininst(fname, python_exe=None,
+                      architecture=None, verbose=False):
     """Extract source archive, build it and create a distutils installer"""
     tmpdir = extract_archive(fname)
     root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
     assert osp.isdir(root)
-    return build_wininst(root, copy_to=osp.dirname(fname),
+    return build_wininst(root, python_exe=python_exe,
+                         copy_to=osp.dirname(fname),
                          architecture=architecture, verbose=verbose)
 
 
