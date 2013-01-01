@@ -435,10 +435,16 @@ cd %WINPYDIR%""" + package_dir + r"""
         self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
                    command=r'${WINPYDIR}\Lib\site-packages\PyQt4\linguist.exe',
                    workdir=r'${WINPYDIR}')
-        if osp.isfile(osp.join(self.python_dir, 'Scripts', 'ipython.exe')):
+        if self.python_version[0] == '3':
+            ipython_exe = 'ipython3.exe'
+            ipython_scr = 'ipython3-script.py'
+        else:
+            ipython_exe = 'ipython.exe'
+            ipython_scr = 'ipython-script.py'
+        if osp.isfile(osp.join(self.python_dir, 'Scripts', ipython_exe)):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                              command='${WINPYDIR}\pythonw.exe',
-                             args='ipython-script.py qtconsole --pylab=inline',
+                             args='%s qtconsole --pylab=inline' % ipython_scr,
                              workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -616,7 +622,8 @@ def make_all(build_number, release_level, basedir=None, simulation=False,
 
 
 if __name__ == '__main__':
-    rebuild_winpython()
-    #make_winpython(0, 'rc1', 32,
+    rebuild_winpython(basedir=r'D:\winpython\basedir33')
+#    make_winpython(0, 'alpha1', 32, basedir=r'D:\winpython\basedir33',
+#                   create_installer=False)#, simulation=True)
                    #remove_existing=False, create_installer=False)
-    make_all(2, '')#, simulation=True)#, remove_existing=False, create_installer=False)
+    make_all(0, 'dev1', basedir=r'D:\winpython\basedir33')#, simulation=True)#, remove_existing=False, create_installer=False)
