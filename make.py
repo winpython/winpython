@@ -374,9 +374,11 @@ cd %WINPYDIR%""" + package_dir + r"""
         print("Installing required packages")
         self.install_package('pywin32-([0-9\.]*[a-z]*).%s-py%s.exe'
                              % (self.py_arch, self.python_version))
-        self.install_package('winpython-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
+        self.install_package('distribute-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
-        self.install_package('spyder(lib)?-([0-9\.]*[a-z]*).%s(-py%s)?.exe'
+        self.install_package('winpython-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
+                             % (self.py_arch, self.python_version))
+        self.install_package('spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
         self.install_package(pattern='PyQt-Py%s-%s-gpl-([0-9\.\-]*).exe'
                                      % (self.python_version, self.pyqt_arch))
