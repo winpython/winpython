@@ -361,10 +361,10 @@ cd %WINPYDIR%""" + package_dir + r"""
         os.mkdir(osp.join(self.python_dir, 'Scripts'))
         self._print_done()
     
-    def _add_vs2008_files(self):
-        """Adding Microsoft Visual Studio 2008 DLLs and manifest"""
-        print("Adding Microsoft Visual C++ 2008 DLLs with manifest""")
-        for fname in disthelpers.get_visual_studio_dlls(
+    def _add_msvc_files(self):
+        """Adding Microsoft Visual C++ DLLs"""
+        print("Adding Microsoft Visual C++ DLLs""")
+        for fname in disthelpers.get_msvc_dlls(
                                 architecture=self.distribution.architecture,
                                 python_version=self.distribution.version):
             shutil.copy(fname, self.python_dir)
@@ -539,7 +539,7 @@ call %~dp0register_python.bat --all %WINPYDIR%""")
 
         if remove_existing:
             if not self.simulation:
-                self._add_vs2008_files()
+                self._add_msvc_files()
             self._install_required_packages()
             self._install_all_other_packages()
             if not self.simulation:
