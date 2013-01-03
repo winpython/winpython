@@ -46,6 +46,16 @@ from winpython import wppm, utils
 #   * %WINPYTHONBASEDIR%\tools.win32\mingw32\libexec
 
 
+#==============================================================================
+# How to prepare the gettext package:
+#==============================================================================
+#
+# * download the latest gettext binaries for win32 (the latest should still be 
+#   from 2005... anyway)
+# * add the missing 'libiconv2.dll' by copying the 'libiconv-2.dll' from MinGW
+#   and renaming to 'libiconv2.dll'
+
+
 def get_drives():
     """Return all active drives"""
     import win32api
