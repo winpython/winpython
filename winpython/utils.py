@@ -60,6 +60,45 @@ def is_program_installed(basename):
             return abspath
 
 
+def get_special_folder_path(path_name):
+    """Return special folder path"""
+    from win32com.shell import shell, shellcon
+    for maybe in """
+        CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
+        CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
+        CSIDL_DESKTOPDIRECTORY CSIDL_COMMON_STARTUP CSIDL_STARTUP
+        CSIDL_COMMON_PROGRAMS CSIDL_PROGRAMS CSIDL_PROGRAM_FILES_COMMON
+        CSIDL_PROGRAM_FILES CSIDL_FONTS""".split():
+        if maybe == path_name:
+            csidl = getattr(shellcon, maybe)
+            return shell.SHGetSpecialFolderPath(0, csidl, False)
+    raise ValueError("%s is an unknown path ID" % (path_name,))
+
+def get_winpython_start_menu_folder(current=True):
+    """Return WinPython Start menu shortcuts folder"""
+    if current:
+        # non-admin install - always goes in this user's start menu.
+        folder = get_special_folder_path("CSIDL_PROGRAMS")
+    else:
+        try:
+            folder = get_special_folder_path("CSIDL_COMMON_PROGRAMS")
+        except OSError:
+            # No CSIDL_COMMON_PROGRAMS on this platform
+            folder = get_special_folder_path("CSIDL_PROGRAMS")
+    return osp.join(folder, 'WinPython')
+
+def create_winpython_start_menu_folder(current=True):
+    """Create WinPython Start menu folder -- remove it if it already exists"""
+    path = get_winpython_start_menu_folder(current=current)
+    if osp.isdir(path):
+        try:
+            shutil.rmtree(path, onerror=onerror)
+        except WindowsError:
+            print("Directory %s could not be removed" % path, file=sys.stderr)
+    else:
+        os.mkdir(path)
+    return path
+
 def create_shortcut(path, description, filename,
                     arguments="", workdir="", iconpath="", iconindex=0):
     """Create Windows shortcut (.lnk file)"""
@@ -78,6 +117,8 @@ def create_shortcut(path, description, filename,
         ilink.SetIconLocation(iconpath, iconindex)
     # now save it.
     ipf = ilink.QueryInterface(pythoncom.IID_IPersistFile)
+    if not filename.endswith('.lnk'):
+        filename += '.lnk'
     ipf.Save(filename, 0)
 
 

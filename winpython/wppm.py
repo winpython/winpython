@@ -218,7 +218,8 @@ class Distribution(object):
             try:
                 shutil.rmtree(path, onerror=utils.onerror)
             except WindowsError:
-                print >>sys.stderr, "Directory %s could not be removed" % path
+                print("Directory %s could not be removed" % path,
+                      file=sys.stderr)
         
     def remove_directory(self, path):
         """Try to remove directory -- on WindowsError, remove it later"""

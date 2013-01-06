@@ -13,10 +13,14 @@ Created on Tue Aug 21 21:46:30 2012
 from __future__ import print_function
 
 import sys
+import os
 import os.path as osp
 import subprocess
 
 from guidata.py3compat import winreg
+
+# Local imports
+from winpython import utils
 
 
 def register(target, current=True):
@@ -86,6 +90,15 @@ def register(target, current=True):
     else:
         print('Unable to register ActiveX: please install pywin32',
               file=sys.stderr)
+
+    # Create start menu entries for all WinPython launchers
+    wpgroup = utils.create_winpython_start_menu_folder(current=current)
+    wpdir = osp.join(target, os.pardir)
+    for name in os.listdir(wpdir):
+        bname, ext = osp.splitext(name)
+        if ext == '.exe':
+            utils.create_shortcut(osp.join(wpdir, name), bname,
+                                  osp.join(wpgroup, bname))
 
 
 if __name__ == '__main__':
