@@ -10,7 +10,11 @@ Register a Python distribution
 Created on Tue Aug 21 21:46:30 2012
 """
 
+from __future__ import print_function
+
+import sys
 import os.path as osp
+import subprocess
 
 from guidata.py3compat import winreg
 
@@ -74,6 +78,15 @@ def register(target, current=True):
     winreg.SetValueEx(winreg.CreateKey(root, pat3 % "Compiled"),
                       "", 0, winreg.REG_SZ, "Compiled Python File")
 
+    # Register the Python ActiveX Scripting client (requires pywin32)
+    axscript = osp.join(target, 'Lib', 'site-packages', 'win32comext',
+                        'axscript', 'client', 'pyscript.py')
+    if osp.isfile(axscript):
+        subprocess.call('"%s" "%s"' % (python, axscript), cwd=target)
+    else:
+        print('Unable to register ActiveX: please install pywin32',
+              file=sys.stderr)
+
 
 if __name__ == '__main__':
-    register(r'D:\Pierre\build\winpython-2.7.3\python-2.7.3')
+    register(sys.prefix)
