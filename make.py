@@ -436,6 +436,9 @@ cd %WINPYDIR%""" + package_dir + r"""
                              settingspath=settingspath)
         self.create_launcher('WP Control Panel.exe', 'winpython.ico',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
+        self.create_launcher('Register.exe', 'winpython.ico',
+                             args='register_python',
+                             workdir='${WINPYDIR}\Scripts')
         self.create_launcher('Qt Demo.exe', 'qt.ico', args='qtdemo.pyw',
           workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
         self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
