@@ -82,15 +82,6 @@ def register(target, current=True):
     winreg.SetValueEx(winreg.CreateKey(root, pat3 % "Compiled"),
                       "", 0, winreg.REG_SZ, "Compiled Python File")
 
-    # Register the Python ActiveX Scripting client (requires pywin32)
-    axscript = osp.join(target, 'Lib', 'site-packages', 'win32comext',
-                        'axscript', 'client', 'pyscript.py')
-    if osp.isfile(axscript):
-        subprocess.call('"%s" "%s"' % (python, axscript), cwd=target)
-    else:
-        print('Unable to register ActiveX: please install pywin32',
-              file=sys.stderr)
-
     # Create start menu entries for all WinPython launchers
     wpgroup = utils.create_winpython_start_menu_folder(current=current)
     wpdir = osp.join(target, os.pardir)
@@ -99,6 +90,15 @@ def register(target, current=True):
         if ext == '.exe':
             utils.create_shortcut(osp.join(wpdir, name), bname,
                                   osp.join(wpgroup, bname))
+
+    # Register the Python ActiveX Scripting client (requires pywin32)
+    axscript = osp.join(target, 'Lib', 'site-packages', 'win32comext',
+                        'axscript', 'client', 'pyscript.py')
+    if osp.isfile(axscript):
+        subprocess.call('"%s" "%s"' % (python, axscript), cwd=target)
+    else:
+        print('Unable to register ActiveX: please install pywin32',
+              file=sys.stderr)
 
 
 if __name__ == '__main__':
