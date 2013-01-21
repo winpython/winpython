@@ -436,9 +436,18 @@ cd %WINPYDIR%""" + package_dir + r"""
                              settingspath=settingspath)
         self.create_launcher('WP Control Panel.exe', 'winpython.ico',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
-        self.create_launcher('Register.exe', 'winpython.ico',
-                             args='register_python',
-                             workdir='${WINPYDIR}\Scripts')
+
+        #XXX: Uncomment this part only when we are clear on how to handle 
+        # the registration process during installation. "Register.exe" was 
+        # only intended to be executed during installation by installer.nsi,
+        # but, we can't let this executable at the root of WinPython directory
+        # (too dangerous) and we can't move it easily as launchers are made 
+        # to be executed when located at root directory... so we could remove 
+        # it just after executing it, but is it even possible?
+#        self.create_launcher('Register.exe', 'winpython.ico',
+#                             args='register_python',
+#                             workdir='${WINPYDIR}\Scripts')
+
         self.create_launcher('Qt Demo.exe', 'qt.ico', args='qtdemo.pyw',
           workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
         self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
@@ -641,4 +650,4 @@ if __name__ == '__main__':
 #    make_winpython(0, 'alpha1', 32, basedir=r'D:\winpython\basedir33',
 #                   create_installer=False)#, simulation=True)
                    #remove_existing=False, create_installer=False)
-    make_all(0, 'dev1', basedir=r'D:\winpython\basedir33')#, simulation=True)#, remove_existing=False, create_installer=False)
+    make_all(0, 'beta1', basedir=r'D:\winpython\basedir33')#, simulation=True)#, remove_existing=False, create_installer=False)
