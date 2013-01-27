@@ -422,10 +422,10 @@ cd %WINPYDIR%""" + package_dir + r"""
     def _create_launchers(self):
         """Create launchers"""
         self._print("Creating launchers")
-        self.create_launcher('Command prompt.exe', 'cmd.ico',
+        self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
                              command='$SYSDIR\cmd.exe',
                              args='/k', workdir='${WINPYDIR}')
-        self.create_launcher('Python interpreter.exe', 'python.ico')
+        self.create_launcher('WinPython Interpreter.exe', 'python.ico')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              args='spyder', workdir='${WINPYDIR}\Scripts',
@@ -434,7 +434,7 @@ cd %WINPYDIR%""" + package_dir + r"""
                              args='spyder --light',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
-        self.create_launcher('WP Control Panel.exe', 'winpython.ico',
+        self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
         self.create_launcher('Register.exe', 'winpython.ico',
                              args='register_python',
