@@ -1,0 +1,68 @@
+WinPython tools
+===============
+
+Copyright © 2012 Pierre Raybaut
+Licensed under the terms of the MIT License
+(see winpython/__init__.py for details)
+
+
+    Overview
+
+        WinPython is a portable distribution of the Python programming 
+        language for Windows (http://code.google.com/p/winpython).
+		
+		This is the `winpython` Python package, not the distribution itself.
+		It includes two main features:
+
+			The WinPython Package Manager (WPPM): let you install/uninstall 
+            to your WinPython distribution any standard Python package built 
+			with distutils (e.g. "dummypackage-2.1.win-amd64-py2.7.‌exe")
+			
+			The WinPython build toolchain: make.py is the script used to 
+			build a WinPython distribution from (almost) scratch.
+
+    Dependencies
+    
+        Python >=2.6 or Python >=3.0
+        PyQt4 >=4.5 or PySide >=1.1.1 (PyQt4 is recommended)
+        spyderlib >=2.1
+        guidata >=1.6
+
+    Requirements
+
+        7zip (directory has to be available in PATH)
+        NSIS:
+          * "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
+          * with TextReplace plugin installed
+        Microsoft Visual C++ DLLs -- the versions have to be the same as the 
+        one used to build your Python installation. For example, when using the
+        official Python 2.7 build, you will need v9.0.21022.8:
+          * 32bit: http://www.microsoft.com/en-us/download/details.aspx?id=29
+          * 64bit: http://www.microsoft.com/en-us/download/confirmation.aspx?id=15336
+
+    Installation
+    
+        From the source package (see section 'Building dependencies'), you may 
+        install WinPython using the integrated setup.py script based on Python 
+        standard library `distutils` with the following command:
+            `python setup.py install`
+
+        Note that `distutils` does *not* uninstall previous versions of Python 
+        packages: it simply copies files on top of an existing installation. 
+        When using this command, it is thus highly recommended to uninstall 
+        manually any previous version of WinPython by removing the associated 
+        directory ('winpython' in your site-packages directory).
+
+        From the Python package index, you may simply install WinPython *and* 
+        upgrade an existing installation using `pip`:
+        http://pypi.python.org/pypi
+
+        But the easiest way to install the last stable release of WinPython is 
+		by using an executable installer: http://winpython.googlecode.com
+            
+    More informations
+    
+        Downloads, bug reports and feature requests:
+            http://code.google.com/p/winpython/
+        Discussions:
+            http://groups.google.com/group/winpython
