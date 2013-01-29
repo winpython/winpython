@@ -15,8 +15,6 @@ import os
 import sys
 import platform
 
-from guidata.py3compat import getcwd, to_text_string
-
 from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
                                 QColor, QAbstractItemView, QProgressDialog,
@@ -39,6 +37,7 @@ from spyderlib.utils import encoding
 from winpython import __version__, __project_url__, __forum_url__
 from winpython import wppm, associate, utils
 from winpython.config import get_icon
+from winpython.py3compat import getcwd, to_text_string
 
 
 COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = list(range(5))

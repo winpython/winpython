@@ -17,9 +17,9 @@ import os
 import os.path as osp
 import subprocess
 
-from guidata.py3compat import winreg
 
 # Local imports
+from winpython.py3compat import winreg
 from winpython import utils
 
 
