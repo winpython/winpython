@@ -594,21 +594,33 @@ def rebuild_winpython(basedir=None, verbose=False):
                             architecture=architecture, verbose=verbose)
 
 
-def make_winpython(build_number, release_level, architecture,
-                   basedir=None, verbose=False, remove_existing=True,
-                   create_installer=True, simulation=False):
-    """Make WinPython distribution, assuming that the following folders exist
-    in *basedir* directory (if basedir is None, the WINPYTHONBASEDIR environ-
-    ment variable is assumed to be basedir):
-    
+ROOTDIR_DOC = """
+
+    The WinPython root directory (WINPYTHONROOTDIR environment variable which 
+    may be overriden with the `rootdir` option) contains the following folders:
       * (required) `packages.win32`: contains distutils 32-bit packages
       * (required) `packages.win-amd64`: contains distutils 64-bit packages
       * (optional) `packages.src`: contains distutils source distributions
       * (required) `tools`: contains architecture-independent tools
       * (optional) `tools.win32`: contains 32-bit-specific tools
-      * (optional) `tools.win-amd64`: contains 64-bit-specific tools
+      * (optional) `tools.win-amd64`: contains 64-bit-specific tools"""
+
+def make_winpython(build_number, release_level, architecture,
+                   basedir=None, verbose=False, remove_existing=True,
+                   create_installer=True, simulation=False):
+    """Make WinPython distribution, for a given base directory and 
+    architecture:
+
+    make_winpython(build_number, release_level, architecture,
+                   basedir=None, verbose=False, remove_existing=True,
+                   create_installer=True, simulation=False)
     
-    architecture: integer (32 or 64)"""
+    `build_number`: build number [int]
+    `release_level`: release level (e.g. 'beta1', '') [str]
+    `architecture`: [int] (32 or 64)
+    `basedir`: [str] if None, WINPYTHONBASEDIR env var must be set
+    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
+    """ + ROOTDIR_DOC
     basedir = basedir if basedir is not None else utils.BASE_DIR
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
@@ -635,19 +647,30 @@ def make_winpython(build_number, release_level, architecture,
         dist.create_installer()
     return dist
 
+def make_all(build_number, release_level, pyver,
+             rootdir=None, simulation=False, create_installer=True,
+             verbose=False, remove_existing=True):
+    """Make WinPython for both 32 and 64bit architectures:
+    
+    make_all(build_number, release_level, pyver, rootdir, simulation=False,
+             create_installer=True, verbose=False, remove_existing=True)
 
-def make_all(build_number, release_level, basedir=None, simulation=False,
-             create_installer=True, verbose=False, remove_existing=True):
-    """Make WinPython for both 32 and 64bit architectures"""
+    `build_number`: build number [int]
+    `release_level`: release level (e.g. 'beta1', '') [str]
+    `pyver`: Python version (X.Y format) [str]
+    `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
+    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
+    """ + ROOTDIR_DOC
+    assert re.match(r'[0-9]+\.[0-9]+', pyver) is not None
+    rootdir = rootdir if rootdir is not None else utils.ROOT_DIR
+    assert rootdir is not None, "The *rootdir* directory must be specified"
+    basedir = osp.join(rootdir, 'basedir%s' % pyver[::2])
+    rebuild_winpython(basedir=basedir)
     for architecture in (64, 32):
-        make_winpython(build_number, release_level, architecture,
-                       basedir, verbose, remove_existing, create_installer,
-                       simulation)
+        make_winpython(build_number, release_level, architecture, basedir,
+                       verbose, remove_existing, create_installer, simulation)
 
 
 if __name__ == '__main__':
-    rebuild_winpython(basedir=r'D:\winpython\basedir33')
-#    make_winpython(0, 'alpha1', 32, basedir=r'D:\winpython\basedir33',
-#                   create_installer=False)#, simulation=True)
-                   #remove_existing=False, create_installer=False)
-    make_all(0, 'beta1', basedir=r'D:\winpython\basedir33')#, simulation=True)#, remove_existing=False, create_installer=False)
+#    make_all(0, 'beta2', pyver='3.3')
+    make_all(3, '', pyver='2.7')
