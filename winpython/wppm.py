@@ -19,11 +19,10 @@ import re
 import sys
 import subprocess
 
-from guidata.py3compat import configparser as cp
-
 # Local imports
 from winpython import utils
 from winpython.config import get_data_path
+from winpython.py3compat import configparser as cp
 
 # Workaround for installing PyVISA on Windows from source:
 os.environ['HOME'] = os.environ['USERPROFILE']
