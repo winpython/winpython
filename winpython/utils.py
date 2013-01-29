@@ -31,6 +31,7 @@ from guidata.utils import decode_fs_string
 TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
 if osp.isdir(TOOLS_DIR):
     os.environ['PATH'] += ';%s' % TOOLS_DIR
+ROOT_DIR = os.environ.get('WINPYTHONROOTDIR')
 BASE_DIR = os.environ.get('WINPYTHONBASEDIR')
 
 
