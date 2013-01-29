@@ -4,13 +4,9 @@
 # Licensed under the terms of the MIT License
 # (see spyderlib/__init__.py for details)
 
-#==============================================================================
-# This is the exact copy of spyderlib.py3compat from Spyder Project
-#==============================================================================
-
 """
-winpython.py3compat
--------------------
+winpython.py3compat (exact copy of spyderlib.py3compat)
+-------------------------------------------------------
 
 Transitional module providing compatibility functions intended to help 
 migrating from Python 2 to Python 3.
@@ -27,6 +23,21 @@ import os
 
 PY2 = sys.version[0] == '2'
 PY3 = sys.version[0] == '3'
+
+
+#==============================================================================
+# Data types
+#==============================================================================
+if PY2:
+    # Python 2
+    TEXT_TYPES = (str, unicode)
+    INT_TYPES = (int, long)
+else:
+    # Python 3
+    TEXT_TYPES = (str,)
+    INT_TYPES = (int,)
+NUMERIC_TYPES = tuple(list(INT_TYPES) + [float, complex])
+
 
 #==============================================================================
 # Renamed/Reorganized modules
@@ -56,19 +67,10 @@ else:
     import pickle
     from collections import MutableMapping
 
+
 #==============================================================================
 # Strings
 #==============================================================================
-if PY2:
-    # Python 2
-    text_types = (str, unicode)
-    int_types = (int, long)
-else:
-    # Python 3
-    text_types = (str,)
-    int_types = (int,)
-numeric_types = tuple(list(int_types) + [float, complex])
-
 if PY2:
     # Python 2
     import codecs
