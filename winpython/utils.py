@@ -23,8 +23,7 @@ import shutil
 import atexit
 import sys
 import stat
-
-from guidata.utils import decode_fs_string
+import locale
 
 
 # Development only
@@ -136,6 +135,13 @@ def is_python_distribution(path):
     return osp.isfile(osp.join(path, 'python.exe'))\
            and osp.isdir(osp.join(path, 'Lib', 'site-packages'))
 
+
+def decode_fs_string(string):
+    """Convert string from file system charset to unicode"""
+    charset = sys.getfilesystemencoding()
+    if charset is None:
+        charset = locale.getpreferredencoding()
+    return string.decode(charset)
 
 def exec_shell_cmd(args, path):
     """Execute shell command (*args* is a list of arguments) in *path*"""
