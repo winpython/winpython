@@ -46,7 +46,10 @@ if PY2:
     # Python 2
     import __builtin__ as builtins
     import ConfigParser as configparser
-    import _winreg as winreg
+    try:
+        import _winreg as winreg
+    except ImportError:
+        pass
     from sys import maxint as maxsize
     try:
         import CStringIO as io
@@ -61,7 +64,10 @@ else:
     # Python 3
     import builtins
     import configparser
-    import winreg
+    try:
+        import winreg
+    except ImportError:
+        pass
     from sys import maxsize
     import io
     import pickle
