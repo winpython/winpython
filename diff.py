@@ -42,7 +42,7 @@ class Package(object):
     
     def upgrade_wiki(self, other):
         assert self.name == other.name
-        return "  * [%s %s] %s --> %s (%s)\r\n" % (self.url, self.name,
+        return "  * [%s %s] %s → %s (%s)\r\n" % (self.url, self.name,
                                 other.version, self.version, self.description)
 
 
