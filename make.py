@@ -19,7 +19,7 @@ import subprocess
 import shutil
 import sys
 
-from guidata import disthelpers
+from guidata.disthelpers import get_msvc_dlls
 
 # Local imports
 from winpython import wppm, utils
@@ -374,9 +374,8 @@ cd %WINPYDIR%""" + package_dir + r"""
     def _add_msvc_files(self):
         """Adding Microsoft Visual C++ DLLs"""
         print("Adding Microsoft Visual C++ DLLs""")
-        for fname in disthelpers.get_msvc_dlls(
-                                architecture=self.distribution.architecture,
-                                python_version=self.distribution.version):
+        for fname in get_msvc_dlls(architecture=self.distribution.architecture,
+                                   python_version=self.distribution.version):
             shutil.copy(fname, self.python_dir)
 
     def _install_required_packages(self):
