@@ -507,13 +507,10 @@ cmd.exe /k""")
                                  options='--light')
         self.create_python_batch('register_python.bat',
                                  r'\Scripts', 'register_python')
-        self.create_batch_script('register_this_python.bat', r"""@echo off
-call %~dp0env.bat
-call %~dp0register_python.bat %WINPYDIR%""")
-        self.create_batch_script('register_this_python_for_all.bat',
+        self.create_batch_script('register_python_for_all.bat',
                                  r"""@echo off
 call %~dp0env.bat
-call %~dp0register_python.bat --all %WINPYDIR%""")
+call %~dp0register_python.bat --all""")
         self.create_python_batch('wpcp.bat', r'\Scripts', 'wpcp')
         self.create_python_batch('pyqt_demo.bat',
              r'\Lib\site-packages\PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')
