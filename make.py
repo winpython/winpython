@@ -319,8 +319,8 @@ The following packages are included in WinPython v%s.
 
         build_nsis('launcher.nsi', fname, data)
 
-    def create_python_batch(self, name, package_dir, script_name,
-                            options=None):
+    def create_python_batch(self, name, script_name,
+                            workdir=None, options=None):
         """Create batch file to run a Python script"""
         if options is None:
             options = ''
@@ -330,12 +330,16 @@ The following packages are included in WinPython v%s.
             cmd = 'start %WINPYDIR%\pythonw.exe'
         else:
             cmd = '%WINPYDIR%\python.exe'
+        changedir = ''
+        if workdir is not None:
+            workdir = osp.join('%WINPYDIR%', workdir)
+            changedir = r"""cd %s
+""" % workdir
         if script_name:
             script_name = ' ' + script_name
         self.create_batch_script(name, r"""@echo off
 call %~dp0env.bat
-cd %WINPYDIR%""" + package_dir + r"""
-""" + cmd + script_name + options + " %*")
+""" + changedir + cmd + script_name + options + " %*")
 
     def create_installer(self):
         """Create installer with NSIS"""
@@ -501,19 +505,19 @@ set PATH=""" + path)
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
 cmd.exe /k""")
-        self.create_python_batch('python.bat', '', '')
-        self.create_python_batch('spyder.bat', r'\Scripts', 'spyder')
-        self.create_python_batch('spyder_light.bat', r'\Scripts', 'spyder',
-                                 options='--light')
-        self.create_python_batch('register_python.bat',
-                                 r'\Scripts', 'register_python')
+        self.create_python_batch('python.bat', '')
+        self.create_python_batch('spyder.bat', 'spyder', workdir='Scripts')
+        self.create_python_batch('spyder_light.bat', 'spyder',
+                                 workdir='Scripts', options='--light')
+        self.create_python_batch('register_python.bat', 'register_python',
+                                 workdir='Scripts')
         self.create_batch_script('register_python_for_all.bat',
                                  r"""@echo off
 call %~dp0env.bat
 call %~dp0register_python.bat --all""")
-        self.create_python_batch('wpcp.bat', r'\Scripts', 'wpcp')
-        self.create_python_batch('pyqt_demo.bat',
-             r'\Lib\site-packages\PyQt4\examples\demos\qtdemo', 'qtdemo.pyw')
+        self.create_python_batch('wpcp.bat', 'wpcp', workdir='Scripts')
+        self.create_python_batch('pyqt_demo.bat', 'qtdemo.pyw',
+                     workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
         self._print_done()
 
     def make(self, remove_existing=True):
