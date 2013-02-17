@@ -438,6 +438,7 @@ call %~dp0env.bat
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
+                             command='${WINPYDIR}\pythonw.exe',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
 
         #XXX: Uncomment this part only when we are clear on how to handle 

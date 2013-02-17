@@ -16,21 +16,19 @@ import sys
 import platform
 
 from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
-                                QHBoxLayout, QDockWidget, QFont, QVBoxLayout,
-                                QColor, QAbstractItemView, QProgressDialog,
-                                QTableView, QMessageBox, QPushButton, QLabel,
-                                QTabWidget, QToolTip, QDesktopServices)
+                                QHBoxLayout, QVBoxLayout, QColor, QMessageBox,
+                                QAbstractItemView, QProgressDialog, QTableView,
+                                QPushButton, QLabel, QTabWidget, QToolTip,
+                                QDesktopServices)
 from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
                                  QThread, QTimer, QUrl)
 from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
 import spyderlib.qt
 
-from spyderlib.widgets.internalshell import InternalShell
 from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
                                        get_std_icon, action2button,
                                        mimedata2url)
-from spyderlib.utils.windows import set_attached_console_visible
 from spyderlib.utils import encoding
 
 # Local imports
@@ -277,7 +275,6 @@ class DistributionSelector(QWidget):
         self.browse_btn = None
         self.label = None
         self.line_edit = None
-        self.console = None
         self.setup_widget()
         
     def set_distribution(self, path):
@@ -308,9 +305,7 @@ class DistributionSelector(QWidget):
         if not osp.isdir(basedir):
             basedir = getcwd()
         while True:
-            self.console.emit(SIGNAL('redirect_stdio(bool)'), False)
             directory = getexistingdirectory(self, self.TITLE, basedir)
-            self.console.emit(SIGNAL('redirect_stdio(bool)'), True)
             if not directory:
                 break
             if not utils.is_python_distribution(directory):
@@ -361,7 +356,6 @@ class PMWindow(QMainWindow):
         self.selector = None
         self.table = None
         self.untable = None
-        self.console = None
         
         self.basedir = None
         
@@ -420,27 +414,6 @@ class PMWindow(QMainWindow):
         vlayout.addWidget(self.tabwidget)
         central_widget.setLayout(vlayout)
         self.setCentralWidget(central_widget)
-                
-        # Create the console widget
-        font = QFont("Courier new")
-        font.setPointSize(8)
-        self.console = self.selector.console = cons = InternalShell(self)
-        #self.console.interpreter.restore_stds()
-        
-        # Setup the console widget
-        cons.set_font(font)
-        cons.set_codecompletion_auto(True)
-        cons.set_calltips(True)
-        cons.setup_calltips(size=600, font=font)
-        cons.setup_completion(size=(300, 180), font=font)
-        console_dock = QDockWidget("Console", self)
-        console_dock.setWidget(cons)
-        console_dock.hide()
-        self.connect(cons, SIGNAL('traceback_available()'),
-                     console_dock.show)
-        
-        # Add the console widget to window as a dockwidget
-        self.addDockWidget(Qt.BottomDockWidgetArea, console_dock)
         
         # Install tab
         add_action = create_action(self, "&Add packages...",
@@ -491,9 +464,9 @@ class PMWindow(QMainWindow):
         add_actions(option_menu, (register_action,))
 
         # View menu
-        view_menu = self.menuBar().addMenu("&View")
-        popmenu = self.createPopupMenu()
-        add_actions(view_menu, popmenu.actions())
+#        view_menu = self.menuBar().addMenu("&View")
+#        popmenu = self.createPopupMenu()
+#        add_actions(view_menu, popmenu.actions())
         
         # Help menu
         about_action = create_action(self, "About %s..." % self.NAME,
@@ -717,14 +690,9 @@ Please provide any additional information below.
                python_distribution_infos(),
                platform.python_version(), spyderlib.qt.QtCore.__version__,
                spyderlib.qt.API_NAME, spyderlib.qt.__version__,) )
-        
-    def closeEvent(self, event):
-        self.console.exit_interpreter()
-        event.accept()
 
         
 def main(test=False):
-    set_attached_console_visible(False)
     app = QApplication([])
     win = PMWindow()
     win.show()
