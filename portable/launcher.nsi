@@ -52,12 +52,12 @@ end_workdir:
 
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYDIR", "${WINPYDIR}").r0'
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYVER", "${WINPYVER}").r0'
-CreateDirectory "$EXEDIR\settings"
-System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("HOME", "$EXEDIR\settings").r0'
 ReadEnvStr $R0 "PATH"
 StrCpy $R0 "${PREPATH};$R0;${POSTPATH}"
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("PATH", R0).r0'
 
+IfFileExists "$EXEDIR\settings\*.*" 0 end_settings
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("HOME", "$EXEDIR\settings").r0'
 StrCmp "${SETTINGSDIR}" "" end_settings
 CreateDirectory "$EXEDIR\settings\${SETTINGSDIR}"
 StrCpy $R5 "$EXEDIR\settings\${SETTINGSDIR}\${SETTINGSNAME}"
