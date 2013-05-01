@@ -25,6 +25,9 @@ import sys
 import stat
 import locale
 
+# Local imports
+from winpython.py3compat import winreg
+
 
 # Development only
 TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
@@ -59,6 +62,47 @@ def is_program_installed(basename):
         if osp.isfile(abspath):
             return abspath
 
+
+#==============================================================================
+# Environment variables
+#==============================================================================
+def get_env(name, current=True):
+    """Return HKCU/HKLM environment variable name and value
+    
+    For example, get_user_env('PATH') may returns:
+    ('Path', u'C:\\Program Files\\Intel\\WiFi\\bin\\')"""
+    root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
+    key = winreg.OpenKey(root, "Environment")
+    for index in range(0, winreg.QueryInfoKey(key)[1]):
+        try:
+            value = winreg.EnumValue(key, index)
+            if value[0].lower() == name.lower():
+                # Return both value[0] and value[1] because value[0] could be 
+                # different from name (lowercase/uppercase)
+                return value[0], value[1]
+        except:
+            break
+
+def set_env(name, value, current=True):
+    """Set HKCU/HKLM environment variables"""
+    root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
+    key = winreg.OpenKey(root, "Environment")
+    try:
+        _x, key_type = winreg.QueryValueEx(key, name)
+    except WindowsError:
+        key_type = winreg.REG_EXPAND_SZ
+    key = winreg.OpenKey(root, "Environment", 0, winreg.KEY_SET_VALUE)
+    winreg.SetValueEx(key, name, 0, key_type, value)
+    from win32gui import SendMessageTimeout
+    from win32con import (HWND_BROADCAST, WM_SETTINGCHANGE,
+                          SMTO_ABORTIFHUNG)
+    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0,
+                       "Environment", SMTO_ABORTIFHUNG, 5000)
+
+
+#==============================================================================
+# Shortcuts, start menu
+#==============================================================================
 
 def get_special_folder_path(path_name):
     """Return special folder path"""
@@ -122,12 +166,15 @@ def create_shortcut(path, description, filename,
     ipf.Save(filename, 0)
 
 
+#==============================================================================
+# Misc.
+#==============================================================================
+
 def print_box(text):
     """Print text in a box"""
     line0 = "+" + ("-"*(len(text)+2)) + "+"
     line1 = "| " + text + " |"
     print(("\n\n" + "\n".join([line0, line1, line0]) + "\n"))
-
 
 def is_python_distribution(path):
     """Return True if path is a Python distribution"""
@@ -135,6 +182,10 @@ def is_python_distribution(path):
     return osp.isfile(osp.join(path, 'python.exe'))\
            and osp.isdir(osp.join(path, 'Lib', 'site-packages'))
 
+
+#==============================================================================
+# Shell, Python queries
+#==============================================================================
 
 def decode_fs_string(string):
     """Convert string from file system charset to unicode"""
