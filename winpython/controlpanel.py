@@ -461,7 +461,10 @@ class PMWindow(QMainWindow):
         register_action = create_action(self, "Register distribution...",
                       tip="Register file extensions, icons and context menu",
                       triggered=self.register_distribution)
-        add_actions(option_menu, (register_action,))
+        unregister_action = create_action(self, "Unregister distribution...",
+                      tip="Unregister file extensions, icons and context menu",
+                      triggered=self.unregister_distribution)
+        add_actions(option_menu, (register_action, unregister_action))
 
         # View menu
 #        view_menu = self.menuBar().addMenu("&View")
@@ -534,7 +537,7 @@ class PMWindow(QMainWindow):
         """Register distribution"""
         answer = QMessageBox.warning(self, "Register distribution",
             "This will associate file extensions, icons and "
-            "Windows explorer's context menu entry ('Edit with IDLE') "
+            "Windows explorer's context menu entries ('Edit with IDLE', ...) "
             "with selected Python distribution in Windows registry. "
             "<br>Shortcuts for all WinPython launchers will be installed "
             "in <i>WinPython</i> Start menu group (replacing existing "
@@ -550,7 +553,23 @@ class PMWindow(QMainWindow):
             QMessageBox.Yes | QMessageBox.No)
         if answer == QMessageBox.Yes:
             associate.register(self.distribution.target)
-    
+
+    def unregister_distribution(self):
+        """Unregister distribution"""
+        answer = QMessageBox.warning(self, "Unregister distribution",
+            "This will remove file extensions associations, icons and "
+            "Windows explorer's context menu entries ('Edit with IDLE', ...) "
+            "with selected Python distribution in Windows registry. "
+            "<br>Shortcuts for all WinPython launchers will be removed "
+            "from <i>WinPython</i> Start menu group."
+            "<br>If <i>pywin32</i> is installed (it should be on any "
+            "WinPython distribution), the Python ActiveX Scripting client "
+            "will also be unregistered."
+            "<br><br>Do you want to continue?",
+            QMessageBox.Yes | QMessageBox.No)
+        if answer == QMessageBox.Yes:
+            associate.unregister(self.distribution.target)
+
     def distribution_changed(self, path):
         """Distribution path has just changed"""
         for package in self.table.model.packages:
