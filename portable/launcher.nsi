@@ -70,11 +70,9 @@ write_settings:
 WriteINIStr $R5 "main" last_drive $1
 end_settings:
 
-StrCmp "${PARAMETERS}" "" 0 param
 ${GetParameters} $R1
-Goto end_param
-param:
-StrCpy $R1 "${PARAMETERS}"
+StrCmp "${PARAMETERS}" "" end_param 0
+StrCpy $R1 "${PARAMETERS} $R1"
 end_param:
 
 Exec '"${COMMAND}" $R1'
