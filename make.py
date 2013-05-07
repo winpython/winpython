@@ -474,6 +474,10 @@ call %~dp0env.bat
                              command='${WINPYDIR}\pythonw.exe',
                              args='%s qtconsole --pylab=inline' % ipython_scr,
                              workdir='${WINPYDIR}\Scripts')
+            self.create_launcher('IPython Notebook.exe', 'ipython.ico',
+                             command='${WINPYDIR}\python.exe',
+                             args='%s notebook' % ipython_scr,
+                             workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
                                  command=r'${WINPYDIR}\..'+self.THG_PATH,
