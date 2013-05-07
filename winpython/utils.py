@@ -232,6 +232,16 @@ def get_python_infos(path):
         ver = None
     return ver, arch
 
+def get_python_long_version(path):
+    """Return long version (X.Y.Z) for the Python distribution located in 
+    *path*"""
+    ver = python_query("import sys; print('%d.%d.%d' % "\
+                       "(sys.version_info.major, sys.version_info.minor,"\
+                       "sys.version_info.micro))", path)
+    if re.match(r'([0-9]*)\.([0-9]*)\.([0-9]*)', ver) is None:
+        ver = None
+    return ver
+
 
 #==============================================================================
 # Extract functions
