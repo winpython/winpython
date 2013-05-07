@@ -464,7 +464,11 @@ class PMWindow(QMainWindow):
         unregister_action = create_action(self, "Unregister distribution...",
                       tip="Unregister file extensions, icons and context menu",
                       triggered=self.unregister_distribution)
-        add_actions(option_menu, (register_action, unregister_action))
+        open_console_action = create_action(self, "Open console here",
+                    triggered=lambda: os.startfile(self.command_prompt_path))
+        open_console_action.setEnabled(osp.exists(self.command_prompt_path))
+        add_actions(option_menu, (register_action, unregister_action,
+                                  None, open_console_action))
 
         # View menu
 #        view_menu = self.menuBar().addMenu("&View")
@@ -569,6 +573,11 @@ class PMWindow(QMainWindow):
             QMessageBox.Yes | QMessageBox.No)
         if answer == QMessageBox.Yes:
             associate.unregister(self.distribution.target)
+
+    @property
+    def command_prompt_path(self):
+        return osp.join(self.distribution.target, osp.pardir,
+                        "WinPython Command Prompt.exe")
 
     def distribution_changed(self, path):
         """Distribution path has just changed"""
