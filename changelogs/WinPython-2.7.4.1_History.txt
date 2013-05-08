@@ -1,6 +1,14 @@
-== History of changes for WinPython 2.7.4.1 ==
+﻿== History of changes for WinPython 2.7.4.1 ==
 
 The following changes were made to WinPython distribution since version 2.7.4.0.
+
+=== Internals ===
+
+The following changes were made to WinPython tools (`winpython` Python package), including WPPM, WPCP and the distribution generation script (`make.py` and its dependencies):
+  * WinPython Control Panel: added shortcut to command prompt
+  * Bugfix: all launchers now accept command line options -- Example, for executing IPython Qt console without pylab mode enabled, just create a shortcut pointing to "IPython Qt console.exe" and add the option "--pylab=None"
+  * Added launcher for IPython notebook
+  * WinPython registration: now registers entries in HKCU\Software\Python\PythonCore. In other words, any distutils Python package will see WinPython distribution as a standard installed Python distribution
 
 === Python packages ===
 

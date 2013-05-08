@@ -1,6 +1,19 @@
-== History of changes for WinPython 2.7.4.0 ==
+﻿== History of changes for WinPython 2.7.4.0 ==
 
 The following changes were made to WinPython distribution since version 2.7.3.3.
+
+=== Internals ===
+
+The following changes were made to WinPython tools (`winpython` Python package), including WPPM, WPCP and the distribution generation script (`make.py` and its dependencies):
+  * utils: added `set_env` and `get_env` functions (will be useful to fix Issue 35)
+  * Register WinPython distribution:
+    * Added "Edit with Spyder" to context menu entries (requires Spyder 2.2+)
+    * Added "unregistration" process (WinPython Control Panel: new "Unregister distribution..." entry in "Advanced" menu)
+  * Issue 19: Disable 'settings' folder (%HOME% redirection) by renaming/deleting the directory
+  * WinPython control panel (Issue 29): removed embedded Python (Spyder) console
+  * Batch scripts: removed unnecessary "cd %WINPYDIR%" (this became unnecessary)
+  * Fixed 'register_python.bat' scripts following changes in command line options (these changes were made in revision 9a62581ae693)
+  * py3compat: fixed ImportError on non Windows plaforms due to winreg/_winreg
 
 === Tools ===
 
