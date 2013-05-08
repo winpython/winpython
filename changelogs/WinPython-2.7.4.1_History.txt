@@ -1,0 +1,20 @@
+== History of changes for WinPython 2.7.4.1 ==
+
+The following changes were made to WinPython distribution since version 2.7.4.0.
+
+=== Python packages ===
+
+Upgraded packages:
+
+  * [http://formlayout.googlecode.com formlayout] 1.0.9 → 1.0.13 (Module for creating form dialogs/widgets to edit various type of parameters without having to write any GUI code)
+  * [http://pypi.python.org/pypi/distribute distribute] 0.6.36 → 0.6.38 (Download, build, install, upgrade, and uninstall Python packages - easily)
+  * [http://pypi.python.org/pypi/simplejson simplejson] 3.1.3 → 3.2.0 (Simple, fast, extensible JSON (JavaScript Object Notation) encoder/decoder)
+  * [http://pypi.python.org/pypi/logilab-common logilab-common] 0.58.3 → 0.59.1 (Collection of low-level Python packages and modules used by Logilab projects (required for pylint))
+  * [http://www.logilab.org/project/pylint pylint] 0.26.0 → 0.28.0 (Logilab code analysis module: analyzes Python source code looking for bugs and signs of poor quality)
+  * [http://pypi.python.org/pypi/mahotas mahotas] 0.9.8 → 0.99 (Computer Vision library)
+  * [http://pypi.python.org/pypi/logilab-astng logilab-astng] 0.24.1 → 0.24.3 (Rebuild a new abstract syntax tree from Python's ast (required for pylint))
+  * [http://code.google.com/p/psutil psutil] 0.7.0 → 0.7.1 (Provides an interface for retrieving information on all running processes and system utilization (CPU, disk, memory, network) in a portable way)
+  * [http://code.google.com/p/winpython winpython] 0.12 → 0.13 (WinPython distribution tools, including WPPM (package manager))
+  * [http://pypi.python.org/pypi/spyder spyder] 2.1.14dev4 → 2.2.0 (Scientific PYthon Development EnviRonment: designed for interactive computing and data visualisation with a simple and intuitive user interface)
+
+----
