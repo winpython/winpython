@@ -172,8 +172,11 @@ def test_compare(basedir, version1, version2):
 if __name__ == '__main__':
 #    test_parse_package_index_wiki('2.7.3.3')
 #    print(compare_package_indexes('2.7.3.1', '2.7.3.3'))
+    write_changelog('2.7.3.0', '2.7.3.1')
     write_changelog('2.7.3.1', '2.7.3.2')
     write_changelog('2.7.3.2', '2.7.3.3')
     write_changelog('2.7.3.3', '2.7.4.0')
+    write_changelog('2.7.4.0', '2.7.4.1')
 #    write_changelog('3.3.0.0beta1', '3.3.0.0beta2')
     write_changelog('3.3.0.0beta2', '3.3.1.0')
+    write_changelog('3.3.1.0', '3.3.1.1')
