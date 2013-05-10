@@ -404,6 +404,15 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
                 elif osp.isdir(path):
                     if self.verbose:
                         print("rmdir:  %s" % fname)
+                    pycache = osp.join(path, '__pycache__')
+                    if osp.exists(pycache):
+                        try:
+                            shutil.rmtree(pycache, onerror=utils.onerror)
+                            if self.verbose:
+                                print("rmtree: %s" % pycache)
+                        except WindowsError:
+                            print("Directory %s could not be removed"\
+                                  % pycache, file=sys.stderr)
                     try:
                         os.rmdir(path)
                     except OSError:
