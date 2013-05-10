@@ -707,5 +707,5 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='2.7', simulation=True)
-    make_all(1, '', pyver='3.3', simulation=True)
+    make_all(2, '', pyver='2.7', simulation=True)
+    make_all(2, '', pyver='3.3', simulation=True)
