@@ -382,6 +382,32 @@ call %~dp0env.bat
                                    python_version=self.distribution.version):
             shutil.copy(fname, self.python_dir)
 
+    def _check_packages(self):
+        """Check packages for duplicates or unsupported packages"""
+        print("Checking packages")
+        packages = []
+        for fname0 in os.listdir(self.srcdir) + os.listdir(self.instdir):
+            fname = self.get_package_fname(fname0)
+            if fname == self.python_fname:
+                continue
+            try:
+                pack = wppm.Package(fname)
+            except NotImplementedError:
+                print("WARNING: package %s is not supported"\
+                      % osp.basename(fname), file=sys.stderr)
+                continue
+            packages.append(pack)
+        all_duplicates = []
+        for pack in packages:
+            if pack.name in all_duplicates:
+                continue
+            all_duplicates.append(pack.name)
+            duplicates = [p for p in packages if p.name == pack.name]
+            if len(duplicates) > 1:
+                print("WARNING: duplicate packages %s (%s)" % \
+                      (pack.name, ", ".join([p.version for p in duplicates])),
+                      file=sys.stderr)
+
     def _install_required_packages(self):
         """Installing required packages"""
         print("Installing required packages")
@@ -403,10 +429,12 @@ call %~dp0env.bat
         """Try to install all other packages in instdir"""
         print("Installing other packages")
         for fname in os.listdir(self.srcdir) + os.listdir(self.instdir):
-            try:
-                self.install_package(fname)
-            except NotImplementedError:
-                pass
+            if osp.basename(fname) != osp.basename(self.python_fname):
+                try:
+                    self.install_package(fname)
+                except NotImplementedError:
+                    print("WARNING: unable to install package %s"\
+                          % osp.basename(fname), file=sys.stderr)
     
     def _copy_dev_tools(self):
         """Copy dev tools"""
@@ -564,6 +592,8 @@ call %~dp0register_python.bat --all""")
         self.distribution = wppm.Distribution(self.python_dir,
                                           verbose=self.verbose, indent=True)
 
+        self._check_packages()
+
         if remove_existing:
             if not self.simulation:
                 self._add_msvc_files()
@@ -677,5 +707,5 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='2.7')
-    make_all(1, '', pyver='3.3')
+    make_all(1, '', pyver='2.7', simulation=True)
+    make_all(1, '', pyver='3.3', simulation=True)
