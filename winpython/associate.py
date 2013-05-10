@@ -182,7 +182,7 @@ def unregister(target, current=True):
             winreg.DeleteKey(root, key)
         except WindowsError:
             rootkey = 'HKEY_CURRENT_USER' if current else 'HKEY_LOCAL_MACHINE'
-            raise WindowsError(r'Unable to remove %s\%s' % (rootkey, key))
+            print(r'Unable to remove %s\%s' % (rootkey, key), file=sys.stderr)
     
     # Start menu shortcuts
     for path, desc, fname in _get_shortcut_data(target, current=current):
