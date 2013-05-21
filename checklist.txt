@@ -1,7 +1,0 @@
-01. Extract Python python-2.7.3.amd64.msi installer to the python-2.7.3.amd64 directory
-02. Rename python.exe to python-2.7.3.amd64.exe
-03. Create the python.bat, adding necessary env vars and changing PATH
-04. Extract PyQt NSIS installer
-05. Copy the qt.conf file to python-2.7.3.amd64 directory
-06. Add Qt docs to the appropriate directory
-07. Add all library docs in Python's Doc folder
