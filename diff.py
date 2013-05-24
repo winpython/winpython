@@ -14,9 +14,15 @@ from __future__ import print_function, with_statement
 
 import os.path as osp
 import re
+import shutil
 
 # Local imports
-from winpython import utils
+from winpython import utils, config
+
+
+CHANGELOGS_DIR = osp.join(config.get_data_path(), osp.pardir, osp.pardir,
+                          'changelogs')
+assert osp.isdir(CHANGELOGS_DIR)
 
 
 class Package(object):
@@ -69,6 +75,9 @@ class PackageIndex(object):
         with open(fname, 'rb') as fdesc:
             text = fdesc.read()
         self.from_text(text)
+        
+        # Copy to winpython/changelogs
+        shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
     
     def from_text(self, text):
         version = re.match(self.WINPYTHON_PATTERN, text).groups()[0]
@@ -149,6 +158,8 @@ def write_changelog(version1, version2, rootdir=None):
     fname = osp.join(basedir, 'build', 'WinPython-%s_History.txt' % version2)
     with open(fname, 'wb') as fdesc:
         fdesc.write(text)
+    # Copy to winpython/changelogs
+    shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
 
 
 def test_parse_package_index_wiki(version, rootdir=None):
@@ -171,14 +182,9 @@ def test_compare(basedir, version1, version2):
 
 if __name__ == '__main__':
 #    test_parse_package_index_wiki('2.7.3.3')
-#    print(compare_package_indexes('2.7.3.1', '2.7.3.3'))
-    write_changelog('2.7.3.0', '2.7.3.1')
-    write_changelog('2.7.3.1', '2.7.3.2')
-    write_changelog('2.7.3.2', '2.7.3.3')
-    write_changelog('2.7.3.3', '2.7.4.0')
-    write_changelog('2.7.4.0', '2.7.4.1')
-    write_changelog('2.7.4.1', '2.7.4.2')
+    print(compare_package_indexes('2.7.3.1', '2.7.3.3'))
+#    write_changelog('2.7.4.0', '2.7.4.1')
+#    write_changelog('2.7.4.1', '2.7.5.0')
 #    write_changelog('3.3.0.0beta1', '3.3.0.0beta2')
-    write_changelog('3.3.0.0beta2', '3.3.1.0')
-    write_changelog('3.3.1.0', '3.3.1.1')
-    write_changelog('3.3.1.1', '3.3.1.2')
+#    write_changelog('3.3.1.0', '3.3.1.1')
+#    write_changelog('3.3.1.1', '3.3.2.0')
