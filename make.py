@@ -19,7 +19,7 @@ import subprocess
 import shutil
 import sys
 
-from guidata.disthelpers import get_msvc_dlls
+from guidata import disthelpers as dh
 
 # Local imports
 from winpython import wppm, utils
@@ -378,8 +378,9 @@ call %~dp0env.bat
     def _add_msvc_files(self):
         """Adding Microsoft Visual C++ DLLs"""
         print("Adding Microsoft Visual C++ DLLs""")
-        for fname in get_msvc_dlls(architecture=self.distribution.architecture,
-                                   python_version=self.distribution.version):
+        msvc_version = dh.get_msvc_version(self.distribution.version)
+        for fname in dh.get_msvc_dlls(msvc_version,
+                               architecture=self.distribution.architecture):
             shutil.copy(fname, self.python_dir)
 
     def _check_packages(self):
@@ -707,5 +708,5 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(2, '', pyver='2.7', simulation=True)
-    make_all(2, '', pyver='3.3', simulation=True)
+    make_all(0, '', pyver='2.7')#, simulation=True)
+    make_all(0, '', pyver='3.3')#, simulation=True)
