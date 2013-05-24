@@ -17,11 +17,10 @@ import re
 import shutil
 
 # Local imports
-from winpython import utils, config
+from winpython import utils
 
 
-CHANGELOGS_DIR = osp.join(config.get_data_path(), osp.pardir, osp.pardir,
-                          'changelogs')
+CHANGELOGS_DIR = osp.join(osp.dirname(__file__), 'changelogs')
 assert osp.isdir(CHANGELOGS_DIR)
 
 
@@ -75,9 +74,6 @@ class PackageIndex(object):
         with open(fname, 'rb') as fdesc:
             text = fdesc.read()
         self.from_text(text)
-        
-        # Copy to winpython/changelogs
-        shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
     
     def from_text(self, text):
         version = re.match(self.WINPYTHON_PATTERN, text).groups()[0]
@@ -182,9 +178,9 @@ def test_compare(basedir, version1, version2):
 
 if __name__ == '__main__':
 #    test_parse_package_index_wiki('2.7.3.3')
-    print(compare_package_indexes('2.7.3.1', '2.7.3.3'))
+#    print(compare_package_indexes('2.7.3.1', '2.7.3.3'))
 #    write_changelog('2.7.4.0', '2.7.4.1')
-#    write_changelog('2.7.4.1', '2.7.5.0')
+    write_changelog('2.7.4.1', '2.7.5.0')
 #    write_changelog('3.3.0.0beta1', '3.3.0.0beta2')
 #    write_changelog('3.3.1.0', '3.3.1.1')
-#    write_changelog('3.3.1.1', '3.3.2.0')
+    write_changelog('3.3.1.1', '3.3.2.0')
