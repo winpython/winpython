@@ -1,0 +1,32 @@
+== History of changes for WinPython 2.7.5.0 ==
+
+The following changes were made to WinPython distribution since version 2.7.4.1.
+
+=== Tools ===
+
+Upgraded packages:
+
+  * [http://tortoisehg.bitbucket.org TortoiseHg] 2.7.2 → 2.8 (Set of graphical tools and a shell extension for the Mercurial distributed revision control system)
+
+=== Python packages ===
+
+New packages:
+
+  * [http://pypi.python.org/pypi/colorama colorama] 0.2.5 (Cross-platform colored terminal text)
+
+Upgraded packages:
+
+  * [http://www.cython.org Cython] 0.19 → 0.19.1 (Cython is a language that makes writing C extensions for the Python language as easy as Python)
+  * [http://packages.python.org/guiqwt guiqwt] 2.2.1 → 2.3.0 (Efficient curve/image plotting and other GUI tools for scientific data processing software development)
+  * [http://pypi.python.org/pypi/distribute distribute] 0.6.38 → 0.6.40 (Download, build, install, upgrade, and uninstall Python packages - easily)
+  * [http://www.pytables.org tables] 3.0.0b1 → 3.0.0rc2 (Package based on HDF5 library for managing hierarchical datasets (extremely large amounts of data))
+  * [http://abel.ee.ucla.edu/cvxopt cvxopt] 1.1.5 → 1.1.6 (Convex optimization library)
+  * [http://pypi.python.org/pypi/simplejson simplejson] 3.2.0 → 3.3.0 (Simple, fast, extensible JSON (JavaScript Object Notation) encoder/decoder)
+  * [http://www.python.org/ Python] 2.7.4 → 2.7.5 (Python programming language with standard library)
+  * [http://jinja.pocoo.org Jinja2] 2.6 → 2.7 (Sandboxed template engine (provides a Django-like non-XML syntax and compiles templates into executable python code))
+  * [http://pypi.python.org/pypi/scikit-image scikit-image] 0.8.1 → 0.8.2 (Image processing toolbox for SciPy)
+  * [http://pypi.python.org/pypi/mahotas mahotas] 0.99 → 1.0 (Computer Vision library)
+  * [http://packages.python.org/guidata guidata] 1.5.1 → 1.6.1 (Automatically generated graphical user interfaces for easy data set edition and display)
+  * [http://code.google.com/p/winpython winpython] 0.13 → 0.14 (WinPython distribution tools, including WPPM (package manager))
+
+----

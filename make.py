@@ -25,6 +25,10 @@ from guidata import disthelpers as dh
 from winpython import wppm, utils
 
 
+CHANGELOGS_DIR = osp.join(osp.dirname(__file__), 'changelogs')
+assert osp.isdir(CHANGELOGS_DIR)
+
+
 #==============================================================================
 # How to prepare the MinGW package:
 #==============================================================================
@@ -615,6 +619,8 @@ call %~dp0register_python.bat --all""")
         fname = osp.join(self.winpydir, os.pardir,
                          'WinPython-%s.txt' % self.winpyver)
         open(fname, 'w').write(self.package_index_wiki)
+        # Copy to winpython/changelogs
+        shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
 
 
 def rebuild_winpython(basedir=None, verbose=False):
