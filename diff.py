@@ -104,7 +104,7 @@ def diff_package_dicts(dict1, dict2):
     text = ""
     set1, set2 = set(dict1.keys()), set(dict2.keys())
     # New packages
-    new = set2 - set1
+    new = sorted(set2 - set1)
     if new:
         text += "New packages:\r\n\r\n"
         for name in new:
@@ -113,7 +113,7 @@ def diff_package_dicts(dict1, dict2):
         text += '\r\n'
     # Upgraded packages
     upgraded_list = []
-    for name in set1 & set2:
+    for name in sorted(set1 & set2):
         package1 = dict1[name]
         package2 = dict2[name]
         if package1.version != package2.version:
@@ -121,7 +121,7 @@ def diff_package_dicts(dict1, dict2):
     if upgraded_list:
         text += "Upgraded packages:\r\n\r\n%s\r\n" % "".join(upgraded_list)
     # Removed packages
-    removed = set1 - set2
+    removed = sorted(set1 - set2)
     if removed:
         text += "Removed packages:\r\n\r\n"
         for name in removed:
