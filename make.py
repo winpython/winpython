@@ -23,6 +23,7 @@ from guidata import disthelpers as dh
 
 # Local imports
 from winpython import wppm, utils
+import diff
 
 
 CHANGELOGS_DIR = osp.join(osp.dirname(__file__), 'changelogs')
@@ -616,11 +617,18 @@ call %~dp0register_python.bat --all""")
             self._print_done()
         
         # Writing package index
+        self._print("Writing package index")
         fname = osp.join(self.winpydir, os.pardir,
                          'WinPython-%s.txt' % self.winpyver)
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
         shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
+        self._print_done()
+        
+        # Writing changelog
+        self._print("Writing changelog")
+        diff.write_changelog(self.winpyver)
+        self._print_done()
 
 
 def rebuild_winpython(basedir=None, verbose=False):
@@ -714,5 +722,5 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(0, '', pyver='2.7')#, simulation=True)
-    make_all(0, '', pyver='3.3')#, simulation=True)
+    make_all(1, '', pyver='2.7', simulation=True)
+    make_all(1, '', pyver='3.3', simulation=True)

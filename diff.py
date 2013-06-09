@@ -12,6 +12,7 @@ Created on Tue Jan 29 11:56:54 2013
 
 from __future__ import print_function, with_statement
 
+import os
 import os.path as osp
 import re
 import shutil
@@ -128,10 +129,27 @@ def diff_package_dicts(dict1, dict2):
             text += package.to_wiki()
         text += '\r\n'
     return text
+    
+
+def find_closer_version(version1):
+    """Find version which is the closest to `version`"""
+    builddir = osp.join(get_basedir(version1), 'build')
+    func = lambda name: re.match(r'WinPython-([0-9\.]*)\.txt', name)
+    versions = [func(name).groups()[0]
+                for name in os.listdir(builddir) if func(name)]
+    try:
+        index = versions.index(version1)
+    except ValueError:
+        raise ValueError("Unknown version %s" % version1)
+    if index == 0:
+        raise ValueError("No version prior to %s" % version1)
+    return versions[index-1]
 
 
-def compare_package_indexes(version1, version2, rootdir=None):
+def compare_package_indexes(version2, version1=None, rootdir=None):
     """Compare two package index Wiki pages"""
+    if version1 is None:
+        version1 = find_closer_version(version2)
     text = '\r\n'.join(["== History of changes for WinPython %s ==" % version2,
                         "", "The following changes were made to WinPython "\
                         "distribution since version %s." % version1, "", ""])
@@ -147,10 +165,18 @@ def compare_package_indexes(version1, version2, rootdir=None):
     return text
 
 
-def write_changelog(version1, version2, rootdir=None):
+def _copy_all_changelogs(version, basedir):
+    basever = '.'.join(version.split('.')[:2])
+    for name in os.listdir(CHANGELOGS_DIR):
+        if re.match(r'WinPython-%s([0-9\.]*)\.txt' % basever, name):
+            shutil.copyfile(osp.join(CHANGELOGS_DIR, name),
+                            osp.join(basedir, 'build', name))
+
+def write_changelog(version2, version1=None, rootdir=None):
     """Write changelog between version1 and version2 of WinPython"""
-    text = compare_package_indexes(version1, version2, rootdir=rootdir)
-    basedir = get_basedir(version1, rootdir=rootdir)
+    text = compare_package_indexes(version2, version1, rootdir=rootdir)
+    basedir = get_basedir(version2, rootdir=rootdir)
+    _copy_all_changelogs(version2, basedir)
     fname = osp.join(basedir, 'build', 'WinPython-%s_History.txt' % version2)
     with open(fname, 'wb') as fdesc:
         fdesc.write(text)
@@ -172,15 +198,17 @@ def test_parse_package_index_wiki(version, rootdir=None):
         print('')
 
 
-def test_compare(basedir, version1, version2):
-    print(compare_package_indexes(basedir, version1, version2))
+def test_compare(basedir, version2, version1):
+    print(compare_package_indexes(basedir, version2, version1))
 
 
 if __name__ == '__main__':
 #    test_parse_package_index_wiki('2.7.3.3')
-#    print(compare_package_indexes('2.7.3.1', '2.7.3.3'))
-#    write_changelog('2.7.4.0', '2.7.4.1')
-    write_changelog('2.7.4.1', '2.7.5.0')
-#    write_changelog('3.3.0.0beta1', '3.3.0.0beta2')
-#    write_changelog('3.3.1.0', '3.3.1.1')
-    write_changelog('3.3.1.1', '3.3.2.0')
+#    print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
+#    write_changelog('2.7.4.1', '2.7.4.0')
+#    write_changelog('2.7.5.0', '2.7.4.1')
+    write_changelog('2.7.5.1')#, '2.7.5.0')
+#    write_changelog('3.3.0.0beta2', '3.3.0.0beta1')
+#    write_changelog('3.3.1.1', '3.3.1.0')
+#    write_changelog('3.3.2.0', '3.3.1.1')
+#    write_changelog('3.3.2.1', '3.3.2.0')
