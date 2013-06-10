@@ -26,11 +26,13 @@ OutFile ""
 ;================================================================
 
 # Standard NSIS plugins
+!include "WordFunc.nsh"
 !include "FileFunc.nsh"
 !include "TextReplace.nsh"
 
 # Custom NSIS plugins
 !include "ReplaceInFileWithTextReplace.nsh"
+!include "EnumIni.nsh"
 
 SilentInstall silent
 AutoCloseWindow true
@@ -53,6 +55,7 @@ end_workdir:
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYDIR", "${WINPYDIR}").r0'
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYVER", "${WINPYVER}").r0'
 
+
 ;================================================================
 ; Settings directory
 IfFileExists "$EXEDIR\settings\*.*" 0 end_settings
@@ -73,45 +76,67 @@ end_settings:
 
 
 ; WinPython settings
+IfFileExists "$EXEDIR\settings\*.*" 0 winpython_settings_profile
 StrCpy $R6 "$EXEDIR\settings\winpython.ini"
+Goto winpython_settings_continue
+winpython_settings_profile:
+StrCpy $R6 "$PROFILE\winpython.ini"
+winpython_settings_continue:
 IfFileExists $R6 winpython_settings_done
 ClearErrors
 FileOpen $0 $R6 w
 IfErrors winpython_settings_done
+FileWrite $0 "[debug]$\r$\nstate = disabled"
+FileWrite $0 "$\r$\n"
 FileWrite $0 "$\r$\n[environment]"
-FileWrite $0 "$\r$\n## Uncomment following lines to override environment variables"
-FileWrite $0 "$\r$\n#path = "
-FileWrite $0 "$\r$\n#pythonpath = "
-FileWrite $0 "$\r$\n#pythonstartup = "
+FileWrite $0 "$\r$\n## <?> Uncomment lines to override environment variables"
+FileWrite $0 "$\r$\n#PATH = "
+FileWrite $0 "$\r$\n#PYTHONPATH = "
+FileWrite $0 "$\r$\n#PYTHONSTARTUP = "
 FileClose $0
 winpython_settings_done:
 
 
-; PATH
-IfFileExists $R6 0 no_path_replacement
-ReadINIStr $0 $R6 "environment" path
-IfErrors no_path_replacement
-StrCpy $R0 $0
-Goto set_path
-no_path_replacement:
+; Debug state
+IfFileExists $R6 0 no_debug
+ReadINIStr $R7 $R6 "debug" "state"
+StrCmp $R7 "" no_debug
+StrCmp $R7 "disabled" no_debug
+StrCpy $R7 "enabled"
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYDEBUG", "True").r0'
+no_debug:
+
+
+;================================================================
+; Environment variables
 ReadEnvStr $R0 "PATH"
-set_path:
+
+IfFileExists $R6 0 envvar_done
+StrCpy $R9 0
+envvar_loop:
+    ${EnumIniValue} $1 $R6 "environment" $R9
+    StrCmp $1 "" envvar_done
+    IntOp $R9 $R9 + 1
+    ReadINIStr $2 $R6 "environment" $1
+
+    ${StrFilter} $1 "+" "" " " $1 ; Upper case + remove trailing spaces
+    StrCmp $1 "PATH" found_path
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("$1", "$2").r0'
+    Goto end_found_path
+
+    found_path:
+    StrCpy $R0 $2
+    StrCmp $R7 "disabled" end_found_path
+    MessageBox MB_OK|MB_ICONINFORMATION "Found PATH=$2"
+    end_found_path:
+
+    StrCmp $R7 "disabled" envvar_loop
+    MessageBox MB_YESNO|MB_ICONQUESTION "$R9: Name='$1'$\nValue='$2'$\n$\n$\nMore?" IDYES envvar_loop
+envvar_done:
+
 StrCpy $R0 "${PREPATH};$R0;${POSTPATH}"
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("PATH", R0).r0'
-
-; PYTHONPATH
-IfFileExists $R6 0 no_pythonpath_replacement
-ReadINIStr $R0 $R6 "environment" pythonpath
-IfErrors no_pythonpath_replacement
-System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("PYTHONPATH", R0).r0'
-no_pythonpath_replacement:
-
-; PYTHONSTARTUP
-IfFileExists $R6 0 no_pythonstartup_replacement
-ReadINIStr $R0 $R6 "environment" pythonstartup
-IfErrors no_pythonstartup_replacement
-System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("PYTHONSTARTUP", R0).r0'
-no_pythonstartup_replacement:
+;================================================================
 
 
 ; Command line parameters
