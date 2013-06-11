@@ -174,9 +174,9 @@ def _copy_all_changelogs(version, basedir):
 
 def write_changelog(version2, version1=None, rootdir=None):
     """Write changelog between version1 and version2 of WinPython"""
-    text = compare_package_indexes(version2, version1, rootdir=rootdir)
     basedir = get_basedir(version2, rootdir=rootdir)
     _copy_all_changelogs(version2, basedir)
+    text = compare_package_indexes(version2, version1, rootdir=rootdir)
     fname = osp.join(basedir, 'build', 'WinPython-%s_History.txt' % version2)
     with open(fname, 'wb') as fdesc:
         fdesc.write(text)
@@ -207,6 +207,7 @@ if __name__ == '__main__':
 #    print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
 #    write_changelog('2.7.4.1', '2.7.4.0')
 #    write_changelog('2.7.5.0', '2.7.4.1')
+    write_changelog('3.3.2.1')#, '2.7.5.0')
     write_changelog('2.7.5.1')#, '2.7.5.0')
 #    write_changelog('3.3.0.0beta2', '3.3.0.0beta1')
 #    write_changelog('3.3.1.1', '3.3.1.0')
