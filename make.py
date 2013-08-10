@@ -419,7 +419,7 @@ call %~dp0env.bat
         print("Installing required packages")
         self.install_package('pywin32-([0-9\.]*[a-z]*).%s-py%s.exe'
                              % (self.py_arch, self.python_version))
-        self.install_package('distribute-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
+        self.install_package('setuptools-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
         self.install_package('winpython-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
@@ -578,7 +578,8 @@ call %~dp0register_python.bat --all""")
         self.python_fullversion = '.'.join(vlst[:3])
 
         # Create the WinPython base directory
-        self._print("Creating WinPython base directory")
+        self._print("Creating WinPython %s base directory"\
+                    % self.python_version)
         self.winpydir = osp.join(self.target, distname)
         if osp.isdir(self.winpydir) and remove_existing \
            and not self.simulation:
