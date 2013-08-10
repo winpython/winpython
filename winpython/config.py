@@ -10,14 +10,10 @@ WinPython utilities configuration
 Created on Wed Aug 29 12:23:19 2012
 """
 
-
-from guidata.configtools import add_image_path, get_module_data_path
-from guidata.configtools import get_icon  # analysis:ignore
-
+from spyderlib.baseconfig import add_image_path, get_module_data_path
 
 add_image_path(get_module_data_path('winpython', relpath='images'))
 add_image_path(get_module_data_path('spyderlib', relpath='images'))
-
 
 def get_data_path():
     """Return package data path"""

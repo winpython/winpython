@@ -26,15 +26,14 @@ from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
 import spyderlib.qt
 
-from spyderlib.utils.qthelpers import (add_actions, create_action, keybinding,
-                                       get_std_icon, action2button,
+from spyderlib.utils.qthelpers import (get_icon, add_actions, create_action,
+                                       keybinding, get_std_icon, action2button,
                                        mimedata2url)
 from spyderlib.utils import encoding
 
 # Local imports
 from winpython import __version__, __project_url__, __forum_url__
 from winpython import wppm, associate, utils
-from winpython.config import get_icon
 from winpython.py3compat import getcwd, to_text_string
 
 
