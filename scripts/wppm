@@ -21,13 +21,13 @@ parser.add_argument('-u', '--uninstall', dest='uninstall',
 args = parser.parse_args()
 
 if args.install and args.uninstall:
-    raise RuntimeError, "Incompatible arguments: --install and --uninstall"
+    raise RuntimeError("Incompatible arguments: --install and --uninstall")
 
 if not args.install and not args.uninstall:
     args.install = True
 
 if not osp.isfile(args.fname):
-    raise IOError, "File not found: %s" % args.fname
+    raise IOError("File not found: %s" % args.fname)
 
 if utils.is_python_distribution(args.target):
     dist = wppm.Distribution(args.target)
@@ -39,9 +39,9 @@ if utils.is_python_distribution(args.target):
             else:
                 dist.uninstall(package)
         else:
-            raise RuntimeError, "Package is not compatible with Python "\
-                                "%s %dbit" % (dist.version, dist.architecture)
+            raise RuntimeError("Package is not compatible with Python "\
+                               "%s %dbit" % (dist.version, dist.architecture))
     except NotImplementedError:
-        raise RuntimeError, "Package is not (yet) supported by WPPM"
+        raise RuntimeError("Package is not (yet) supported by WPPM")
 else:
-    raise WindowsError, "Invalid Python distribution %s" % args.target
+    raise WindowsError("Invalid Python distribution %s" % args.target)
