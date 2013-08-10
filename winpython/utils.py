@@ -337,6 +337,14 @@ def build_wininst(root, python_exe=None, copy_to=None,
         p.stdout.close()
         p.stderr.close()
     distdir = osp.join(root, 'dist')
+    if not osp.isdir(distdir):
+        raise RuntimeError("Build failed: see package README file for further"\
+                   " details regarding installation requirements.\n\n"\
+                   "For more concrete debugging infos, please try to build "\
+                   "the package from the command line:\n"\
+                   "1. Open a WinPython command prompt\n"\
+                   "2. Change working directory to the appropriate folder\n"\
+                   "3. Type `python setup.py build install`")
     pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
     for distname in os.listdir(distdir):
         match = re.match(pattern, distname)
