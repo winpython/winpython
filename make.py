@@ -698,6 +698,18 @@ def make_winpython(build_number, release_level, architecture,
         dist.create_installer()
     return dist
 
+def get_basedir(pyver, rootdir=None):
+    """Get basedir from Python version
+    
+    `pyver`: Python version (X.Y format) [str]
+    `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
+    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
+    """ + ROOTDIR_DOC
+    assert re.match(r'[0-9]+\.[0-9]+', pyver) is not None
+    rootdir = rootdir if rootdir is not None else utils.ROOT_DIR
+    assert rootdir is not None, "The *rootdir* directory must be specified"
+    return osp.join(rootdir, 'basedir%s' % pyver[::2][:2])
+
 def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
              verbose=False, remove_existing=True):
@@ -712,10 +724,7 @@ def make_all(build_number, release_level, pyver,
     `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
     """ + ROOTDIR_DOC
-    assert re.match(r'[0-9]+\.[0-9]+', pyver) is not None
-    rootdir = rootdir if rootdir is not None else utils.ROOT_DIR
-    assert rootdir is not None, "The *rootdir* directory must be specified"
-    basedir = osp.join(rootdir, 'basedir%s' % pyver[::2])
+    basedir = get_basedir(pyver, rootdir=rootdir)
     rebuild_winpython(basedir=basedir)
     for architecture in (64, 32):
         make_winpython(build_number, release_level, architecture, basedir,
@@ -723,5 +732,5 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='2.7', simulation=True)
-    make_all(1, '', pyver='3.3', simulation=True)
+    make_all(2, '', pyver='2.7')#, create_installer=False)#, remove_existing=False, simulation=True)
+    make_all(2, '', pyver='3.3')#, create_installer=False)#, remove_existing=False, simulation=True)
