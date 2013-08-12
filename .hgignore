@@ -4,6 +4,8 @@
 \.settings$
 \.spyderproject$
 \.ropeproject$
+\.project$
+\.pydevproject$
 \.orig$
 \.DS_Store$
 ^build/
