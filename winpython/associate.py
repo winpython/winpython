@@ -26,6 +26,8 @@ KEY_C = r"Software\Classes\%s"
 KEY_C0 = KEY_C % r"Python.%sFile\shell"
 KEY_C1 = KEY_C % r"Python.%sFile\shell\%s"
 KEY_C2 = KEY_C1 + r"\command"
+KEY_DROP0 = KEY_C % r"Python.%sFile\shellex"
+KEY_DROP1 = KEY_C % r"Python.%sFile\shellex\DropHandler"
 KEY_I = KEY_C % r"Python.%sFile\DefaultIcon"
 KEY_D = KEY_C % r"Python.%sFile"
 EWI = "Edit with IDLE"
@@ -92,6 +94,12 @@ def register(target, current=True):
     winreg.SetValueEx(winreg.CreateKey(root, KEY_C2 % ("NoCon", EWS)),
                       "", 0, winreg.REG_SZ,
                       '"%s" "%s\Scripts\spyder" "%%1"' % (pythonw, target))
+
+    # Drop support
+    handler = "{60254CA5-953B-11CF-8C96-00AA00B8708C}"
+    for ftype in ("", "NoCon", "Compiled"):
+        winreg.SetValueEx(winreg.CreateKey(root, KEY_DROP1 % ftype),
+                          "", 0, winreg.REG_SZ, handler)
     
     # Icons
     dlls = osp.join(target, 'DLLs')
@@ -150,6 +158,9 @@ def unregister(target, current=True):
     short_version = utils.get_python_infos(target)[0]
     key_core = (KEY_S1 % short_version) + r'\%s'
     for key in (
+                # Drop support
+                KEY_DROP1 % "", KEY_DROP1 % "NoCon", KEY_DROP1 % "Compiled",
+                KEY_DROP0 % "", KEY_DROP0 % "NoCon", KEY_DROP0 % "Compiled",
                 # Icons
                 KEY_I % "NoCon", KEY_I % "Compiled", KEY_I % "",
                 # Edit with IDLE
