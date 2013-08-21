@@ -21,7 +21,7 @@ import subprocess
 
 # Local imports
 from winpython import utils
-from winpython.config import get_data_path
+from winpython.config import DATA_PATH
 from winpython.py3compat import configparser as cp
 
 # Workaround for installing PyVISA on Windows from source:
@@ -33,7 +33,7 @@ def get_package_metadata(database, name):
     # Note: we could use the PyPI database but this has been written on 
     # machine which is not connected to the internet
     db = cp.ConfigParser()
-    db.readfp(open(osp.join(get_data_path(), database)))
+    db.readfp(open(osp.join(DATA_PATH, database)))
     metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
     for key in metadata:
         name1 = name.lower()
