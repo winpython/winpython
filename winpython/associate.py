@@ -74,6 +74,9 @@ def register(target, current=True):
     # Verbs
     python = osp.abspath(osp.join(target, 'python.exe'))
     pythonw = osp.abspath(osp.join(target, 'pythonw.exe'))
+    spyder = osp.abspath(osp.join(target, os.pardir, 'Spyder.exe'))
+    if not osp.isfile(spyder):
+        spyder = '%s" "%s\Scripts\spyder' % (pythonw, target)
     winreg.SetValueEx(winreg.CreateKey(root, KEY_C2 % ("", "open")),
                       "", 0, winreg.REG_SZ, '"%s" "%%1" %%*' % python)
     winreg.SetValueEx(winreg.CreateKey(root, KEY_C2 % ("NoCon", "open")),
@@ -89,11 +92,9 @@ def register(target, current=True):
                       '"%s" "%s\Lib\idlelib\idle.pyw" -n -e "%%1"'
                       % (pythonw, target))
     winreg.SetValueEx(winreg.CreateKey(root, KEY_C2 % ("", EWS)),
-                      "", 0, winreg.REG_SZ,
-                      '"%s" "%s\Scripts\spyder" "%%1"' % (pythonw, target))
+                      "", 0, winreg.REG_SZ, '"%s" "%%1"' % spyder)
     winreg.SetValueEx(winreg.CreateKey(root, KEY_C2 % ("NoCon", EWS)),
-                      "", 0, winreg.REG_SZ,
-                      '"%s" "%s\Scripts\spyder" "%%1"' % (pythonw, target))
+                      "", 0, winreg.REG_SZ, '"%s" "%%1"' % spyder)
 
     # Drop support
     handler = "{60254CA5-953B-11CF-8C96-00AA00B8708C}"
