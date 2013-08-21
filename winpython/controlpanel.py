@@ -14,22 +14,22 @@ import os.path as osp
 import os
 import sys
 import platform
+import locale
 
-from spyderlib.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
+from winpython.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QHBoxLayout, QVBoxLayout, QColor, QMessageBox,
                                 QAbstractItemView, QProgressDialog, QTableView,
                                 QPushButton, QLabel, QTabWidget, QToolTip,
                                 QDesktopServices)
-from spyderlib.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
+from winpython.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
                                  QThread, QTimer, QUrl)
-from spyderlib.qt.compat import (to_qvariant, getopenfilenames,
+from winpython.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
-import spyderlib.qt
+import winpython.qt
 
-from spyderlib.utils.qthelpers import (get_icon, add_actions, create_action,
-                                       keybinding, get_std_icon, action2button,
-                                       mimedata2url)
-from spyderlib.utils import encoding
+from winpython.qthelpers import (get_icon, add_actions, create_action,
+                                 keybinding, get_std_icon, action2button,
+                                 mimedata2url)
 
 # Local imports
 from winpython import __version__, __project_url__, __forum_url__
@@ -330,7 +330,14 @@ class Thread(QThread):
         try:
             self.callback()
         except Exception as error:
-            self.error = encoding.to_unicode_from_fs(str(error))
+            error_str = str(error)
+            fs_encoding = sys.getfilesystemencoding()\
+                          or locale.getpreferredencoding()
+            try:
+                error_str = error_str.decode(fs_encoding)
+            except (UnicodeError, TypeError):
+                pass
+            self.error = error_str
 
 
 def python_distribution_infos():
@@ -688,8 +695,8 @@ What is the expected output? What do you see instead?
 Please provide any additional information below.
 """ % (python_distribution_infos(),
        __version__, platform.python_version(),
-       spyderlib.qt.QtCore.__version__, spyderlib.qt.API_NAME,
-       spyderlib.qt.__version__)
+       winpython.qt.QtCore.__version__, winpython.qt.API_NAME,
+       winpython.qt.__version__)
        
         url = QUrl("%s/issues/entry" % __project_url__)
         url.addQueryItem("comment", issue_template)
@@ -715,8 +722,8 @@ Please provide any additional information below.
             Python %s, Qt %s, %s %s"""
             % (self.NAME, __version__, __project_url__, __forum_url__,
                python_distribution_infos(),
-               platform.python_version(), spyderlib.qt.QtCore.__version__,
-               spyderlib.qt.API_NAME, spyderlib.qt.__version__,) )
+               platform.python_version(), winpython.qt.QtCore.__version__,
+               winpython.qt.API_NAME, winpython.qt.__version__,) )
 
         
 def main(test=False):
@@ -731,6 +738,7 @@ def main(test=False):
 
 def test():
     app, win = main(test=True)
+    print(sys.modules)
     app.exec_()
 
 
