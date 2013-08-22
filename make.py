@@ -732,5 +732,13 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(3, '', pyver='2.7')#, create_installer=False)#, remove_existing=False, simulation=True)
     make_all(3, '', pyver='3.3')#, create_installer=False)#, remove_existing=False, simulation=True)
+    make_all(3, '', pyver='2.7')#, create_installer=False)#, remove_existing=False, simulation=True)
+
+    import upload
+    import time
+    for version in ("3.3.2.3", "2.7.5.3"):
+        for architecture in (64, 32):
+            print(time.ctime())
+            upload.upload_installer(version, architecture)
+            print()
