@@ -52,7 +52,7 @@ def upload_installer(version, architecture):
 
 if __name__ == '__main__':
     import time
-    for version in ("3.3.2.2", "2.7.5.2"):
+    for version in ("3.3.2.3", "2.7.5.3"):
         for architecture in (64, 32):
             print(time.ctime())
             upload_installer(version, architecture)
