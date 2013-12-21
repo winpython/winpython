@@ -21,10 +21,11 @@ import re
 from winpython import utils, wppm
 
 
-def test_python_packages():
+def test_python_packages(pyver):
     """Check if all Python packages are supported by WinPython"""
+    basedir = utils.get_basedir(pyver)
     for suffix in ('src', 'win32', 'win-amd64'):
-        dirname = osp.join(utils.BASE_DIR, 'packages.%s' % suffix)
+        dirname = osp.join(basedir, 'packages.%s' % suffix)
         for name in os.listdir(dirname):
             if osp.isfile(osp.join(dirname, name)) \
                and not re.match(r'python-([0-9\.]*)(\.amd64)?\.msi', name):
@@ -36,4 +37,5 @@ def test_python_packages():
 
 
 if __name__ == '__main__':
-    test_python_packages()
+    test_python_packages('2.7')
+    test_python_packages('3.3')

@@ -645,17 +645,6 @@ def rebuild_winpython(basedir=None, verbose=False):
                             architecture=architecture, verbose=verbose)
 
 
-ROOTDIR_DOC = """
-
-    The WinPython root directory (WINPYTHONROOTDIR environment variable which 
-    may be overriden with the `rootdir` option) contains the following folders:
-      * (required) `packages.win32`: contains distutils 32-bit packages
-      * (required) `packages.win-amd64`: contains distutils 64-bit packages
-      * (optional) `packages.src`: contains distutils source distributions
-      * (required) `tools`: contains architecture-independent tools
-      * (optional) `tools.win32`: contains 32-bit-specific tools
-      * (optional) `tools.win-amd64`: contains 64-bit-specific tools"""
-
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
                    create_installer=True, simulation=False):
@@ -671,7 +660,7 @@ def make_winpython(build_number, release_level, architecture,
     `architecture`: [int] (32 or 64)
     `basedir`: [str] if None, WINPYTHONBASEDIR env var must be set
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
-    """ + ROOTDIR_DOC
+    """ + utils.ROOTDIR_DOC
     basedir = basedir if basedir is not None else utils.BASE_DIR
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
@@ -698,18 +687,6 @@ def make_winpython(build_number, release_level, architecture,
         dist.create_installer()
     return dist
 
-def get_basedir(pyver, rootdir=None):
-    """Get basedir from Python version
-    
-    `pyver`: Python version (X.Y format) [str]
-    `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
-    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
-    """ + ROOTDIR_DOC
-    assert re.match(r'[0-9]+\.[0-9]+', pyver) is not None
-    rootdir = rootdir if rootdir is not None else utils.ROOT_DIR
-    assert rootdir is not None, "The *rootdir* directory must be specified"
-    return osp.join(rootdir, 'basedir%s' % pyver[::2][:2])
-
 def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
              verbose=False, remove_existing=True):
@@ -723,8 +700,8 @@ def make_all(build_number, release_level, pyver,
     `pyver`: Python version (X.Y format) [str]
     `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
-    """ + ROOTDIR_DOC
-    basedir = get_basedir(pyver, rootdir=rootdir)
+    """ + utils.ROOTDIR_DOC
+    basedir = utils.get_basedir(pyver, rootdir=rootdir)
     rebuild_winpython(basedir=basedir)
     for architecture in (64, 32):
         make_winpython(build_number, release_level, architecture, basedir,
@@ -732,12 +709,12 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(3, '', pyver='3.3')#, create_installer=False)#, remove_existing=False, simulation=True)
-    make_all(3, '', pyver='2.7')#, create_installer=False)#, remove_existing=False, simulation=True)
+    make_all(0, '', pyver='3.3')#, create_installer=False)#, remove_existing=False, simulation=True)
+    make_all(0, '', pyver='2.7')#, create_installer=False)#, remove_existing=False, simulation=True)
 
     import upload
     import time
-    for version in ("3.3.2.3", "2.7.5.3"):
+    for version in ("3.3.3.0", "2.7.6.0"):
         for architecture in (64, 32):
             print(time.ctime())
             upload.upload_installer(version, architecture)

@@ -36,6 +36,29 @@ if osp.isdir(TOOLS_DIR):
 ROOT_DIR = os.environ.get('WINPYTHONROOTDIR')
 BASE_DIR = os.environ.get('WINPYTHONBASEDIR')
 
+ROOTDIR_DOC = """
+
+    The WinPython root directory (WINPYTHONROOTDIR environment variable which 
+    may be overriden with the `rootdir` option) contains the following folders:
+      * (required) `packages.win32`: contains distutils 32-bit packages
+      * (required) `packages.win-amd64`: contains distutils 64-bit packages
+      * (optional) `packages.src`: contains distutils source distributions
+      * (required) `tools`: contains architecture-independent tools
+      * (optional) `tools.win32`: contains 32-bit-specific tools
+      * (optional) `tools.win-amd64`: contains 64-bit-specific tools"""
+
+def get_basedir(pyver, rootdir=None):
+    """Get basedir from Python version
+    
+    `pyver`: Python version (X.Y format) [str]
+    `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
+    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
+    """ + ROOTDIR_DOC
+    assert re.match(r'[0-9]+\.[0-9]+', pyver) is not None
+    rootdir = rootdir if rootdir is not None else ROOT_DIR
+    assert rootdir is not None, "The *rootdir* directory must be specified"
+    return osp.join(rootdir, 'basedir%s' % pyver[::2][:2])
+
 
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`.

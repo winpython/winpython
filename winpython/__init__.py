@@ -3,7 +3,7 @@
 WinPython License Agreement (MIT License)
 -----------------------------------------
 
-Copyright (c) 2012 Pierre Raybaut
+Copyright (c) 2012-2013 Pierre Raybaut
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -27,7 +27,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-__version__ = '0.17'
+__version__ = '0.18'
 __license__ = __doc__
 __project_url__ = 'http://code.google.com/p/winpython'
 __forum_url__   = 'http://groups.google.com/group/winpython'
