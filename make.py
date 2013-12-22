@@ -178,24 +178,27 @@ class WinPythonDistribution(object):
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata('tools.ini', name)
             url, desc = metadata['url'], metadata['description']
-            tools += ['|| [%s %s] || %s || %s ||' % (url, name, ver, desc)]
-        packages = ['|| [%s %s] || %s || %s ||'
-                    % (pack.url, pack.name, pack.version, pack.description)
+            tools += ['[%s](%s) | %s | %s' % (name, url, ver, desc)]
+        packages = ['[%s](%s) | %s | %s'
+                    % (pack.name, pack.url, pack.version, pack.description)
                     for pack in sorted(self.installed_packages,
                                        key=lambda p: p.name.lower())]
         python_desc = 'Python programming language with standard library'
-        return """== WinPython %s ==
+        return """## WinPython %s
 
 The following packages are included in WinPython v%s.
 
-=== Tools ===
+### Tools
 
+Name | Version | Description
+-----|---------|------------
 %s
 
-=== Python packages ===
+### Python packages
 
-|| [http://www.python.org/ Python] || %s || %s ||
-
+Name | Version | Description
+-----|---------|------------
+[Python](http://www.python.org/) | %s | %s
 %s""" % (self.winpyver, self.winpyver, '\n'.join(tools),
          self.python_fullversion, python_desc, '\n'.join(packages))
     
@@ -709,13 +712,5 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(0, '', pyver='3.3')#, create_installer=False)#, remove_existing=False, simulation=True)
-    make_all(0, '', pyver='2.7')#, create_installer=False)#, remove_existing=False, simulation=True)
-
-    import upload
-    import time
-    for version in ("3.3.3.0", "2.7.6.0"):
-        for architecture in (64, 32):
-            print(time.ctime())
-            upload.upload_installer(version, architecture)
-            print()
+    make_all(0, '', pyver='3.3', create_installer=False, simulation=True)
+    make_all(0, '', pyver='2.7', create_installer=False, simulation=True)

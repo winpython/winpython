@@ -26,7 +26,10 @@ assert osp.isdir(CHANGELOGS_DIR)
 
 
 class Package(object):
-    PATTERN = r'\|\| \[([a-zA-Z\-\:\/\.\_0-9]*) ([^\]\ ]*)] \|\| ([^\|]*) \|\| ([^\|]*) \|\|'
+    # SourceForge Wiki syntax:
+    PATTERN = r'\[([a-zA-Z\-\:\/\.\_0-9]*)\]\(([^\]\ ]*)\) \| ([^\|]*) \| ([^\|]*)'
+    # Google Code Wiki syntax:
+    PATTERN_OLD = r'\[([a-zA-Z\-\:\/\.\_0-9]*) ([^\]\ ]*)\] \| ([^\|]*) \| ([^\|]*)'
     def __init__(self):
         self.name = None
         self.version = None
@@ -39,16 +42,20 @@ class Package(object):
         return text
     
     def from_text(self, text):
-        match = re.match(self.PATTERN, text)
-        self.url, self.name, self.version, self.description = match.groups()
+        try:
+            self.url, self.name, self.version, self.description = \
+                                    re.match(self.PATTERN_OLD, text).groups()
+        except AttributeError:
+            self.name, self.url, self.version, self.description = \
+                                        re.match(self.PATTERN, text).groups()
     
     def to_wiki(self):
-        return "  * [%s %s] %s (%s)\r\n" % (self.url, self.name,
-                                            self.version, self.description)
+        return "  * [%s](%s) %s (%s)\r\n" % (self.name, self.url,
+                                             self.version, self.description)
     
     def upgrade_wiki(self, other):
         assert self.name == other.name
-        return "  * [%s %s] %s → %s (%s)\r\n" % (self.url, self.name,
+        return "  * [%s](%s) %s → %s (%s)\r\n" % (self.name, self.url,
                                 other.version, self.version, self.description)
 
 
@@ -60,9 +67,11 @@ def get_basedir(version, rootdir=None):
 
 
 class PackageIndex(object):
-    WINPYTHON_PATTERN = r'== WinPython ([0-9\.a-zA-Z]*) =='
-    TOOLS_LINE = '=== Tools ==='
-    PYTHON_PACKAGES_LINE = '=== Python packages ==='
+    WINPYTHON_PATTERN = r'\#\# WinPython ([0-9\.a-zA-Z]*)'
+    TOOLS_LINE = '### Tools'
+    PYTHON_PACKAGES_LINE = '### Python packages'
+    HEADER_LINE1 = 'Name | Version | Description'
+    HEADER_LINE2 = '-----|---------|------------'
     def __init__(self, version, rootdir=None):
         self.version = version
         self.other_packages = {}
@@ -89,6 +98,8 @@ class PackageIndex(object):
                 elif line == self.PYTHON_PACKAGES_LINE:
                     tools_flag = False
                     python_flag = True
+                    continue
+                elif line in (self.HEADER_LINE1, self.HEADER_LINE2):
                     continue
                 if tools_flag or python_flag:
                     package = Package()
@@ -150,7 +161,7 @@ def compare_package_indexes(version2, version1=None, rootdir=None):
     """Compare two package index Wiki pages"""
     if version1 is None:
         version1 = find_closer_version(version2)
-    text = '\r\n'.join(["== History of changes for WinPython %s ==" % version2,
+    text = '\r\n'.join(["## History of changes for WinPython %s" % version2,
                         "", "The following changes were made to WinPython "\
                         "distribution since version %s." % version1, "", ""])
     pi1 = PackageIndex(version1, rootdir=rootdir)
@@ -161,7 +172,7 @@ def compare_package_indexes(version2, version1=None, rootdir=None):
     py_text = diff_package_dicts(pi1.python_packages, pi2.python_packages)
     if py_text:
         text += PackageIndex.PYTHON_PACKAGES_LINE + '\r\n\r\n' + py_text
-    text += '----\r\n'
+    text += '* * *\r\n'
     return text
 
 
