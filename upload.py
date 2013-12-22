@@ -13,8 +13,8 @@ import re
 
 # Local imports
 import googlecode_upload as gu
-import make
 from winpython.py3compat import configparser as cp
+from winpython import utils
 
 
 def get_hg_user_password():
@@ -33,7 +33,7 @@ def get_hg_user_password():
 def upload_installer(version, architecture):
     """Upload to WinPython GoogleCode project"""
     assert architecture in (32, 64)
-    file_path = osp.join(make.get_basedir(version), "build",
+    file_path = osp.join(utils.get_basedir(version), "build",
                          "WinPython-%dbit-%s.exe" % (architecture, version))
     summary = "WinPython %dbit %s" % (architecture, version)
     
