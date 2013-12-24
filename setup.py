@@ -43,11 +43,11 @@ from winpython import __version__, __project_url__
 
 setup(name=NAME,
       version=__version__,
-      description='WinPython distribution tools, including WPPM',
+      description='%s distribution tools, including WPPM' % NAME,
       long_description=\
-"""WinPython is a portable distribution of the Python programming language 
+"""%s is a portable distribution of the Python programming language 
 for Windows. It is a full-featured Python-based scientific environment, :
-including a package manager, WPPM.""",
+including a package manager, WPPM.""" % NAME,
       download_url='%s/files/%s-%s.zip' % (__project_url__, NAME, __version__),
       author="Pierre Raybaut",
       author_email = 'pierre.raybaut@gmail.com',
