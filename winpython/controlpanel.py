@@ -32,7 +32,7 @@ from winpython.qthelpers import (get_icon, add_actions, create_action,
                                  mimedata2url)
 
 # Local imports
-from winpython import __version__, __project_url__, __forum_url__
+from winpython import __version__, __project_url__
 from winpython import wppm, associate, utils
 from winpython.py3compat import getcwd, to_text_string
 
@@ -711,16 +711,12 @@ Please provide any additional information below.
             <p>Copyright &copy; 2012 Pierre Raybaut
             <br>Licensed under the terms of the MIT License
             <p>Created, developed and maintained by Pierre Raybaut
-            <p>WinPython's community:
-            <ul><li>Bug reports and feature requests: 
-            <a href="%s">Google Code</a>
-            </li><li>Discussions around the project: 
-            <a href="%s">Google Group</a>
-            </li></ul>
+            <p><a href="%s">WinPython at SourceForge</a>: downloads, bug reports, 
+            discussions, etc.</p>
             <p>This program is executed by:<br>
             <b>%s</b><br>
             Python %s, Qt %s, %s %s"""
-            % (self.NAME, __version__, __project_url__, __forum_url__,
+            % (self.NAME, __version__, __project_url__,
                python_distribution_infos(),
                platform.python_version(), winpython.qt.QtCore.__version__,
                winpython.qt.API_NAME, winpython.qt.__version__,) )
