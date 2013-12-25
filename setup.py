@@ -40,14 +40,15 @@ def get_subpackages(name):
 NAME = LIBNAME = 'winpython'
 from winpython import __version__, __project_url__
 
+PROJECT_NAME = 'WinPython'
 
 setup(name=NAME,
       version=__version__,
-      description='%s distribution tools, including WPPM' % NAME,
+      description='%s distribution tools, including WPPM' % PROJECT_NAME,
       long_description=\
 """%s is a portable distribution of the Python programming language 
 for Windows. It is a full-featured Python-based scientific environment, :
-including a package manager, WPPM.""" % NAME,
+including a package manager, WPPM.""" % PROJECT_NAME,
       download_url='%s/files/%s-%s.zip' % (__project_url__, NAME, __version__),
       author="Pierre Raybaut",
       author_email = 'pierre.raybaut@gmail.com',
