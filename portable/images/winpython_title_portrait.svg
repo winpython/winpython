@@ -15,7 +15,7 @@
    height="202.92761"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.48.2 r9819"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="winpython_title_portrait.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="E:\winpython_title.png"
@@ -29,7 +29,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <cc:license
            rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
       </cc:Work>
@@ -486,7 +486,7 @@
        id="tspan3059"
        x="-1.2496948"
        y="190.37538"
-       style="font-size:50px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#808080;font-family:Blue Highway;-inkscape-font-specification:Blue Highway">WinPython</tspan></text>
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#808080;font-family:Blue Highway;-inkscape-font-specification:Blue Highway">WinPython</tspan></text>
   <rect
      style="fill:#b3b3b3;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
      id="rect3061"
