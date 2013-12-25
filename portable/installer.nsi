@@ -35,7 +35,7 @@ SetCompressorDictSize 16 ; MB
 ;------------------------------------------------------------------------------
 Name "${ID} ${ARCH} ${VERSION}${RELEASELEVEL}"
 OutFile "${DISTDIR}\..\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}.exe"
-InstallDir "\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}"
+InstallDir "$EXEDIR\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}"
 BrandingText "${BRANDING}"
 XPStyle on
 RequestExecutionLevel user
