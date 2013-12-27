@@ -1,0 +1,17 @@
+## History of changes for WinPython 3.3.3.1
+
+The following changes were made to WinPython distribution since version 3.3.3.0.
+
+### Python packages
+
+New packages:
+
+  * [PyQtdesignerplugins](http://pypi.python.org/pypi/PyQtdesignerplugins) 1.1 (PyQtdesignerplugins installs Python Qt designer plugins (Matplotlib, guiqwt, etc.) for PyQt4)
+
+Upgraded packages:
+
+  * [guiqwt](http://packages.python.org/guiqwt) 2.3.1 → 2.3.2 (Efficient curve/image plotting and other GUI tools for scientific data processing software development)
+  * [setuptools](http://pypi.python.org/pypi/setuptools) 1.4.2 → 2.0.1 (Download, build, install, upgrade, and uninstall Python packages - easily)
+  * [winpython](http://code.google.com/p/winpython) 0.18 → 1.0 (WinPython distribution tools, including WPPM (package manager))
+
+* * *
