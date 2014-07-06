@@ -638,10 +638,10 @@ call %~dp0register_python.bat --all""")
         self._print_done()
 
 
-def rebuild_winpython(basedir=None, verbose=False):
+def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64)):
     """Rebuild winpython package from source"""
     basedir = basedir if basedir is not None else utils.BASE_DIR
-    for architecture in (32, 64):
+    for architecture in archis:
         suffix = '.win32' if architecture == 32 else '.win-amd64'
         packdir = osp.join(basedir, 'packages' + suffix)
         for name in os.listdir(packdir):
@@ -695,7 +695,7 @@ def make_winpython(build_number, release_level, architecture,
 
 def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
-             verbose=False, remove_existing=True):
+             verbose=False, remove_existing=True, archis=(32, 64)):
     """Make WinPython for both 32 and 64bit architectures:
     
     make_all(build_number, release_level, pyver, rootdir, simulation=False,
@@ -708,13 +708,13 @@ def make_all(build_number, release_level, pyver,
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
     """ + utils.ROOTDIR_DOC
     basedir = utils.get_basedir(pyver, rootdir=rootdir)
-    rebuild_winpython(basedir=basedir)
-    for architecture in (64, 32):
+    rebuild_winpython(basedir=basedir, archis=archis)
+    for architecture in archis:
         make_winpython(build_number, release_level, architecture, basedir,
                        verbose, remove_existing, create_installer, simulation,
                                  rootdir=rootdir)
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='3.3')#, create_installer=False, simulation=True)
-    make_all(1, '', pyver='2.7')#, create_installer=False, simulation=True)
+    make_all(1, '', pyver='3.3', archis=(32, 64))
+    make_all(1, '', pyver='2.7', archis=(32, 64))
