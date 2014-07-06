@@ -81,7 +81,7 @@ class PackageIndex(object):
     
     def from_file(self, basedir):
         fname = osp.join(basedir, 'build', 'WinPython-%s.txt' % self.version)
-        with open(fname, 'rb') as fdesc:
+        with open(fname, 'r') as fdesc:  #  python3 doesn't like 'rb' 
             text = fdesc.read()
         self.from_text(text)
     
@@ -142,9 +142,9 @@ def diff_package_dicts(dict1, dict2):
     return text
     
 
-def find_closer_version(version1):
+def find_closer_version(version1, rootdir=None):
     """Find version which is the closest to `version`"""
-    builddir = osp.join(get_basedir(version1), 'build')
+    builddir = osp.join(get_basedir(version1, rootdir), 'build')
     func = lambda name: re.match(r'WinPython-([0-9\.]*)\.txt', name)
     versions = [func(name).groups()[0]
                 for name in os.listdir(builddir) if func(name)]
@@ -160,7 +160,7 @@ def find_closer_version(version1):
 def compare_package_indexes(version2, version1=None, rootdir=None):
     """Compare two package index Wiki pages"""
     if version1 is None:
-        version1 = find_closer_version(version2)
+        version1 = find_closer_version(version2, rootdir=rootdir)
     text = '\r\n'.join(["## History of changes for WinPython %s" % version2,
                         "", "The following changes were made to WinPython "\
                         "distribution since version %s." % version1, "", ""])
@@ -189,7 +189,7 @@ def write_changelog(version2, version1=None, rootdir=None):
     _copy_all_changelogs(version2, basedir)
     text = compare_package_indexes(version2, version1, rootdir=rootdir)
     fname = osp.join(basedir, 'build', 'WinPython-%s_History.txt' % version2)
-    with open(fname, 'wb') as fdesc:
+    with open(fname, 'w', encoding='utf-8-sig') as fdesc:  # python 3 need
         fdesc.write(text)
     # Copy to winpython/changelogs
     shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
