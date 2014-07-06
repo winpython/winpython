@@ -430,7 +430,8 @@ call %~dp0env.bat
                              % (self.py_arch, self.python_version))
         self.install_package('spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
-        self.install_package(pattern='PyQt-Py%s-%s-gpl-([0-9\.\-]*).exe'
+        # PyQt module is now like :PyQt4-4.10.4-gpl-Py3.4-Qt4.8.6-x32.exe
+        self.install_package(pattern='PyQt4-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
                                      % (self.python_version, self.pyqt_arch))
         self.install_package(
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
