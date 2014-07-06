@@ -115,6 +115,13 @@ class Package(BasePackage):
                 self.name, self.pyversion, arch, self.version = match.groups()
                 self.architecture = int(arch)
                 return
+            # NSIS complement to match PyQt4-4.10.4-gpl-Py3.4-Qt4.8.6-x32.exe   
+            pat = r'([a-zA-Z0-9\_]*)-([0-9\.]*[a-z]*)-gpl-Py([0-9\.]*)-.*-x(64|32)\.exe'
+            match = re.match(pat, bname)
+            if match is not None:
+                self.name, self.version, self.pyversion, arch  = match.groups()
+                self.architecture = int(arch)
+                return
             match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*)-py([0-9\.]*)-x(64|32)-([a-z0-9\.\-]*).exe', bname)
             if match is not None:
                 self.name, self.version, self.pyversion, arch, _pyqt = match.groups()
@@ -201,7 +208,8 @@ class WininstPackage(BasePackage):
 
 
 class Distribution(object):
-    NSIS_PACKAGES = ('PyQt', 'PyQwt')  # known NSIS packages
+    # PyQt module is now like :PyQt4-... 
+    NSIS_PACKAGES = ('PyQt4', 'PyQwt')  # known NSIS packages 
     def __init__(self, target, verbose=False, indent=False):
         self.target = target
         self.verbose = verbose
