@@ -129,7 +129,8 @@ class WinPythonDistribution(object):
     MINGW32_PATH = r'\tools\mingw32\bin'
     
     def __init__(self, build_number, release_level, target, instdir,
-                 srcdir=None, toolsdirs=None, verbose=False, simulation=False):
+                 srcdir=None, toolsdirs=None, verbose=False, simulation=False,
+                 rootdir=None):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
@@ -149,6 +150,7 @@ class WinPythonDistribution(object):
         self.distribution = None
         self.installed_packages = []
         self.simulation = simulation
+        self.rootdir = rootdir  # addded to build from winpython
     
     @property
     def package_index_wiki(self):
@@ -631,7 +633,7 @@ call %~dp0register_python.bat --all""")
         
         # Writing changelog
         self._print("Writing changelog")
-        diff.write_changelog(self.winpyver)
+        diff.write_changelog(self.winpyver, rootdir=self.rootdir)
         self._print_done()
 
 
@@ -650,7 +652,7 @@ def rebuild_winpython(basedir=None, verbose=False):
 
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
-                   create_installer=True, simulation=False):
+                   create_installer=True, simulation=False, rootdir=None):
     """Make WinPython distribution, for a given base directory and 
     architecture:
 
@@ -708,7 +710,8 @@ def make_all(build_number, release_level, pyver,
     rebuild_winpython(basedir=basedir)
     for architecture in (64, 32):
         make_winpython(build_number, release_level, architecture, basedir,
-                       verbose, remove_existing, create_installer, simulation)
+                       verbose, remove_existing, create_installer, simulation,
+                                 rootdir=rootdir)
 
 
 if __name__ == '__main__':
