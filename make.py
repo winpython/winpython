@@ -687,7 +687,8 @@ def make_winpython(build_number, release_level, architecture,
         toolsdirs.append(toolsdir2)
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, packdir, srcdir, toolsdirs,
-                                 verbose=verbose, simulation=simulation)
+                                 verbose=verbose, simulation=simulation,
+                                 rootdir=rootdir)
     dist.make(remove_existing=remove_existing)
     if create_installer and not simulation:
         dist.create_installer()
