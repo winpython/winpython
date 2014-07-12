@@ -1,0 +1,11 @@
+﻿## History of changes for WinPython 3.4.1.1
+
+The following changes were made to WinPython distribution since version 3.4.1.0.
+
+### Python packages
+
+Removed packages:
+
+  * [PySide](https://pypi.python.org/pypi/PySide) 1.2.2 (Python binding of the cross-platform GUI toolkit Qt)
+
+* * *
