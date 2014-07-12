@@ -717,5 +717,8 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='3.3', archis=(32, 64))
-    make_all(1, '', pyver='2.7', archis=(32, 64))
+    make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
+             verbose=True, archis=(32, )) #64))
+    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+             verbose=True, archis=(32, )) #64))
+    # make_all(1, '', pyver='2.7', archis=(32, 64))
