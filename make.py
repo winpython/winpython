@@ -125,7 +125,7 @@ def build_nsis(srcname, dstname, data):
 class WinPythonDistribution(object):
     """WinPython distribution"""
     THG_PATH = r'\tools\TortoiseHg\thgw.exe'
-    WINMERGE_PATH = r'\tools\WinMerge\WinMerge.exe'
+    WINMERGE_PATH = r'\tools\WinMerge\WinMergeU.exe'
     MINGW32_PATH = r'\tools\mingw32\bin'
     
     def __init__(self, build_number, release_level, target, instdir,
@@ -523,7 +523,7 @@ call %~dp0env.bat
                                  command=r'${WINPYDIR}\..'+self.THG_PATH,
                                  workdir=r'${WINPYDIR}')
         if osp.isfile(self.winpydir + self.WINMERGE_PATH):
-            self.create_launcher('WinMerge.exe', 'winmerge.ico',
+            self.create_launcher('WinMergeU.exe', 'winmerge.ico',
                                  command=r'${WINPYDIR}\..'+self.WINMERGE_PATH,
                                  workdir=r'${WINPYDIR}')
         self._print_done()
