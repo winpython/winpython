@@ -239,7 +239,10 @@ Name | Version | Description
         """Return PATH contents to be prepend to the environment variable"""
         path = [r"Lib\site-packages\PyQt4",
                 "",  # Python root directory (python.exe)
-                "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"]
+                "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"
+                #, r"..\tools\Julia\bin"
+                #  , r"..\tools\R\bin"
+                ]
         if self.distribution.architecture == 32 \
            and osp.isdir(self.winpydir + self.MINGW32_PATH):
             path += [r".." + self.MINGW32_PATH]
@@ -316,6 +319,9 @@ Name | Version | Description
         
         data = [('WINPYDIR', '$EXEDIR\%s' % self.python_name),
                 ('WINPYVER', self.winpyver),
+                #('JULIA_HOME','$EXEDIR\%s' % r'\tools\Julia\bin'),
+                # ('JULIA', '$EXEDIR\%s' % r'\tools\Julia\bin\julia.exe'),
+                # ('R_HOME', '$EXEDIR\%s' % r'\tools\R'),
                 ('COMMAND', command),
                 ('PARAMETERS', args),
                 ('WORKDIR', workdir),
@@ -469,9 +475,11 @@ call %~dp0env.bat
                              command='$SYSDIR\cmd.exe',
                              args='/k', workdir='${WINPYDIR}')
         self.create_launcher('WinPython Interpreter.exe', 'python.ico')
+        self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
+                             args='idle.pyw', workdir='${WINPYDIR}\Lib\idlelib')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
-                             args='spyder', workdir='${WINPYDIR}\Scripts',
+                             args='spyder', workdir='${WINPYDIR}',
                              settingspath=settingspath)
         self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
                              args='spyder --light',
@@ -546,7 +554,69 @@ The environment variables are set-up in 'env.bat'.""")
 set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
 set WINPYVER=""" + self.winpyver + """
 set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path)
+set PATH=""" + path )
+
+        self.create_batch_script('start_ijulia.bat', """@echo off
+set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
+set WINPYVER=""" + self.winpyver + """
+set HOME=%WINPYDIR%\..\settings
+set PATH=""" + path +r"""
+rem ******************
+rem Starting Ijulia  (supposing you install it in \tools\Julia of winpython)
+rem ******************
+
+set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
+if  exist "%JULIA_HOME%" goto julia_next
+echo --------------------
+echo First install Julia in \tools\Julia of winpython
+echo suggestion : don't create Julia shortcuts, nor menu, nor desktop icons 
+echo (they would create a .julia in your home directory rather than here)
+echo When it will be done, launch again this .bat
+
+if not exist "%JULIA_HOME%" goto julia_end
+
+:julia_next
+set SYS_PATH=%PATH%
+set PATH=%JULIA_HOME%;%SYS_PATH%
+
+set JULIA_EXE=julia.exe
+set JULIA=%JULIA_HOME%%JULIA_EXE%
+
+set private_libdir=bin
+if not exist "%JULIA_HOME%..\lib\julia\sys.ji" ( ^
+echo "Preparing Julia for first launch. This may take a while" && ^
+echo "You may see two git related errors. This is completely normal" && ^
+cd "%JULIA_HOME%..\share\julia\base" && ^
+"%JULIA%" --build "%JULIA_HOME%..\lib\julia\sys0" sysimg.jl && ^
+"%JULIA%" --build "%JULIA_HOME%..\lib\julia\sys" -J sys0.ji sysimg.jl && ^
+popd && pushd "%cd%" )
+
+echo "julia!"
+echo --------------------
+echo to install Ijulia for Winpython (the first time) :
+echo type 'julia'
+echo type in Julia prompt 'Pkg.add("Ijulia")'
+echo type 'Ctrl + 'D' to quit Julia 
+echo nota : type 'help()' to get help in Julia
+echo --------------------
+echo if error during build process (July18th, 2014), look there for workaround)
+echo "https://github.com/JuliaLang/WinRPM.jl/issues/27#issuecomment-49189546"
+echo --------------------
+rem (not working as of july 18th, 2014 : 
+rem    https://github.com/JuliaLang/IJulia.jl/issues/206 )
+rem echo to enable use of julia from python  (the first time) :  
+rem echo    launch winpython command prompt
+rem echo    cd  ..\settings\.julia\v0.3\IJulia\python 
+rem echo    python setup.py install
+rem echo see http://blog.leahhanson.us/julia-calling-python-calling-julia.html
+rem echo --------------------
+echo to launch Ijulia type now "Ipython notebook --profile julia"
+rem Ipython notebook --profile julia
+:julia_end
+cmd.exe /k
+""")
+
+
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
 cmd.exe /k""")
@@ -717,8 +787,8 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
-             verbose=True, archis=(32, )) #64))
+    #make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #         verbose=True, archis=(32, )) #64))
     make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
              verbose=True, archis=(32, )) #64))
     # make_all(1, '', pyver='2.7', archis=(32, 64))
