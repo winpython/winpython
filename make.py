@@ -617,6 +617,78 @@ cmd.exe /k
 """)
 
 
+        self.create_batch_script('start_with_r.bat', """@echo off
+set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
+set WINPYVER=""" + self.winpyver + """
+set HOME=%WINPYDIR%\..\settings
+set PATH=""" + path +r"""
+
+rem ******************
+rem R part (supposing you install it in \tools\R of winpython)
+rem ******************
+set tmp_Rdirectory=R
+if not exist "%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin" goto r_end
+
+rem  R_HOME for rpy2, R_HOMEBIN for PATH
+set R_HOME=%WINPYDIR%\..\tools\%tmp_Rdirectory%\
+set R_HOMEbin=%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin
+
+
+set SYS_PATH=%PATH%
+set PATH=%R_HOMEbin%;%SYS_PATH%
+
+echo "r!"
+echo "if you want it to be on your winpython icon, update %WINPYDIR%\settings\winpython.ini with"
+echo "PATH=%path%" 
+echo " "
+echo to launch Ipython with R, type now "Ipython notebook"
+rem Ipython notebook
+
+:r_end
+
+cmd.exe /k
+""")
+
+
+        self.create_batch_script('make_cython_use_wingw.bat', """@echo off
+set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
+set WINPYVER=""" + self.winpyver + """
+set HOME=%WINPYDIR%\..\settings
+set PATH=""" + path +r"""
+
+rem ******************
+rem mingw part (supposing you install it in \tools\mingw32)
+rem ******************
+set tmp_mingwdirectory=mingw32
+if not exist "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" goto mingw_end
+
+
+set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
+
+set tmp_blank=
+echo [config]>%pydistutils_cfg%
+echo compiler=mingw32>>%pydistutils_cfg%
+
+echo [build]>>%pydistutils_cfg%
+echo compiler=mingw32>>%pydistutils_cfg%
+
+echo [build_ext]>>%pydistutils_cfg%
+echo compiler=mingw32>>%pydistutils_cfg%
+
+echo cython has been set to use mingw32
+echo to remove this, remove file "%pydistutils_cfg%"
+
+goto mingw_success
+
+:mingw_end
+echo "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" not found
+
+:mingw_success
+pause
+
+""")
+
+
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
 cmd.exe /k""")
