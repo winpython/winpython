@@ -479,7 +479,7 @@ call %~dp0env.bat
                              args='idle.pyw', workdir='${WINPYDIR}\Lib\idlelib')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
-                             args='spyder', workdir='${WINPYDIR}',
+                             args='spyder', workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
         self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
                              args='spyder --light',
