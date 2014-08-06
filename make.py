@@ -595,7 +595,8 @@ echo "julia!"
 echo --------------------
 echo to install Ijulia for Winpython (the first time) :
 echo type 'julia'
-echo type in Julia prompt 'Pkg.add("Ijulia")'
+echo type in Julia prompt 'Pkg.add("IJulia")'
+echo type in Julia prompt 'Pkg.add("PyCall")'
 echo type 'Ctrl + 'D' to quit Julia 
 echo nota : type 'help()' to get help in Julia
 echo --------------------
@@ -612,6 +613,7 @@ rem echo see http://blog.leahhanson.us/julia-calling-python-calling-julia.html
 rem echo --------------------
 echo to launch Ijulia type now "Ipython notebook --profile julia"
 rem Ipython notebook --profile julia
+echo to use julia_magic from Ipython, type "Ipython notebook" instead.
 :julia_end
 cmd.exe /k
 """)
@@ -859,8 +861,8 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    #make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #         verbose=True, archis=(32, )) #64))
+    make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
+             verbose=True, archis=(32, )) #64))
     make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
              verbose=True, archis=(32, )) #64))
     # make_all(1, '', pyver='2.7', archis=(32, 64))
