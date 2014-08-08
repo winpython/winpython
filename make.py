@@ -520,11 +520,11 @@ call %~dp0env.bat
         if osp.isfile(osp.join(self.python_dir, 'Scripts', ipython_exe)):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                              command='${WINPYDIR}\pythonw.exe',
-                             args='%s qtconsole --pylab=inline' % ipython_scr,
+                             args='%s qtconsole --matplotlib=inline' % ipython_scr,
                              workdir='${WINPYDIR}\Scripts')
             self.create_launcher('IPython Notebook.exe', 'ipython.ico',
                              command='${WINPYDIR}\python.exe',
-                             args='%s notebook --pylab=inline' % ipython_scr,
+                             args='%s notebook --matplotlib=inline' % ipython_scr,
                              workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -861,8 +861,8 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
-             verbose=True, archis=(32, )) #64))
+    #make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #         verbose=True, archis=(32, )) #64))
     make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
              verbose=True, archis=(32, )) #64))
     # make_all(1, '', pyver='2.7', archis=(32, 64))
