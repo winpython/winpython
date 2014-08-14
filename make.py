@@ -239,7 +239,7 @@ Name | Version | Description
         """Return PATH contents to be prepend to the environment variable"""
         path = [r"Lib\site-packages\PyQt4",
                 "",  # Python root directory (python.exe)
-                "DLLs", "Scripts", r"..\tools", r"..\tools\gnuwin32\bin"
+                "DLLs", "Scripts", r"..\tools", r"..\tools\mingw32\bin"
                 #, r"..\tools\Julia\bin"
                 #  , r"..\tools\R\bin"
                 ]
@@ -597,6 +597,7 @@ echo to install Ijulia for Winpython (the first time) :
 echo type 'julia'
 echo type in Julia prompt 'Pkg.add("IJulia")'
 echo type in Julia prompt 'Pkg.add("PyCall")'
+echo type in Julia prompt 'Pkg.add("PyPlot")'
 echo type 'Ctrl + 'D' to quit Julia 
 echo nota : type 'help()' to get help in Julia
 echo --------------------
@@ -652,7 +653,7 @@ cmd.exe /k
 """)
 
 
-        self.create_batch_script('make_cython_use_wingw.bat', """@echo off
+        self.create_batch_script('make_cython_use_mingw.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
 set WINPYVER=""" + self.winpyver + """
 set HOME=%WINPYDIR%\..\settings
@@ -864,5 +865,7 @@ if __name__ == '__main__':
     #make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
     #         verbose=True, archis=(32, )) #64))
     make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-             verbose=True, archis=(32, )) #64))
+             verbose=True, archis=(64, )) #32))
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #         verbose=True, archis=(32, )) #64))
     # make_all(1, '', pyver='2.7', archis=(32, 64))
