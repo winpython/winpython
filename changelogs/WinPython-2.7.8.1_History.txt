@@ -1,0 +1,16 @@
+﻿## History of changes for WinPython 2.7.8.1
+
+The following changes were made to WinPython distribution since version 2.7.6.1.
+
+### Python packages
+
+New packages:
+
+  * [pep8](http://pypi.python.org/pypi/pep8) 1.5.7 ()
+  * [rope](http://pypi.python.org/pypi/rope) 0.10.2 ()
+
+Upgraded packages:
+
+  * [Python](http://www.python.org/) 2.7.6 → 2.7.8 (Python programming language with standard library)
+
+* * *
