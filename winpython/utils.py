@@ -370,7 +370,6 @@ def build_wininst(root, python_exe=None, copy_to=None,
                    "3. Type `python setup.py build install`")
     pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
     for distname in os.listdir(distdir):
-        print ('distname', distname)
         match = re.match(pattern, distname)
         if match is not None:
             break
