@@ -329,7 +329,7 @@ def extract_archive(fname, targetdir=None, verbose=False):
     return targetdir
 
 
-WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.]*[a-z]*[0-9]?)(-Qt-([0-9\.]+))?.(win32|win\-amd64)(-py([0-9\.]+))?(-setup)?\.exe'
+WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(-Qt-([0-9\.]+))?.(win32|win\-amd64)(-py([0-9\.]+))?(-setup)?\.exe'
 SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.]*[a-z]*[0-9]?).(zip|tar\.gz)'
 
 def get_source_package_infos(fname):
@@ -370,6 +370,7 @@ def build_wininst(root, python_exe=None, copy_to=None,
                    "3. Type `python setup.py build install`")
     pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
     for distname in os.listdir(distdir):
+        print ('distname', distname)
         match = re.match(pattern, distname)
         if match is not None:
             break
