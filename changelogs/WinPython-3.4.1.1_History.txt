@@ -2,20 +2,31 @@
 
 The following changes were made to WinPython distribution since version 3.4.1.0.
 
+### Tools
+
+Removed packages:
+
+  * [MinGW32](http://www.mingw.org) 4.8.1 ((32-bit version only) Windows specific header files and import libraries, C/C++ and Fortran compilers)
+
 ### Python packages
 
 New packages:
 
+  * [ViTables](http://vitables.org) 2.1 (Graphical tool for browsing and editing files in both HDF5 and PyTables formats)
   * [brewer2mpl](http://pypi.python.org/pypi/brewer2mpl) 1.4 ()
   * [ggplot](https://github.com/yhat/ggplot) 0.6.5 (ggplot for python)
   * [ipython-sql](http://ipython.org) 0.3.3 (Enhanced Python shell)
   * [joblib](http://pypi.python.org/pypi/joblib) 0.8.2 ()
-  * [julia](http://pypi.python.org/pypi/julia) 0.1.1.1 ()
+  * [julia](http://pypi.python.org/pypi/julia) 0.1.1.2 ()
+  * [libpython](http://pypi.python.org/pypi/libpython) 1.0 ()
   * [mpld3](http://pypi.python.org/pypi/mpld3) 0.2 ()
   * [mysql-connector-python](http://pypi.python.org/pypi/mysql-connector-python) 1.2.2 ()
+  * [pep8](http://pypi.python.org/pypi/pep8) 1.5.7 ()
   * [pg8000](http://pypi.python.org/pypi/pg8000) 1.9.14 ()
+  * [pyflakes](http://pypi.python.org/pypi/pyflakes) 0.8.1 ()
   * [pyodbc](http://pypi.python.org/pypi/pyodbc) 3.0.7 ()
   * [reportlab](http://www.reportlab.org) 3.1.8 (The PDF generation library)
+  * [rope_py3k-0.9.4](http://pypi.python.org/pypi/rope_py3k-0.9.4) 1 ()
   * [rpy2](http://pypi.python.org/pypi/rpy2) 2.4.3 ()
   * [seaborn](http://pypi.python.org/pypi/seaborn) 0.3.1 ()
   * [sqlite_bro](https://github.com/stonebig/sqlite_bro) 0.8.6 (a graphic SQLite Client in 1 Python file)
