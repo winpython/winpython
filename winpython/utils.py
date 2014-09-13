@@ -330,7 +330,15 @@ def extract_archive(fname, targetdir=None, verbose=False):
 
 
 WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(-Qt-([0-9\.]+))?.(win32|win\-amd64)(-py([0-9\.]+))?(-setup)?\.exe'
-SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.]*[a-z]*[0-9]?).(zip|tar\.gz)'
+
+# SOURCE_PATTERN defines what an acceptable source package name is
+# As of 2014-09-08 :
+#    - the wheel package format is accepte in source directory
+#    - the tricky regexp is tuned also to support the odd jolib naming :
+#         . joblib-0.8.3_r1-py2.py3-none-any.whl,
+#         . joblib-0.8.3-r1.tar.gz
+
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-[a-z\.0-9]*\-none\-any\.whl)'
 
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
@@ -394,6 +402,44 @@ def source_to_wininst(fname, python_exe=None,
     return build_wininst(root, python_exe=python_exe,
                          copy_to=osp.dirname(fname),
                          architecture=architecture, verbose=verbose)
+
+def build_wheel(this_whl, python_exe=None, copy_to=None,
+                  architecture=None, verbose=False, install_options=None):
+    """Execute the wheel (without dependancies)"""
+    if python_exe is None:
+        python_exe = sys.executable
+    assert osp.isfile(python_exe)
+    myroot = os.path.dirname(python_exe)
+    
+    cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
+    if install_options:
+        cmd += install_options  # typically ['--no-deps']
+        print('wheel install_options',install_options)
+    cmd += [this_whl]
+
+    if verbose:
+        subprocess.call(cmd, cwd=myroot)
+    else:
+        p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        p.communicate()
+        p.stdout.close()
+        p.stderr.close()
+    src_fname = this_whl
+    if copy_to is None:
+        return src_fname
+    else:
+        if verbose:
+            print("Installed %s" %  src_fname )
+        return src_fname
+
+def wheel_to_wininst(fname, python_exe=None,
+                      architecture=None, verbose=False, install_options=None):
+    """Just install a wheel !"""
+    return build_wheel(fname, python_exe=python_exe,
+                         copy_to=osp.dirname(fname),
+                         architecture=architecture, verbose=verbose,
+                         install_options=install_options)
 
 
 if __name__ == '__main__':    
