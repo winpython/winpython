@@ -600,7 +600,8 @@ class PMWindow(QMainWindow):
         """Add packages"""
         basedir = self.basedir if self.basedir is not None else ''
         fnames, _selfilter = getopenfilenames(parent=self, basedir=basedir,
-                      caption='Add packages', filters='*.exe *.zip *.tar.gz')
+                      caption='Add packages',
+                      filters='*.exe *.zip *.tar.gz *.whl')
         if fnames:
             self.basedir = osp.dirname(fnames[0])
             self.table.add_packages(fnames)

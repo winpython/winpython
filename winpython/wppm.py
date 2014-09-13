@@ -92,7 +92,6 @@ class Package(BasePackage):
     def __init__(self, fname):
         BasePackage.__init__(self, fname)
         self.files = []
-        
         self.extract_infos()
         self.extract_optional_infos()
 
@@ -127,7 +126,7 @@ class Package(BasePackage):
                 self.name, self.version, self.pyversion, arch, _pyqt = match.groups()
                 self.architecture = int(arch)
                 return
-        elif bname.endswith(('.zip', '.tar.gz')):
+        elif bname.endswith(('.zip', '.tar.gz', '.whl')):
             # distutils sdist
             infos = utils.get_source_package_infos(bname)
             if infos is not None:
@@ -322,7 +321,7 @@ python "%~dpn0""" + ext + """" %*""")
         if pack is not None:
             self.uninstall(pack)
     
-    def install(self, package):
+    def install(self, package, install_options=None):
         """Install package in distribution"""
         assert package.is_compatible_with(self)
         tmp_fname = None
@@ -340,6 +339,10 @@ python "%~dpn0""" + ext + """" %*""")
             tmp_fname = fname
             package = Package(fname)
             self._print_done()
+        # wheel addition
+        if package.fname.endswith(('.whl')):
+            self.install_bdist_wheel(package, install_options=install_options)
+
         bname = osp.basename(package.fname)
         if bname.endswith('.exe'):
             if re.match(r'(' + ('|'.join(self.NSIS_PACKAGES)) + r')-', bname):
@@ -450,6 +453,23 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         self.copy_files(package, targetdir, 'DLLs', 'DLLs')
         self.copy_files(package, targetdir, 'DATA', '.')
         self._print_done()
+
+    def install_bdist_wheel(self, package, install_options=None):
+        """Install a wheel directly !"""
+        self._print(package, "Installing Wheel")
+        #targetdir = utils.extract_msi(package.fname, targetdir=self.target)
+        try:
+            fname = utils.wheel_to_wininst(package.fname,
+                      python_exe=osp.join(self.target, 'python.exe'),
+                      architecture=self.architecture, verbose=self.verbose,
+                      install_options=install_options)
+        except RuntimeError:
+            if not self.verbose:
+                print("Failed!")
+                raise
+        package = Package(fname)
+        self._print_done()        
+
 
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
