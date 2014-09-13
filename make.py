@@ -130,7 +130,7 @@ class WinPythonDistribution(object):
     
     def __init__(self, build_number, release_level, target, instdir,
                  srcdir=None, toolsdirs=None, verbose=False, simulation=False,
-                 rootdir=None):
+                 rootdir=None, install_options=None):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
@@ -151,6 +151,7 @@ class WinPythonDistribution(object):
         self.installed_packages = []
         self.simulation = simulation
         self.rootdir = rootdir  # addded to build from winpython
+        self.install_options = install_options
     
     @property
     def package_index_wiki(self):
@@ -281,7 +282,8 @@ Name | Version | Description
                 self.distribution._print(pack, "Installing")
                 self.distribution._print_done()
             else:
-                self.distribution.install(pack)
+                self.distribution.install(pack, 
+                                          install_options=self.install_options)
             self.installed_packages.append(pack)
 
     def create_batch_script(self, name, contents):
@@ -432,8 +434,11 @@ call %~dp0env.bat
                              % (self.py_arch, self.python_version))
         self.install_package('setuptools-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
-        self.install_package('winpython-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
+        # Install First these two packages to support wheel format
+        self.install_package('pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
+        self.install_package('wheel-([0-9\.]*[a-z]*[0-9]?).tar.gz')
+
         self.install_package('spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
         # PyQt module is now like :PyQt4-4.10.4-gpl-Py3.4-Qt4.8.6-x32.exe
@@ -442,6 +447,12 @@ call %~dp0env.bat
         self.install_package(
                     pattern='PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
                             % (self.python_version, self.pyqt_arch))
+
+        # Install 'main packages' first (was before Wheel idea, keep for now)                    
+        for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
+            self.install_package(
+                    pattern='%s-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
+                            % (happy_few, self.py_arch, self.python_version))
     
     def _install_all_other_packages(self):
         """Try to install all other packages in instdir"""
@@ -798,7 +809,8 @@ def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64)):
 
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
-                   create_installer=True, simulation=False, rootdir=None):
+                   create_installer=True, simulation=False, rootdir=None,
+                   install_options=None):
     """Make WinPython distribution, for a given base directory and 
     architecture:
 
@@ -833,7 +845,7 @@ def make_winpython(build_number, release_level, architecture,
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, packdir, srcdir, toolsdirs,
                                  verbose=verbose, simulation=simulation,
-                                 rootdir=rootdir)
+                                 rootdir=rootdir,install_options=install_options)
     dist.make(remove_existing=remove_existing)
     if create_installer and not simulation:
         dist.create_installer()
@@ -841,7 +853,8 @@ def make_winpython(build_number, release_level, architecture,
 
 def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
-             verbose=False, remove_existing=True, archis=(32, 64)):
+             verbose=False, remove_existing=True, archis=(32, 64),
+             install_options=['--no-deps']):
     """Make WinPython for both 32 and 64bit architectures:
     
     make_all(build_number, release_level, pyver, rootdir, simulation=False,
@@ -858,22 +871,22 @@ def make_all(build_number, release_level, pyver,
     for architecture in archis:
         make_winpython(build_number, release_level, architecture, basedir,
                        verbose, remove_existing, create_installer, simulation,
-                                 rootdir=rootdir)
+                       rootdir=rootdir, install_options=install_options)
 
 
 if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-            verbose=True, archis=(32, )) #64))
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #        verbose=True, archis=(64, )) #64))
-    #make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #         verbose=True, archis=(32, )) #64))
-    #make_all(1, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #         verbose=True, archis=(64, )) #64))
-    #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #         verbose=True, archis=(32, )) #64))
-    #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #       verbose=True, archis=(64, )) #64))
+    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+            verbose=False, archis=(32, )) #64))
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #        verbose=False, archis=(64, )) #64))
+    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, )) #64))
+    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(64, )) #64))
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, )) #64))
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(64, )) #64))
