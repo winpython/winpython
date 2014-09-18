@@ -45,9 +45,9 @@ def _get_shortcut_data(target, current=True):
     for name in os.listdir(wpdir):
         bname, ext = osp.splitext(name)
         if ext == '.exe':
-            data.append( (osp.join(wpdir, name),
-                          bname,
-                          osp.join(wpgroup, bname)) )
+            data.append((osp.join(wpdir, name),
+                         bname,
+                         osp.join(wpgroup, bname)))
     return data
 
 
@@ -101,7 +101,7 @@ def register(target, current=True):
     for ftype in ("", "NoCon", "Compiled"):
         winreg.SetValueEx(winreg.CreateKey(root, KEY_DROP1 % ftype),
                           "", 0, winreg.REG_SZ, handler)
-    
+
     # Icons
     dlls = osp.join(target, 'DLLs')
     winreg.SetValueEx(winreg.CreateKey(root, KEY_I % ""),
@@ -110,7 +110,7 @@ def register(target, current=True):
                       "", 0, winreg.REG_SZ, r'%s\py.ico' % dlls)
     winreg.SetValueEx(winreg.CreateKey(root, KEY_I % "Compiled"),
                       "", 0, winreg.REG_SZ, r'%s\pyc.ico' % dlls)
-    
+
     # Descriptions
     winreg.SetValueEx(winreg.CreateKey(root, KEY_D % ""),
                       "", 0, winreg.REG_SZ, "Python File")
@@ -195,7 +195,7 @@ def unregister(target, current=True):
         except WindowsError:
             rootkey = 'HKEY_CURRENT_USER' if current else 'HKEY_LOCAL_MACHINE'
             print(r'Unable to remove %s\%s' % (rootkey, key), file=sys.stderr)
-    
+
     # Start menu shortcuts
     for path, desc, fname in _get_shortcut_data(target, current=current):
         if osp.exists(fname):
