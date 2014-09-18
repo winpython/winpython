@@ -30,6 +30,7 @@ class Package(object):
     PATTERN = r'\[([a-zA-Z\-\:\/\.\_0-9]*)\]\(([^\]\ ]*)\) \| ([^\|]*) \| ([^\|]*)'
     # Google Code Wiki syntax:
     PATTERN_OLD = r'\[([a-zA-Z\-\:\/\.\_0-9]*) ([^\]\ ]*)\] \| ([^\|]*) \| ([^\|]*)'
+
     def __init__(self):
         self.name = None
         self.version = None
@@ -40,7 +41,7 @@ class Package(object):
         text = "%s %s" % (self.name, self.version)
         text += "\r\n%s\r\nWebsite: %s" % (self.description, self.url)
         return text
-    
+
     def from_text(self, text):
         try:
             self.url, self.name, self.version, self.description = \
@@ -48,11 +49,11 @@ class Package(object):
         except AttributeError:
             self.name, self.url, self.version, self.description = \
                                         re.match(self.PATTERN, text).groups()
-    
+
     def to_wiki(self):
         return "  * [%s](%s) %s (%s)\r\n" % (self.name, self.url,
                                              self.version, self.description)
-    
+
     def upgrade_wiki(self, other):
         assert self.name == other.name
         return "  * [%s](%s) %s → %s (%s)\r\n" % (self.name, self.url,
@@ -72,19 +73,20 @@ class PackageIndex(object):
     PYTHON_PACKAGES_LINE = '### Python packages'
     HEADER_LINE1 = 'Name | Version | Description'
     HEADER_LINE2 = '-----|---------|------------'
+
     def __init__(self, version, rootdir=None):
         self.version = version
         self.other_packages = {}
         self.python_packages = {}
         basedir = get_basedir(version, rootdir=rootdir)
         self.from_file(basedir)
-    
+
     def from_file(self, basedir):
         fname = osp.join(basedir, 'build', 'WinPython-%s.txt' % self.version)
-        with open(fname, 'r') as fdesc:  #  python3 doesn't like 'rb' 
+        with open(fname, 'r') as fdesc:  # python3 doesn't like 'rb'
             text = fdesc.read()
         self.from_text(text)
-    
+
     def from_text(self, text):
         version = re.match(self.WINPYTHON_PATTERN, text).groups()[0]
         assert version == self.version
@@ -140,7 +142,7 @@ def diff_package_dicts(dict1, dict2):
             text += package.to_wiki()
         text += '\r\n'
     return text
-    
+
 
 def find_closer_version(version1, rootdir=None):
     """Find version which is the closest to `version`"""
@@ -162,7 +164,7 @@ def compare_package_indexes(version2, version1=None, rootdir=None):
     if version1 is None:
         version1 = find_closer_version(version2, rootdir=rootdir)
     text = '\r\n'.join(["## History of changes for WinPython %s" % version2,
-                        "", "The following changes were made to WinPython "\
+                        "", "The following changes were made to WinPython "
                         "distribution since version %s." % version1, "", ""])
     pi1 = PackageIndex(version1, rootdir=rootdir)
     pi2 = PackageIndex(version2, rootdir=rootdir)
@@ -182,6 +184,7 @@ def _copy_all_changelogs(version, basedir):
         if re.match(r'WinPython-%s([0-9\.]*)\.txt' % basever, name):
             shutil.copyfile(osp.join(CHANGELOGS_DIR, name),
                             osp.join(basedir, 'build', name))
+
 
 def write_changelog(version2, version1=None, rootdir=None):
     """Write changelog between version1 and version2 of WinPython"""
@@ -214,13 +217,13 @@ def test_compare(basedir, version2, version1):
 
 
 if __name__ == '__main__':
-#    test_parse_package_index_wiki('2.7.3.3')
-#    print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
-#    write_changelog('2.7.4.1', '2.7.4.0')
-#    write_changelog('2.7.5.0', '2.7.4.1')
-    write_changelog('3.3.2.1')#, '2.7.5.0')
-    write_changelog('2.7.5.1')#, '2.7.5.0')
-#    write_changelog('3.3.0.0beta2', '3.3.0.0beta1')
-#    write_changelog('3.3.1.1', '3.3.1.0')
-#    write_changelog('3.3.2.0', '3.3.1.1')
-#    write_changelog('3.3.2.1', '3.3.2.0')
+    # test_parse_package_index_wiki('2.7.3.3')
+    # print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
+    # write_changelog('2.7.4.1', '2.7.4.0')
+    # write_changelog('2.7.5.0', '2.7.4.1')
+    write_changelog('3.3.2.1')  # , '2.7.5.0')
+    write_changelog('2.7.5.1')  # , '2.7.5.0')
+    # write_changelog('3.3.0.0beta2', '3.3.0.0beta1')
+    # write_changelog('3.3.1.1', '3.3.1.0')
+    # write_changelog('3.3.2.0', '3.3.1.1')
+    # write_changelog('3.3.2.1', '3.3.2.0')
