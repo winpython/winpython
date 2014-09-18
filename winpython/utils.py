@@ -38,7 +38,7 @@ BASE_DIR = os.environ.get('WINPYTHONBASEDIR')
 
 ROOTDIR_DOC = """
 
-    The WinPython root directory (WINPYTHONROOTDIR environment variable which 
+    The WinPython root directory (WINPYTHONROOTDIR environment variable which
     may be overriden with the `rootdir` option) contains the following folders:
       * (required) `packages.win32`: contains distutils 32-bit packages
       * (required) `packages.win-amd64`: contains distutils 64-bit packages
@@ -47,9 +47,10 @@ ROOTDIR_DOC = """
       * (optional) `tools.win32`: contains 32-bit-specific tools
       * (optional) `tools.win-amd64`: contains 64-bit-specific tools"""
 
+
 def get_basedir(pyver, rootdir=None):
     """Get basedir from Python version
-    
+
     `pyver`: Python version (X.Y format) [str]
     `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
@@ -62,11 +63,11 @@ def get_basedir(pyver, rootdir=None):
 
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`.
-    
-    If the error is due to an access error (read-only file), it 
+
+    If the error is due to an access error (read-only file), it
     attempts to add write permission and then retries.
     If the error is for another reason, it re-raises the error.
-    
+
     Usage: `shutil.rmtree(path, onerror=onerror)"""
     if not os.access(path, os.W_OK):
         # Is the error an access error?
@@ -86,12 +87,12 @@ def is_program_installed(basename):
             return abspath
 
 
-#==============================================================================
+# =============================================================================
 # Environment variables
-#==============================================================================
+# =============================================================================
 def get_env(name, current=True):
     """Return HKCU/HKLM environment variable name and value
-    
+
     For example, get_user_env('PATH') may returns:
     ('Path', u'C:\\Program Files\\Intel\\WiFi\\bin\\')"""
     root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
@@ -100,11 +101,13 @@ def get_env(name, current=True):
         try:
             value = winreg.EnumValue(key, index)
             if value[0].lower() == name.lower():
-                # Return both value[0] and value[1] because value[0] could be 
+                # Return both value[0] and value[1] because value[0] could be
                 # different from name (lowercase/uppercase)
                 return value[0], value[1]
         except:
             break
+
+
 
 def set_env(name, value, current=True):
     """Set HKCU/HKLM environment variables"""
@@ -123,23 +126,24 @@ def set_env(name, value, current=True):
                        "Environment", SMTO_ABORTIFHUNG, 5000)
 
 
-#==============================================================================
+# =============================================================================
 # Shortcuts, start menu
-#==============================================================================
+# =============================================================================
 
 def get_special_folder_path(path_name):
     """Return special folder path"""
     from win32com.shell import shell, shellcon
     for maybe in """
-        CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
-        CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
-        CSIDL_DESKTOPDIRECTORY CSIDL_COMMON_STARTUP CSIDL_STARTUP
-        CSIDL_COMMON_PROGRAMS CSIDL_PROGRAMS CSIDL_PROGRAM_FILES_COMMON
-        CSIDL_PROGRAM_FILES CSIDL_FONTS""".split():
+       CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
+       CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
+       CSIDL_DESKTOPDIRECTORY CSIDL_COMMON_STARTUP CSIDL_STARTUP
+       CSIDL_COMMON_PROGRAMS CSIDL_PROGRAMS CSIDL_PROGRAM_FILES_COMMON
+       CSIDL_PROGRAM_FILES CSIDL_FONTS""".split():
         if maybe == path_name:
             csidl = getattr(shellcon, maybe)
             return shell.SHGetSpecialFolderPath(0, csidl, False)
     raise ValueError("%s is an unknown path ID" % (path_name,))
+
 
 def get_winpython_start_menu_folder(current=True):
     """Return WinPython Start menu shortcuts folder"""
@@ -154,6 +158,7 @@ def get_winpython_start_menu_folder(current=True):
             folder = get_special_folder_path("CSIDL_PROGRAMS")
     return osp.join(folder, 'WinPython')
 
+
 def create_winpython_start_menu_folder(current=True):
     """Create WinPython Start menu folder -- remove it if it already exists"""
     path = get_winpython_start_menu_folder(current=current)
@@ -165,6 +170,7 @@ def create_winpython_start_menu_folder(current=True):
     else:
         os.mkdir(path)
     return path
+
 
 def create_shortcut(path, description, filename,
                     arguments="", workdir="", iconpath="", iconindex=0):
@@ -189,9 +195,9 @@ def create_shortcut(path, description, filename,
     ipf.Save(filename, 0)
 
 
-#==============================================================================
+# =============================================================================
 # Misc.
-#==============================================================================
+# =============================================================================
 
 def print_box(text):
     """Print text in a box"""
@@ -199,16 +205,17 @@ def print_box(text):
     line1 = "| " + text + " |"
     print(("\n\n" + "\n".join([line0, line1, line0]) + "\n"))
 
+
 def is_python_distribution(path):
     """Return True if path is a Python distribution"""
-    #XXX: This test could be improved but it seems to be sufficient
+    # XXX: This test could be improved but it seems to be sufficient
     return osp.isfile(osp.join(path, 'python.exe'))\
            and osp.isdir(osp.join(path, 'Lib', 'site-packages'))
 
 
-#==============================================================================
+# =============================================================================
 # Shell, Python queries
-#==============================================================================
+# =============================================================================
 
 def decode_fs_string(string):
     """Convert string from file system charset to unicode"""
@@ -217,9 +224,10 @@ def decode_fs_string(string):
         charset = locale.getpreferredencoding()
     return string.decode(charset)
 
+
 def exec_shell_cmd(args, path):
     """Execute shell command (*args* is a list of arguments) in *path*"""
-    #print " ".join(args)
+    # print " ".join(args)
     process = subprocess.Popen(args, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, cwd=path, shell=True)
     return decode_fs_string(process.stdout.read())
@@ -244,39 +252,41 @@ def python_query(cmd, path):
 
 
 def get_python_infos(path):
-    """Return (version, architecture) for the Python distribution located in 
-    *path*. The version number is limited to MAJOR.MINOR, the architecture is 
+    """Return (version, architecture) for the Python distribution located in
+    *path*. The version number is limited to MAJOR.MINOR, the architecture is
     an integer: 32 or 64"""
     is_64 = python_query('import sys; print(sys.maxsize > 2**32)', path)
     arch = {'True': 64, 'False': 32}.get(is_64, None)
-    ver = python_query("import sys; print('%d.%d' % (sys.version_info.major, "\
+    ver = python_query("import sys; print('%d.%d' % (sys.version_info.major, "
                        "sys.version_info.minor))", path)
     if re.match(r'([0-9]*)\.([0-9]*)', ver) is None:
         ver = None
     return ver, arch
 
+
 def get_python_long_version(path):
     """Return long version (X.Y.Z) for the Python distribution located in 
     *path*"""
-    ver = python_query("import sys; print('%d.%d.%d' % "\
-                       "(sys.version_info.major, sys.version_info.minor,"\
+    ver = python_query("import sys; print('%d.%d.%d' % "
+                       "(sys.version_info.major, sys.version_info.minor,"
                        "sys.version_info.micro))", path)
     if re.match(r'([0-9]*)\.([0-9]*)\.([0-9]*)', ver) is None:
         ver = None
     return ver
 
 
-#==============================================================================
+# =============================================================================
 # Extract functions
-#==============================================================================
+# =============================================================================
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
     tmpdir = tempfile.mkdtemp(prefix='wppm_')
     atexit.register(lambda path: shutil.rmtree(path, onerror=onerror), tmpdir)
     return tmpdir
 
+
 def extract_msi(fname, targetdir=None, verbose=False):
-    """Extract .msi installer to a temporary directory (if targetdir 
+    """Extract .msi installer to a temporary directory (if targetdir
     is None). Return the temporary directory path"""
     assert fname.endswith('.msi')
     if targetdir is None:
@@ -290,8 +300,9 @@ def extract_msi(fname, targetdir=None, verbose=False):
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
     return targetdir
 
+
 def extract_exe(fname, targetdir=None, verbose=False):
-    """Extract .exe archive to a temporary directory (if targetdir 
+    """Extract .exe archive to a temporary directory (if targetdir
     is None). Return the temporary directory path"""
     if targetdir is None:
         targetdir = _create_temp_dir()
@@ -309,12 +320,13 @@ def extract_exe(fname, targetdir=None, verbose=False):
         p.stdout.close()
         retcode = p.returncode
     if retcode != 0:
-        raise RuntimeError("Failed to extract %s (return code: %d)"\
-                            % (fname, retcode))
+        raise RuntimeError("Failed to extract %s (return code: %d)"
+                           % (fname, retcode))
     return targetdir
 
+
 def extract_archive(fname, targetdir=None, verbose=False):
-    """Extract .zip, .exe (considered to be a zip archive) or .tar.gz archive 
+    """Extract .zip, .exe (considered to be a zip archive) or .tar.gz archive
     to a temporary directory (if targetdir is None).
     Return the temporary directory path"""
     if targetdir is None:
@@ -340,11 +352,13 @@ WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(
 
 SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-[a-z\.0-9]*\-none\-any\.whl)'
 
+
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
     match = re.match(SOURCE_PATTERN, osp.basename(fname))
     if match is not None:
         return match.groups()[:2]
+
 
 def build_wininst(root, python_exe=None, copy_to=None,
                   architecture=None, verbose=False):
@@ -369,12 +383,12 @@ def build_wininst(root, python_exe=None, copy_to=None,
         p.stderr.close()
     distdir = osp.join(root, 'dist')
     if not osp.isdir(distdir):
-        raise RuntimeError("Build failed: see package README file for further"\
-                   " details regarding installation requirements.\n\n"\
-                   "For more concrete debugging infos, please try to build "\
-                   "the package from the command line:\n"\
-                   "1. Open a WinPython command prompt\n"\
-                   "2. Change working directory to the appropriate folder\n"\
+        raise RuntimeError("Build failed: see package README file for further"
+                   " details regarding installation requirements.\n\n"
+                   "For more concrete debugging infos, please try to build "
+                   "the package from the command line:\n"
+                   "1. Open a WinPython command prompt\n"
+                   "2. Change working directory to the appropriate folder\n"
                    "3. Type `python setup.py build install`")
     pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
     for distname in os.listdir(distdir):
@@ -393,6 +407,7 @@ def build_wininst(root, python_exe=None, copy_to=None,
             print(("Move: %s --> %s" % (src_fname, (dst_fname))))
         return dst_fname
 
+
 def source_to_wininst(fname, python_exe=None,
                       architecture=None, verbose=False):
     """Extract source archive, build it and create a distutils installer"""
@@ -403,18 +418,19 @@ def source_to_wininst(fname, python_exe=None,
                          copy_to=osp.dirname(fname),
                          architecture=architecture, verbose=verbose)
 
+
 def build_wheel(this_whl, python_exe=None, copy_to=None,
-                  architecture=None, verbose=False, install_options=None):
+                architecture=None, verbose=False, install_options=None):
     """Execute the wheel (without dependancies)"""
     if python_exe is None:
         python_exe = sys.executable
     assert osp.isfile(python_exe)
     myroot = os.path.dirname(python_exe)
-    
+
     cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
     if install_options:
         cmd += install_options  # typically ['--no-deps']
-        print('wheel install_options',install_options)
+        print('wheel install_options', install_options)
     cmd += [this_whl]
 
     if verbose:
@@ -430,19 +446,20 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
         return src_fname
     else:
         if verbose:
-            print("Installed %s" %  src_fname )
+            print("Installed %s" % src_fname)
         return src_fname
 
+
 def wheel_to_wininst(fname, python_exe=None,
-                      architecture=None, verbose=False, install_options=None):
+                     architecture=None, verbose=False, install_options=None):
     """Just install a wheel !"""
     return build_wheel(fname, python_exe=python_exe,
-                         copy_to=osp.dirname(fname),
-                         architecture=architecture, verbose=verbose,
-                         install_options=install_options)
+                       copy_to=osp.dirname(fname),
+                       architecture=architecture, verbose=verbose,
+                       install_options=install_options)
 
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     gcc = get_gcc_version(osp.join(BASE_DIR, 'tools.win32', 'mingw32', 'bin'))
     print(("gcc version: %r" % gcc))
 
@@ -452,17 +469,18 @@ if __name__ == '__main__':
     print_box("Test")
     dname = sys.prefix
     print((dname+':', '\n', get_python_infos(dname)))
-    #dname = r'E:\winpython\sandbox\python-2.7.3'
-    #print dname+':', '\n', get_python_infos(dname)
-    
+    # dname = r'E:\winpython\sandbox\python-2.7.3'
+    # print dname+':', '\n', get_python_infos(dname)
+
     tmpdir = r'D:\Tests\winpython_tests'
     if not osp.isdir(tmpdir):
         os.mkdir(tmpdir)
     print((extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
-                               'winpython-0.3dev.win-amd64.exe'),
-                          tmpdir)))
-    #extract_exe(osp.join(tmpdir, 'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
-    #extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
+                           'winpython-0.3dev.win-amd64.exe'),
+                           tmpdir)))
+    # extract_exe(osp.join(tmpdir,
+    #                      'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
+    # extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 
-#    path = r'D:\Pierre\_test\xlrd-0.8.0.tar.gz'
-#    source_to_wininst(path)
+    # path = r'D:\Pierre\_test\xlrd-0.8.0.tar.gz'
+    # source_to_wininst(path)
