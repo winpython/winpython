@@ -46,12 +46,12 @@ setup(name=NAME,
       version=__version__,
       description='%s distribution tools, including WPPM' % PROJECT_NAME,
       long_description=\
-"""%s is a portable distribution of the Python programming language 
+"""%s is a portable distribution of the Python programming language
 for Windows. It is a full-featured Python-based scientific environment, :
 including a package manager, WPPM.""" % PROJECT_NAME,
       download_url='%s/files/%s-%s.zip' % (__project_url__, NAME, __version__),
       author="Pierre Raybaut",
-      author_email = 'pierre.raybaut@gmail.com',
+      author_email='pierre.raybaut@gmail.com',
       url=__project_url__,
       license='MIT',
       keywords='PyQt4 PySide',
@@ -59,7 +59,7 @@ including a package manager, WPPM.""" % PROJECT_NAME,
       packages=get_subpackages(LIBNAME),
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.mo', '.svg', '.png', '.css',
-                                               '.html', '.js', '.ini')),},
+                                               '.html', '.js', '.ini')), },
       requires=["PyQt4 (>=4.5)", "guidata (>=1.6.1)"],
       scripts=[osp.join('scripts', fname) for fname in
                ('register_python', 'register_python.bat',
