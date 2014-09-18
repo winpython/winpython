@@ -39,6 +39,7 @@ from winpython.py3compat import getcwd, to_text_string
 
 COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = list(range(5))
 
+
 class PackagesModel(QAbstractTableModel):
     def __init__(self):
         QAbstractTableModel.__init__(self)
@@ -57,8 +58,8 @@ class PackagesModel(QAbstractTableModel):
         if column in (NAME, VERSION, ACTION, DESCRIPTION):
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index))
         else:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index)|
-                                Qt.ItemIsUserCheckable|Qt.ItemIsEditable)
+            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) |
+                                Qt.ItemIsUserCheckable | Qt.ItemIsEditable)
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid() or not (0 <= index.row() < len(self.packages)):
@@ -80,9 +81,9 @@ class PackagesModel(QAbstractTableModel):
                 return to_qvariant(package.description)
         elif role == Qt.TextAlignmentRole:
             if column == ACTION:
-                return to_qvariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                return to_qvariant(int(Qt.AlignRight | Qt.AlignVCenter))
             else:
-                return to_qvariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return to_qvariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole:
             if package in self.checked:
                 color = QColor(Qt.darkGreen)
@@ -97,8 +98,8 @@ class PackagesModel(QAbstractTableModel):
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                return to_qvariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
-            return to_qvariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                return to_qvariant(int(Qt.AlignHCenter | Qt.AlignVCenter))
+            return to_qvariant(int(Qt.AlignRight | Qt.AlignVCenter))
         if role != Qt.DisplayRole:
             return to_qvariant()
         if orientation == Qt.Horizontal:
@@ -117,7 +118,7 @@ class PackagesModel(QAbstractTableModel):
 
     def columnCount(self, index=QModelIndex()):
         return len(COLUMNS)
-    
+
     def setData(self, index, value, role=Qt.EditRole):
         if index.isValid() and 0 <= index.row() < len(self.packages)\
            and role == Qt.CheckStateRole:
@@ -138,6 +139,7 @@ NO_REPAIR_ACTION = 'None (Already installed)'
 UPGRADE_ACTION = 'Upgrade from v'
 NONE_ACTION = '-'
 
+
 class PackagesTable(QTableView):
     def __init__(self, parent, process, winname):
         QTableView.__init__(self, parent)
@@ -156,7 +158,7 @@ class PackagesTable(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.verticalHeader().hide()
         self.setShowGrid(False)
-            
+
     def reset_model(self):
         self.model.reset()
         self.horizontalHeader().setStretchLastSection(True)
@@ -197,7 +199,7 @@ class PackagesTable(QTableView):
                                 % (dist.version, dist.architecture,
                                    "<br>".join(notcompatible)),
                                 QMessageBox.Ok)
-    
+
     def add_package(self, package):
         for pack in self.model.packages:
             if pack.name == package.name:
@@ -206,7 +208,7 @@ class PackagesTable(QTableView):
         self.model.packages.sort(key=lambda x: x.name)
         self.model.checked.add(package)
         self.reset_model()
-    
+
     def remove_package(self, package):
         self.model.packages = [pack for pack in self.model.packages
                                if pack.fname != package.fname]
@@ -215,7 +217,7 @@ class PackagesTable(QTableView):
         if package in self.model.actions:
             self.model.actions.pop(package)
         self.reset_model()
-    
+
     def refresh_distribution(self, dist):
         self.distribution = dist
         if self.process == 'install':
@@ -236,7 +238,7 @@ class PackagesTable(QTableView):
             for package in self.model.packages:
                 self.model.actions[package] = NONE_ACTION
         self.reset_model()
-    
+
     def select_all(self):
         allpk = set(self.model.packages)
         if self.model.checked == allpk:
@@ -246,7 +248,7 @@ class PackagesTable(QTableView):
         self.model.reset()
 
     def dragMoveEvent(self, event):
-        """Reimplement Qt method, just to avoid default drag'n drop 
+        """Reimplement Qt method, just to avoid default drag'n drop
         implementation of QTableView to handle events"""
         event.acceptProposedAction()
 
@@ -256,7 +258,7 @@ class PackagesTable(QTableView):
         source = event.mimeData()
         if source.hasUrls() and mimedata2url(source):
             event.acceptProposedAction()
-            
+
     def dropEvent(self, event):
         """Reimplement Qt method
         Unpack dropped data and handle it"""
@@ -269,24 +271,25 @@ class PackagesTable(QTableView):
 class DistributionSelector(QWidget):
     """Python distribution selector widget"""
     TITLE = 'Select a Python distribution path'
+
     def __init__(self, parent):
         super(DistributionSelector, self).__init__(parent)
         self.browse_btn = None
         self.label = None
         self.line_edit = None
         self.setup_widget()
-        
+
     def set_distribution(self, path):
         """Set distribution directory"""
         self.line_edit.setText(path)
-        
+
     def setup_widget(self):
         """Setup workspace selector widget"""
         self.label = QLabel()
         self.line_edit = QLineEdit()
         self.line_edit.setAlignment(Qt.AlignRight)
         self.line_edit.setReadOnly(True)
-        #self.line_edit.setDisabled(True)
+        # self.line_edit.setDisabled(True)
         self.browse_btn = QPushButton(get_std_icon('DirOpenIcon'), "", self)
         self.browse_btn.setToolTip(self.TITLE)
         self.connect(self.browse_btn, SIGNAL("clicked()"),
@@ -297,7 +300,7 @@ class DistributionSelector(QWidget):
         layout.addWidget(self.browse_btn)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
-    
+
     def select_directory(self):
         """Select directory"""
         basedir = to_text_string(self.line_edit.text())
@@ -325,7 +328,7 @@ class Thread(QThread):
         QThread.__init__(self, parent)
         self.callback = None
         self.error = None
-    
+
     def run(self):
         try:
             self.callback()
@@ -341,7 +344,7 @@ class Thread(QThread):
 
 
 def python_distribution_infos():
-    """Return Python distribution infos (not selected distribution but 
+    """Return Python distribution infos (not selected distribution but
     the one used to run this script)"""
     winpyver = os.environ.get('WINPYVER')
     if winpyver is None:
@@ -352,27 +355,28 @@ def python_distribution_infos():
 
 class PMWindow(QMainWindow):
     NAME = 'WinPython Control Panel'
+
     def __init__(self):
         QMainWindow.__init__(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.distribution = None
-        
+
         self.tabwidget = None
         self.selector = None
         self.table = None
         self.untable = None
-        
+
         self.basedir = None
-        
+
         self.select_all_action = None
         self.install_action = None
         self.uninstall_action = None
         self.remove_action = None
         self.packages_icon = get_std_icon('FileDialogContentsView')
-        
+
         self.setup_window()
-    
+
     def _add_table(self, table, title, icon):
         """Add table tab to main tab widget, return button layout"""
         widget = QWidget()
@@ -383,12 +387,12 @@ class PMWindow(QMainWindow):
         tabvlayout.addLayout(btn_layout)
         self.tabwidget.addTab(widget, icon, title)
         return btn_layout
-            
+
     def setup_window(self):
         """Setup main window"""
         self.setWindowTitle(self.NAME)
         self.setWindowIcon(get_icon('winpython.svg'))
-        
+
         self.selector = DistributionSelector(self)
         self.connect(self.selector, SIGNAL('selected_distribution(QString)'),
                      self.distribution_changed)
@@ -398,7 +402,7 @@ class PMWindow(QMainWindow):
                      self.refresh_install_button)
         self.connect(self.table, SIGNAL("clicked(QModelIndex)"),
                      lambda index: self.refresh_install_button())
-        
+
         self.untable = PackagesTable(self, 'uninstall', self.NAME)
         self.connect(self.untable, SIGNAL("clicked(QModelIndex)"),
                      lambda index: self.refresh_uninstall_button())
@@ -420,7 +424,7 @@ class PMWindow(QMainWindow):
         vlayout.addWidget(self.tabwidget)
         central_widget.setLayout(vlayout)
         self.setCentralWidget(central_widget)
-        
+
         # Install tab
         add_action = create_action(self, "&Add packages...",
                                    icon=get_std_icon('DialogOpenButton'),
@@ -435,8 +439,8 @@ class PMWindow(QMainWindow):
                                    icon=get_std_icon('DialogYesButton'),
                                    triggered=self.table.select_all)
         self.install_action = create_action(self, "&Install packages",
-                           icon=get_std_icon('DialogApplyButton'),
-                           triggered=lambda: self.process_packages('install'))
+                            icon=get_std_icon('DialogApplyButton'),
+                            triggered=lambda: self.process_packages('install'))
         self.install_action.setEnabled(False)
         quit_action = create_action(self, "&Quit",
                                     icon=get_std_icon('DialogCloseButton'),
@@ -445,23 +449,23 @@ class PMWindow(QMainWindow):
         add_actions(packages_menu, [add_action, self.remove_action,
                                     self.install_action,
                                     None, quit_action])
-        
+
         # Uninstall tab
         self.uninstall_action = create_action(self, "&Uninstall packages",
                        icon=get_std_icon('DialogCancelButton'),
                        triggered=lambda: self.process_packages('uninstall'))
         self.uninstall_action.setEnabled(False)
-        
+
         uninstall_btn = action2button(self.uninstall_action, autoraise=False,
                                       text_beside_icon=True)
-        
+
         # Option menu
         option_menu = self.menuBar().addMenu("&Options")
         repair_action = create_action(self, "Repair packages",
                       tip="Reinstall packages even if version is unchanged",
                       toggled=self.toggle_repair)
         add_actions(option_menu, (repair_action,))
-        
+
         # Advanced menu
         option_menu = self.menuBar().addMenu("&Advanced")
         register_action = create_action(self, "Register distribution...",
@@ -476,11 +480,11 @@ class PMWindow(QMainWindow):
         add_actions(option_menu, (register_action, unregister_action,
                                   None, open_console_action))
 
-        # View menu
-#        view_menu = self.menuBar().addMenu("&View")
-#        popmenu = self.createPopupMenu()
-#        add_actions(view_menu, popmenu.actions())
-        
+        # # View menu
+        # view_menu = self.menuBar().addMenu("&View")
+        # popmenu = self.createPopupMenu()
+        # add_actions(view_menu, popmenu.actions())
+
         # Help menu
         about_action = create_action(self, "About %s..." % self.NAME,
                                 icon=get_std_icon('MessageBoxInformation'),
@@ -495,7 +499,7 @@ class PMWindow(QMainWindow):
         status = self.statusBar()
         status.setObjectName("StatusBar")
         status.showMessage("Welcome to %s!" % self.NAME, 5000)
-        
+
         # Button layouts
         for act in (add_action, self.remove_action, None,
                     self.select_all_action, self.install_action):
@@ -506,24 +510,24 @@ class PMWindow(QMainWindow):
                                                    text_beside_icon=True))
         unbtn_layout.addWidget(uninstall_btn)
         unbtn_layout.addStretch()
-        
+
         self.resize(400, 500)
-    
+
     def current_tab_changed(self, index):
         """Current tab has just changed"""
         if index == 0:
             self.show_drop_tip()
-    
+
     def refresh_install_button(self):
         """Refresh install button enable state"""
         self.table.refresh_distribution(self.distribution)
-        self.install_action.setEnabled(\
+        self.install_action.setEnabled(
             len(self.get_packages_to_be_installed()) > 0)
         nbp = len(self.table.get_selected_packages())
         for act in (self.remove_action, self.select_all_action):
             act.setEnabled(nbp > 0)
         self.show_drop_tip()
-    
+
     def show_drop_tip(self):
         """Show drop tip on install table"""
         callback = lambda: QToolTip.showText(
@@ -532,12 +536,12 @@ class PMWindow(QMainWindow):
                         'Executable installers (distutils) or source packages',
                         self)
         QTimer.singleShot(500, callback)
-    
+
     def refresh_uninstall_button(self):
         """Refresh uninstall button enable state"""
         nbp = len(self.untable.get_selected_packages())
         self.uninstall_action.setEnabled(nbp > 0)
-    
+
     def toggle_repair(self, state):
         """Toggle repair mode"""
         self.table.repair = state
@@ -595,13 +599,13 @@ class PMWindow(QMainWindow):
         self.distribution = dist
         self.selector.label.setText('Python %s %dbit:'
                                     % (dist.version, dist.architecture))
-    
+
     def add_packages(self):
         """Add packages"""
         basedir = self.basedir if self.basedir is not None else ''
         fnames, _selfilter = getopenfilenames(parent=self, basedir=basedir,
-                      caption='Add packages',
-                      filters='*.exe *.zip *.tar.gz *.whl')
+                                 caption='Add packages',
+                                 filters='*.exe *.zip *.tar.gz *.whl')
         if fnames:
             self.basedir = osp.dirname(fnames[0])
             self.table.add_packages(fnames)
@@ -611,7 +615,7 @@ class PMWindow(QMainWindow):
         return [pack for pack in self.table.get_selected_packages()
                 if self.table.model.actions[pack]
                 not in (NO_REPAIR_ACTION, NONE_ACTION)]
-    
+
     def remove_packages(self):
         """Remove selected packages"""
         for package in self.table.get_selected_packages():
@@ -677,7 +681,7 @@ class PMWindow(QMainWindow):
             table.refresh_distribution(self.distribution)
 
     def report_issue(self):
-        
+
         issue_template = """\
 Python distribution:   %s
 Control panel version: %s
@@ -698,10 +702,10 @@ Please provide any additional information below.
        __version__, platform.python_version(),
        winpython.qt.QtCore.__version__, winpython.qt.API_NAME,
        winpython.qt.__version__)
-       
+
         url = QUrl("%s/issues/entry" % __project_url__)
         url.addQueryItem("comment", issue_template)
-        QDesktopServices.openUrl(url)    
+        QDesktopServices.openUrl(url)
 
     def about(self):
         """About this program"""
@@ -712,7 +716,7 @@ Please provide any additional information below.
             <p>Copyright &copy; 2012 Pierre Raybaut
             <br>Licensed under the terms of the MIT License
             <p>Created, developed and maintained by Pierre Raybaut
-            <p><a href="%s">WinPython at SourceForge</a>: downloads, bug reports, 
+            <p><a href="%s">WinPython at SourceForge</a>: downloads, bug reports,
             discussions, etc.</p>
             <p>This program is executed by:<br>
             <b>%s</b><br>
@@ -720,9 +724,9 @@ Please provide any additional information below.
             % (self.NAME, __version__, __project_url__,
                python_distribution_infos(),
                platform.python_version(), winpython.qt.QtCore.__version__,
-               winpython.qt.API_NAME, winpython.qt.__version__,) )
+               winpython.qt.API_NAME, winpython.qt.__version__,))
 
-        
+
 def main(test=False):
     app = QApplication([])
     win = PMWindow()
