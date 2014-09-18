@@ -46,7 +46,7 @@ def qapplication(translate=True):
         SpyderApplication = MacApplication
     else:
         SpyderApplication = QApplication
-    
+
     app = SpyderApplication.instance()
     if not app:
         # Set Application name for Gnome 3
@@ -71,6 +71,8 @@ def file_uri(fname):
 
 
 QT_TRANSLATOR = None
+
+
 def install_translator(qapp):
     """Install Qt translator to the QApplication instance"""
     global QT_TRANSLATOR
@@ -78,7 +80,7 @@ def install_translator(qapp):
         qt_translator = QTranslator()
         if qt_translator.load("qt_"+QLocale.system().name(),
                       QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
-            QT_TRANSLATOR = qt_translator # Keep reference alive
+            QT_TRANSLATOR = qt_translator  # Keep reference alive
     if QT_TRANSLATOR is not None:
         qapp.installTranslator(QT_TRANSLATOR)
 
@@ -94,9 +96,9 @@ def _process_mime_path(path, extlist):
         if os.name == 'nt':
             # On Windows platforms, a local path reads: file:///c:/...
             # and a UNC based path reads like: file://server/share
-            if path.startswith(r"file:///"): # this is a local path
-                path=path[8:]
-            else: # this is a unc path
+            if path.startswith(r"file:///"):  # this is a local path
+                path = path[8:]
+            else:  # this is a unc path
                 path = path[5:]
         else:
             path = path[7:]
@@ -168,7 +170,7 @@ def create_action(parent, text, shortcut=None, icon=None, tip=None,
         action.setData(to_qvariant(data))
     if menurole is not None:
         action.setMenuRole(menurole)
-    #TODO: Hard-code all shortcuts and choose context=Qt.WidgetShortcut
+    # TODO: Hard-code all shortcuts and choose context=Qt.WidgetShortcut
     # (this will avoid calling shortcuts from another dockwidget
     #  since the context thing doesn't work quite well with these widgets)
     action.setShortcutContext(context)
@@ -201,14 +203,14 @@ def add_actions(target, actions, insert_before=None):
                 target.insertAction(insert_before, action)
         previous_action = action
 
-        
+
 def get_std_icon(name, size=None):
     """Get standard platform icon
     Call 'show_std_icons()' for details"""
     if not name.startswith('SP_'):
         name = 'SP_'+name
-    icon = QWidget().style().standardIcon( getattr(QStyle, name) )
+    icon = QWidget().style().standardIcon(getattr(QStyle, name))
     if size is None:
         return icon
     else:
-        return QIcon( icon.pixmap(size, size) )
+        return QIcon(icon.pixmap(size, size))

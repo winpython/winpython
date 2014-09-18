@@ -22,7 +22,7 @@ def get_module_path(modname):
 def get_module_data_path(modname, relpath=None, attr_name='DATAPATH'):
     """Return module *modname* data path
     Note: relpath is ignored if module has an attribute named *attr_name*
-    
+
     Handles py2exe/cx_Freeze distributions"""
     datapath = getattr(sys.modules[modname], attr_name, '')
     if datapath:
