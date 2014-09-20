@@ -23,9 +23,9 @@ Licensed under the terms of the MIT License
 
     Dependencies
     
-        Python >=2.6 or Python >=3.0
-        PyQt4 >=4.5 or PySide >=1.1.1 (PyQt4 is recommended)
-        guidata >=1.6.1
+        Python2 >= 2.7 or Python3 >= 3.3
+        PyQt4 >= 4.6 or PySide >= 1.2 (PyQt4 is recommended)
+        guidata >= 1.6.1
 
     Requirements
 
