@@ -21,8 +21,8 @@ from __future__ import print_function
 import sys
 import os
 
-PY2 = sys.version[0] == '2'
-PY3 = sys.version[0] == '3'
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
 
 
 # =============================================================================
