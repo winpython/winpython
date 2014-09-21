@@ -17,3 +17,5 @@
 ^winpython.egg-info/
 MANIFEST
 Thumbs.db
+*~
+*.swp
