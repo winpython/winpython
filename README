@@ -9,7 +9,7 @@ Licensed under the terms of the MIT License
     Overview
 
         WinPython is a portable distribution of the Python programming 
-        language for Windows (http://winpython.sourceforge.net).
+        language for Windows (http://winpython.github.io).
 		
 		This is the `winpython` Python package, not the distribution itself.
 		It includes two main features:
@@ -64,6 +64,6 @@ Licensed under the terms of the MIT License
     More informations
     
         Downloads, bug reports and feature requests:
-            https://github.com/stonebig/winpython
+            https://github.com/winpython/winpython
         Discussions:
             http://groups.google.com/group/winpython
