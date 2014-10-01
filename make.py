@@ -656,7 +656,7 @@ set R_HOMEbin=%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin
 
 
 set SYS_PATH=%PATH%
-set PATH=%R_HOMEbin%;%SYS_PATH%
+set PATH=%SYS_PATH%;%R_HOMEbin%
 
 echo "r!"
 echo "if you want it to be on your winpython icon, update %WINPYDIR%\settings\winpython.ini with"
