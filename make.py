@@ -769,7 +769,7 @@ call %~dp0register_python.bat --all""")
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.]*)(\.amd64)?\.msi')
+                            r'python-([0-9\.rc]*)(\.amd64)?\.msi')
         self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
