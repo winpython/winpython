@@ -669,6 +669,38 @@ rem Ipython notebook
 
 cmd.exe /k
 """)
+        # Prepare a live patch on python (shame we need it) to have mingw64ok
+        patch_distutils = ""
+        if self.py_arch == "win-amd64":
+            patch_distutils="""
+Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
+"""            
+        self.create_batch_script('Find_And_replace.vbs',"""
+' from http://stackoverflow.com/questions/15291341/
+'             a-batch-file-to-read-a-file-and-replace-a-string-with-a-new-one
+
+If WScript.Arguments.Count <> 3 then
+  WScript.Echo "usage: Find_And_replace.vbs filename word_to_find replace_with "
+  WScript.Quit
+end If
+
+FindAndReplace WScript.Arguments.Item(0), WScript.Arguments.Item(1), WScript.Arguments.Item(2)
+WScript.Echo "Operation Complete"
+
+function FindAndReplace(strFilename, strFind, strReplace)
+    Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
+    strInputFile = inputFile.ReadAll
+    inputFile.Close
+    Set inputFile = Nothing
+    result_text = Replace(strInputFile, strFind, strReplace)
+    if result <> strInputFile then
+        Set outputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename,2,true)
+        outputFile.Write result_text
+        outputFile.Close
+        Set outputFile = Nothing
+    end if    
+end function
+""")
 
         self.create_batch_script('make_cython_use_mingw.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
@@ -682,7 +714,8 @@ rem ******************
 set tmp_mingwdirectory=mingw32
 if not exist "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" goto mingw_end
 
-
+""" + patch_distutils +
+"""
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 
 set tmp_blank=
