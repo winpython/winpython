@@ -919,15 +919,15 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ))
     make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-             verbose=False, archis=(32, ))
-    # make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ))
-    # make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, )))
-    # make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ))
+    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ))
+    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
     # make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    # make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ))
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(64, ))
