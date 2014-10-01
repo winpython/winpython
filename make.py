@@ -673,7 +673,7 @@ cmd.exe /k
         patch_distutils = ""
         if self.py_arch == "win-amd64":
             patch_distutils="""
-Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
+%~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
 """            
         self.create_batch_script('Find_And_replace.vbs',"""
 ' from http://stackoverflow.com/questions/15291341/
