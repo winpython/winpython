@@ -667,10 +667,30 @@ cmd.exe /k
         # Prepare a live patch on python (shame we need it) to have mingw64ok
         patch_distutils = ""
         if self.py_arch == "win-amd64":
-            patch_distutils="""
+            if sys.version_info[0] == '3':
+                use_spec = r"\specs100"    
+            else:
+                use_spec = r"\specs90"
+            patch_distutils=r"""
 %~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
+
+set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
+set WINPYMSVCR=libmsvcr100.a
+IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
+
+
+cd %WINPYDIR%
+copy  /Y ..\tools\mingw32\x86_64-w64-mingw32\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
+copy  /Y ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2""" + use_spec + r""" ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\specs
+
+REM generate python.34 import file
+
+..\tools\mingw32\bin\gendef.exe python%WINPYXX%.dll
+..\tools\mingw32\bin\dlltool -D python%WINPYXX%.dll -d python%WINPYXX%.def -l libpython%WINPYXX%.dll.a
+move /Y libpython%WINPYXX%.dll.a libs
+del python%WINPYXX%.def
 """            
-        self.create_batch_script('Find_And_replace.vbs',"""
+        self.create_batch_script('Find_And_replace.vbs',r"""
 ' from http://stackoverflow.com/questions/15291341/
 '             a-batch-file-to-read-a-file-and-replace-a-string-with-a-new-one
 
@@ -680,7 +700,7 @@ If WScript.Arguments.Count <> 3 then
 end If
 
 FindAndReplace WScript.Arguments.Item(0), WScript.Arguments.Item(1), WScript.Arguments.Item(2)
-WScript.Echo "Operation Complete"
+'WScript.Echo "Operation Complete"
 
 function FindAndReplace(strFilename, strFind, strReplace)
     Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
@@ -707,7 +727,7 @@ set tmp_mingwdirectory=mingw32
 if not exist "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" goto mingw_end
 
 """ + patch_distutils +
-"""
+r"""
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 
 set tmp_blank=
@@ -729,7 +749,7 @@ goto mingw_success
 echo "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" not found
 
 :mingw_success
-pause
+rem pause
 
 """)
 
@@ -754,6 +774,13 @@ call %~dp0register_python.bat --all""")
         self.create_python_batch('wpcp.bat', 'wpcp', workdir='Scripts')
         self.create_python_batch('pyqt_demo.bat', 'qtdemo.pyw',
                      workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
+
+        # pre-run wingw batch
+        print ('now pre-running extra mingw')
+        filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
+        p = subprocess.Popen(filepath, shell=True, stdout = subprocess.PIPE)
+        stdout, stderr = p.communicate()
+
         self._print_done()
 
     def make(self, remove_existing=True):
