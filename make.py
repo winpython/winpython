@@ -575,11 +575,9 @@ set WINPYVER=""" + self.winpyver + """
 set HOME=%WINPYDIR%\..\settings
 set PATH=""" + path)
 
-        self.create_batch_script('start_ijulia.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
-set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path + r"""
+        self.create_batch_script('start_ijulia.bat', r"""@echo off
+call %~dp0env.bat
+
 rem ******************
 rem Starting Ijulia  (supposing you install it in \tools\Julia of winpython)
 rem ******************
@@ -638,11 +636,8 @@ echo to use julia_magic from Ipython, type "Ipython notebook" instead.
 cmd.exe /k
 """)
 
-        self.create_batch_script('start_with_r.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
-set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path + r"""
+        self.create_batch_script('start_with_r.bat', r"""@echo off
+call %~dp0env.bat
 
 rem ******************
 rem R part (supposing you install it in \tools\R of winpython)
@@ -702,11 +697,8 @@ function FindAndReplace(strFilename, strFind, strReplace)
 end function
 """)
 
-        self.create_batch_script('make_cython_use_mingw.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
-set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path + r"""
+        self.create_batch_script('make_cython_use_mingw.bat', r"""@echo off
+call %~dp0env.bat
 
 rem ******************
 rem mingw part (supposing you install it in \tools\mingw32)
@@ -740,6 +732,11 @@ echo "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" not found
 pause
 
 """)
+
+        self.create_batch_script('make_cython_use_vc.bat', """@echo off
+set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
+echo [config]>%pydistutils_cfg%
+        """)
 
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
