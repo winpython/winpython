@@ -575,11 +575,9 @@ set WINPYVER=""" + self.winpyver + """
 set HOME=%WINPYDIR%\..\settings
 set PATH=""" + path)
 
-        self.create_batch_script('start_ijulia.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
-set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path + r"""
+        self.create_batch_script('start_ijulia.bat', r"""@echo off
+call %~dp0env.bat
+
 rem ******************
 rem Starting Ijulia  (supposing you install it in \tools\Julia of winpython)
 rem ******************
@@ -638,11 +636,8 @@ echo to use julia_magic from Ipython, type "Ipython notebook" instead.
 cmd.exe /k
 """)
 
-        self.create_batch_script('start_with_r.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
-set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path + r"""
+        self.create_batch_script('start_with_r.bat', r"""@echo off
+call %~dp0env.bat
 
 rem ******************
 rem R part (supposing you install it in \tools\R of winpython)
@@ -656,7 +651,7 @@ set R_HOMEbin=%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin
 
 
 set SYS_PATH=%PATH%
-set PATH=%R_HOMEbin%;%SYS_PATH%
+set PATH=%SYS_PATH%;%R_HOMEbin%
 
 echo "r!"
 echo "if you want it to be on your winpython icon, update %WINPYDIR%\settings\winpython.ini with"
@@ -669,12 +664,61 @@ rem Ipython notebook
 
 cmd.exe /k
 """)
+        # Prepare a live patch on python (shame we need it) to have mingw64ok
+        patch_distutils = ""
+        if self.py_arch == "win-amd64":
+            if sys.version_info[0] == '3':
+                use_spec = r"\specs100"    
+            else:
+                use_spec = r"\specs90"
+            patch_distutils=r"""
+%~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
 
-        self.create_batch_script('make_cython_use_mingw.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
-set HOME=%WINPYDIR%\..\settings
-set PATH=""" + path + r"""
+set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
+set WINPYMSVCR=libmsvcr100.a
+IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
+
+
+cd %WINPYDIR%
+copy  /Y ..\tools\mingw32\x86_64-w64-mingw32\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
+copy  /Y ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2""" + use_spec + r""" ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\specs
+
+REM generate python.34 import file
+
+..\tools\mingw32\bin\gendef.exe python%WINPYXX%.dll
+..\tools\mingw32\bin\dlltool -D python%WINPYXX%.dll -d python%WINPYXX%.def -l libpython%WINPYXX%.dll.a
+move /Y libpython%WINPYXX%.dll.a libs
+del python%WINPYXX%.def
+"""            
+        self.create_batch_script('Find_And_replace.vbs',r"""
+' from http://stackoverflow.com/questions/15291341/
+'             a-batch-file-to-read-a-file-and-replace-a-string-with-a-new-one
+
+If WScript.Arguments.Count <> 3 then
+  WScript.Echo "usage: Find_And_replace.vbs filename word_to_find replace_with "
+  WScript.Quit
+end If
+
+FindAndReplace WScript.Arguments.Item(0), WScript.Arguments.Item(1), WScript.Arguments.Item(2)
+'WScript.Echo "Operation Complete"
+
+function FindAndReplace(strFilename, strFind, strReplace)
+    Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
+    strInputFile = inputFile.ReadAll
+    inputFile.Close
+    Set inputFile = Nothing
+    result_text = Replace(strInputFile, strFind, strReplace)
+    if result <> strInputFile then
+        Set outputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename,2,true)
+        outputFile.Write result_text
+        outputFile.Close
+        Set outputFile = Nothing
+    end if    
+end function
+""")
+
+        self.create_batch_script('make_cython_use_mingw.bat', r"""@echo off
+call %~dp0env.bat
 
 rem ******************
 rem mingw part (supposing you install it in \tools\mingw32)
@@ -682,7 +726,8 @@ rem ******************
 set tmp_mingwdirectory=mingw32
 if not exist "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" goto mingw_end
 
-
+""" + patch_distutils +
+r"""
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 
 set tmp_blank=
@@ -704,9 +749,14 @@ goto mingw_success
 echo "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" not found
 
 :mingw_success
-pause
+rem pause
 
 """)
+
+        self.create_batch_script('make_cython_use_vc.bat', """@echo off
+set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
+echo [config]>%pydistutils_cfg%
+        """)
 
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
@@ -724,6 +774,13 @@ call %~dp0register_python.bat --all""")
         self.create_python_batch('wpcp.bat', 'wpcp', workdir='Scripts')
         self.create_python_batch('pyqt_demo.bat', 'qtdemo.pyw',
                      workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
+
+        # pre-run wingw batch
+        print ('now pre-running extra mingw')
+        filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
+        p = subprocess.Popen(filepath, shell=True, stdout = subprocess.PIPE)
+        stdout, stderr = p.communicate()
+
         self._print_done()
 
     def make(self, remove_existing=True):
@@ -736,7 +793,7 @@ call %~dp0register_python.bat --all""")
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.]*)(\.amd64)?\.msi')
+                            r'python-([0-9\.rc]*)(\.amd64)?\.msi')
         self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
@@ -886,15 +943,15 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ))
     make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-             verbose=False, archis=(32, ))
-    # make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ))
-    # make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, )))
-    # make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ))
+    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ))
+    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
     # make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    # make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ))
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(64, ))
