@@ -537,13 +537,13 @@ call %~dp0env.bat
         if osp.isfile(osp.join(self.python_dir, 'Scripts', ipython_exe)):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                                  command='${WINPYDIR}\pythonw.exe',
-                                 args='%s qtconsole --matplotlib=inline'
-                                      % ipython_scr,
+                                 args='%s qtconsole --matplotlib=inline' %
+                                      ipython_scr,
                                  workdir='${WINPYDIR}\Scripts')
             self.create_launcher('IPython Notebook.exe', 'ipython.ico',
                                  command='${WINPYDIR}\python.exe',
-                                 args='%s notebook --matplotlib=inline'
-                                      % ipython_scr,
+                                 args='%s notebook --matplotlib=inline' %
+                                      ipython_scr,
                                  workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -667,21 +667,22 @@ cmd.exe /k
         # Prepare a live patch on python (shame we need it) to have mingw64ok
         patch_distutils = ""
         if self.py_arch == "win-amd64":
-            if sys.version_info[0] == '3':
-                use_spec = r"\specs100"    
-            else:
-                use_spec = r"\specs90"
             patch_distutils=r"""
 %~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
 
 set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
-set WINPYMSVCR=libmsvcr100.a
-IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
 
+rem Python 3.3+ case
+set WINPYMSVCR=libmsvcr100.a
+set WINPYSPEC=specs100
+
+rem Python2.7 case
+IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
+IF "%WINPYXX%"=="27" set WINPYSPEC=specs90
 
 cd %WINPYDIR%
 copy  /Y ..\tools\mingw32\x86_64-w64-mingw32\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
-copy  /Y ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2""" + use_spec + r""" ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\specs
+copy  /Y ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\%WINPYSPEC% ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\specs
 
 REM generate python.34 import file
 
