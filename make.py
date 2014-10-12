@@ -158,7 +158,7 @@ class WinPythonDistribution(object):
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = [('gettext', '0.14.4'), ('SciTE', '3.3.7')]   
+        installed_tools = [('gettext', '0.14.4'), ('SciTE', '3.3.7')]
 
         def get_tool_path(relpath, checkfunc):
             if self.simulation:
@@ -228,7 +228,7 @@ Name | Version | Description
     def pyqt_arch(self):
         """Return distribution architecture, in PyQt format: x32/x64"""
         return 'x%d' % self.distribution.architecture
-   
+
     @property
     def py_arch(self):
         """Return distribution architecture, in Python distutils format:
@@ -297,7 +297,7 @@ Name | Version | Description
         fd = open(osp.join(scriptdir, name), 'w')
         fd.write(contents)
         fd.close()
-   
+
     def create_launcher(self, name, icon, command=None,
                         args=None, workdir=None, settingspath=None):
         """Create exe launcher with NSIS"""
@@ -453,7 +453,7 @@ call %~dp0env.bat
             'PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
             % (self.python_version, self.pyqt_arch))
 
-        # Install 'main packages' first (was before Wheel idea, keep for now)             
+        # Install 'main packages' first (was before Wheel idea, keep for now)
         for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
             self.install_package(
                 '%s-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
@@ -649,7 +649,6 @@ rem  R_HOME for rpy2, R_HOMEBIN for PATH
 set R_HOME=%WINPYDIR%\..\tools\%tmp_Rdirectory%\
 set R_HOMEbin=%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin
 
-
 set SYS_PATH=%PATH%
 set PATH=%SYS_PATH%;%R_HOMEbin%
 
@@ -667,7 +666,7 @@ cmd.exe /k
         # Prepare a live patch on python (shame we need it) to have mingw64ok
         patch_distutils = ""
         if self.py_arch == "win-amd64":
-            patch_distutils=r"""
+            patch_distutils = r"""
 %~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
 
 set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
@@ -690,8 +689,9 @@ REM generate python.34 import file
 ..\tools\mingw32\bin\dlltool -D python%WINPYXX%.dll -d python%WINPYXX%.def -l libpython%WINPYXX%.dll.a
 move /Y libpython%WINPYXX%.dll.a libs
 del python%WINPYXX%.def
-"""            
-        self.create_batch_script('Find_And_replace.vbs',r"""
+"""
+
+        self.create_batch_script('Find_And_replace.vbs', r"""
 ' from http://stackoverflow.com/questions/15291341/
 '             a-batch-file-to-read-a-file-and-replace-a-string-with-a-new-one
 
@@ -714,7 +714,7 @@ function FindAndReplace(strFilename, strFind, strReplace)
         outputFile.Write result_text
         outputFile.Close
         Set outputFile = Nothing
-    end if    
+    end if
 end function
 """)
 
@@ -777,9 +777,9 @@ call %~dp0register_python.bat --all""")
                      workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
 
         # pre-run wingw batch
-        print ('now pre-running extra mingw')
+        print('now pre-running extra mingw')
         filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
-        p = subprocess.Popen(filepath, shell=True, stdout = subprocess.PIPE)
+        p = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
         stdout, stderr = p.communicate()
 
         self._print_done()
@@ -837,12 +837,12 @@ call %~dp0register_python.bat --all""")
         if not self.simulation:
             self._create_launchers()
             self._create_batch_scripts()
-    
+
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
-  
+
         # Writing package index
         self._print("Writing package index")
         fname = osp.join(self.winpydir, os.pardir,
@@ -946,7 +946,7 @@ if __name__ == '__main__':
 
     #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
               verbose=False, archis=(64, ))
     #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
