@@ -158,7 +158,7 @@ class WinPythonDistribution(object):
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = [('gettext', '0.14.4'), ('SciTE', '3.3.7')]   
+        installed_tools = [('gettext', '0.14.4'), ('SciTE', '3.3.7')]
 
         def get_tool_path(relpath, checkfunc):
             if self.simulation:
@@ -228,7 +228,7 @@ Name | Version | Description
     def pyqt_arch(self):
         """Return distribution architecture, in PyQt format: x32/x64"""
         return 'x%d' % self.distribution.architecture
-   
+
     @property
     def py_arch(self):
         """Return distribution architecture, in Python distutils format:
@@ -297,7 +297,7 @@ Name | Version | Description
         fd = open(osp.join(scriptdir, name), 'w')
         fd.write(contents)
         fd.close()
-   
+
     def create_launcher(self, name, icon, command=None,
                         args=None, workdir=None, settingspath=None):
         """Create exe launcher with NSIS"""
@@ -453,7 +453,7 @@ call %~dp0env.bat
             'PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
             % (self.python_version, self.pyqt_arch))
 
-        # Install 'main packages' first (was before Wheel idea, keep for now)             
+        # Install 'main packages' first (was before Wheel idea, keep for now)
         for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
             self.install_package(
                 '%s-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
@@ -636,6 +636,41 @@ echo to use julia_magic from Ipython, type "Ipython notebook" instead.
 cmd.exe /k
 """)
 
+
+        self.create_batch_script('Add_or_removeLine.vbs',r"""
+'from http://blogs.technet.com/b/heyscriptingguy/archive/2007/09/07/
+' how-can-i-remove-any-line-in-a-text-file-that-contains-a-specified-string-value.aspx
+If WScript.Arguments.Count <> 3 then
+  WScript.Echo "usage: Add_or_removeLine.vbs filename word_to_find line_to_add" &_
+  vbNewLine & "or         Add_or_removeLine.vbs filename word_to_find -remove"
+  WScript.Quit
+end If
+
+Set colArgs = WScript.Arguments
+Add_or_removeLine colArgs(0), colArgs(1), colArgs(2) 
+
+function Add_or_removeLine(strFilename, strFind, strAction)
+    Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
+    a_change = False
+    Do Until inputFile.AtEndOfStream
+        strLine = inputFile.ReadLine
+        If InStr(strLine, strFind) = 0 Then
+            result_text= result_text & strLine & vbNewLine 
+        else
+           a_change = True
+           if strAction <> "-remove" then result_text= result_text & strLine & vbNewLine & strAction & vbNewLine
+        End If
+    Loop
+    inputFile.Close
+
+    if a_change then
+        Set outputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename,2,true)
+        outputFile.Write result_text
+        outputFile.Close
+    end if    
+end function
+""")
+
         self.create_batch_script('start_with_r.bat', r"""@echo off
 call %~dp0env.bat
 
@@ -643,31 +678,46 @@ rem ******************
 rem R part (supposing you install it in \tools\R of winpython)
 rem ******************
 set tmp_Rdirectory=R
-if not exist "%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin" goto r_end
+if not exist "%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin" goto r_bad
 
 rem  R_HOME for rpy2, R_HOMEBIN for PATH
 set R_HOME=%WINPYDIR%\..\tools\%tmp_Rdirectory%\
 set R_HOMEbin=%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin
 
-
 set SYS_PATH=%PATH%
 set PATH=%SYS_PATH%;%R_HOMEbin%
 
 echo "r!"
-echo "if you want it to be on your winpython icon, update %WINPYDIR%\settings\winpython.ini with"
-echo "PATH=%path%"
-echo " "
-echo to launch Ipython with R, type now "Ipython notebook"
-rem Ipython notebook
+echo "We are going to  update %WINPYDIR%\settings\winpython.ini with"
+echo "R_HOME = %R_HOME%"
+echo "(relaunch this batch, if you move your winpython)"
+pause
+
+%~dp0Add_or_removeLine.vbs ..\settings\winpython.ini  "R_HOME = " -remove
+
+rem Handle case when winpython.ini is not already created
+if exist "..\settings\winpython.ini" goto ini_exists 
+
+echo [debug]>"..\settings\winpython.ini"
+echo state = disabled>>"..\settings\winpython.ini"
+echo [environment]>>"..\settings\winpython.ini"
+
+:ini_exists 
+%~dp0Add_or_removeLine.vbs ..\settings\winpython.ini  "[environment]" "R_HOME = %R_HOME%"
+goto r_end
+
+:r_bad 
+
+echo directory "%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin" not found
+echo please install R at "%WINPYDIR%\..\tools\%tmp_Rdirectory%" 
+pause
 
 :r_end
-
-cmd.exe /k
 """)
         # Prepare a live patch on python (shame we need it) to have mingw64ok
         patch_distutils = ""
         if self.py_arch == "win-amd64":
-            patch_distutils=r"""
+            patch_distutils = r"""
 %~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
 
 set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
@@ -690,8 +740,9 @@ REM generate python.34 import file
 ..\tools\mingw32\bin\dlltool -D python%WINPYXX%.dll -d python%WINPYXX%.def -l libpython%WINPYXX%.dll.a
 move /Y libpython%WINPYXX%.dll.a libs
 del python%WINPYXX%.def
-"""            
-        self.create_batch_script('Find_And_replace.vbs',r"""
+"""
+
+        self.create_batch_script('Find_And_replace.vbs', r"""
 ' from http://stackoverflow.com/questions/15291341/
 '             a-batch-file-to-read-a-file-and-replace-a-string-with-a-new-one
 
@@ -714,7 +765,7 @@ function FindAndReplace(strFilename, strFind, strReplace)
         outputFile.Write result_text
         outputFile.Close
         Set outputFile = Nothing
-    end if    
+    end if
 end function
 """)
 
@@ -777,9 +828,9 @@ call %~dp0register_python.bat --all""")
                      workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
 
         # pre-run wingw batch
-        print ('now pre-running extra mingw')
+        print('now pre-running extra mingw')
         filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
-        p = subprocess.Popen(filepath, shell=True, stdout = subprocess.PIPE)
+        p = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
         stdout, stderr = p.communicate()
 
         self._print_done()
@@ -837,12 +888,12 @@ call %~dp0register_python.bat --all""")
         if not self.simulation:
             self._create_launchers()
             self._create_batch_scripts()
-    
+
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
-  
+
         # Writing package index
         self._print("Writing package index")
         fname = osp.join(self.winpydir, os.pardir,
@@ -946,7 +997,7 @@ if __name__ == '__main__':
 
     #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
               verbose=False, archis=(64, ))
     #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
