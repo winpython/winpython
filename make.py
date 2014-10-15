@@ -109,7 +109,7 @@ def replace_in_nsis_file(fname, data):
 
 def build_nsis(srcname, dstname, data):
     """Build NSIS script"""
-    portable_dir = osp.join(osp.dirname(__file__), 'portable')
+    portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
     shutil.copy(osp.join(portable_dir, srcname), dstname)
     data = [('!addincludedir', osp.join(portable_dir, 'include'))
             ] + list(data)
@@ -266,7 +266,7 @@ Name | Version | Description
     @property
     def toolsdirs(self):
         """Return tools directory list"""
-        return [osp.join(osp.dirname(__file__), 'tools')] + self._toolsdirs
+        return [osp.join(osp.dirname(osp.abspath(__file__)), 'tools')] + self._toolsdirs
 
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdirs"""
@@ -305,7 +305,7 @@ Name | Version | Description
                         args=None, workdir=None, settingspath=None):
         """Create exe launcher with NSIS"""
         assert name.endswith('.exe')
-        portable_dir = osp.join(osp.dirname(__file__), 'portable')
+        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
         icon_fname = osp.join(portable_dir, 'icons', icon)
         assert osp.isfile(icon_fname)
 
@@ -368,7 +368,7 @@ call %~dp0env.bat
     def create_installer(self):
         """Create installer with NSIS"""
         self._print("Creating WinPython installer")
-        portable_dir = osp.join(osp.dirname(__file__), 'portable')
+        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
         fname = osp.join(portable_dir, 'installer-tmp.nsi')
         data = (('DISTDIR', self.winpydir),
                 ('ARCH', self.winpy_arch),
@@ -928,7 +928,7 @@ def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64)):
         for name in os.listdir(packdir):
             if name.startswith('winpython-') and name.endswith('.exe'):
                 os.remove(osp.join(packdir, name))
-        utils.build_wininst(osp.dirname(__file__), copy_to=packdir,
+        utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
                             architecture=architecture, verbose=verbose)
 
 
