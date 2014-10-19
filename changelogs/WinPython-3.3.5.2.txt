@@ -22,7 +22,7 @@ Name | Version | Description
 [colorama](http://pypi.python.org/pypi/colorama) | 0.3.2 | Cross-platform colored terminal text
 [cvxopt](http://abel.ee.ucla.edu/cvxopt) | 1.1.7 | Convex optimization library
 [cx_Freeze](http://cx-freeze.sourceforge.net) | 4.3.3 | Deployment tool which converts Python scripts into stand-alone Windows executables (i.e. target machine does not require Python or any other library to be installed)
-[Cython](http://www.cython.org) | 0.21 | Cython is a language that makes writing C extensions for the Python language as easy as Python
+[Cython](http://www.cython.org) | 0.21.1 | Cython is a language that makes writing C extensions for the Python language as easy as Python
 [decorator](http://pypi.python.org/pypi/decorator) | 3.4.0 | Better living through Python with decorators
 [docutils](http://docutils.sourceforge.net) | 0.12 | Text processing system for processing plaintext documentation into useful formats, such as HTML or LaTeX (includes reStructuredText)
 [formlayout](http://formlayout.googlecode.com) | 1.0.15 | Module for creating form dialogs/widgets to edit various type of parameters without having to write any GUI code
@@ -42,7 +42,7 @@ Name | Version | Description
 [lxml](http://pypi.python.org/pypi/lxml) | 3.4.0 | Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API.
 [mahotas](http://pypi.python.org/pypi/mahotas) | 1.2.1 | Computer Vision library
 [MarkupSafe](http://pypi.python.org/pypi/MarkupSafe) | 0.23 | Implements a XML/HTML/XHTML Markup safe string for Python
-[matplotlib](http://matplotlib.sourceforge.net) | 1.4.0 | 2D plotting library (embeddable in GUIs created with PyQt)
+[matplotlib](http://matplotlib.sourceforge.net) | 1.4.1 | 2D plotting library (embeddable in GUIs created with PyQt)
 [mpld3](http://pypi.python.org/pypi/mpld3) | 0.2 | D3 Viewer for Matplotlib
 [mysql-connector-python](http://pypi.python.org/pypi/mysql-connector-python) | 1.2.3 | MySQL driver written in Python
 [networkx](http://pypi.python.org/pypi/networkx) | 1.9.1 | Python package for creating and manipulating graphs and networks
@@ -51,7 +51,7 @@ Name | Version | Description
 [numba](http://pypi.python.org/pypi/numba) | 0.15.1 | compiling Python code using LLVM
 [numexpr](http://code.google.com/p/numexpr) | 2.4 | Fast evaluation of array expressions elementwise by using a vector-based virtual machine
 [numpy-MKL](http://numpy.scipy.org/) | 1.8.2 | NumPy: multidimensional array processing for numbers, strings, records and objects (SciPy''s core module)
-[pandas](http://pypi.python.org/pypi/pandas) | 0.14.1 | Powerful data structures for data analysis, time series and statistics
+[pandas](http://pypi.python.org/pypi/pandas) | 0.15.0 | Powerful data structures for data analysis, time series and statistics
 [patsy](http://pypi.python.org/pypi/patsy) | 0.3.0 | Describing statistical models using symbolic formulas
 [pep8](http://pypi.python.org/pypi/pep8) | 1.5.7 | Python style guide checker
 [pg8000](http://pypi.python.org/pypi/pg8000) | 1.10.1 | PostgreSQL interface library
