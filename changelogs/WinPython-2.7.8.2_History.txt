@@ -25,7 +25,7 @@ New packages:
 
 Upgraded packages:
 
-  * [Cython](http://www.cython.org) 0.20.2 → 0.21 (Cython is a language that makes writing C extensions for the Python language as easy as Python)
+  * [Cython](http://www.cython.org) 0.20.2 → 0.21.1 (Cython is a language that makes writing C extensions for the Python language as easy as Python)
   * [Pillow](http://pypi.python.org/pypi/Pillow) 2.5.2 → 2.6.1 (Python Imaging Library (fork))
   * [SQLAlchemy](http://www.sqlalchemy.org) 0.9.7 → 0.9.8 (SQL Toolkit and Object Relational Mapper)
   * [Sphinx](http://sphinx.pocoo.org) 1.2.2 → 1.2.3 (Tool for generating documentation which uses reStructuredText as its markup language)
@@ -37,10 +37,11 @@ Upgraded packages:
   * [joblib](http://pypi.python.org/pypi/joblib) 0.8.2 → 0.8.3_r1 (Lightweight pipelining: using Python functions as pipeline jobs.)
   * [julia](http://sourceforge.net/projects/stonebig.u/files/packages) 0.1.1.2 → 0.1.1.4 (Python interface to the Julia language)
   * [logilab-common](http://pypi.python.org/pypi/logilab-common) 0.61.0 → 0.62.1 (Collection of low-level Python packages and modules used by Logilab projects (required for pylint))
-  * [matplotlib](http://matplotlib.sourceforge.net) 1.3.1 → 1.4.0 (2D plotting library (embeddable in GUIs created with PyQt))
+  * [matplotlib](http://matplotlib.sourceforge.net) 1.3.1 → 1.4.1 (2D plotting library (embeddable in GUIs created with PyQt))
   * [mysql-connector-python](http://pypi.python.org/pypi/mysql-connector-python) 1.2.2 → 1.2.3 (MySQL driver written in Python)
   * [networkx](http://pypi.python.org/pypi/networkx) 1.9 → 1.9.1 (Python package for creating and manipulating graphs and networks)
   * [nose](http://somethingaboutorange.com/mrl/projects/nose) 1.3.3 → 1.3.4 (nose is a discovery-based unittest extension (e.g. NumPy test module is using nose))
+  * [pandas](http://pypi.python.org/pypi/pandas) 0.14.1 → 0.15.0 (Powerful data structures for data analysis, time series and statistics)
   * [pg8000](http://pypi.python.org/pypi/pg8000) 1.9.14 → 1.10.1 (PostgreSQL interface library)
   * [pylint](http://www.logilab.org/project/pylint) 1.3.0 → 1.3.1 (Logilab code analysis module: analyzes Python source code looking for bugs and signs of poor quality)
   * [pyparsing](http://pyparsing.wikispaces.com/) 2.0.2 → 2.0.3 (A Python Parsing Module)
