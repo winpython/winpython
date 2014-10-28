@@ -188,8 +188,8 @@ class PackagesTable(QTableView):
         self.emit(SIGNAL('package_added()'))
         if notsupported:
             QMessageBox.warning(self, "Warning",
-                                "The following packages are <b>not (yet) "
-                                "supported</b> by %s:\n\n%s"
+                                "The following packages filenaming are <b>not "
+                                "recognized</b> by %s:\n\n%s"
                                 % (self.winname, "<br>".join(notsupported)),
                                 QMessageBox.Ok)
         if notcompatible:
