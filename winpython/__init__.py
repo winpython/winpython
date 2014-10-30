@@ -29,4 +29,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 __version__ = '1.0'
 __license__ = __doc__
-__project_url__ = 'http://winpython.sourceforge.net/'
+__project_url__ = 'http://winpython.github.io/'
