@@ -58,7 +58,7 @@ RequestExecutionLevel user
 !define MUI_FINISHPAGE_REBOOTLATER_DEFAULT
 #!define MUI_FINISHPAGE_RUN "$INSTDIR\${ID}.exe"
 !define MUI_FINISHPAGE_LINK "Visit ${ID} official website"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://code.google.com/p/winpython/"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://winpython.github.io/"
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_LANGUAGE "English"
 
