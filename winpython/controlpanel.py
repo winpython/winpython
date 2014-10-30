@@ -716,7 +716,7 @@ Please provide any additional information below.
             <p>Copyright &copy; 2012 Pierre Raybaut
             <br>Licensed under the terms of the MIT License
             <p>Created, developed and maintained by Pierre Raybaut
-            <p><a href="%s">WinPython at SourceForge</a>: downloads, bug reports,
+            <p><a href="%s">WinPython at Github.io</a>: downloads, bug reports,
             discussions, etc.</p>
             <p>This program is executed by:<br>
             <b>%s</b><br>
