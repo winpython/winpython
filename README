@@ -27,7 +27,6 @@ Licensed under the terms of the MIT License
         Python2 >= 2.7 or Python3 >= 3.3
         PyQt4 >= 4.6 or PySide >= 1.2 (PyQt4 is recommended)
         pip >= 1.5.4 and setuptools >= 3.4.4
-        guidata >= 1.6.1
 
     Requirements
 
