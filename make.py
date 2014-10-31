@@ -19,9 +19,8 @@ import subprocess
 import shutil
 import sys
 
-from guidata import disthelpers as dh
-
 # Local imports
+from winpython import disthelpers as dh
 from winpython import wppm, utils
 import diff
 

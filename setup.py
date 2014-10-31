@@ -60,7 +60,7 @@ including a package manager, WPPM.""" % PROJECT_NAME,
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.mo', '.svg', '.png', '.css',
                                                '.html', '.js', '.ini')), },
-      requires=["PyQt4 (>=4.5)", "guidata (>=1.6.1)"],
+      requires=["PyQt4 (>=4.5)"],
       scripts=[osp.join('scripts', fname) for fname in
                ('register_python', 'register_python.bat',
                 'wpcp', 'wpcp.bat', 'wppm', 'wppm.bat', '2to3.bat')],
