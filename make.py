@@ -446,6 +446,8 @@ call %~dp0env.bat
         self.install_package('pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                              % (self.py_arch, self.python_version))
         self.install_package('wheel-([0-9\.]*[a-z]*[0-9]?).tar.gz')
+        # six is needed early
+        self.install_package('six-([0-9\.]*[a-z]*[0-9]?)-py2.py3-none-any.whl')
 
         self.install_package(
             'spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
