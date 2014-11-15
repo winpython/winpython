@@ -131,7 +131,7 @@ class WinPythonDistribution(object):
 
     def __init__(self, build_number, release_level, target, instdirs,
                  srcdirs=None, toolsdirs=None, verbose=False, simulation=False,
-                 rootdir=None, install_options=None, flavor=''):
+                 rootdir=None, install_options=None, flavor='', docsdirs=None):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
@@ -144,6 +144,9 @@ class WinPythonDistribution(object):
         if toolsdirs is None:
             toolsdirs = []
         self._toolsdirs = toolsdirs
+        if docsdirs is None:
+            docsdirs = []
+        self._docsdirs = docsdirs
         self.verbose = verbose
         self.winpydir = None
         self.python_fname = None
@@ -267,6 +270,14 @@ Name | Version | Description
         """Return tools directory list"""
         return [osp.join(osp.dirname(osp.abspath(__file__)), 'tools')] + self._toolsdirs
 
+    @property
+    def docsdirs(self):
+        """Return docs directory list"""
+        if osp.isdir(osp.join(osp.dirname(osp.abspath(__file__)), 'docs')):
+            return [osp.join(osp.dirname(osp.abspath(__file__)), 'docs')] + self._docsdirs
+        else:
+            return self._docsdirs
+            
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdirs"""
         for path in (self.instdirs + self.srcdirs):
@@ -492,6 +503,20 @@ call %~dp0env.bat
                 copy(path, osp.join(toolsdir, name))
                 if self.verbose:
                     print(path + ' --> ' + osp.join(toolsdir, name))
+        self._print_done()
+
+    def _copy_dev_docs(self):
+        """Copy dev docs"""
+        self._print("Copying docs")
+        docsdir = osp.join(self.winpydir, self.python_name , 'Scripts', 'docs')
+        os.mkdir(docsdir)
+        for dirname in self.docsdirs:
+            for name in os.listdir(dirname):
+                path = osp.join(dirname, name)
+                copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
+                copy(path, osp.join(docsdir, name))
+                if self.verbose:
+                    print(path + ' --> ' + osp.join(docsdir, name))
         self._print_done()
 
     def _create_launchers(self):
@@ -895,6 +920,7 @@ call %~dp0register_python.bat --all""")
             self._install_all_other_packages()
             if not self.simulation:
                 self._copy_dev_tools()
+                self._copy_dev_docs()
         if not self.simulation:
             self._create_launchers()
             self._create_batch_scripts()
@@ -985,12 +1011,29 @@ def make_winpython(build_number, release_level, architecture,
         for flavor_tools in [toolsdir3, toolsdir4]:
             if osp.isdir(flavor_tools):
                 toolsdirs.append(flavor_tools)
+
+    # create same for docs dirs as for tools dirs
+    docsdir1 = osp.join(basedir, 'docs')
+    assert osp.isdir(docsdir1)
+    docsdirs = [docsdir1]
+    docsdir2 = osp.join(basedir, 'docs' + suffix)
+    if osp.isdir(docsdir2):
+        docsdirs.append(docsdir2)
+    # add flavor tools in basedirxx\flavor\tools and tools+suffix
+    if flavor != '':
+        docsdir3 = osp.join(basedir, flavor, 'docs')
+        docsdir4 = osp.join(basedir, flavor, 'docs' + suffix)
+        for flavor_docs in [docsdir3, docsdir4]:
+            if osp.isdir(flavor_docs):
+                docsdirs.append(flavor_docs)
+                
         
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, packdirs, srcdirs, toolsdirs,
                                  verbose=verbose, simulation=simulation,
                                  rootdir=rootdir,
-                                 install_options=install_options, flavor=flavor)
+                                 install_options=install_options,
+                                 flavor=flavor, docsdirs=docsdirs)
     dist.make(remove_existing=remove_existing)
     if create_installer and not simulation:
         dist.create_installer()
@@ -1025,15 +1068,19 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ))
-    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='')
-    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+             verbose=False, archis=(32, ))
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='')
+    #make_all(3, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    #make_all(2, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    # make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ))
-    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ))
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ), flavor='FlavorKivy')
