@@ -373,6 +373,7 @@ def build_wininst(root, python_exe=None, copy_to=None,
         archstr = 'win32' if architecture == 32 else 'win-amd64'
         cmd += ['--plat-name=%s' % archstr]
     cmd += ['bdist_wininst']
+    #  print('build_wininst', root, cmd)
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
@@ -432,6 +433,7 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
         cmd += install_options  # typically ['--no-deps']
         print('wheel install_options', install_options)
     cmd += [this_whl]
+    #  print('build_wheel', myroot, cmd)
 
     if verbose:
         subprocess.call(cmd, cwd=myroot)
