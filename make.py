@@ -750,12 +750,20 @@ pause
 :r_end
 """)
         # Prepare a live patch on python (shame we need it) to have mingw64ok
-        patch_distutils = ""
-        if self.py_arch == "win-amd64":
-            patch_distutils = r"""
-%~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
+        patch_distutils = r"""
 
 set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
+
+set WINPYARCH="WIN32"
+if  "%WiNPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
+
+if %WINPYARCH%=="WIN32"     set WINMINGW=lib\gcc\i686-w64-mingw32
+if %WINPYARCH%=="WIN-AMD64" set WINMINGW=lib\gcc\x86_64-w64-mingw32
+
+if not  %WINPYARCH%=="WIN-AMD64" goto no_distutil_patch
+%~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
+:no_distutil_patch
+
 
 rem Python 3.3+ case
 set WINPYMSVCR=libmsvcr100.a
@@ -766,8 +774,14 @@ IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
 IF "%WINPYXX%"=="27" set WINPYSPEC=specs90
 
 cd %WINPYDIR%
-copy  /Y ..\tools\mingw32\x86_64-w64-mingw32\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
-copy  /Y ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\%WINPYSPEC% ..\tools\mingw32\lib\gcc\x86_64-w64-mingw32\4.8.2\specs
+copy  /Y ..\tools\mingw32\%WINMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
+
+REM copy the right version of gcc
+set dir482=..\tools\mingw32\%WINMINGW%\4.8.2\%WINPYSPEC%
+if exist %dir482% copy  /Y %dir482% ..\tools\mingw32\%WINMINGW%\4.8.2\specs
+
+set dir492=..\tools\mingw32\%WINMINGW%\4.9.2\%WINPYSPEC%
+if exist %dir492% copy  /Y %dir492% ..\tools\mingw32\%WINMINGW%\4.9.2\specs
 
 REM generate python.34 import file
 
@@ -1068,19 +1082,19 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-             verbose=False, archis=(32, ))
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='')
-    #make_all(3, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ))
-    #make_all(3, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ))
-    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ), flavor='')
+    #make_all(4, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ))
+    #make_all(4, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ))
+    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ))
+    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
