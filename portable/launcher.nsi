@@ -14,6 +14,12 @@ Licensed under the terms of the MIT License
 !addincludedir ""
 !define WINPYDIR ""
 !define WINPYVER ""
+;  Addition for R_HOME
+!define R_HOME ""
+;  Addition for JULIA_HOME and JULIA
+!define JULIA_HOME ""
+!define JULIA ""
+
 !define COMMAND ""
 !define PARAMETERS ""
 !define WORKDIR ""
@@ -55,6 +61,24 @@ end_workdir:
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYDIR", "${WINPYDIR}").r0'
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("WINPYVER", "${WINPYVER}").r0'
 
+; Addition of R_HOME Environment Variable if %R_Home%\bin exists
+StrCmp "${R_HOME}" "" end_Rsettings
+IfFileExists "${R_HOME}\bin\*.*" 0 end_Rsettings
+
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("R_HOME", "${R_HOME}").r0'
+
+end_Rsettings:
+
+; Addition of JULIA and JULIA_HOME Environment Variable if %JULIA% program exists
+StrCmp "${JULIA}" "" end_Julia_settings
+IfFileExists "${JULIA}\bin\*.*" 0 end_Julia_settings
+
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA", "${JULIA}").r0'
+
+StrCmp "${JULIA_HOME}" "" end_Julia_settings
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA_HOME", "${JULIA_HOME}").r0'
+
+end_Julia_settings:
 
 ;================================================================
 ; Settings directory

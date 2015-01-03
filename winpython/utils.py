@@ -237,6 +237,10 @@ def get_gcc_version(path):
     """Return version of the GCC compiler installed in *path*"""
     return exec_shell_cmd('gcc --version', path).splitlines()[0].split()[-1]
 
+def get_r_version(path):
+    """Return version of the R installed in *path*"""
+    return exec_shell_cmd('dir ..\README.R*', path).splitlines()[-3].split("-")[-1]
+
 
 def get_thg_version(path):
     """Return version of TortoiseHg installed in *path*"""
