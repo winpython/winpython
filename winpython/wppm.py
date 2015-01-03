@@ -128,6 +128,17 @@ class Package(BasePackage):
                 self.name, self.version, self.pyversion, arch, _pyqt = match.groups()
                 self.architecture = int(arch)
                 return
+        # New : Binary wheel case
+        elif bname.endswith(('32.whl', '64.whl')):
+            match = re.match(utils.WHEELBIN_PATTERN, bname)
+            # typical macht is ('scipy', '0.14.1rc1', '34', 'win32')
+            if match is not None:
+                self.name, self.version,  self.pywheel , arch  = match.groups()
+                # self.pywheel version is '34' not 3.4
+                self.pyversion = self.pywheel[:1] + '.' + self.pywheel[1:]
+                # wheel arch is 'win32' or 'win_amd64'
+                self.architecture = 32 if arch == 'win32' else 64
+                return
         elif bname.endswith(('.zip', '.tar.gz', '.whl')):
             # distutils sdist
             infos = utils.get_source_package_infos(bname)

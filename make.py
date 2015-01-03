@@ -473,9 +473,9 @@ call %~dp0env.bat
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
         for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
+            # can be a wheel now
             self.install_package(
-                '%s-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-                % (happy_few, self.py_arch, self.python_version))
+                '%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few) 
 
     def _install_all_other_packages(self):
         """Try to install all other packages in instdirs"""

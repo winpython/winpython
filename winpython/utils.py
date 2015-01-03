@@ -352,6 +352,10 @@ WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(
 
 SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-[a-z\.0-9]*\-none\-any\.whl)'
 
+# WHEELBIN_PATTERN defines what an acceptable binary wheel package is
+# "cp([0-9]*)" to replace per cp(34) for python3.4
+# "win32|win\_amd64" to replace per "win\_amd64" for 64bit
+WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)-cp([0-9]*)\-none\-(win32|win\_amd64)\.whl'
 
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
@@ -373,7 +377,7 @@ def build_wininst(root, python_exe=None, copy_to=None,
         archstr = 'win32' if architecture == 32 else 'win-amd64'
         cmd += ['--plat-name=%s' % archstr]
     cmd += ['bdist_wininst']
-    #  print('build_wininst', root, cmd)
+    # root = a tmp dir in windows\tmp, 
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
@@ -406,6 +410,8 @@ def build_wininst(root, python_exe=None, copy_to=None,
         shutil.move(src_fname, dst_fname)
         if verbose:
             print(("Move: %s --> %s" % (src_fname, (dst_fname))))
+            # remove tempo dir 'root' no more needed
+            shutil.rmtree(root, onerror=onerror)
         return dst_fname
 
 
