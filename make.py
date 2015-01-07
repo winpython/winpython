@@ -128,6 +128,8 @@ class WinPythonDistribution(object):
     THG_PATH = r'\tools\TortoiseHg\thgw.exe'
     WINMERGE_PATH = r'\tools\WinMerge\WinMergeU.exe'
     MINGW32_PATH = r'\tools\mingw32\bin'
+    R_PATH = r'\tools\R\bin'
+    JULIA_PATH = r'\tools\Julia\bin'
 
     def __init__(self, build_number, release_level, target, instdirs,
                  srcdirs=None, toolsdirs=None, verbose=False, simulation=False,
@@ -185,6 +187,12 @@ class WinPythonDistribution(object):
         if gccpath is not None:
             gccver = utils.get_gcc_version(gccpath)
             installed_tools += [('MinGW32', gccver)]
+
+        rpath = get_tool_path(self.R_PATH, osp.isdir)
+        if rpath is not None:
+            rver = utils.get_r_version(rpath)
+            installed_tools += [('R', rver)]
+
         tools = []
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata('tools.ini', name)
@@ -249,12 +257,19 @@ Name | Version | Description
         path = [r"Lib\site-packages\PyQt4",
                 "",  # Python root directory (python.exe)
                 "DLLs", "Scripts", r"..\tools", r"..\tools\mingw32\bin"
-                # , r"..\tools\Julia\bin"
-                # , r"..\tools\R\bin"
                 ]
         if self.distribution.architecture == 32 \
            and osp.isdir(self.winpydir + self.MINGW32_PATH):
             path += [r".." + self.MINGW32_PATH]
+
+        if self.distribution.architecture == 32:
+            path += [r".." + self.R_PATH + r"\i386"]
+
+        if self.distribution.architecture == 64:
+            path += [r".." + self.R_PATH + r"\x64"]
+
+        path += [r".." + self.JULIA_PATH]
+
         return path
 
     @property
@@ -337,9 +352,6 @@ Name | Version | Description
 
         data = [('WINPYDIR', '$EXEDIR\%s' % self.python_name),
                 ('WINPYVER', self.winpyver),
-                # ('JULIA_HOME','$EXEDIR\%s' % r'\tools\Julia\bin'),
-                # ('JULIA', '$EXEDIR\%s' % r'\tools\Julia\bin\julia.exe'),
-                # ('R_HOME', '$EXEDIR\%s' % r'\tools\R'),
                 ('COMMAND', command),
                 ('PARAMETERS', args),
                 ('WORKDIR', workdir),
@@ -347,6 +359,12 @@ Name | Version | Description
                 ('POSTPATH', postpath),
                 ('Icon', icon_fname),
                 ('OutFile', name)]
+
+        # handle well Flavor with R included
+        data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
+                 ('JULIA_HOME','$EXEDIR\%s' % r'tools\Julia\bin'),
+                 ('JULIA', '$EXEDIR\%s' % r'tools\Julia\bin\julia.exe')]
+
         if settingspath is not None:
             data += [('SETTINGSDIR', osp.dirname(settingspath)),
                      ('SETTINGSNAME', osp.basename(settingspath))]
@@ -473,9 +491,9 @@ call %~dp0env.bat
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
         for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
+            # can be a wheel now
             self.install_package(
-                '%s-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-                % (happy_few, self.py_arch, self.python_version))
+                '%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few) 
 
     def _install_all_other_packages(self):
         """Try to install all other packages in instdirs"""
@@ -606,8 +624,25 @@ The environment variables are set-up in 'env.bat'.""")
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
         self.create_batch_script('env.bat', """@echo off
 set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + """
+set WINPYVER=""" + self.winpyver + r"""
 set HOME=%WINPYDIR%\..\settings
+set WINPYARCH="WIN32"
+if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
+
+rem handle R if included
+if not exist "%WINPYDIR%\..\tools\R\bin" goto r_bad
+set R_HOME=%WINPYDIR%\..\tools\R
+if %WINPYARCH%=="WIN32"     set R_HOMEbin=%R_HOME%\bin\i386
+if not %WINPYARCH%=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
+:r_bad
+
+rem handle Julia if included
+if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
+set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
+set JULIA_EXE=julia.exe
+set JULIA=%JULIA_HOME%%JULIA_EXE%
+:julia_bad
+
 set PATH=""" + path)
 
         self.create_batch_script('start_ijulia.bat', r"""@echo off
@@ -709,42 +744,49 @@ end function
         self.create_batch_script('start_with_r.bat', r"""@echo off
 call %~dp0env.bat
 
+rem **get Base of winpython in pure path form
+pushd
+cd /d  %WINPYDIR%
+cd..
+set WINPYDIR..=%CD%
+popd
+
 rem ******************
 rem R part (supposing you install it in \tools\R of winpython)
 rem ******************
 set tmp_Rdirectory=R
-if not exist "%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin" goto r_bad
+if not exist "%WINPYDIR..%\tools\%tmp_Rdirectory%\bin" goto r_bad
 
 rem  R_HOME for rpy2, R_HOMEBIN for PATH
-set R_HOME=%WINPYDIR%\..\tools\%tmp_Rdirectory%\
-set R_HOMEbin=%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin
+set R_HOME=%WINPYDIR..%\tools\%tmp_Rdirectory%
+if %WINPYARCH%=="WIN32"     set R_HOMEbin=%R_HOME%\bin\i386
+if not %WINPYARCH%=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
 
 set SYS_PATH=%PATH%
 set PATH=%SYS_PATH%;%R_HOMEbin%
 
 echo "r!"
-echo "We are going to  update %WINPYDIR%\settings\winpython.ini with"
+echo "We are going to  update %WINPYDIR..%\settings\winpython.ini with"
 echo "R_HOME = %R_HOME%"
 echo "(relaunch this batch, if you move your winpython)"
 pause
 
-%~dp0Add_or_removeLine.vbs ..\settings\winpython.ini  "R_HOME = " -remove
-
 rem Handle case when winpython.ini is not already created
-if exist "..\settings\winpython.ini" goto ini_exists 
+if exist "%WINPYDIR..%\settings\winpython.ini" goto ini_exists 
 
-echo [debug]>"..\settings\winpython.ini"
-echo state = disabled>>"..\settings\winpython.ini"
-echo [environment]>>"..\settings\winpython.ini"
+echo [debug]>"%WINPYDIR..%\settings\winpython.ini"
+echo state = disabled>>"%WINPYDIR..%\settings\winpython.ini"
+echo [environment]>>"%WINPYDIR..%\settings\winpython.ini"
 
 :ini_exists 
-%~dp0Add_or_removeLine.vbs ..\settings\winpython.ini  "[environment]" "R_HOME = %R_HOME%"
+%~dp0Add_or_removeLine.vbs %WINPYDIR..%\settings\winpython.ini  "R_HOME = " -remove
+%~dp0Add_or_removeLine.vbs %WINPYDIR..%\settings\winpython.ini  "[environment]" "R_HOME = %R_HOME%"
 goto r_end
 
 :r_bad 
 
-echo directory "%WINPYDIR%\..\tools\%tmp_Rdirectory%\bin" not found
-echo please install R at "%WINPYDIR%\..\tools\%tmp_Rdirectory%" 
+echo directory "%WINPYDIR..%\tools\%tmp_Rdirectory%\bin" not found
+echo please install R at "%WINPYDIR..%\tools\%tmp_Rdirectory%" 
 pause
 
 :r_end
@@ -1082,19 +1124,25 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='')
-    #make_all(4, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='')
+    #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    #make_all(4, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ))
-    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #        verbose=False, archis=(32, ))
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(64, ), flavor='FlavorRfull')
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
+    make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+              verbose=False, archis=(32, ), flavor='FlavorRfull')
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='FlavorRfull')
