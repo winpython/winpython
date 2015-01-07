@@ -369,6 +369,22 @@ python "%~dpn0""" + ext + """" %*""")
         package.save_log(self.logdir)
         if tmp_fname is not None:
             os.remove(tmp_fname)
+            
+        # We patch pip live (around line 100) !!!!
+        # rational: https://github.com/pypa/pip/issues/2328
+        if package.name == "pip":
+            do_replace = self.target + (r"\Lib\site-packages\pip\_vendor" +
+                         r"\distlib\scripts.py"  )
+            print("do_replace" , do_replace)
+            fh = open(do_replace,"r")
+            the_thing =  fh.read()             
+            fh.close()
+            the_thing = the_thing.replace(
+              " executable = get_executable()",
+              " executable = os.path.join(os.path.basename(get_executable()))") 
+            fh = open(do_replace,"w")
+            fh.write(the_thing)
+            fh.close()
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
