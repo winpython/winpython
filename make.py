@@ -1009,10 +1009,10 @@ def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64)):
         suffix = '.win32' if architecture == 32 else '.win-amd64'
         packdir = osp.join(basedir, 'packages' + suffix)
         for name in os.listdir(packdir):
-            if name.startswith('winpython-') and name.endswith('.exe'):
+            if name.startswith('winpython-') and name.endswith(('.exe', '.whl')):
                 os.remove(osp.join(packdir, name))
         utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
-                            architecture=architecture, verbose=verbose)
+                            architecture=architecture, verbose=verbose, installer='bdist_wheel')
 
 
 def make_winpython(build_number, release_level, architecture,
@@ -1132,8 +1132,8 @@ if __name__ == '__main__':
     #          verbose=False, archis=(32, ))
     #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #        verbose=False, archis=(32, ))
+    make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+            verbose=False, archis=(32, ))
     #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
     #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
@@ -1142,7 +1142,7 @@ if __name__ == '__main__':
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(32, ), flavor='FlavorRfull')
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ), flavor='FlavorRfull')
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
