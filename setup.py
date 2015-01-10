@@ -11,6 +11,14 @@ WinPython
 The WinPython distribution tools (wppm, ...)
 """
 
+# for wheels creation
+import setuptools
+try:
+    from wheel.bdist_wheel import bdist_wheel
+except ImportError:
+    pass
+
+
 from distutils.core import setup
 import os
 import os.path as osp
