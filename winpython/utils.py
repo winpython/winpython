@@ -354,7 +354,7 @@ WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(
 #         . joblib-0.8.3_r1-py2.py3-none-any.whl,
 #         . joblib-0.8.3-r1.tar.gz
 
-SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-[a-z\.0-9]*\-none\-any\.whl)'
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-(py2|py2\.py3|py3)\-none\-any\.whl)'
 
 # WHEELBIN_PATTERN defines what an acceptable binary wheel package is
 # "cp([0-9]*)" to replace per cp(34) for python3.4
@@ -369,7 +369,7 @@ def get_source_package_infos(fname):
 
 
 def build_wininst(root, python_exe=None, copy_to=None,
-                  architecture=None, verbose=False):
+                  architecture=None, verbose=False, installer='bdist_wininst'):
     """Build wininst installer from Python package located in *root*
     and eventually copy it to *copy_to* folder.
     Return wininst installer full path."""
@@ -380,7 +380,7 @@ def build_wininst(root, python_exe=None, copy_to=None,
     if architecture is not None:
         archstr = 'win32' if architecture == 32 else 'win-amd64'
         cmd += ['--plat-name=%s' % archstr]
-    cmd += ['bdist_wininst']
+    cmd += [installer]
     # root = a tmp dir in windows\tmp, 
     if verbose:
         subprocess.call(cmd, cwd=root)
@@ -404,8 +404,16 @@ def build_wininst(root, python_exe=None, copy_to=None,
         match = re.match(pattern, distname)
         if match is not None:
             break
+        # for wheels (winpython here)
+        match = re.match(SOURCE_PATTERN, distname)
+        if match is not None:
+             break
+        match = re.match(WHEELBIN_PATTERN, distname)
+        if match is not None:
+            break
     else:
-        raise RuntimeError("Build failed: not a pure Python package?")
+        raise RuntimeError("Build failed: not a pure Python package? %s" %
+                          distdir)
     src_fname = osp.join(distdir, distname)
     if copy_to is None:
         return src_fname
