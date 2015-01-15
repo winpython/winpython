@@ -71,11 +71,12 @@ end_Rsettings:
 
 ; Addition of JULIA and JULIA_HOME Environment Variable if %JULIA% program exists
 StrCmp "${JULIA}" "" end_Julia_settings
-IfFileExists "${JULIA}\bin\*.*" 0 end_Julia_settings
+IfFileExists "${JULIA}" 0 end_Julia_settings
 
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA", "${JULIA}").r0'
 
 StrCmp "${JULIA_HOME}" "" end_Julia_settings
+IfFileExists "${JULIA_HOME}\*.*" 0 end_Julia_settings
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA_HOME", "${JULIA_HOME}").r0'
 
 end_Julia_settings:
