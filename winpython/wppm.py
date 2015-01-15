@@ -372,19 +372,28 @@ python "%~dpn0""" + ext + """" %*""")
             
         # We patch pip live (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
-        if package.name == "pip":
+        if package.name == "get-pip":
+            # self.exec_script
+            my_script_is=osp.join(self.target, 'Scripts', 'get-pip.py')
+            self.install_script(my_script_is, install_options=None)
+        if package.name == "pip" or package.name == "get-pip":
+            import glob
+            for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
+                utils.patch_shebang_line(ffname)
             do_replace = self.target + (r"\Lib\site-packages\pip\_vendor" +
                          r"\distlib\scripts.py"  )
             print("do_replace" , do_replace)
             fh = open(do_replace,"r")
             the_thing =  fh.read()             
             fh.close()
-            the_thing = the_thing.replace(
+            the_thing_after = the_thing.replace(
               " executable = get_executable()",
               " executable = os.path.join(os.path.basename(get_executable()))") 
-            fh = open(do_replace,"w")
-            fh.write(the_thing)
-            fh.close()
+            if not the_thing_after == the_thing:
+                print("do_replace_ok" , do_replace)
+                fh = open(do_replace,"w")
+                fh.write(the_thing_after)
+                fh.close()
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
@@ -474,7 +483,7 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         targetdir = utils.extract_archive(package.fname)
         self._print_done()
 
-        self._print(package, "Installing")
+        self._print(package, "Installing %s from " % targetdir)
         self.copy_files(package, targetdir, 'PURELIB',
                         osp.join('Lib', 'site-packages'))
         self.copy_files(package, targetdir, 'PLATLIB',
@@ -501,6 +510,17 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         package = Package(fname)
         self._print_done()
 
+    def install_script(self, script, install_options=None):
+        try:
+            fname = utils.do_script(script,
+                        python_exe=osp.join(self.target, 'python.exe'),
+                        architecture=self.architecture, verbose=self.verbose,
+                        install_options=install_options)
+        except RuntimeError:
+            if not self.verbose:
+                print("Failed!")
+                raise
+                
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
         (binary distribution, .msi file)"""

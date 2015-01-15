@@ -278,6 +278,33 @@ def get_python_long_version(path):
         ver = None
     return ver
 
+# =============================================================================
+# Patch chebang line (courtesy of Christoph Gohlke)
+# =============================================================================
+def patch_shebang_line(fname, pad=b' '):
+    """Remove absolute path to python.exe in shebang lines."""
+    if sys.version_info[0] == 2:
+        shebang_line = re.compile(r"(#!.+pythonw?\.exe)")  # Python2.7
+    else:
+        shebang_line = re.compile(b"(#!.+pythonw?\.exe)")  # Python3+
+
+    with open(fname, 'rb') as fh:
+        content = fh.read()
+
+    content = shebang_line.split(content, maxsplit=1)
+    if len(content) != 3:
+        return
+    exe = os.path.basename(content[1][2:])
+    content[1] = b'#!' + exe + (pad * (len(content[1]) - len(exe) - 2))
+    content = b''.join(content)
+
+    try:
+        with open(fname, 'wb') as fh:
+            fh.write(content)
+            print("patched", fname)
+    except Exception:
+        print("failed to patch", fname)
+
 
 # =============================================================================
 # Extract functions
@@ -302,6 +329,17 @@ def extract_msi(fname, targetdir=None, verbose=False):
         args += ['/qn']
     args += ['TARGETDIR=%s' % targetdir]
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
+    print ('fname=%s' % fname)
+    print ('TARGETDIR=%s' % targetdir)
+    # ensure pip if it's not 3.3
+    if '-3.3' not in targetdir:
+        subprocess.call([r'%s\%s' %(targetdir, 'python.exe'), '-m' , 'ensurepip'],
+                     cwd=osp.dirname(r'%s\%s' %(targetdir, 'pythons.exe')))
+        # We patch ensurepip live (shame) !!!!
+        # rational: https://github.com/pypa/pip/issues/2328
+        import glob
+        for fname in glob.glob(r'%s\Scripts\*.exe' % targetdir):
+            patch_shebang_line(fname)
     return targetdir
 
 
@@ -354,7 +392,7 @@ WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(
 #         . joblib-0.8.3_r1-py2.py3-none-any.whl,
 #         . joblib-0.8.3-r1.tar.gz
 
-SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-(py2|py2\.py3|py3)\-none\-any\.whl)'
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-(py[2-7]*|py[2-7]*\.py[2-7]*)\-none\-any\.whl)'
 
 # WHEELBIN_PATTERN defines what an acceptable binary wheel package is
 # "cp([0-9]*)" to replace per cp(34) for python3.4
@@ -446,7 +484,8 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
     assert osp.isfile(python_exe)
     myroot = os.path.dirname(python_exe)
 
-    cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
+    #cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
+    cmd = [python_exe, '-m', 'pip', 'install']
     if install_options:
         cmd += install_options  # typically ['--no-deps']
         print('wheel install_options', install_options)
@@ -469,7 +508,35 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
             print("Installed %s" % src_fname)
         return src_fname
 
+def do_script(this_script, python_exe=None, copy_to=None,
+                architecture=None, verbose=False, install_options=None):
+    """Execute a script (get-pip typically)"""
+    if python_exe is None:
+        python_exe = sys.executable
+    assert osp.isfile(python_exe)
+    myroot = os.path.dirname(python_exe)
 
+    #cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
+    cmd = [python_exe]
+    if install_options:
+        cmd += install_options  # typically ['--no-deps']
+        print('script install_options', install_options)
+    cmd += [this_script]
+    #  print('build_wheel', myroot, cmd)
+    print("Executing " , cmd)
+
+    if verbose:
+        subprocess.call(cmd, cwd=myroot)
+    else:
+        p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        p.communicate()
+        p.stdout.close()
+        p.stderr.close()
+    if verbose:
+            print("Executed " % cmd)
+    return 'ok'
+  
 def wheel_to_wininst(fname, python_exe=None,
                      architecture=None, verbose=False, install_options=None):
     """Just install a wheel !"""

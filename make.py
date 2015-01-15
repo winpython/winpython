@@ -304,7 +304,7 @@ Name | Version | Description
             raise RuntimeError(
                 'Could not found required package matching %s' % pattern)
 
-    def install_package(self, pattern):
+    def install_package(self, pattern, install_options=None):
         """Install package matching pattern"""
         fname = self.get_package_fname(pattern)
         if fname not in [p.fname for p in self.installed_packages]:
@@ -313,8 +313,11 @@ Name | Version | Description
                 self.distribution._print(pack, "Installing")
                 self.distribution._print_done()
             else:
-                self.distribution.install(pack,
-                                          install_options=self.install_options)
+                if install_options:
+                    self.distribution.install(pack, install_options)
+                else:
+                    self.distribution.install(pack, 
+                                         install_options=self.install_options)
             self.installed_packages.append(pack)
 
     def create_batch_script(self, name, contents):
@@ -362,8 +365,8 @@ Name | Version | Description
 
         # handle well Flavor with R included
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
-                 ('JULIA_HOME','$EXEDIR\%s' % r'tools\Julia\bin'),
-                 ('JULIA', '$EXEDIR\%s' % r'tools\Julia\bin\julia.exe')]
+                 ('JULIA_HOME','$EXEDIR%s' % r'\tools\Julia\bin'),
+                 ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe')]
 
         if settingspath is not None:
             data += [('SETTINGSDIR', osp.dirname(settingspath)),
@@ -424,7 +427,8 @@ call %~dp0env.bat
         os.mkdir(self.python_dir)
         utils.extract_msi(self.python_fname, targetdir=self.python_dir)
         os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
-        os.mkdir(osp.join(self.python_dir, 'Scripts'))
+        if not os.path.exists(osp.join(self.python_dir, 'Scripts')):
+            os.mkdir(osp.join(self.python_dir, 'Scripts'))
         self._print_done()
 
     def _add_msvc_files(self):
@@ -469,18 +473,20 @@ call %~dp0env.bat
         print("Installing required packages")
         self.install_package('pywin32-([0-9\.]*[a-z]*).%s-py%s.exe'
                              % (self.py_arch, self.python_version))
-        self.install_package('setuptools-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-                             % (self.py_arch, self.python_version))
         # Install First these two packages to support wheel format
-        self.install_package('pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-                             % (self.py_arch, self.python_version))
+        if self.python_version == '3.3':
+            self.install_package('get-pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
+                             % (self.py_arch, self.python_version))           
+        #else:
+        self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
+                              'setuptools' , install_options=['--upgrade','--no-deps'])
+        self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
+                              'pip', install_options=['--upgrade','--no-deps'])
+
         self.install_package('wheel-([0-9\.]*[a-z]*[0-9]?).tar.gz')
         # six is needed early
         self.install_package('six-([0-9\.]*[a-z]*[0-9]?)-py2.py3-none-any.whl')
 
-        self.install_package(
-            'spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-            % (self.py_arch, self.python_version))
         # PyQt module is now like :PyQt4-4.10.4-gpl-Py3.4-Qt4.8.6-x32.exe
         self.install_package(
             'PyQt4-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
@@ -488,6 +494,10 @@ call %~dp0env.bat
         self.install_package(
             'PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
             % (self.python_version, self.pyqt_arch))
+
+        self.install_package(
+            'spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
+            % (self.py_arch, self.python_version))
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
         for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
@@ -1126,14 +1136,14 @@ if __name__ == '__main__':
 
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='')
+    make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ), flavor='')
     #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
     #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
-            verbose=False, archis=(32, ))
+    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #        verbose=False, archis=(32, ))
     #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
     #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
