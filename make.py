@@ -298,7 +298,7 @@ Name | Version | Description
         for path in (self.instdirs + self.srcdirs):
             for fname in os.listdir(path):
                 match = re.match(pattern, fname)
-                if match is not None:
+                if match is not None or pattern==fname:
                     return osp.abspath(osp.join(path, fname))
         else:
             raise RuntimeError(
@@ -471,8 +471,8 @@ call %~dp0env.bat
     def _install_required_packages(self):
         """Installing required packages"""
         print("Installing required packages")
-        self.install_package('pywin32-([0-9\.]*[a-z]*).%s-py%s.exe'
-                             % (self.py_arch, self.python_version))
+        self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
+                              'pywin32')
         # Install First these two packages to support wheel format
         if self.python_version == '3.3':
             self.install_package('get-pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
