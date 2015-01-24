@@ -483,27 +483,12 @@ call %~dp0env.bat
         self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
                               'pip', install_options=['--upgrade','--no-deps'])
 
-        self.install_package('wheel-([0-9\.]*[a-z]*[0-9]?).tar.gz')
-        # six is needed early
-        self.install_package('six-([0-9\.]*[a-z]*[0-9]?)-py2.py3-none-any.whl')
-
-        # PyQt module is now like :PyQt4-4.10.4-gpl-Py3.4-Qt4.8.6-x32.exe
-        self.install_package(
-            'PyQt4-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
-            % (self.python_version, self.pyqt_arch))
-        self.install_package(
-            'PyQwt-([0-9\.]*)-py%s-%s-([a-z0-9\.\-]*).exe'
-            % (self.python_version, self.pyqt_arch))
-
-        self.install_package(
-            'spyder(lib)?-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-            % (self.py_arch, self.python_version))
-
         # Install 'main packages' first (was before Wheel idea, keep for now)
-        for happy_few in['numpy-MKL', 'scipy', 'matplotlib', 'pandas']:
+        for happy_few in['wheel', 'six', 'PyQt4', 'PyQwt', 'spyder', 'numpy', 'scipy', 
+            'matplotlib', 'pandas']:
             # can be a wheel now
             self.install_package(
-                '%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few) 
+                '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few) 
 
     def _install_all_other_packages(self):
         """Try to install all other packages in instdirs"""
@@ -1134,25 +1119,25 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ))
-    make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='')
-    #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
+    make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+             verbose=False, archis=(32, ))
+    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='')
+    #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    #make_all(5, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #        verbose=False, archis=(32, ))
-    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(2, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
