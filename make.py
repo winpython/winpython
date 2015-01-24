@@ -604,9 +604,9 @@ call %~dp0env.bat
                                       ipython_scr,
                                  workdir='${WINPYDIR}\Scripts')
             self.create_launcher('IPython Notebook.exe', 'ipython.ico',
-                                 command='${WINPYDIR}\python.exe',
-                                 args='%s notebook --matplotlib=inline' %
-                                      ipython_scr,
+                                 command='${WINPYDIR}\Scripts\%s' %
+                                        ipython_exe,
+                                 args=' notebook --matplotlib=inline',
                                  workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
