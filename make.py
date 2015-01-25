@@ -218,7 +218,7 @@ Name | Version | Description
 Name | Version | Description
 -----|---------|------------
 [Python](http://www.python.org/) | %s | %s
-%s""" % (self.winpyver , self.winpyver, self.flavor, '\n'.join(tools),
+%s""" % (self.winpyver, self.winpyver, self.flavor, '\n'.join(tools),
          self.python_fullversion, python_desc, '\n'.join(packages))
 
     @property
@@ -292,13 +292,13 @@ Name | Version | Description
             return [osp.join(osp.dirname(osp.abspath(__file__)), 'docs')] + self._docsdirs
         else:
             return self._docsdirs
-            
+
     def get_package_fname(self, pattern):
         """Get package matching pattern in instdirs"""
         for path in (self.instdirs + self.srcdirs):
             for fname in os.listdir(path):
                 match = re.match(pattern, fname)
-                if match is not None or pattern==fname:
+                if match is not None or pattern == fname:
                     return osp.abspath(osp.join(path, fname))
         else:
             raise RuntimeError(
@@ -316,7 +316,7 @@ Name | Version | Description
                 if install_options:
                     self.distribution.install(pack, install_options)
                 else:
-                    self.distribution.install(pack, 
+                    self.distribution.install(pack,
                                          install_options=self.install_options)
             self.installed_packages.append(pack)
 
@@ -365,7 +365,7 @@ Name | Version | Description
 
         # handle well Flavor with R included
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
-                 ('JULIA_HOME','$EXEDIR%s' % r'\tools\Julia\bin'),
+                 ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
                  ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe')]
 
         if settingspath is not None:
@@ -444,7 +444,7 @@ call %~dp0env.bat
         print("Checking packages")
         packages = []
         my_plist = []
-        for m in (self.srcdirs +  self.instdirs):
+        for m in (self.srcdirs + self.instdirs):
             my_plist += os.listdir(m)
         for fname0 in my_plist:
             fname = self.get_package_fname(fname0)
@@ -471,28 +471,29 @@ call %~dp0env.bat
     def _install_required_packages(self):
         """Installing required packages"""
         print("Installing required packages")
+
         # Install First these two packages to support wheel format
         if self.python_version == '3.3':
             self.install_package('get-pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-                             % (self.py_arch, self.python_version))           
-        #else:
+                                 % (self.py_arch, self.python_version))
+        # else:
         self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
-                              'setuptools' , install_options=['--upgrade','--no-deps'])
+                             'setuptools', install_options=['--upgrade', '--no-deps'])
         self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
-                              'pip', install_options=['--upgrade','--no-deps'])
+                             'pip', install_options=['--upgrade', '--no-deps'])
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
-        for happy_few in['pywin32', 'wheel', 'six', 'PyQt4', 'PyQwt', 'spyder', 'numpy', 'scipy', 
-            'matplotlib', 'pandas']:
+        for happy_few in['pywin32', 'wheel', 'six', 'PyQt4', 'PyQwt', 'spyder',
+                         'numpy', 'scipy', 'matplotlib', 'pandas']:
             # can be a wheel now
             self.install_package(
-                '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few) 
+                '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few)
 
     def _install_all_other_packages(self):
         """Try to install all other packages in instdirs"""
         print("Installing other packages")
         my_list = []
-        for m in (self.srcdirs +  self.instdirs):
+        for m in (self.srcdirs + self.instdirs):
             my_list += os.listdir(m)
         for fname in my_list:
             if osp.basename(fname) != osp.basename(self.python_fname):
@@ -519,7 +520,7 @@ call %~dp0env.bat
     def _copy_dev_docs(self):
         """Copy dev docs"""
         self._print("Copying docs")
-        docsdir = osp.join(self.winpydir, self.python_name , 'Scripts', 'docs')
+        docsdir = osp.join(self.winpydir, self.python_name, 'Scripts', 'docs')
         os.mkdir(docsdir)
         for dirname in self.docsdirs:
             for name in os.listdir(dirname):
