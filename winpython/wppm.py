@@ -37,7 +37,9 @@ def get_package_metadata(database, name):
     metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
     for key in metadata:
         name1 = name.lower()
-        for name2 in (name1, name1.split('-')[0]):
+        # wheel replace '-' per '_' in key        
+        for name2 in (name1, name1.split('-')[0],
+            '_'.join(name1.split('-')[0:1])):
             try:
                 metadata[key] = db.get(name2, key)
                 break
@@ -370,6 +372,14 @@ python "%~dpn0""" + ext + """" %*""")
         if tmp_fname is not None:
             os.remove(tmp_fname)
             
+        # We minimal post-install pywin (pywin32_postinstall.py do too much)
+        if package.name == "pywin32":
+            origin = self.target + (r"\Lib\site-packages\pywin32_system32")
+            destin = self.target
+            for name in os.listdir(origin):
+                print("shutil.copy ", osp.join(origin, name), " ", osp.join(destin, name))
+                shutil.copyfile(osp.join(origin, name), osp.join(destin, name))            
+
         # We patch pip live (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
         if package.name == "get-pip":

@@ -397,7 +397,7 @@ SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz
 # WHEELBIN_PATTERN defines what an acceptable binary wheel package is
 # "cp([0-9]*)" to replace per cp(34) for python3.4
 # "win32|win\_amd64" to replace per "win\_amd64" for 64bit
-WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)-cp([0-9]*)\-none\-(win32|win\_amd64)\.whl'
+WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z\+]*[0-9]?)-cp([0-9]*)\-none\-(win32|win\_amd64)\.whl'
 
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
