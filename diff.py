@@ -57,7 +57,7 @@ class Package(object):
     def upgrade_wiki(self, other):
         # wheel replace '-' per '_' in key
         assert self.name.replace('-','_') == other.name.replace('-','_')
-        return "  * [%s](%s) %s  %s (%s)\r\n" % (self.name, self.url,
+        return "  * [%s](%s) %s → %s (%s)\r\n" % (self.name, self.url,
                                 other.version, self.version, self.description)
 
 
