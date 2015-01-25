@@ -471,8 +471,6 @@ call %~dp0env.bat
     def _install_required_packages(self):
         """Installing required packages"""
         print("Installing required packages")
-        self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
-                              'pywin32')
         # Install First these two packages to support wheel format
         if self.python_version == '3.3':
             self.install_package('get-pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
@@ -484,7 +482,7 @@ call %~dp0env.bat
                               'pip', install_options=['--upgrade','--no-deps'])
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
-        for happy_few in['wheel', 'six', 'PyQt4', 'PyQwt', 'spyder', 'numpy', 'scipy', 
+        for happy_few in['pywin32', 'wheel', 'six', 'PyQt4', 'PyQwt', 'spyder', 'numpy', 'scipy', 
             'matplotlib', 'pandas']:
             # can be a wheel now
             self.install_package(
