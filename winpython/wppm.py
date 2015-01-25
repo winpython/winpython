@@ -39,7 +39,7 @@ def get_package_metadata(database, name):
         name1 = name.lower()
         # wheel replace '-' per '_' in key        
         for name2 in (name1, name1.split('-')[0],
-            '_'.join(name1.split('-')[0:1])):
+            '-'.join(name1.split('_'))):
             try:
                 metadata[key] = db.get(name2, key)
                 break
