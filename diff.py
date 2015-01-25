@@ -55,8 +55,9 @@ class Package(object):
                                              self.version, self.description)
 
     def upgrade_wiki(self, other):
-        assert self.name == other.name
-        return "  * [%s](%s) %s → %s (%s)\r\n" % (self.name, self.url,
+        # wheel replace '-' per '_' in key  
+        assert self.name.replace('-','_') == other.name.replace('-','_')
+        return "  * [%s](%s) %s  %s (%s)\r\n" % (self.name, self.url,
                                 other.version, self.version, self.description)
 
 
@@ -114,9 +115,16 @@ class PackageIndex(object):
                         self.python_packages[package.name] = package
 
 
-def diff_package_dicts(dict1, dict2):
+def diff_package_dicts(dict1_in, dict2_in):
     """Return difference between package dict1 and package dict2"""
     text = ""
+    # wheel replace '-' per '_' in key        
+    dict1 = {} ; dict2 = {}
+    for key in dict1_in:
+        dict1[key.replace('-','_')] = dict1_in[key] 
+    for key in dict2_in:
+        dict2[key.replace('-','_')] = dict2_in[key]
+
     set1, set2 = set(dict1.keys()), set(dict2.keys())
     # New packages
     new = sorted(set2 - set1)

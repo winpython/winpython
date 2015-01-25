@@ -37,7 +37,9 @@ def get_package_metadata(database, name):
     metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
     for key in metadata:
         name1 = name.lower()
-        for name2 in (name1, name1.split('-')[0]):
+        # wheel replace '-' per '_' in key        
+        for name2 in (name1, name1.split('-')[0],
+            '_'.join(name1.split('-')[0:1])):
             try:
                 metadata[key] = db.get(name2, key)
                 break
