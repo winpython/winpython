@@ -99,7 +99,7 @@ def replace_in_nsis_file(fname, data):
         for start, text in data:
             if start not in ('Icon', 'OutFile') and not start.startswith('!'):
                 start = '!define ' + start
-            if line.startswith(start):
+            if line.startswith(start + ' '):
                 lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
     fd = open(fname, 'w')
     fd.writelines(lines)
