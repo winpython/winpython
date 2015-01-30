@@ -99,7 +99,7 @@ def replace_in_nsis_file(fname, data):
         for start, text in data:
             if start not in ('Icon', 'OutFile') and not start.startswith('!'):
                 start = '!define ' + start
-            if line.startswith(start):
+            if line.startswith(start + ' '):
                 lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
     fd = open(fname, 'w')
     fd.writelines(lines)
@@ -483,8 +483,8 @@ call %~dp0env.bat
                              'pip', install_options=['--upgrade', '--no-deps'])
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
-        for happy_few in['pywin32', 'wheel', 'six', 'PyQt4', 'PyQwt', 'spyder',
-                         'numpy', 'scipy', 'matplotlib', 'pandas']:
+        for happy_few in['pywin32', 'wheel', 'six', 'numpy',  'spyder',
+                          'scipy', 'matplotlib', 'pandas']:
             # can be a wheel now
             self.install_package(
                 '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few)
@@ -1077,9 +1077,23 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
                 
+    #  Every pack to 1 wheel directory
+    wheeldir = osp.join(builddir, 'wheels_tmp'  + suffix)
+    if osp.isdir(wheeldir):
+        shutil.rmtree(wheeldir, onerror=utils.onerror)
+    os.mkdir(wheeldir)
+    for  m in (srcdirs + packdirs): 
+        src_files = os.listdir(m)
+        for  file_name in src_files:
+            full_file_name = os.path.join(m, file_name)
+            if (os.path.isfile(full_file_name)):
+                shutil.copy(full_file_name, wheeldir)
+    srcdirs2 = [wheeldir] 
+    packdirs2 = [ ]
+    install_options=['--no-index' , '--find-links=%s' % wheeldir]
         
     dist = WinPythonDistribution(build_number, release_level,
-                                 builddir, packdirs, srcdirs, toolsdirs,
+                                 builddir, packdirs2, srcdirs2, toolsdirs,
                                  verbose=verbose, simulation=simulation,
                                  rootdir=rootdir,
                                  install_options=install_options,
@@ -1093,7 +1107,7 @@ def make_winpython(build_number, release_level, architecture,
 def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
              verbose=False, remove_existing=True, archis=(32, 64),
-             install_options=['--no-deps'], flavor=''):
+             install_options=['--no-index'], flavor=''):
     """Make WinPython for both 32 and 64bit architectures:
 
     make_all(build_number, release_level, pyver, rootdir, simulation=False,
