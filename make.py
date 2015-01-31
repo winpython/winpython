@@ -33,31 +33,15 @@ assert osp.isdir(CHANGELOGS_DIR)
 # How to prepare the MinGW package:
 # =============================================================================
 #
-# * download and install MinGW using the latest mingw-get-inst-YYYYMMDD.exe
-#   (the default target installation directory is C:\MinGW) and install the
-#   C/C++/Fortran compilers
-# * create WinPython MinGW32 directory %WINPYTHONBASEDIR%\tools.win32\mingw32
-#   (where the WINPYTHONBASEDIR environment variable points to your WinPython
-#    base directory -- see function `make_winpython` below)
-# * explore the target MinGW installation directory (default: C:\MinGW)
-# * copy the `bin`, `doc`, `include`, `lib` and `libexec` folders from
-#   C:\MinGW to %WINPYTHONBASEDIR%\tools.win32\mingw32 (with MinGW 4.6.2,
-#   the overall size should be around 151 MB for 1435 files and 63 folders):
-#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\bin
-#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\doc
-#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\include
-#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\lib
-#   * %WINPYTHONBASEDIR%\tools.win32\mingw32\libexec
-
-
-# =============================================================================
-# How to prepare the gettext package:
-# =============================================================================
-#
-# * download the latest gettext binaries for win32 (the latest should still be
-#   from 2005... anyway)
-# * add the missing 'libiconv2.dll' by copying the 'libiconv-2.dll' from MinGW
-#   and renaming to 'libiconv2.dll'
+# go to https://github.com/numpy/numpy/wiki/Mingw-static-toolchain
+# for 32 bit, download mingw32static-2014-11.7z and unzip it
+#             copy mingw32static-2014-11\mingw32static 
+#              to %WINPYTHONBASEDIR%\tools.win32\mingw32
+#              (so you have a %WINPYTHONBASEDIR%\tools.win32\mingw32\bin)
+# for 64 bit, download mingw64static-2014-11.7z and unzip it
+#             copy mingw64static-2014-11\mingw32static 
+#              to %WINPYTHONBASEDIR%\tools.win-amd64\mingw32
+#              (so you have a %WINPYTHONBASEDIR%\tools.win-amd64\mingw32\bin)
 
 
 def get_drives():
@@ -131,18 +115,15 @@ class WinPythonDistribution(object):
     R_PATH = r'\tools\R\bin'
     JULIA_PATH = r'\tools\Julia\bin'
 
-    def __init__(self, build_number, release_level, target, instdirs,
-                 srcdirs=None, toolsdirs=None, verbose=False, simulation=False,
+    def __init__(self, build_number, release_level, target, wheeldir,
+                 toolsdirs=None, verbose=False, simulation=False,
                  rootdir=None, install_options=None, flavor='', docsdirs=None):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
         self.release_level = release_level
         self.target = target
-        self.instdirs = instdirs
-        self.srcdirs = srcdirs
-        if srcdirs is None:
-            self.srcdirs = []
+        self.wheeldir = wheeldir
         if toolsdirs is None:
             toolsdirs = []
         self._toolsdirs = toolsdirs
@@ -294,12 +275,12 @@ Name | Version | Description
             return self._docsdirs
 
     def get_package_fname(self, pattern):
-        """Get package matching pattern in instdirs"""
-        for path in (self.instdirs + self.srcdirs):
-            for fname in os.listdir(path):
-                match = re.match(pattern, fname)
-                if match is not None or pattern == fname:
-                    return osp.abspath(osp.join(path, fname))
+        """Get package matching pattern in wheeldir"""
+        path = self.wheeldir
+        for fname in os.listdir(path):
+            match = re.match(pattern, fname)
+            if match is not None or pattern == fname:
+                return osp.abspath(osp.join(path, fname))
         else:
             raise RuntimeError(
                 'Could not found required package matching %s' % pattern)
@@ -444,8 +425,7 @@ call %~dp0env.bat
         print("Checking packages")
         packages = []
         my_plist = []
-        for m in (self.srcdirs + self.instdirs):
-            my_plist += os.listdir(m)
+        my_plist += os.listdir(self.wheeldir)
         for fname0 in my_plist:
             fname = self.get_package_fname(fname0)
             if fname == self.python_fname:
@@ -490,11 +470,10 @@ call %~dp0env.bat
                 '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few)
 
     def _install_all_other_packages(self):
-        """Try to install all other packages in instdirs"""
+        """Try to install all other packages in wheeldir"""
         print("Installing other packages")
         my_list = []
-        for m in (self.srcdirs + self.instdirs):
-            my_list += os.listdir(m)
+        my_list += os.listdir(self.wheeldir)
         for fname in my_list:
             if osp.basename(fname) != osp.basename(self.python_fname):
                 try:
@@ -922,7 +901,7 @@ call %~dp0register_python.bat --all""")
 
     def make(self, remove_existing=True):
         """Make WinPython distribution in target directory from the installers
-        located in instdirs
+        located in wheeldir
 
         remove_existing=True: (default) install all from scratch
         remove_existing=False: only for test purpose (launchers/scripts)"""
@@ -1031,30 +1010,37 @@ def make_winpython(build_number, release_level, architecture,
     assert architecture in (32, 64)
     utils.print_box("Making WinPython %dbits" % architecture)
     suffix = '.win32' if architecture == 32 else '.win-amd64'
-    packdir1 = osp.join(basedir, 'packages' + suffix)
-    assert osp.isdir(packdir1)
-    packdirs = [packdir1]
-    srcdir1 = osp.join(basedir, 'packages.src')
-    assert osp.isdir(srcdir1)
-    srcdirs = [srcdir1]
-    # add flavor src and binary packages
-    if flavor != '':
-        packdir2 = osp.join(basedir, flavor, 'packages' + suffix)
-        if osp.isdir(packdir2):
-            packdirs.append(packdir2)
-        srcdir2 = osp.join(basedir, flavor, 'packages.src')
-        if osp.isdir(srcdir2):
-            srcdirs.append(srcdir2)
+
+    # Create Build director, where Winpython will be constructed
     builddir = osp.join(basedir, 'build' + flavor)
     if not osp.isdir(builddir):
         os.mkdir(builddir)
+
+    # Create 1 wheel directory to receive all packages whished  for build
+    wheeldir = osp.join(builddir, 'wheels_tmp'  + suffix)
+    if osp.isdir(wheeldir):
+        shutil.rmtree(wheeldir, onerror=utils.onerror)
+    os.mkdir(wheeldir)
+    #  Copy Every package directory to the wheel directory
+    source_dirs = [osp.join(basedir, 'packages' + suffix),
+                   osp.join(basedir, 'packages.src'),
+                   osp.join(basedir, flavor, 'packages' + suffix),
+                   osp.join(basedir, flavor, 'packages.src')]
+    for m in list(set(source_dirs)): 
+        if osp.isdir(m):
+            src_files = os.listdir(m)
+            for file_name in src_files:
+                full_file_name = os.path.join(m, file_name)
+                shutil.copy(full_file_name, wheeldir)
+
+    # Define List of Tools directory to collect
     toolsdir1 = osp.join(basedir, 'tools')
     assert osp.isdir(toolsdir1)
     toolsdirs = [toolsdir1]
     toolsdir2 = osp.join(basedir, 'tools' + suffix)
     if osp.isdir(toolsdir2):
         toolsdirs.append(toolsdir2)
-    # add flavor tools in basedirxx\flavor\tools and tools+suffix
+    # add flavor tools
     if flavor != '':
         toolsdir3 = osp.join(basedir, flavor, 'tools')
         toolsdir4 = osp.join(basedir, flavor, 'tools' + suffix)
@@ -1062,14 +1048,14 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_tools):
                 toolsdirs.append(flavor_tools)
 
-    # create same for docs dirs as for tools dirs
+    # Define List of docs directory to collect
     docsdir1 = osp.join(basedir, 'docs')
     assert osp.isdir(docsdir1)
     docsdirs = [docsdir1]
     docsdir2 = osp.join(basedir, 'docs' + suffix)
     if osp.isdir(docsdir2):
         docsdirs.append(docsdir2)
-    # add flavor tools in basedirxx\flavor\tools and tools+suffix
+    # add flavor docs
     if flavor != '':
         docsdir3 = osp.join(basedir, flavor, 'docs')
         docsdir4 = osp.join(basedir, flavor, 'docs' + suffix)
@@ -1077,23 +1063,10 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
                 
-    #  Every pack to 1 wheel directory
-    wheeldir = osp.join(builddir, 'wheels_tmp'  + suffix)
-    if osp.isdir(wheeldir):
-        shutil.rmtree(wheeldir, onerror=utils.onerror)
-    os.mkdir(wheeldir)
-    for  m in (srcdirs + packdirs): 
-        src_files = os.listdir(m)
-        for  file_name in src_files:
-            full_file_name = os.path.join(m, file_name)
-            if (os.path.isfile(full_file_name)):
-                shutil.copy(full_file_name, wheeldir)
-    srcdirs2 = [wheeldir] 
-    packdirs2 = [ ]
     install_options=['--no-index' , '--find-links=%s' % wheeldir]
         
     dist = WinPythonDistribution(build_number, release_level,
-                                 builddir, packdirs2, srcdirs2, toolsdirs,
+                                 builddir, wheeldir, toolsdirs,
                                  verbose=verbose, simulation=simulation,
                                  rootdir=rootdir,
                                  install_options=install_options,
