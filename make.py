@@ -498,8 +498,10 @@ call %~dp0env.bat
 
     def _copy_dev_docs(self):
         """Copy dev docs"""
-        self._print("Copying docs")
-        docsdir = osp.join(self.winpydir, self.python_name, 'Scripts', 'docs')
+        self._print("Copying Noteebook docs")
+        docsdir = osp.join(self.winpydir, 'notebooks')
+        os.mkdir(docsdir)
+        docsdir = osp.join(self.winpydir, 'notebooks', 'docs')
         os.mkdir(docsdir)
         for dirname in self.docsdirs:
             for name in os.listdir(dirname):
@@ -562,15 +564,17 @@ call %~dp0env.bat
             ipython_scr = 'ipython-script.py'
         if osp.isfile(osp.join(self.python_dir, 'Scripts', ipython_exe)):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
-                                 command='${WINPYDIR}\pythonw.exe',
-                                 args='%s qtconsole --matplotlib=inline' %
-                                      ipython_scr,
-                                 workdir='${WINPYDIR}\Scripts')
+                                 command='${WINPYDIR}\Scripts\%s' %
+                                        ipython_exe,
+                                 args=' qtconsole --matplotlib=inline',
+                                 workdir=r'${WINPYDIR}\..\notebooks')
             self.create_launcher('IPython Notebook.exe', 'ipython.ico',
                                  command='${WINPYDIR}\Scripts\%s' %
                                         ipython_exe,
                                  args=' notebook --matplotlib=inline',
-                                 workdir='${WINPYDIR}\Scripts')
+                                 workdir=r'${WINPYDIR}\..\notebooks')
+                                 # --notebook-dir=%~dp0 
+                                 # workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
                                  command=r'${WINPYDIR}\..'+self.THG_PATH,
