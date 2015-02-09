@@ -390,20 +390,17 @@ python "%~dpn0""" + ext + """" %*""")
             import glob
             for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
                 utils.patch_shebang_line(ffname)
-            do_replace = self.target + (r"\Lib\site-packages\pip\_vendor" +
-                         r"\distlib\scripts.py"  )
-            print("do_replace" , do_replace)
-            fh = open(do_replace,"r")
-            the_thing =  fh.read()             
-            fh.close()
-            the_thing_after = the_thing.replace(
+            utils.patch_sourcefile(
+              self.target + (
+              r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
               " executable = get_executable()",
-              " executable = os.path.join(os.path.basename(get_executable()))") 
-            if not the_thing_after == the_thing:
-                print("do_replace_ok" , do_replace)
-                fh = open(do_replace,"w")
-                fh.write(the_thing_after)
-                fh.close()
+              " executable = os.path.join(os.path.basename(get_executable()))")
+        # We patch IPython\kernel\kernelspec.py live (around line 51) !!!!
+        if package.name == "ipython":
+            utils.patch_sourcefile(
+              self.target + r"\Lib\site-packages\IPython\kernel\kernelspec.py",
+              r" kernel_dict = json.load(f)", 
+              r" kernel_dict = json.loads(('\n'.join(f.readlines())).replace('[WINPYDIR]',(os.environ['WINPYDIR']).replace('\\','\\\\')))") 
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""

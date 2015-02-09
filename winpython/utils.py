@@ -237,9 +237,15 @@ def get_gcc_version(path):
     """Return version of the GCC compiler installed in *path*"""
     return exec_shell_cmd('gcc --version', path).splitlines()[0].split()[-1]
 
+
 def get_r_version(path):
     """Return version of the R installed in *path*"""
     return exec_shell_cmd('dir ..\README.R*', path).splitlines()[-3].split("-")[-1]
+
+
+def get_julia_version(path):
+    """Return version of the Julia installed in *path*"""
+    return exec_shell_cmd('julia.exe -v', path).splitlines()[0].split(" ")[-1]
 
 
 def get_thg_version(path):
@@ -304,6 +310,23 @@ def patch_shebang_line(fname, pad=b' '):
             print("patched", fname)
     except Exception:
         print("failed to patch", fname)
+
+
+# =============================================================================
+# Patch sourcefile (instead of forking packages)
+# =============================================================================
+def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
+    """Replace a string in a source file"""
+    import io
+    if osp.isfile(fname) and not in_text == out_text:
+        with io.open(fname, 'r') as fh:
+            content = fh.read()
+        new_content = content.replace(in_text, out_text)
+        if not new_content == content:
+            if not silent_mode:
+                print("patching " , fname, "from", in_text, "to", out_text)
+            with io.open(fname, 'wt') as fh:
+                fh.write(new_content)
 
 
 # =============================================================================
