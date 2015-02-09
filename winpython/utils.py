@@ -108,7 +108,6 @@ def get_env(name, current=True):
             break
 
 
-
 def set_env(name, value, current=True):
     """Set HKCU/HKLM environment variables"""
     root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
@@ -275,7 +274,7 @@ def get_python_infos(path):
 
 
 def get_python_long_version(path):
-    """Return long version (X.Y.Z) for the Python distribution located in 
+    """Return long version (X.Y.Z) for the Python distribution located in
     *path*"""
     ver = python_query("import sys; print('%d.%d.%d' % "
                        "(sys.version_info.major, sys.version_info.minor,"
@@ -283,6 +282,7 @@ def get_python_long_version(path):
     if re.match(r'([0-9]*)\.([0-9]*)\.([0-9]*)', ver) is None:
         ver = None
     return ver
+
 
 # =============================================================================
 # Patch chebang line (courtesy of Christoph Gohlke)
@@ -324,7 +324,7 @@ def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
         new_content = content.replace(in_text, out_text)
         if not new_content == content:
             if not silent_mode:
-                print("patching " , fname, "from", in_text, "to", out_text)
+                print("patching ", fname, "from", in_text, "to", out_text)
             with io.open(fname, 'wt') as fh:
                 fh.write(new_content)
 
@@ -352,12 +352,13 @@ def extract_msi(fname, targetdir=None, verbose=False):
         args += ['/qn']
     args += ['TARGETDIR=%s' % targetdir]
     subprocess.call([extract]+args, cwd=osp.dirname(fname))
-    print ('fname=%s' % fname)
-    print ('TARGETDIR=%s' % targetdir)
+    print('fname=%s' % fname)
+    print('TARGETDIR=%s' % targetdir)
     # ensure pip if it's not 3.3
     if '-3.3' not in targetdir:
-        subprocess.call([r'%s\%s' %(targetdir, 'python.exe'), '-m' , 'ensurepip'],
-                     cwd=osp.dirname(r'%s\%s' %(targetdir, 'pythons.exe')))
+        subprocess.call(
+            [r'%s\%s' % (targetdir, 'python.exe'), '-m', 'ensurepip'],
+            cwd=osp.dirname(r'%s\%s' % (targetdir, 'pythons.exe')))
         # We patch ensurepip live (shame) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
         import glob
@@ -442,7 +443,7 @@ def build_wininst(root, python_exe=None, copy_to=None,
         archstr = 'win32' if architecture == 32 else 'win-amd64'
         cmd += ['--plat-name=%s' % archstr]
     cmd += [installer]
-    # root = a tmp dir in windows\tmp, 
+    # root = a tmp dir in windows\tmp,
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
@@ -468,13 +469,13 @@ def build_wininst(root, python_exe=None, copy_to=None,
         # for wheels (winpython here)
         match = re.match(SOURCE_PATTERN, distname)
         if match is not None:
-             break
+            break
         match = re.match(WHEELBIN_PATTERN, distname)
         if match is not None:
             break
     else:
         raise RuntimeError("Build failed: not a pure Python package? %s" %
-                          distdir)
+                           distdir)
     src_fname = osp.join(distdir, distname)
     if copy_to is None:
         return src_fname
@@ -507,7 +508,7 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
     assert osp.isfile(python_exe)
     myroot = os.path.dirname(python_exe)
 
-    #cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
+    # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
     cmd = [python_exe, '-m', 'pip', 'install']
     if install_options:
         cmd += install_options  # typically ['--no-deps']
@@ -539,14 +540,14 @@ def do_script(this_script, python_exe=None, copy_to=None,
     assert osp.isfile(python_exe)
     myroot = os.path.dirname(python_exe)
 
-    #cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
+    # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
     cmd = [python_exe]
     if install_options:
         cmd += install_options  # typically ['--no-deps']
         print('script install_options', install_options)
     cmd += [this_script]
-    #  print('build_wheel', myroot, cmd)
-    print("Executing " , cmd)
+    # print('build_wheel', myroot, cmd)
+    print("Executing ", cmd)
 
     if verbose:
         subprocess.call(cmd, cwd=myroot)
@@ -559,7 +560,8 @@ def do_script(this_script, python_exe=None, copy_to=None,
     if verbose:
             print("Executed " % cmd)
     return 'ok'
-  
+
+
 def wheel_to_wininst(fname, python_exe=None,
                      architecture=None, verbose=False, install_options=None):
     """Just install a wheel !"""
