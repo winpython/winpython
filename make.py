@@ -908,6 +908,24 @@ call %~dp0register_python.bat --all""")
 
         self._print_done()
 
+    def _run_complement_batch_scripts(self):
+        """ tools\..\run_complement.bat for final complements"""
+        print('now run_complement.bat in tooldirs\..')
+        for post_complement in list(set([osp.dirname(s)
+                                         for s in self._toolsdirs])):
+            filepath = osp.join(post_complement, "run_complement.bat")
+            if osp.isfile(filepath):
+                print('launch "%s"  for  "%s"' % (filepath,  self.winpydir))
+                try:
+                    retcode = subprocess.call('"%s"   "%s"' % (filepath,  self.winpydir),
+                                  shell=True, stdout=sys.stderr)
+                    if retcode < 0:
+                        print("Child was terminated by signal", -retcode, file=sys.stderr)
+                except OSError as e:
+                    print("Execution failed:", e, file=sys.stderr)
+
+        self._print_done()
+
     def make(self, remove_existing=True):
         """Make WinPython distribution in target directory from the installers
         located in wheeldir
@@ -962,6 +980,7 @@ call %~dp0register_python.bat --all""")
         if not self.simulation:
             self._create_launchers()
             self._create_batch_scripts()
+            self._run_complement_batch_scripts()
 
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
@@ -1136,3 +1155,5 @@ if __name__ == '__main__':
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
     #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
+    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ), flavor='FlavorJulia')
