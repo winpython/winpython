@@ -174,6 +174,11 @@ class WinPythonDistribution(object):
             rver = utils.get_r_version(rpath)
             installed_tools += [('R', rver)]
 
+        juliapath = get_tool_path(self.JULIA_PATH, osp.isdir)
+        if juliapath is not None:
+            juliaver = utils.get_julia_version(juliapath)
+            installed_tools += [('Julia', juliaver)]
+
         tools = []
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata('tools.ini', name)
