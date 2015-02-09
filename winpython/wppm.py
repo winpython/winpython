@@ -395,6 +395,12 @@ python "%~dpn0""" + ext + """" %*""")
               r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
               " executable = get_executable()",
               " executable = os.path.join(os.path.basename(get_executable()))")
+        # We patch IPython\kernel\kernelspec.py live (around line 51) !!!!
+        if package.name == "ipython":
+            utils.patch_sourcefile(
+              self.target + r"\Lib\site-packages\IPython\kernel\kernelspec.py",
+              r" kernel_dict = json.load(f)", 
+              r" kernel_dict = json.loads(('\n'.join(f.readlines())).replace('[WINPYDIR]',(os.environ['WINPYDIR']).replace('\\','\\\\')))") 
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
