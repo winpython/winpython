@@ -918,7 +918,7 @@ call %~dp0register_python.bat --all""")
                 print('launch "%s"  for  "%s"' % (filepath,  self.winpydir))
                 try:
                     retcode = subprocess.call('"%s"   "%s"' % (filepath,  self.winpydir),
-                                  shell=True, stdout=sys.stderr)
+                                              shell=True, stdout=sys.stderr)
                     if retcode < 0:
                         print("Child was terminated by signal", -retcode, file=sys.stderr)
                 except OSError as e:
@@ -1045,7 +1045,7 @@ def make_winpython(build_number, release_level, architecture,
         os.mkdir(builddir)
 
     # Create 1 wheel directory to receive all packages whished  for build
-    wheeldir = osp.join(builddir, 'wheels_tmp'  + suffix)
+    wheeldir = osp.join(builddir, 'wheels_tmp' + suffix)
     if osp.isdir(wheeldir):
         shutil.rmtree(wheeldir, onerror=utils.onerror)
     os.mkdir(wheeldir)
@@ -1054,7 +1054,7 @@ def make_winpython(build_number, release_level, architecture,
                    osp.join(basedir, 'packages.src'),
                    osp.join(basedir, flavor, 'packages' + suffix),
                    osp.join(basedir, flavor, 'packages.src')]
-    for m in list(set(source_dirs)): 
+    for m in list(set(source_dirs)):
         if osp.isdir(m):
             src_files = os.listdir(m)
             for file_name in src_files:
@@ -1090,9 +1090,9 @@ def make_winpython(build_number, release_level, architecture,
         for flavor_docs in [docsdir3, docsdir4]:
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
-                
-    install_options=['--no-index' , '--find-links=%s' % wheeldir]
-        
+
+    install_options = ['--no-index', '--find-links=%s' % wheeldir]
+
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
                                  verbose=verbose, simulation=simulation,

@@ -37,9 +37,9 @@ def get_package_metadata(database, name):
     metadata = dict(description='', url='http://pypi.python.org/pypi/' + name)
     for key in metadata:
         name1 = name.lower()
-        # wheel replace '-' per '_' in key        
+        # wheel replace '-' per '_' in key
         for name2 in (name1, name1.split('-')[0],
-            '-'.join(name1.split('_'))):
+                      '-'.join(name1.split('_'))):
             try:
                 metadata[key] = db.get(name2, key)
                 break
@@ -233,7 +233,7 @@ class Distribution(object):
         self.init_log_dir()
         self.to_be_removed = []  # list of directories to be removed later
         self.version, self.architecture = utils.get_python_infos(target)
- 
+
     def clean_up(self):
         """Remove directories which couldn't be removed when building"""
         for path in self.to_be_removed:
@@ -242,7 +242,7 @@ class Distribution(object):
             except WindowsError:
                 print("Directory %s could not be removed" % path,
                       file=sys.stderr)
-  
+
     def remove_directory(self, path):
         """Try to remove directory -- on WindowsError, remove it later"""
         try:
@@ -371,20 +371,20 @@ python "%~dpn0""" + ext + """" %*""")
         package.save_log(self.logdir)
         if tmp_fname is not None:
             os.remove(tmp_fname)
-            
+   
         # We minimal post-install pywin (pywin32_postinstall.py do too much)
         if package.name == "pywin32":
             origin = self.target + (r"\Lib\site-packages\pywin32_system32")
             destin = self.target
             for name in os.listdir(origin):
                 print("shutil.copy ", osp.join(origin, name), " ", osp.join(destin, name))
-                shutil.copyfile(osp.join(origin, name), osp.join(destin, name))            
+                shutil.copyfile(osp.join(origin, name), osp.join(destin, name))
 
         # We patch pip live (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
         if package.name == "get-pip":
             # self.exec_script
-            my_script_is=osp.join(self.target, 'Scripts', 'get-pip.py')
+            my_script_is = osp.join(self.target, 'Scripts', 'get-pip.py')
             self.install_script(my_script_is, install_options=None)
         if package.name == "pip" or package.name == "get-pip":
             import glob
@@ -527,7 +527,7 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
             if not self.verbose:
                 print("Failed!")
                 raise
-                
+
     def install_bdist_msi(self, package):
         """Install a distutils package built with the bdist_msi option
         (binary distribution, .msi file)"""
