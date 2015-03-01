@@ -573,7 +573,7 @@ call %~dp0env.bat
                                         ipython_exe,
                                  args=' qtconsole --matplotlib=inline',
                                  workdir=r'${WINPYDIR}\..\notebooks')
-            self.create_launcher('IPython Notebook.exe', 'ipython.ico',
+            self.create_launcher('IPython Notebook.exe', 'jupyter.ico',
                                  command='${WINPYDIR}\Scripts\%s' %
                                         ipython_exe,
                                  args=' notebook --matplotlib=inline',
@@ -588,6 +588,26 @@ call %~dp0env.bat
             self.create_launcher('WinMergeU.exe', 'winmerge.ico',
                                  command=r'${WINPYDIR}\..'+self.WINMERGE_PATH,
                                  workdir=r'${WINPYDIR}')
+
+        # R console launchers
+        r_exe = self.R_PATH + r"\i386\R.exe"
+        if osp.isfile(self.winpydir + r_exe):
+            self.create_launcher('R Console32.exe', 'r.ico',
+                                 command='${WINPYDIR}\..' + r_exe,
+                                 workdir=r'${WINPYDIR}\..\notebooks')
+        r_exe = self.R_PATH + r"\x64\R.exe"
+        if osp.isfile(self.winpydir + r_exe):
+            self.create_launcher('R Console64.exe', 'r.ico',
+                                 command='${WINPYDIR}\..' + r_exe,
+                                 workdir=r'${WINPYDIR}\..\notebooks')
+
+        # Julia console launcher
+        julia_exe   =  self.JULIA_PATH + r"\julia.exe"
+        if osp.isfile(self.winpydir + julia_exe):
+            self.create_launcher('Julia Console.exe', 'julia.ico',
+                                 command='${WINPYDIR}\..'+ julia_exe,
+                                 workdir=r'${WINPYDIR}\..\notebooks')
+
         self._print_done()
 
     def _create_batch_scripts(self):
@@ -1133,9 +1153,9 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
              verbose=False, archis=(32, ))
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='')
     #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
@@ -1147,13 +1167,19 @@ if __name__ == '__main__':
     #         verbose=False, archis=(64, ))
     #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(15, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(15, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    # make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ), flavor='FlavorJulia')
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='FlavorJulia')
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ), flavor='FlavorRJulia')
