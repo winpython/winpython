@@ -1153,9 +1153,9 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
              verbose=False, archis=(32, ))
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='')
     #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
@@ -1167,15 +1167,19 @@ if __name__ == '__main__':
     #         verbose=False, archis=(64, ))
     #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(15, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(15, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    # make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
-    #make_all(5, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ), flavor='FlavorJulia')
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorJulia')
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(32, ), flavor='FlavorRJulia')
