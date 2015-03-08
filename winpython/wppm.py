@@ -386,10 +386,24 @@ python "%~dpn0""" + ext + """" %*""")
             # self.exec_script
             my_script_is = osp.join(self.target, 'Scripts', 'get-pip.py')
             self.install_script(my_script_is, install_options=None)
-        if package.name == "pip" or package.name == "get-pip":
+        # change of method 2014-05-08: 
+        # touching pip at installation seems not working anymore
+        # so brute force method is applied
+        if package.name == "pip" or package.name == "get-pip" or 1==1:
             import glob
             for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
                 utils.patch_shebang_line(ffname)
+            # ensure pip.exe
+            if (not osp.exists(r'%s\Scripts\pip.exe' % self.target) and
+                osp.exists(r'%s\Scripts\pip3.exe' % self.target)):
+                    shutil.copyfile(r'%s\Scripts\pip3.exe' % self.target,
+                                    r'%s\Scripts\pip.exe' % self.target)
+            if (not osp.exists(r'%s\Scripts\pip.exe' % self.target) and
+                osp.exists(r'%s\Scripts\pip2.exe' % self.target)):
+                    shutil.copyfile(r'%s\Scripts\pip2.exe' % self.target,
+                                    r'%s\Scripts\pip.exe' % self.target)
+
+        if package.name == "pip" or package.name == "get-pip":
             utils.patch_sourcefile(
               self.target + (
               r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
@@ -400,7 +414,8 @@ python "%~dpn0""" + ext + """" %*""")
             utils.patch_sourcefile(
               self.target + r"\Lib\site-packages\IPython\kernel\kernelspec.py",
               r" kernel_dict = json.load(f)", 
-              r" kernel_dict = json.loads(('\n'.join(f.readlines())).replace('[WINPYDIR]',(os.environ['WINPYDIR']).replace('\\','\\\\')))") 
+              r" kernel_dict = json.loads(('\n'.join(f.readlines())).replace('[WINPYDIR]',(os.environ['WINPYDIR']).replace('\\','\\\\')))"+
+              ";" + "from  winpython.utils import patch_julia03; patch_julia03()") 
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""

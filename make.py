@@ -462,14 +462,14 @@ call %~dp0env.bat
         if self.python_version == '3.3':
             self.install_package('get-pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
                                  % (self.py_arch, self.python_version))
-        # else:
-        self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
+        if self.python_version == '2.7':
+            self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
                              'setuptools', install_options=['--upgrade', '--no-deps'])
-        self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
+            self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
                              'pip', install_options=['--upgrade', '--no-deps'])
 
         # Install 'main packages' first (was before Wheel idea, keep for now)
-        for happy_few in['pywin32', 'wheel', 'six', 'numpy',  'spyder',
+        for happy_few in['sqlite_bro', 'wheel', 'pywin32', 'six', 'numpy',  'spyder',
                           'scipy', 'matplotlib', 'pandas']:
             # can be a wheel now
             self.install_package(
@@ -1155,8 +1155,8 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-             verbose=False, archis=(32, ))
+    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ))
     #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='')
     #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
@@ -1181,7 +1181,7 @@ if __name__ == '__main__':
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
     #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ), flavor='FlavorJulia')
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='FlavorJulia')
+    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ), flavor='FlavorJulia')
     #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRJulia')
