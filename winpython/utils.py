@@ -328,6 +328,67 @@ def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
             with io.open(fname, 'wt') as fh:
                 fh.write(new_content)
 
+# =============================================================================
+# Patch sourcelines (instead of forking packages)
+# =============================================================================
+def patch_sourcelines(fname, in_line_start, out_line, endline='\n', silent_mode=False):
+    """Replace the middle of lines between in_line_start and endline """
+    import io
+    import os.path as osp
+    if osp.isfile(fname):
+        with io.open(fname, 'r') as fh:
+            contents = fh.readlines()
+            content = "".join(contents) 
+            for l in range(len(contents)): 
+                if contents[l].startswith(in_line_start):
+                   begining , middle = in_line_start , contents[l][len(in_line_start):]
+                   ending = ""
+                   if middle.find(endline)>0:
+                       ending = endline + endline.join(middle.split(endline)[1:])
+                       middle = middle.split(endline)[0]
+                   middle = out_line
+                   new_line = begining + middle + ending
+                   if not new_line == contents[l]:
+                       if not silent_mode:
+                           print("patching ", fname, " from\n", contents[l], "\nto\n", new_line)
+                   contents[l] = new_line
+            new_content = "".join(contents)            
+        if not new_content == content:
+            # if not silent_mode:
+            #    print("patching ", fname, "from", content, "to", new_content)
+            with io.open(fname, 'wt') as fh:
+                try:
+                    fh.write(new_content)
+                except:
+                    print("impossible to patch", fname, "from", content,
+                          "to", new_content)
+
+def patch_julia03():
+    """Ugly patch of Julia/ZMQ and Julia/Nettle to make them movable"""
+    import io
+    import os.path as osp
+    out_line ='"'+  os.path.dirname(os.environ["WINPYDIR"]).replace("\\" ,"\\\\")
+    end_line = r"\\settings\\.julia"
+    from  winpython.utils import patch_sourcelines
+
+    in_line_start = '@checked_lib zmq ';
+
+    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\ZMQ\deps\deps.jl";
+    patch_sourcelines (fname, in_line_start, out_line, end_line);
+    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\ZMQ\deps\deps.jl";
+    patch_sourcelines (fname, in_line_start, out_line, end_line);
+    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\ZMQ\deps\deps.jl";
+    patch_sourcelines (fname, in_line_start, out_line, end_line);
+
+    in_line_start = '@checked_lib nettle ';
+
+    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\Nettle\deps\deps.jl";
+    patch_sourcelines (fname, in_line_start, out_line, end_line);
+    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\Nettle\deps\deps.jl";
+    patch_sourcelines (fname, in_line_start, out_line, end_line);
+    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\Nettle\deps\deps.jl";
+    patch_sourcelines (fname, in_line_start, out_line, end_line);
+
 
 # =============================================================================
 # Extract functions
