@@ -19,6 +19,8 @@ Licensed under the terms of the MIT License
 ;  Addition for JULIA_HOME and JULIA
 !define JULIA_HOME ""
 !define JULIA ""
+;  Addition for JULIA_PKGDIR
+!define JULIA_PKGDIR ""
 
 !define COMMAND ""
 !define PARAMETERS ""
@@ -78,6 +80,11 @@ System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA", "${JULIA}").r0'
 StrCmp "${JULIA_HOME}" "" end_Julia_settings
 IfFileExists "${JULIA_HOME}\*.*" 0 end_Julia_settings
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA_HOME", "${JULIA_HOME}").r0'
+
+;  Addition for JULIA_PKGDIR
+StrCmp "${JULIA_PKGDIR}" "" end_Julia_settings
+IfFileExists "${JULIA_PKGDIR}\*.*" 0 end_Julia_settings
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA_PKGDIR", "${JULIA_PKGDIR}").r0'
 
 end_Julia_settings:
 

@@ -351,6 +351,7 @@ Name | Version | Description
 
         # handle well Flavor with R included
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
+                 ('JULIA_PKGDIR', '$EXEDIR%s' % r'\settings\.julia'),
                  ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
                  ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe')]
 
@@ -643,6 +644,7 @@ if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
 set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
 set JULIA_EXE=julia.exe
 set JULIA=%JULIA_HOME%%JULIA_EXE%
+set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 :julia_bad
 
 set PATH=""" + path)
