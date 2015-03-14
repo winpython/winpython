@@ -371,7 +371,7 @@ python "%~dpn0""" + ext + """" %*""")
         package.save_log(self.logdir)
         if tmp_fname is not None:
             os.remove(tmp_fname)
-   
+
         # We minimal post-install pywin (pywin32_postinstall.py do too much)
         if package.name == "pywin32":
             origin = self.target + (r"\Lib\site-packages\pywin32_system32")
@@ -386,22 +386,23 @@ python "%~dpn0""" + ext + """" %*""")
             # self.exec_script
             my_script_is = osp.join(self.target, 'Scripts', 'get-pip.py')
             self.install_script(my_script_is, install_options=None)
-        # change of method 2014-05-08: 
+        # change of method 2014-05-08:
         # touching pip at installation seems not working anymore
         # so brute force method is applied
-        if package.name == "pip" or package.name == "get-pip" or 1==1:
+        if package.name == "pip" or package.name == "get-pip" or 1 == 1:
             import glob
             for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
                 utils.patch_shebang_line(ffname)
-            # ensure pip.exe
-            if (not osp.exists(r'%s\Scripts\pip.exe' % self.target) and
-                osp.exists(r'%s\Scripts\pip3.exe' % self.target)):
-                    shutil.copyfile(r'%s\Scripts\pip3.exe' % self.target,
-                                    r'%s\Scripts\pip.exe' % self.target)
-            if (not osp.exists(r'%s\Scripts\pip.exe' % self.target) and
-                osp.exists(r'%s\Scripts\pip2.exe' % self.target)):
-                    shutil.copyfile(r'%s\Scripts\pip2.exe' % self.target,
-                                    r'%s\Scripts\pip.exe' % self.target)
+            # ensure pip.exe and easy_install.exe
+            problems = [('pip', 'pip'), ('easy_install', 'easy_install-')]
+            solutions = [('%s.%s' % sys.version_info[:2]),
+                         ('%s' % sys.version_info[0])]
+            for p in problems:
+                problem = r'%s\Scripts\%s.exe' % (self.target, p[0])
+                for s in solutions:
+                    solution = r'%s\Scripts\%s%s.exe' % (self.target, p[1], s)
+                    if not osp.exists(problem) and osp.exists(solution):
+                        shutil.copyfile(solution, problem)
 
         if package.name == "pip" or package.name == "get-pip":
             utils.patch_sourcefile(
@@ -413,9 +414,9 @@ python "%~dpn0""" + ext + """" %*""")
         if package.name == "ipython":
             utils.patch_sourcefile(
               self.target + r"\Lib\site-packages\IPython\kernel\kernelspec.py",
-              r" kernel_dict = json.load(f)", 
+              r" kernel_dict = json.load(f)",
               r" kernel_dict = json.loads(('\n'.join(f.readlines())).replace('[WINPYDIR]',(os.environ['WINPYDIR']).replace('\\','\\\\')))"+
-              ";" + "from  winpython.utils import patch_julia03; patch_julia03()") 
+              ";" + "from  winpython.utils import patch_julia03; patch_julia03()")
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
