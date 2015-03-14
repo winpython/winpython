@@ -35,11 +35,11 @@ assert osp.isdir(CHANGELOGS_DIR)
 #
 # go to https://github.com/numpy/numpy/wiki/Mingw-static-toolchain
 # for 32 bit, download mingw32static-2014-11.7z and unzip it
-#             copy mingw32static-2014-11\mingw32static 
+#             copy mingw32static-2014-11\mingw32static
 #              to %WINPYTHONBASEDIR%\tools.win32\mingw32
 #              (so you have a %WINPYTHONBASEDIR%\tools.win32\mingw32\bin)
 # for 64 bit, download mingw64static-2014-11.7z and unzip it
-#             copy mingw64static-2014-11\mingw32static 
+#             copy mingw64static-2014-11\mingw32static
 #              to %WINPYTHONBASEDIR%\tools.win-amd64\mingw32
 #              (so you have a %WINPYTHONBASEDIR%\tools.win-amd64\mingw32\bin)
 
@@ -579,7 +579,7 @@ call %~dp0env.bat
                                         ipython_exe,
                                  args=' notebook --matplotlib=inline',
                                  workdir=r'${WINPYDIR}\..\notebooks')
-                                 # --notebook-dir=%~dp0 
+                                 # --notebook-dir=%~dp0
                                  # workdir='${WINPYDIR}\Scripts')
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
@@ -697,7 +697,7 @@ echo "https://github.com/JuliaLang/WinRPM.jl/issues/27#issuecomment-49189546"
 echo --------------------
 rem (not working as of july 18th, 2014:
 rem    https://github.com/JuliaLang/IJulia.jl/issues/206 )
-rem echo to enable use of julia from python  (the first time):  
+rem echo to enable use of julia from python  (the first time):
 rem echo    launch winpython command prompt
 rem echo    cd  ..\settings\.julia\v0.3\IJulia\python
 rem echo    python setup.py install
@@ -721,7 +721,7 @@ If WScript.Arguments.Count <> 3 then
 end If
 
 Set colArgs = WScript.Arguments
-Add_or_removeLine colArgs(0), colArgs(1), colArgs(2) 
+Add_or_removeLine colArgs(0), colArgs(1), colArgs(2)
 
 function Add_or_removeLine(strFilename, strFind, strAction)
     Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
@@ -729,7 +729,7 @@ function Add_or_removeLine(strFilename, strFind, strAction)
     Do Until inputFile.AtEndOfStream
         strLine = inputFile.ReadLine
         If InStr(strLine, strFind) = 0 Then
-            result_text= result_text & strLine & vbNewLine 
+            result_text= result_text & strLine & vbNewLine
         else
            a_change = True
            if strAction <> "-remove" then result_text= result_text & strLine & vbNewLine & strAction & vbNewLine
@@ -741,7 +741,7 @@ function Add_or_removeLine(strFilename, strFind, strAction)
         Set outputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename,2,true)
         outputFile.Write result_text
         outputFile.Close
-    end if    
+    end if
 end function
 """)
 
@@ -776,21 +776,21 @@ echo "(relaunch this batch, if you move your winpython)"
 pause
 
 rem Handle case when winpython.ini is not already created
-if exist "%WINPYDIR..%\settings\winpython.ini" goto ini_exists 
+if exist "%WINPYDIR..%\settings\winpython.ini" goto ini_exists
 
 echo [debug]>"%WINPYDIR..%\settings\winpython.ini"
 echo state = disabled>>"%WINPYDIR..%\settings\winpython.ini"
 echo [environment]>>"%WINPYDIR..%\settings\winpython.ini"
 
-:ini_exists 
+:ini_exists
 %~dp0Add_or_removeLine.vbs %WINPYDIR..%\settings\winpython.ini  "R_HOME = " -remove
 %~dp0Add_or_removeLine.vbs %WINPYDIR..%\settings\winpython.ini  "[environment]" "R_HOME = %R_HOME%"
 goto r_end
 
-:r_bad 
+:r_bad
 
 echo directory "%WINPYDIR..%\tools\%tmp_Rdirectory%\bin" not found
-echo please install R at "%WINPYDIR..%\tools\%tmp_Rdirectory%" 
+echo please install R at "%WINPYDIR..%\tools\%tmp_Rdirectory%"
 pause
 
 :r_end
@@ -1155,33 +1155,33 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ))
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+             verbose=False, archis=(32, ))
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='')
-    #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(7, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    #make_all(6, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(7, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
     #        verbose=False, archis=(32, ))
-    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(15, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(15, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
-    # make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
     #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ), flavor='FlavorJulia')
-    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='FlavorJulia')
-    #make_all(1, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='FlavorJulia')
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRJulia')
