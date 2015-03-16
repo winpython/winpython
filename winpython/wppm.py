@@ -341,7 +341,7 @@ python "%~dpn0""" + ext + """" %*""")
         """Install package in distribution"""
         assert package.is_compatible_with(self)
         tmp_fname = None
-        self.uninstall_existing(package)
+        # (tragic if pip) self.uninstall_existing(package)
         if package.fname.endswith(('.tar.gz', '.zip')):
             self._print(package, "Building")
             try:
@@ -461,7 +461,12 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         self._print(package, "Uninstalling")
         if isinstance(package, WininstPackage):
             package.uninstall()
-        else:
+            package.remove_log(self.logdir)
+        elif not package.name == 'pip':
+            subprocess.call([os.path.dirname(sys.executable) + r'\python.exe',
+                            '-m', 'pip', 'uninstall', package.name, '-y'],
+                            cwd=os.path.dirname(sys.executable))
+            # legacy, if some package installed by old non-pip means
             package.load_log(self.logdir)
             for fname in reversed(package.files):
                 path = osp.join(self.target, fname)
