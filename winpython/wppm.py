@@ -38,7 +38,7 @@ def get_package_metadata(database, name):
     for key in metadata:
         name1 = name.lower()
         # wheel replace '-' per '_' in key
-        for name2 in (name1, name1.split('-')[0],
+        for name2 in (name1, name1.split('-')[0], name1.replace('-', '_'),
                       '-'.join(name1.split('_'))):
             try:
                 metadata[key] = db.get(name2, key)
@@ -323,6 +323,15 @@ python "%~dpn0""" + ext + """" %*""")
                     continue
                 if pack.name is not None and pack.version is not None:
                     wininst.append(pack)
+        # Include package installed via pip (not via WPPM)
+        already = set(b.name.replace('-', '_') for b in wppm+wininst)
+        try:
+            import pip
+            wppm += [Package('%s-%s-py2.py3-none-any.whl' % (i.key, i.version))
+                     for i in pip.get_installed_distributions()
+                     if i.key.replace('-', '_') not in already]
+        except:
+            pass
         return wppm + wininst
 
     def find_package(self, name):
