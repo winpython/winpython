@@ -38,7 +38,7 @@ def get_package_metadata(database, name):
     for key in metadata:
         name1 = name.lower()
         # wheel replace '-' per '_' in key
-        for name2 in (name1, name1.split('-')[0],
+        for name2 in (name1, name1.split('-')[0], name1.replace('-', '_'),
                       '-'.join(name1.split('_'))):
             try:
                 metadata[key] = db.get(name2, key)
@@ -323,7 +323,32 @@ python "%~dpn0""" + ext + """" %*""")
                     continue
                 if pack.name is not None and pack.version is not None:
                     wininst.append(pack)
-        return wppm + wininst
+        # Include package installed via pip (not via WPPM)
+        already = set(b.name.replace('-', '_') for b in wppm+wininst)
+        try:
+            if  os.path.dirname(sys.executable) == self.target:
+                #  direct way: we interrogate ourself
+                import pip
+                pip_list = [(i.key, i.version)
+                             for i in pip.get_installed_distributions()
+                        if i.key.replace('-','_')  not in already]
+            else:
+                #  indirect way: we interrogate something else
+                cmdx=[osp.join(self.target, 'python.exe'), '-c',
+                      "import pip;print('+!+'.join(['%s@+@%s@+@' % (i.key,i.version)  for i in pip.get_installed_distributions()]))"]
+                p = subprocess.Popen(cmdx, shell=True, stdout=subprocess.PIPE,
+                                     cwd=self.target)
+                stdout, stderr = p.communicate()
+                start_at = 2 if sys.version_info >= (3,0) else 0
+                pip_list = [line.split("@+@")[:2] for line in
+                            ("%s" % stdout)[start_at:].split("+!+")]
+
+            # add it to the list is not there
+            wppm += [Package('%s-%s-py2.py3-none-any.whl' % (i[0], i[1]))
+                    for i in pip_list if i[0].replace('-', '_') not in already]
+        except:
+            pass
+        return sorted(wppm + wininst, key=lambda tup: tup.name.lower())
 
     def find_package(self, name):
         """Find installed package"""
