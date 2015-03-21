@@ -324,14 +324,12 @@ python "%~dpn0""" + ext + """" %*""")
                 if pack.name is not None and pack.version is not None:
                     wininst.append(pack)
         # Include package installed via pip (not via WPPM)
-        already = set(b.name.replace('-', '_') for b in wppm+wininst)
         try:
             if  os.path.dirname(sys.executable) == self.target:
                 #  direct way: we interrogate ourself
                 import pip
                 pip_list = [(i.key, i.version)
-                             for i in pip.get_installed_distributions()
-                        if i.key.replace('-','_')  not in already]
+                             for i in pip.get_installed_distributions()]
             else:
                 #  indirect way: we interrogate something else
                 cmdx=[osp.join(self.target, 'python.exe'), '-c',
@@ -343,9 +341,13 @@ python "%~dpn0""" + ext + """" %*""")
                 pip_list = [line.split("@+@")[:2] for line in
                             ("%s" % stdout)[start_at:].split("+!+")]
 
-            # add it to the list is not there
-            wppm += [Package('%s-%s-py2.py3-none-any.whl' % (i[0], i[1]))
-                    for i in pip_list if i[0].replace('-', '_') not in already]
+            # create pip package list
+            wppip = [Package('%s-%s-py2.py3-none-any.whl' % (i[0], i[1]))
+                     for i in pip_list]
+            # pip package version is supposed better
+            already = set(b.name.replace('-', '_') for b in wppip+wininst)
+            wppm = wppip + [i for i in wppm
+                            if i.name.replace('-', '_') not in already]
         except:
             pass
         return sorted(wppm + wininst, key=lambda tup: tup.name.lower())
