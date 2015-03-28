@@ -342,12 +342,12 @@ python "%~dpn0""" + ext + """" %*""")
                             ("%s" % stdout)[start_at:].split("+!+")]
 
             # create pip package list
-            wppip = [Package('%s-%s-py2.py3-none-any.whl' % (i[0], i[1]))
-                     for i in pip_list]
+            wppip = [Package('%s-%s-py2.py3-none-any.whl' %
+                     (i[0].lower(), i[1])) for i in pip_list]
             # pip package version is supposed better
             already = set(b.name.replace('-', '_') for b in wppip+wininst)
             wppm = wppip + [i for i in wppm
-                            if i.name.replace('-', '_') not in already]
+                            if i.name.replace('-', '_').lower() not in already]
         except:
             pass
         return sorted(wppm + wininst, key=lambda tup: tup.name.lower())
