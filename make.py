@@ -670,6 +670,7 @@ set PATH=%JULIA_HOME%;%SYS_PATH%
 
 set JULIA_EXE=julia.exe
 set JULIA=%JULIA_HOME%%JULIA_EXE%
+set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 
 set private_libdir=bin
 if not exist "%JULIA_HOME%..\lib\julia\sys.ji" ( ^
@@ -684,6 +685,7 @@ echo "julia!"
 echo --------------------
 echo to install Ijulia for Winpython (the first time) :
 echo type 'julia'
+echo type in Julia prompt 'Pkg.init()'
 echo type in Julia prompt 'Pkg.add("IJulia")'
 echo type in Julia prompt 'Pkg.add("PyCall")'
 echo type in Julia prompt 'Pkg.add("PyPlot")'
@@ -1153,8 +1155,8 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ))
+    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+             verbose=False, archis=(32, ))
     #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='')
     #make_all(7, '', pyver='3.3', rootdir=r'D:\Winpython',
@@ -1173,12 +1175,10 @@ if __name__ == '__main__':
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
     #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='FlavorRfull')
+    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='FlavorRfull')
     #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
-    #make_all(3, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ), flavor='FlavorJulia')
     #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorJulia')
     #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
