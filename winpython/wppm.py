@@ -312,7 +312,8 @@ python "%~dpn0""" + ext + """" %*""")
     def get_installed_packages(self):
         """Return installed packages"""
         # Packages installed with WPPM
-        wppm = [Package(logname[:-4]) for logname in os.listdir(self.logdir)]
+        wppm = [Package(logname[:-4]) for logname in os.listdir(self.logdir)
+                if '.whl.log' not in logname ]
         # Packages installed with distutils wininst
         wininst = []
         for name in os.listdir(self.target):

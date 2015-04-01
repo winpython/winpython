@@ -338,8 +338,8 @@ def patch_sourcelines(fname, in_line_start, out_line, endline='\n', silent_mode=
     if osp.isfile(fname):
         with io.open(fname, 'r') as fh:
             contents = fh.readlines()
-            content = "".join(contents) 
-            for l in range(len(contents)): 
+            content = "".join(contents)
+            for l in range(len(contents)):
                 if contents[l].startswith(in_line_start):
                    begining , middle = in_line_start , contents[l][len(in_line_start):]
                    ending = ""
@@ -352,7 +352,7 @@ def patch_sourcelines(fname, in_line_start, out_line, endline='\n', silent_mode=
                        if not silent_mode:
                            print("patching ", fname, " from\n", contents[l], "\nto\n", new_line)
                    contents[l] = new_line
-            new_content = "".join(contents)            
+            new_content = "".join(contents)
         if not new_content == content:
             # if not silent_mode:
             #    print("patching ", fname, "from", content, "to", new_content)
@@ -582,7 +582,12 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
     else:
         p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
-        p.communicate()
+        stdout, stderr = p.communicate()
+        the_log = ("%s" % stdout)
+        if 'not find any' in the_log:
+            print("Failed to Install: \n %s \n" % this_whl)
+            print("msg: %s" % stdout)
+            raise RuntimeError
         p.stdout.close()
         p.stderr.close()
     src_fname = this_whl
