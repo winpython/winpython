@@ -326,8 +326,9 @@ python "%~dpn0""" + ext + """" %*""")
                     wininst.append(pack)
         # Include package installed via pip (not via WPPM)
         try:
-            if  os.path.dirname(sys.executable) == self.target:
+            if os.path.dirname(sys.executable) == self.target and 1==2:
                 #  direct way: we interrogate ourself
+                #  avoid as it work only once (bug): result is never updated
                 import pip
                 pip_list = [(i.key, i.version)
                              for i in pip.get_installed_distributions()]
