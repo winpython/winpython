@@ -21,7 +21,7 @@ from winpython.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
                                 QAbstractItemView, QProgressDialog, QTableView,
                                 QPushButton, QLabel, QTabWidget, QToolTip,
                                 QDesktopServices)
-from winpython.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, SIGNAL,
+from winpython.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, Signal,
                                  QThread, QTimer, QUrl)
 from winpython.qt.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
@@ -41,6 +41,9 @@ COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = list(range(5))
 
 
 class PackagesModel(QAbstractTableModel):
+    # Signals after PyQt4 old SIGNAL removal
+    dataChanged = Signal(QModelIndex, QModelIndex)
+
     def __init__(self):
         QAbstractTableModel.__init__(self)
         self.packages = []
@@ -127,8 +130,9 @@ class PackagesModel(QAbstractTableModel):
                 self.checked.remove(package)
             else:
                 self.checked.add(package)
-            self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
-                      index, index)
+            # PyQt4 old SIGNAL: self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
+            # PyQt4 old SIGNAL:           index, index)
+            self.dataChanged.emit(index, index)
             return True
         return False
 
@@ -141,6 +145,9 @@ NONE_ACTION = '-'
 
 
 class PackagesTable(QTableView):
+    # Signals after PyQt4 old SIGNAL removal, to be emitted after package_added event
+    package_added = Signal()
+
     def __init__(self, parent, process, winname):
         QTableView.__init__(self, parent)
         assert process in ('install', 'uninstall')
@@ -185,7 +192,8 @@ class PackagesTable(QTableView):
                     notcompatible.append(bname)
             except NotImplementedError:
                 notsupported.append(bname)
-        self.emit(SIGNAL('package_added()'))
+        # PyQt4 old SIGNAL: self.emit(SIGNAL('package_added()'))
+        self.package_added.emit()
         if notsupported:
             QMessageBox.warning(self, "Warning",
                                 "The following packages filenaming are <b>not "
@@ -272,6 +280,9 @@ class DistributionSelector(QWidget):
     """Python distribution selector widget"""
     TITLE = 'Select a Python distribution path'
 
+    # Signals after PyQt4 old SIGNAL removal
+    selected_distribution = Signal(str)
+
     def __init__(self, parent):
         super(DistributionSelector, self).__init__(parent)
         self.browse_btn = None
@@ -292,8 +303,9 @@ class DistributionSelector(QWidget):
         # self.line_edit.setDisabled(True)
         self.browse_btn = QPushButton(get_std_icon('DirOpenIcon'), "", self)
         self.browse_btn.setToolTip(self.TITLE)
-        self.connect(self.browse_btn, SIGNAL("clicked()"),
-                     self.select_directory)
+        # PyQt4 old SIGNAL:self.connect(self.browse_btn, SIGNAL("clicked()"),
+        # PyQt4 old SIGNAL:             self.select_directory)
+        self.browse_btn.clicked.connect(self.select_directory)
         layout = QHBoxLayout()
         layout.addWidget(self.label)
         layout.addWidget(self.line_edit)
@@ -318,7 +330,8 @@ class DistributionSelector(QWidget):
                 continue
             directory = osp.abspath(osp.normpath(directory))
             self.set_distribution(directory)
-            self.emit(SIGNAL('selected_distribution(QString)'), directory)
+            # PyQt4 old SIGNAL: self.emit(SIGNAL('selected_distribution(QString)'), directory)
+            self.selected_distribution.emit(directory)
             break
 
 
@@ -338,7 +351,7 @@ class Thread(QThread):
                           or locale.getpreferredencoding()
             try:
                 error_str = error_str.decode(fs_encoding)
-            except (UnicodeError, TypeError):
+            except (UnicodeError, TypeError, AttributeError):
                 pass
             self.error = error_str
 
@@ -394,25 +407,32 @@ class PMWindow(QMainWindow):
         self.setWindowIcon(get_icon('winpython.svg'))
 
         self.selector = DistributionSelector(self)
-        self.connect(self.selector, SIGNAL('selected_distribution(QString)'),
-                     self.distribution_changed)
+        # PyQt4 old SIGNAL: self.connect(self.selector, SIGNAL('selected_distribution(QString)'),
+        # PyQt4 old SIGNAL:              self.distribution_changed)
+        self.selector.selected_distribution.connect(self.distribution_changed)
 
         self.table = PackagesTable(self, 'install', self.NAME)
-        self.connect(self.table, SIGNAL('package_added()'),
-                     self.refresh_install_button)
-        self.connect(self.table, SIGNAL("clicked(QModelIndex)"),
-                     lambda index: self.refresh_install_button())
+        # PyQt4 old SIGNAL:self.connect(self.table, SIGNAL('package_added()'),
+        # PyQt4 old SIGNAL:             self.refresh_install_button)
+        self.table.package_added.connect(self.refresh_install_button)
+
+        # PyQt4 old SIGNAL: self.connect(self.table, SIGNAL("clicked(QModelIndex)"),
+        # PyQt4 old SIGNAL:              lambda index: self.refresh_install_button())
+        self.table.clicked.connect(lambda index: self.refresh_install_button())
 
         self.untable = PackagesTable(self, 'uninstall', self.NAME)
-        self.connect(self.untable, SIGNAL("clicked(QModelIndex)"),
-                     lambda index: self.refresh_uninstall_button())
+        # PyQt4 old SIGNAL:self.connect(self.untable, SIGNAL("clicked(QModelIndex)"),
+        # PyQt4 old SIGNAL:             lambda index: self.refresh_uninstall_button())
+        self.untable.clicked.connect(lambda index: self.refresh_uninstall_button())
 
         self.selector.set_distribution(sys.prefix)
         self.distribution_changed(sys.prefix)
 
         self.tabwidget = QTabWidget()
-        self.connect(self.tabwidget, SIGNAL('currentChanged(int)'),
-                     self.current_tab_changed)
+        # PyQt4 old SIGNAL:self.connect(self.tabwidget, SIGNAL('currentChanged(int)'),
+        # PyQt4 old SIGNAL:             self.current_tab_changed)
+        self.tabwidget.currentChanged.connect(self.current_tab_changed)
+
         btn_layout = self._add_table(self.table, "Install/upgrade packages",
                                      get_std_icon("ArrowDown"))
         unbtn_layout = self._add_table(self.untable, "Uninstall packages",
