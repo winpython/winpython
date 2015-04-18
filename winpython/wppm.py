@@ -166,7 +166,7 @@ class Package(BasePackage):
         try:
             data = open(self.logpath(logdir), 'U').readlines()
         except (IOError, OSError):
-            raise
+            data = []  # it can be now ()
         self.files = []
         for line in data:
             relpath = line.strip()
@@ -492,9 +492,11 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
             package.uninstall()
             package.remove_log(self.logdir)
         elif not package.name == 'pip':
-            subprocess.call([os.path.dirname(sys.executable) + r'\python.exe',
+            # trick to get true target (if not current)
+            this_executable_path = os.path.dirname(self.logdir)	
+            subprocess.call([this_executable_path + r'\python.exe',
                             '-m', 'pip', 'uninstall', package.name, '-y'],
-                            cwd=os.path.dirname(sys.executable))
+                            cwd=this_executable_path)
             # legacy, if some package installed by old non-pip means
             package.load_log(self.logdir)
             for fname in reversed(package.files):
