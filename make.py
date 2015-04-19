@@ -240,7 +240,7 @@ Name | Version | Description
     @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
-        path = [r"Lib\site-packages\PyQt4",
+        path = [r"Lib\site-packages\PyQt5", r"Lib\site-packages\PyQt4",
                 "",  # Python root directory (python.exe)
                 "DLLs", "Scripts", r"..\tools", r"..\tools\mingw32\bin"
                 ]
@@ -466,6 +466,11 @@ call %~dp0env.bat
             self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
                       'setuptools', install_options=['--upgrade', '--no-deps'])
 
+        #Pyqt5 (doesn't currently install in build this way, reason unclear)
+        #self.install_package(
+        #    'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
+        #    % (self.python_version, self.pyqt_arch))
+
         # Install 'main packages' first (was before Wheel idea, keep for now)
         for happy_few in['pip', 'wheel', 'pywin32', 'six', 'numpy',  'spyder',
                          'scipy', 'matplotlib', 'pandas']:
@@ -549,17 +554,29 @@ call %~dp0env.bat
         #                     args='register_python',
         #                     workdir='${WINPYDIR}\Scripts')
 
-        self.create_launcher('Qt Demo.exe', 'qt.ico', args='qtdemo.pyw',
-          workdir=r'${WINPYDIR}\Lib\site-packages\PyQt4\examples\demos\qtdemo')
-        self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
-                  command=r'${WINPYDIR}\Lib\site-packages\PyQt4\assistant.exe',
-                  workdir=r'${WINPYDIR}')
-        self.create_launcher('Qt Designer.exe', 'qtdesigner.ico',
-                   command=r'${WINPYDIR}\Lib\site-packages\PyQt4\designer.exe',
-                   workdir=r'${WINPYDIR}')
-        self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
-                   command=r'${WINPYDIR}\Lib\site-packages\PyQt4\linguist.exe',
-                   workdir=r'${WINPYDIR}')
+        python_lib_dir = osp.join(self.winpydir, self.python_name,
+                                  r"Lib\site-packages")
+        # manage Qt4, Qt5
+        for QtV in (5, 4):
+            PyQt = 'PyQt%s' % QtV
+            QtDemo_path = 'demos\qtdemo' if QtV == 4 else 'qtdemo'
+            if osp.isdir(osp.join(python_lib_dir, PyQt)):
+                self.create_launcher('Qt%s Demo.exe' % QtV, 'qt.ico', 
+                    args='qtdemo.pyw', workdir=
+                    r'${WINPYDIR}\Lib\site-packages\%s\examples\%s' %
+                         (PyQt, QtDemo_path) )
+                self.create_launcher('Qt%s Assistant.exe' % QtV,
+                    'qtassistant.ico',
+                    command=r'${WINPYDIR}\Lib\site-packages\%s\assistant.exe' %
+                    PyQt, workdir=r'${WINPYDIR}')
+                self.create_launcher('Qt%s Designer.exe' % QtV,
+                    'qtdesigner.ico',
+                    command=r'${WINPYDIR}\Lib\site-packages\%s\designer.exe' %
+                    PyQt, workdir=r'${WINPYDIR}')
+                self.create_launcher('Qt%s Linguist.exe' % QtV,
+                    'qtlinguist.ico',
+                    command=r'${WINPYDIR}\Lib\site-packages\%s\linguist.exe' %
+                    PyQt, workdir=r'${WINPYDIR}')
         if self.python_version[0] == '3':
             ipython_exe = 'ipython3.exe'
             ipython_scr = 'ipython3-script.py'
@@ -919,8 +936,10 @@ cmd.exe /k""")
 call %~dp0env.bat
 call %~dp0register_python.bat --all""")
         self.create_python_batch('wpcp.bat', 'wpcp', workdir='Scripts')
-        self.create_python_batch('pyqt_demo.bat', 'qtdemo.pyw',
-                     workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
+        self.create_python_batch('pyqt4_demo.bat', 'qtdemo.pyw',
+             workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
+        self.create_python_batch('pyqt5_demo.bat', 'qtdemo.pyw',
+             workdir=r'Lib\site-packages\PyQt5\examples\qtdemo')
 
         # pre-run wingw batch
         print('now pre-running extra mingw')
@@ -1155,31 +1174,29 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-             verbose=False, archis=(32, ))
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='')
-    #make_all(7, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #         verbose=False, archis=(32, ))
+    make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ), flavor='')
+    #make_all(8, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    #make_all(7, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(8, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='2.7', rootdir=r'D:\Winpython',
     #        verbose=False, archis=(32, ))
-    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
+    #make_all(5, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(4, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorJulia')
-    #make_all(2, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRJulia')

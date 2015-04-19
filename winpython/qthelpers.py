@@ -3,13 +3,19 @@
 # Copyright © 2009-2011 Pierre Raybaut
 # Licensed under the terms of the MIT License
 # (copied from Spyder source code [spyderlib.qt])
+#
+# Qt5 migration would not have been possible without
+#   2014-2015 Spyder Development Team work
+# (MIT License too, same parent project)
 
 """Qt utilities"""
 
 from winpython.qt.QtGui import (QAction, QStyle, QWidget, QIcon, QApplication,
-                                QMenu, QKeySequence, QToolButton)
-from winpython.qt.QtCore import (SIGNAL, Qt, QLocale, QTranslator,
-                                 QLibraryInfo, QEvent)
+                                QLabel, QVBoxLayout, QHBoxLayout, QLineEdit,
+                                QKeyEvent, QMenu, QKeySequence, QToolButton,
+                                QPixmap)
+from winpython.qt.QtCore import (Signal, QObject, Qt, QLocale, QTranslator,
+                                 QLibraryInfo, QEvent, Slot)
 from winpython.qt.compat import to_qvariant, from_qvariant
 
 import os
@@ -29,13 +35,16 @@ def get_icon(name):
 
 class MacApplication(QApplication):
     """Subclass to be able to open external files with our Mac app"""
+    open_external_file = Signal(str)
+
     def __init__(self, *args):
         QApplication.__init__(self, *args)
 
     def event(self, event):
         if event.type() == QEvent.FileOpen:
             fname = str(event.file())
-            self.emit(SIGNAL('open_external_file(QString)'), fname)
+            # PyQt4 old SIGNAL: self.emit(SIGNAL('open_external_file(QString)'), fname)
+            self.open_external_file.emit(fname)
         return QApplication.event(self, event)
 
 
@@ -153,9 +162,11 @@ def create_action(parent, text, shortcut=None, icon=None, tip=None,
     """Create a QAction"""
     action = QAction(text, parent)
     if triggered is not None:
-        parent.connect(action, SIGNAL("triggered()"), triggered)
+        # PyQt4 old SIGNAL: parent.connect(action, SIGNAL("triggered()"), triggered)
+        action.triggered.connect(triggered)
     if toggled is not None:
-        parent.connect(action, SIGNAL("toggled(bool)"), toggled)
+        # PyQt4 old SIGNAL: parent.connect(action, SIGNAL("toggled(bool)"), toggled)
+        action.toggled.connect(toggled)
         action.setCheckable(True)
     if icon is not None:
         if is_text_string(icon):
