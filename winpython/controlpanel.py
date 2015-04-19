@@ -167,7 +167,9 @@ class PackagesTable(QTableView):
         self.setShowGrid(False)
 
     def reset_model(self):
-        self.model.reset()
+        # self.model.reset() is deprecated in Qt5
+        self.model.beginResetModel()
+        self.model.endResetModel()
         self.horizontalHeader().setStretchLastSection(True)
         for colnb in (ACTION, CHECK, NAME, VERSION):
             self.resizeColumnToContents(colnb)
