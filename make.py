@@ -805,8 +805,10 @@ set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
 set WINPYARCH="WIN32"
 if  "%WiNPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
 
-if %WINPYARCH%=="WIN32"     set WINMINGW=lib\gcc\i686-w64-mingw32
-if %WINPYARCH%=="WIN-AMD64" set WINMINGW=lib\gcc\x86_64-w64-mingw32
+if %WINPYARCH%=="WIN32"     set BASEMINGW=i686-w64-mingw32
+if %WINPYARCH%=="WIN-AMD64" set BASEMINGW=x86_64-w64-mingw32
+
+set WINMINGW=lib\gcc\%BASEMINGW%
 
 if not  %WINPYARCH%=="WIN-AMD64" goto no_distutil_patch
 %~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
@@ -822,7 +824,7 @@ IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
 IF "%WINPYXX%"=="27" set WINPYSPEC=specs90
 
 cd %WINPYDIR%
-copy  /Y ..\tools\mingw32\%WINMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
+copy  /Y ..\tools\mingw32\%BASEMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
 
 REM copy the right version of gcc
 set dir482=..\tools\mingw32\%WINMINGW%\4.8.2\%WINPYSPEC%
