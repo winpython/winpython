@@ -449,7 +449,7 @@ call %~dp0env.bat
                                  % (self.py_arch, self.python_version))
         if self.python_version == '2.7' or self.python_version == '3.4':
             self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
-                      'setuptools', install_options=['--upgrade', '--no-deps'])
+                      'setuptools')
 
         #Pyqt5 (doesn't currently install in build this way, reason unclear)
         #self.install_package(
@@ -1118,7 +1118,7 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
 
-    install_options = ['--no-index', '--find-links=%s' % wheeldir]
+    install_options = ['--no-index', '--upgrade', '--find-links=%s' % wheeldir]
 
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
