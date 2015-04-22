@@ -456,10 +456,9 @@ call %~dp0env.bat
         #    'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
         #    % (self.python_version, self.pyqt_arch))
 
-        # Install 'main packages' first (was before Wheel idea, keep for now)
+        # Install 'critical' packages first
         for happy_few in['pip', 'wheel', 'pywin32', 'six', 'numpy',  'spyder',
                          'scipy', 'matplotlib', 'pandas']:
-            # can be a wheel now
             self.install_package(
                 '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few)
 
