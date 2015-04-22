@@ -29,21 +29,6 @@ CHANGELOGS_DIR = osp.join(osp.dirname(__file__), 'changelogs')
 assert osp.isdir(CHANGELOGS_DIR)
 
 
-# =============================================================================
-# How to prepare the MinGW package:
-# =============================================================================
-#
-# go to https://github.com/numpy/numpy/wiki/Mingw-static-toolchain
-# for 32 bit, download mingw32static-2014-11.7z and unzip it
-#             copy mingw32static-2014-11\mingw32static
-#              to %WINPYTHONBASEDIR%\tools.win32\mingw32
-#              (so you have a %WINPYTHONBASEDIR%\tools.win32\mingw32\bin)
-# for 64 bit, download mingw64static-2014-11.7z and unzip it
-#             copy mingw64static-2014-11\mingw32static
-#              to %WINPYTHONBASEDIR%\tools.win-amd64\mingw32
-#              (so you have a %WINPYTHONBASEDIR%\tools.win-amd64\mingw32\bin)
-
-
 def get_drives():
     """Return all active drives"""
     import win32api
@@ -349,7 +334,7 @@ Name | Version | Description
                 ('Icon', icon_fname),
                 ('OutFile', name)]
 
-        # handle well Flavor with R included
+        # handle well Flavor with R or JULIA
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
                  ('JULIA_PKGDIR', '$EXEDIR%s' % r'\settings\.julia'),
                  ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
@@ -464,17 +449,16 @@ call %~dp0env.bat
                                  % (self.py_arch, self.python_version))
         if self.python_version == '2.7' or self.python_version == '3.4':
             self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
-                      'setuptools', install_options=['--upgrade', '--no-deps'])
+                      'setuptools')
 
         #Pyqt5 (doesn't currently install in build this way, reason unclear)
         #self.install_package(
         #    'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
         #    % (self.python_version, self.pyqt_arch))
 
-        # Install 'main packages' first (was before Wheel idea, keep for now)
+        # Install 'critical' packages first
         for happy_few in['pip', 'wheel', 'pywin32', 'six', 'numpy',  'spyder',
                          'scipy', 'matplotlib', 'pandas']:
-            # can be a wheel now
             self.install_package(
                 '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few)
 
@@ -625,6 +609,35 @@ call %~dp0env.bat
                                  workdir=r'${WINPYDIR}\..\notebooks')
 
         self._print_done()
+
+    def _create_batch_scripts_initial(self):
+        """Create batch scripts"""
+        self._print("Creating batch scripts initial")
+        conv = lambda path: ";".join(['%WINPYDIR%\\'+pth for pth in path])
+        path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
+        self.create_batch_script('env.bat', """@echo off
+set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
+set WINPYVER=""" + self.winpyver + r"""
+set HOME=%WINPYDIR%\..\settings
+set WINPYARCH="WIN32"
+if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
+
+rem handle R if included
+if not exist "%WINPYDIR%\..\tools\R\bin" goto r_bad
+set R_HOME=%WINPYDIR%\..\tools\R
+if %WINPYARCH%=="WIN32"     set R_HOMEbin=%R_HOME%\bin\i386
+if not %WINPYARCH%=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
+:r_bad
+
+rem handle Julia if included
+if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
+set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
+set JULIA_EXE=julia.exe
+set JULIA=%JULIA_HOME%%JULIA_EXE%
+set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
+:julia_bad
+
+set PATH=""" + path)
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
@@ -820,8 +833,10 @@ set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
 set WINPYARCH="WIN32"
 if  "%WiNPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
 
-if %WINPYARCH%=="WIN32"     set WINMINGW=lib\gcc\i686-w64-mingw32
-if %WINPYARCH%=="WIN-AMD64" set WINMINGW=lib\gcc\x86_64-w64-mingw32
+if %WINPYARCH%=="WIN32"     set BASEMINGW=i686-w64-mingw32
+if %WINPYARCH%=="WIN-AMD64" set BASEMINGW=x86_64-w64-mingw32
+
+set WINMINGW=lib\gcc\%BASEMINGW%
 
 if not  %WINPYARCH%=="WIN-AMD64" goto no_distutil_patch
 %~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
@@ -837,7 +852,7 @@ IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
 IF "%WINPYXX%"=="27" set WINPYSPEC=specs90
 
 cd %WINPYDIR%
-copy  /Y ..\tools\mingw32\%WINMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
+copy  /Y ..\tools\mingw32\%BASEMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
 
 REM copy the right version of gcc
 set dir482=..\tools\mingw32\%WINMINGW%\4.8.2\%WINPYSPEC%
@@ -941,7 +956,7 @@ call %~dp0register_python.bat --all""")
         self.create_python_batch('pyqt5_demo.bat', 'qtdemo.pyw',
              workdir=r'Lib\site-packages\PyQt5\examples\qtdemo')
 
-        # pre-run wingw batch
+        # pre-run mingw batch
         print('now pre-running extra mingw')
         filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
         p = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
@@ -949,12 +964,12 @@ call %~dp0register_python.bat --all""")
 
         self._print_done()
 
-    def _run_complement_batch_scripts(self):
+    def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
         """ tools\..\run_complement.bat for final complements"""
-        print('now run_complement.bat in tooldirs\..')
+        print('now %s in tooldirs\..' % this_batch)
         for post_complement in list(set([osp.dirname(s)
                                          for s in self._toolsdirs])):
-            filepath = osp.join(post_complement, "run_complement.bat")
+            filepath = osp.join(post_complement, this_batch)
             if osp.isfile(filepath):
                 print('launch "%s"  for  "%s"' % (filepath,  self.winpydir))
                 try:
@@ -1013,6 +1028,9 @@ call %~dp0register_python.bat --all""")
         if remove_existing:
             if not self.simulation:
                 self._add_msvc_files()
+            if not self.simulation:
+                self._create_batch_scripts_initial()
+                self._run_complement_batch_scripts("run_required_first.bat")
             self._install_required_packages()
             self._install_all_other_packages()
             if not self.simulation:
@@ -1132,7 +1150,7 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
 
-    install_options = ['--no-index', '--find-links=%s' % wheeldir]
+    install_options = ['--no-index', '--upgrade', '--find-links=%s' % wheeldir]
 
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
@@ -1178,6 +1196,8 @@ if __name__ == '__main__':
     #         verbose=False, archis=(32, ))
     make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
               verbose=False, archis=(64, ), flavor='')
+    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython\basedirQt5',
+    #         verbose=False, archis=(64, ))
     #make_all(8, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
     #make_all(8, '', pyver='3.3', rootdir=r'D:\Winpython',
