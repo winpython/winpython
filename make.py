@@ -29,21 +29,6 @@ CHANGELOGS_DIR = osp.join(osp.dirname(__file__), 'changelogs')
 assert osp.isdir(CHANGELOGS_DIR)
 
 
-# =============================================================================
-# How to prepare the MinGW package:
-# =============================================================================
-#
-# go to https://github.com/numpy/numpy/wiki/Mingw-static-toolchain
-# for 32 bit, download mingw32static-2014-11.7z and unzip it
-#             copy mingw32static-2014-11\mingw32static
-#              to %WINPYTHONBASEDIR%\tools.win32\mingw32
-#              (so you have a %WINPYTHONBASEDIR%\tools.win32\mingw32\bin)
-# for 64 bit, download mingw64static-2014-11.7z and unzip it
-#             copy mingw64static-2014-11\mingw32static
-#              to %WINPYTHONBASEDIR%\tools.win-amd64\mingw32
-#              (so you have a %WINPYTHONBASEDIR%\tools.win-amd64\mingw32\bin)
-
-
 def get_drives():
     """Return all active drives"""
     import win32api
@@ -349,7 +334,7 @@ Name | Version | Description
                 ('Icon', icon_fname),
                 ('OutFile', name)]
 
-        # handle well Flavor with R included
+        # handle well Flavor with R or JULIA
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
                  ('JULIA_PKGDIR', '$EXEDIR%s' % r'\settings\.julia'),
                  ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
@@ -941,7 +926,7 @@ call %~dp0register_python.bat --all""")
         self.create_python_batch('pyqt5_demo.bat', 'qtdemo.pyw',
              workdir=r'Lib\site-packages\PyQt5\examples\qtdemo')
 
-        # pre-run wingw batch
+        # pre-run mingw batch
         print('now pre-running extra mingw')
         filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
         p = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
