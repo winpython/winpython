@@ -25,8 +25,8 @@ Licensed under the terms of the MIT License
     Dependencies
     
         Python2 >= 2.7 or Python3 >= 3.3
-        PyQt4 >= 4.6 or PySide >= 1.2 (PyQt4 is recommended)
-        pip >= 1.5.4 and setuptools >= 3.4.4
+        PyQt4 >= 4.11 or PySide >= 1.2 (PyQt4 is recommended)
+        pip >= 6.0.8 and setuptools >= 15.1
 
     Requirements
 
@@ -64,7 +64,6 @@ Licensed under the terms of the MIT License
     
         Downloads:
             https://sourceforge.net/projects/winpython/files/ 
-            or until march 17th 2015,  https://sourceforge.net/projects/stonebig.u/files/
         Development, bug reports and feature requests:
             https://github.com/winpython/winpython
         Discussions:
