@@ -328,7 +328,7 @@ python "%~dpn0""" + ext + """" %*""")
         try:
             if os.path.dirname(sys.executable) == self.target:
                 #  direct way: we interrogate ourself
-                import pip
+                import imp, pip
                 pip.utils.pkg_resources = imp.reload(pip.utils.pkg_resources)
                 pip_list = [(i.key, i.version)
                              for i in pip.get_installed_distributions()]
@@ -493,7 +493,7 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
             package.remove_log(self.logdir)
         elif not package.name == 'pip':
             # trick to get true target (if not current)
-            this_executable_path = os.path.dirname(self.logdir)	
+            this_executable_path = os.path.dirname(self.logdir)
             subprocess.call([this_executable_path + r'\python.exe',
                             '-m', 'pip', 'uninstall', package.name, '-y'],
                             cwd=this_executable_path)
