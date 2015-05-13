@@ -545,7 +545,7 @@ call %~dp0env.bat
             PyQt = 'PyQt%s' % QtV
             QtDemo_path = 'demos\qtdemo' if QtV == 4 else 'qtdemo'
             if osp.isdir(osp.join(python_lib_dir, PyQt)):
-                self.create_launcher('Qt%s Demo.exe' % QtV, 'qt.ico', 
+                self.create_launcher('Qt%s Demo.exe' % QtV, 'qt.ico',
                     args='qtdemo.pyw', workdir=
                     r'${WINPYDIR}\Lib\site-packages\%s\examples\%s' %
                          (PyQt, QtDemo_path) )
