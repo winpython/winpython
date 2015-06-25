@@ -517,12 +517,15 @@ call %~dp0env.bat
                              workdir='${WINPYDIR}\Lib\idlelib')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
-                             args='spyder', workdir='${WINPYDIR}\Scripts',
-                             settingspath=settingspath)
-        self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
-                             args='spyder --light',
+                             command='${WINPYDIR}\Scripts\spyder.exe',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
+        self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
+                             args='--light',
+                             command='${WINPYDIR}\Scripts\spyder.exe',
+                             workdir='${WINPYDIR}\Scripts',
+                             settingspath=settingspath)
+
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
                              command='${WINPYDIR}\pythonw.exe',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
@@ -1192,31 +1195,31 @@ if __name__ == '__main__':
     # DO create only what version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython\basedirQt5',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='')
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython\basedirQt5',
     #         verbose=False, archis=(64, ))
-    #make_all(8, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(9, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ))
-    #make_all(8, '', pyver='3.3', rootdir=r'D:\Winpython',
+    #make_all(9, '', pyver='3.3', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ))
-    #make_all(5, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #        verbose=False, archis=(32, ))
-    #make_all(5, '', pyver='2.7', rootdir=r'D:\Winpython',
+    make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
+            verbose=False, archis=(32, ))
+    #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorJulia')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorJulia')
-    #make_all(3, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(32, ), flavor='FlavorRJulia')
