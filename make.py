@@ -347,16 +347,18 @@ Name | Version | Description
         build_nsis('launcher.nsi', fname, data)
 
     def create_python_batch(self, name, script_name,
-                            workdir=None, options=None):
+                            workdir=None, options=None, command=None):
         """Create batch file to run a Python script"""
         if options is None:
             options = ''
         else:
             options = ' ' + options
-        if script_name.endswith('.pyw'):
-            cmd = 'start %WINPYDIR%\pythonw.exe'
-        else:
-            cmd = '%WINPYDIR%\python.exe'
+
+        if command is None:
+            if script_name.endswith('.pyw'):
+                command = 'start %WINPYDIR%\pythonw.exe'
+            else:
+                command = '%WINPYDIR%\python.exe'
         changedir = ''
         if workdir is not None:
             workdir = osp.join('%WINPYDIR%', workdir)
@@ -366,7 +368,7 @@ Name | Version | Description
             script_name = ' ' + script_name
         self.create_batch_script(name, r"""@echo off
 call %~dp0env.bat
-""" + changedir + cmd + script_name + options + " %*")
+""" + changedir + command + script_name + options + " %*")
 
     def create_installer(self):
         """Create installer with NSIS"""
@@ -517,12 +519,13 @@ call %~dp0env.bat
                              workdir='${WINPYDIR}\Lib\idlelib')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
-                             command='${WINPYDIR}\Scripts\spyder.exe',
+                             command='${WINPYDIR}\python.exe',
+                             args='-m spyderlib.start_app',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
         self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
-                             args='--light',
-                             command='${WINPYDIR}\Scripts\spyder.exe',
+                             command='${WINPYDIR}\python.exe',
+                             args='-m spyderlib.start_app --light',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
 
@@ -944,9 +947,13 @@ echo [config]>%pydistutils_cfg%
 call %~dp0env.bat
 cmd.exe /k""")
         self.create_python_batch('python.bat', '')
-        self.create_python_batch('spyder.bat', 'spyder', workdir='Scripts')
-        self.create_python_batch('spyder_light.bat', 'spyder',
-                                 workdir='Scripts', options='--light')
+        self.create_python_batch('spyder.bat', 'spyderlib.start_app',
+                                 workdir='Scripts',
+                                 command = '%WINPYDIR%\python.exe -m')
+        self.create_python_batch('spyder_light.bat', 'spyderlib.start_app',
+                                 workdir='Scripts',
+                                 command = '%WINPYDIR%\python.exe -m',
+                                 options='--light')
         self.create_python_batch('register_python.bat', 'register_python',
                                  workdir='Scripts')
         self.create_batch_script('register_python_for_all.bat',
