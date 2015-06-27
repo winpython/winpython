@@ -1199,34 +1199,18 @@ def make_all(build_number, release_level, pyver,
 
 
 if __name__ == '__main__':
-    # DO create only what version at a time
+    # DO create only one version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='')
+    make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+              verbose=False, archis=(64, ), flavor='')
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython\basedirQt5',
     #         verbose=False, archis=(64, ))
-    #make_all(9, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ))
-    #make_all(9, '', pyver='3.3', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ))
-    make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
-            verbose=False, archis=(32, ))
     #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='FlavorIgraph')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ), flavor='FlavorKivy')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ), flavor='FlavorRfull')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorRfull')
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ), flavor='FlavorJulia')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorJulia')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(32, ), flavor='FlavorRJulia')
