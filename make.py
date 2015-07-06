@@ -273,7 +273,7 @@ Name | Version | Description
                 return osp.abspath(osp.join(path, fname))
         else:
             raise RuntimeError(
-                'Could not found required package matching %s' % pattern)
+                'Could not find required package matching %s' % pattern)
 
     def install_package(self, pattern, install_options=None):
         """Install package matching pattern"""
@@ -445,24 +445,16 @@ call %~dp0env.bat
         """Installing required packages"""
         print("Installing required packages")
 
-        # Install First these two packages to support wheel format
-        if self.python_version == '3.3':
-            self.install_package('get-pip-([0-9\.]*[a-z]*[0-9]?).%s(-py%s)?.exe'
-                                 % (self.py_arch, self.python_version))
-        if self.python_version == '2.7' or self.python_version == '3.4':
-            self.install_package('%s-([0-9\.]*[a-z]*[0-9]?)(.*)(\.exe|\.whl)' %
-                      'setuptools')
-
         #Pyqt5 (doesn't currently install in build this way, reason unclear)
         #self.install_package(
         #    'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
         #    % (self.python_version, self.pyqt_arch))
 
         # Install 'critical' packages first
-        for happy_few in['pip', 'wheel', 'pywin32', 'six', 'numpy',  'spyder',
-                         'scipy', 'matplotlib', 'pandas']:
+        for happy_few in['setuptools', 'pip', 'pywin32']:
             self.install_package(
-                '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few)
+                '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few,
+                     install_options = self.install_options+['--upgrade'])
 
     def _install_all_other_packages(self):
         """Try to install all other packages in wheeldir"""
@@ -1160,7 +1152,7 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
 
-    install_options = ['--no-index', '--upgrade', '--find-links=%s' % wheeldir]
+    install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
 
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
