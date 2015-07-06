@@ -583,10 +583,11 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
         p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
-        the_log = ("%s" % stdout)
-        if 'not find any' in the_log:
+        the_log = ("%s" % stdout + "\n %s" % stderr)
+
+        if ' not find ' in the_log or ' not found ' in the_log:
             print("Failed to Install: \n %s \n" % this_whl)
-            print("msg: %s" % stdout)
+            print("msg: %s" % the_log)
             raise RuntimeError
         p.stdout.close()
         p.stderr.close()
