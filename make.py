@@ -675,69 +675,6 @@ set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 
 set PATH=""" + path)
 
-        self.create_batch_script('start_ijulia.bat', r"""@echo off
-call %~dp0env.bat
-
-rem ******************
-rem Starting Ijulia  (supposing you install it in \tools\Julia of winpython)
-rem ******************
-
-set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
-if  exist "%JULIA_HOME%" goto julia_next
-echo --------------------
-echo First install Julia in \tools\Julia of winpython
-echo suggestion : don't create Julia shortcuts, nor menu, nor desktop icons
-echo (they would create a .julia in your home directory rather than here)
-echo When it will be done, launch again this .bat
-
-if not exist "%JULIA_HOME%" goto julia_end
-
-:julia_next
-set SYS_PATH=%PATH%
-set PATH=%JULIA_HOME%;%SYS_PATH%
-
-set JULIA_EXE=julia.exe
-set JULIA=%JULIA_HOME%%JULIA_EXE%
-set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
-
-set private_libdir=bin
-if not exist "%JULIA_HOME%..\lib\julia\sys.ji" ( ^
-echo "Preparing Julia for first launch. This may take a while" && ^
-echo "You may see two git related errors. This is completely normal" && ^
-cd "%JULIA_HOME%..\share\julia\base" && ^
-"%JULIA%" --build "%JULIA_HOME%..\lib\julia\sys0" sysimg.jl && ^
-"%JULIA%" --build "%JULIA_HOME%..\lib\julia\sys" -J sys0.ji sysimg.jl && ^
-popd && pushd "%cd%" )
-
-echo "julia!"
-echo --------------------
-echo to install Ijulia for Winpython (the first time) :
-echo type 'julia'
-echo type in Julia prompt 'Pkg.init()'
-echo type in Julia prompt 'Pkg.add("IJulia")'
-echo type in Julia prompt 'Pkg.add("PyCall")'
-echo type in Julia prompt 'Pkg.add("PyPlot")'
-echo type 'Ctrl + 'D' to quit Julia
-echo nota : type 'help()' to get help in Julia
-echo --------------------
-echo if error during build process (July18th, 2014), look there for workaround)
-echo "https://github.com/JuliaLang/WinRPM.jl/issues/27#issuecomment-49189546"
-echo --------------------
-rem (not working as of july 18th, 2014:
-rem    https://github.com/JuliaLang/IJulia.jl/issues/206 )
-rem echo to enable use of julia from python  (the first time):
-rem echo    launch winpython command prompt
-rem echo    cd  ..\settings\.julia\v0.3\IJulia\python
-rem echo    python setup.py install
-rem echo see http://blog.leahhanson.us/julia-calling-python-calling-julia.html
-rem echo --------------------
-echo to launch Ijulia type now "Ipython notebook --profile julia"
-rem Ipython notebook --profile julia
-echo to use julia_magic from Ipython, type "Ipython notebook" instead.
-:julia_end
-cmd.exe /k
-""")
-
 
         self.create_batch_script('Add_or_removeLine.vbs',r"""
 'from http://blogs.technet.com/b/heyscriptingguy/archive/2007/09/07/
@@ -773,56 +710,7 @@ function Add_or_removeLine(strFilename, strFind, strAction)
 end function
 """)
 
-        self.create_batch_script('start_with_r.bat', r"""@echo off
-call %~dp0env.bat
 
-rem **get Base of winpython in pure path form
-pushd
-cd /d  %WINPYDIR%
-cd..
-set WINPYDIR..=%CD%
-popd
-
-rem ******************
-rem R part (supposing you install it in \tools\R of winpython)
-rem ******************
-set tmp_Rdirectory=R
-if not exist "%WINPYDIR..%\tools\%tmp_Rdirectory%\bin" goto r_bad
-
-rem  R_HOME for rpy2, R_HOMEBIN for PATH
-set R_HOME=%WINPYDIR..%\tools\%tmp_Rdirectory%
-if %WINPYARCH%=="WIN32"     set R_HOMEbin=%R_HOME%\bin\i386
-if not %WINPYARCH%=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
-
-set SYS_PATH=%PATH%
-set PATH=%SYS_PATH%;%R_HOMEbin%
-
-echo "r!"
-echo "We are going to  update %WINPYDIR..%\settings\winpython.ini with"
-echo "R_HOME = %R_HOME%"
-echo "(relaunch this batch, if you move your winpython)"
-pause
-
-rem Handle case when winpython.ini is not already created
-if exist "%WINPYDIR..%\settings\winpython.ini" goto ini_exists
-
-echo [debug]>"%WINPYDIR..%\settings\winpython.ini"
-echo state = disabled>>"%WINPYDIR..%\settings\winpython.ini"
-echo [environment]>>"%WINPYDIR..%\settings\winpython.ini"
-
-:ini_exists
-%~dp0Add_or_removeLine.vbs %WINPYDIR..%\settings\winpython.ini  "R_HOME = " -remove
-%~dp0Add_or_removeLine.vbs %WINPYDIR..%\settings\winpython.ini  "[environment]" "R_HOME = %R_HOME%"
-goto r_end
-
-:r_bad
-
-echo directory "%WINPYDIR..%\tools\%tmp_Rdirectory%\bin" not found
-echo please install R at "%WINPYDIR..%\tools\%tmp_Rdirectory%"
-pause
-
-:r_end
-""")
         # Prepare a live patch on python (shame we need it) to have mingw64ok
         patch_distutils = r"""
 
