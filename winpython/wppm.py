@@ -223,7 +223,7 @@ class WininstPackage(BasePackage):
 
 class Distribution(object):
     # PyQt module is now like :PyQt4-...
-    NSIS_PACKAGES = ('PyQt4', 'PyQwt')  # known NSIS packages
+    NSIS_PACKAGES = ('PyQt4', 'PyQwt', 'PyQt5')  # known NSIS packages
 
     def __init__(self, target, verbose=False, indent=False):
         self.target = target
