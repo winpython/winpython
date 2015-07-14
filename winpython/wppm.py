@@ -603,7 +603,10 @@ python "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %
 
         self._print(package, "Installing")
         self.copy_files(package, targetdir, 'Lib', 'Lib')
-        if bname.startswith('PyQt'):
+        if bname.startswith('PyQt5'):
+            # PyQt5
+            outdir = osp.join('Lib', 'site-packages', 'PyQt5')
+        elif bname.startswith('PyQt'):
             # PyQt4
             outdir = osp.join('Lib', 'site-packages', 'PyQt4')
         else:
