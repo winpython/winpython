@@ -445,11 +445,6 @@ call %~dp0env.bat
         """Installing required packages"""
         print("Installing required packages")
 
-        #Pyqt5 (doesn't currently install in build this way, reason unclear)
-        #self.install_package(
-        #    'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
-        #    % (self.python_version, self.pyqt_arch))
-
         # Install 'critical' packages first
         for happy_few in['setuptools', 'pip', 'pywin32']:
             self.install_package(
@@ -524,17 +519,6 @@ call %~dp0env.bat
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
                              command='${WINPYDIR}\pythonw.exe',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
-
-        # XXX: Uncomment this part only when we are clear on how to handle
-        # the registration process during installation. "Register.exe" was
-        # only intended to be executed during installation by installer.nsi,
-        # but, we can't let this executable at the root of WinPython directory
-        # (too dangerous) and we can't move it easily as launchers are made
-        # to be executed when located at root directory... so we could remove
-        # it just after executing it, but is it even possible?
-        # self.create_launcher('Register.exe', 'winpython.ico',
-        #                     args='register_python',
-        #                     workdir='${WINPYDIR}\Scripts')
 
         python_lib_dir = osp.join(self.winpydir, self.python_name,
                                   r"Lib\site-packages")
