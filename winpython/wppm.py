@@ -449,22 +449,24 @@ python "%~dpn0""" + ext + """" %*""")
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
-        if package.name in ('PyQt', 'PyQt4'):
+        if package.name.lower() in ('pyqt4', 'pyqt5'):
             # Qt configuration file (where to find Qt)
             name = 'qt.conf'
             contents = """[Paths]
 Prefix = .
 Binaries = ."""
             self.create_file(package, name,
-                             osp.join('Lib', 'site-packages', 'PyQt4'),
+                             osp.join('Lib', 'site-packages', package.name),
                              contents)
             self.create_file(package, name, '.',
-                             contents.replace('.', './Lib/site-packages/PyQt4'))
+                             contents.replace('.', './Lib/site-packages/%s' % package.name))
             # pyuic script
-            self.create_file(package, 'pyuic4.bat', 'Scripts', r'''@echo off
-python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9''')
+            self.create_file(package, 'pyuic%s.bat' % package.name[-1],
+                'Scripts', r'''@echo off
+python "%WINPYDIR%\Lib\site-packages\%s\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
+                % package.name)
             # Adding missing __init__.py files (fixes Issue 8)
-            uic_path = osp.join('Lib', 'site-packages', 'PyQt4', 'uic')
+            uic_path = osp.join('Lib', 'site-packages', package.name, 'uic')
             for dirname in ('Loader', 'port_v2', 'port_v3'):
                 self.create_file(package, '__init__.py',
                                  osp.join(uic_path, dirname), '')
