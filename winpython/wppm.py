@@ -371,7 +371,7 @@ python "%~dpn0""" + ext + """" %*""")
         assert package.is_compatible_with(self)
         tmp_fname = None
         # (tragic if pip) self.uninstall_existing(package)
-        if package.fname.endswith(('.tar.gz', '.zip')):
+        if package.fname.endswith(('.NOtar.gz', '.NOzip')):
             self._print(package, "Building")
             try:
                 fname = utils.source_to_wininst(package.fname,
@@ -385,8 +385,8 @@ python "%~dpn0""" + ext + """" %*""")
             package = Package(fname)
             self._print_done()
         # wheel addition
-        if package.fname.endswith(('.whl')):
-            self.install_bdist_wheel(package, install_options=install_options)
+        if package.fname.endswith(('.whl', '.tar.gz', '.zip')):
+            self.install_bdist_direct(package, install_options=install_options)
 
         bname = osp.basename(package.fname)
         if bname.endswith('.exe'):
@@ -397,7 +397,8 @@ python "%~dpn0""" + ext + """" %*""")
         elif bname.endswith('.msi'):
             self.install_bdist_msi(package)
         self.handle_specific_packages(package)
-        package.save_log(self.logdir)
+        if not package.fname.endswith(('.whl', '.tar.gz', '.zip')):
+            package.save_log(self.logdir)
         if tmp_fname is not None:
             os.remove(tmp_fname)
 
@@ -461,10 +462,11 @@ Binaries = ."""
             self.create_file(package, name, '.',
                              contents.replace('.', './Lib/site-packages/%s' % package.name))
             # pyuic script
+            tmp_string = r'''@echo off
+python "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
+
             self.create_file(package, 'pyuic%s.bat' % package.name[-1],
-                'Scripts', r'''@echo off
-python "%WINPYDIR%\Lib\site-packages\%s\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
-                % package.name)
+                'Scripts', tmp_string.replace('package.name', package.name))
             # Adding missing __init__.py files (fixes Issue 8)
             uic_path = osp.join('Lib', 'site-packages', package.name, 'uic')
             for dirname in ('Loader', 'port_v2', 'port_v3'):
@@ -555,9 +557,9 @@ python "%WINPYDIR%\Lib\site-packages\%s\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9
         self.copy_files(package, targetdir, 'DATA', '.')
         self._print_done()
 
-    def install_bdist_wheel(self, package, install_options=None):
-        """Install a wheel directly !"""
-        self._print(package, "Installing Wheel")
+    def install_bdist_direct(self, package, install_options=None):
+        """Install a package directly !"""
+        self._print(package, "Installing %s" % package.fname.split(".")[-1])
         # targetdir = utils.extract_msi(package.fname, targetdir=self.target)
         try:
             fname = utils.direct_pip_install(package.fname,
