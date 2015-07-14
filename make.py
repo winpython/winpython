@@ -520,17 +520,6 @@ call %~dp0env.bat
                              command='${WINPYDIR}\pythonw.exe',
                              args='wpcp', workdir='${WINPYDIR}\Scripts')
 
-        # XXX: Uncomment this part only when we are clear on how to handle
-        # the registration process during installation. "Register.exe" was
-        # only intended to be executed during installation by installer.nsi,
-        # but, we can't let this executable at the root of WinPython directory
-        # (too dangerous) and we can't move it easily as launchers are made
-        # to be executed when located at root directory... so we could remove
-        # it just after executing it, but is it even possible?
-        # self.create_launcher('Register.exe', 'winpython.ico',
-        #                     args='register_python',
-        #                     workdir='${WINPYDIR}\Scripts')
-
         python_lib_dir = osp.join(self.winpydir, self.python_name,
                                   r"Lib\site-packages")
         # manage Qt4, Qt5
