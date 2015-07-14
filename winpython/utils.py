@@ -561,9 +561,9 @@ def source_to_wininst(fname, python_exe=None,
                          architecture=architecture, verbose=verbose)
 
 
-def wheel_pip_install(fname, python_exe=None,
+def direct_pip_install(fname, python_exe=None,
                      architecture=None, verbose=False, install_options=None):
-    """direct install via pip !"""
+    """Direct install via pip !"""
     copy_to = osp.dirname(fname)
 
     if python_exe is None:
@@ -571,13 +571,11 @@ def wheel_pip_install(fname, python_exe=None,
     assert osp.isfile(python_exe)
     myroot = os.path.dirname(python_exe)
 
-    # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
     cmd = [python_exe, '-m', 'pip', 'install']
     if install_options:
         cmd += install_options  # typically ['--no-deps']
-        print('wheel install_options', install_options)
+        print('pip install_options', install_options)
     cmd += [fname]
-    #  print('build_wheel', myroot, cmd)
 
     if verbose:
         subprocess.call(cmd, cwd=myroot)

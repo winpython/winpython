@@ -558,7 +558,7 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         self._print(package, "Installing Wheel")
         # targetdir = utils.extract_msi(package.fname, targetdir=self.target)
         try:
-            fname = utils.wheel_pip_install(package.fname,
+            fname = utils.direct_pip_install(package.fname,
                         python_exe=osp.join(self.target, 'python.exe'),
                         architecture=self.architecture, verbose=self.verbose,
                         install_options=install_options)
