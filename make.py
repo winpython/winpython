@@ -445,11 +445,6 @@ call %~dp0env.bat
         """Installing required packages"""
         print("Installing required packages")
 
-        #Pyqt5 (doesn't currently install in build this way, reason unclear)
-        #self.install_package(
-        #    'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
-        #    % (self.python_version, self.pyqt_arch))
-
         # Install 'critical' packages first
         for happy_few in['setuptools', 'pip', 'pywin32']:
             self.install_package(
