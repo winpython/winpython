@@ -133,7 +133,7 @@ class Package(BasePackage):
         # New : Binary wheel case
         elif bname.endswith(('32.whl', '64.whl')):
             match = re.match(utils.WHEELBIN_PATTERN, bname)
-            # typical macht is ('scipy', '0.14.1rc1', '34', 'win32')
+            # typical match is ('scipy', '0.14.1rc1', '34', 'win32')
             if match is not None:
                 self.name, self.version,  self.pywheel , arch  = match.groups()
                 # self.pywheel version is '34' not 3.4
@@ -558,7 +558,7 @@ python "%WINPYDIR%\Lib\site-packages\PyQt4\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8
         self._print(package, "Installing Wheel")
         # targetdir = utils.extract_msi(package.fname, targetdir=self.target)
         try:
-            fname = utils.wheel_to_wininst(package.fname,
+            fname = utils.wheel_pip_install(package.fname,
                         python_exe=osp.join(self.target, 'python.exe'),
                         architecture=self.architecture, verbose=self.verbose,
                         install_options=install_options)

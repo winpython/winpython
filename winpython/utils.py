@@ -561,9 +561,11 @@ def source_to_wininst(fname, python_exe=None,
                          architecture=architecture, verbose=verbose)
 
 
-def build_wheel(this_whl, python_exe=None, copy_to=None,
-                architecture=None, verbose=False, install_options=None):
-    """Execute the wheel (without dependancies)"""
+def wheel_pip_install(fname, python_exe=None,
+                     architecture=None, verbose=False, install_options=None):
+    """direct install via pip !"""
+    copy_to = osp.dirname(fname)
+
     if python_exe is None:
         python_exe = sys.executable
     assert osp.isfile(python_exe)
@@ -574,7 +576,7 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
     if install_options:
         cmd += install_options  # typically ['--no-deps']
         print('wheel install_options', install_options)
-    cmd += [this_whl]
+    cmd += [fname]
     #  print('build_wheel', myroot, cmd)
 
     if verbose:
@@ -586,12 +588,12 @@ def build_wheel(this_whl, python_exe=None, copy_to=None,
         the_log = ("%s" % stdout + "\n %s" % stderr)
 
         if ' not find ' in the_log or ' not found ' in the_log:
-            print("Failed to Install: \n %s \n" % this_whl)
+            print("Failed to Install: \n %s \n" % fname)
             print("msg: %s" % the_log)
             raise RuntimeError
         p.stdout.close()
         p.stderr.close()
-    src_fname = this_whl
+    src_fname = fname
     if copy_to is None:
         return src_fname
     else:
@@ -627,15 +629,6 @@ def do_script(this_script, python_exe=None, copy_to=None,
     if verbose:
             print("Executed " % cmd)
     return 'ok'
-
-
-def wheel_to_wininst(fname, python_exe=None,
-                     architecture=None, verbose=False, install_options=None):
-    """Just install a wheel !"""
-    return build_wheel(fname, python_exe=python_exe,
-                       copy_to=osp.dirname(fname),
-                       architecture=architecture, verbose=verbose,
-                       install_options=install_options)
 
 
 if __name__ == '__main__':
