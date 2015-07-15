@@ -9,8 +9,6 @@
 
 import os
 
-import imp
-
 try:
     #be friendly with Pyqt5
     are_you_here = __import__('PyQt5')
