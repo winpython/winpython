@@ -445,11 +445,17 @@ call %~dp0env.bat
         """Installing required packages"""
         print("Installing required packages")
 
+        # Specific check for PyQt5 non-wheel:
+        import glob
+        if len(glob.glob(osp.join(self.wheeldir, 'PyQt5*.exe'))) > 0:
+            self.install_package(
+                'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
+                % (self.python_version, self.pyqt_arch))
         # Install 'critical' packages first
         for happy_few in['setuptools', 'pip', 'pywin32']:
             self.install_package(
                 '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few,
-                     install_options = self.install_options+['--upgrade'])
+                install_options=self.install_options+['--upgrade'])
 
     def _install_all_other_packages(self):
         """Try to install all other packages in wheeldir"""
@@ -528,7 +534,7 @@ call %~dp0env.bat
             QtDemo_path = 'demos\qtdemo' if QtV == 4 else 'qtdemo'
             if osp.isdir(osp.join(python_lib_dir, PyQt)):
                 self.create_launcher('Qt%s Demo.exe' % QtV, 'qt.ico',
-                    args='qtdemo.pyw', workdir=
+                    args='qtdemo.pyw'  if QtV == 4 else 'qtdemo.py', workdir=
                     r'${WINPYDIR}\Lib\site-packages\%s\examples\%s' %
                          (PyQt, QtDemo_path) )
                 self.create_launcher('Qt%s Assistant.exe' % QtV,
@@ -1068,10 +1074,10 @@ if __name__ == '__main__':
 
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(32, ))
-    make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-              verbose=False, archis=(64, ), flavor='')
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython\basedirQt5',
-    #         verbose=False, archis=(64, ))
+    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
+    #          verbose=False, archis=(64, ), flavor='')
+    make_all(4, '', pyver='3.4', rootdir=r'D:\WinpythonQt5',
+             verbose=False, archis=(64, ))
     #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
