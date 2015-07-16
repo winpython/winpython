@@ -370,20 +370,7 @@ python "%~dpn0""" + ext + """" %*""")
         """Install package in distribution"""
         assert package.is_compatible_with(self)
         tmp_fname = None
-        # (tragic if pip) self.uninstall_existing(package)
-        if package.fname.endswith(('.NOtar.gz', '.NOzip')):
-            self._print(package, "Building")
-            try:
-                fname = utils.source_to_wininst(package.fname,
-                          python_exe=osp.join(self.target, 'python.exe'),
-                          architecture=self.architecture, verbose=self.verbose)
-            except RuntimeError:
-                if not self.verbose:
-                    print("Failed!")
-                raise
-            tmp_fname = fname
-            package = Package(fname)
-            self._print_done()
+
         # wheel addition
         if package.fname.endswith(('.whl', '.tar.gz', '.zip')):
             self.install_bdist_direct(package, install_options=install_options)

@@ -363,31 +363,32 @@ def patch_sourcelines(fname, in_line_start, out_line, endline='\n', silent_mode=
                     print("impossible to patch", fname, "from", content,
                           "to", new_content)
 
+
 def patch_julia03():
     """Ugly patch of Julia/ZMQ and Julia/Nettle to make them movable"""
     import io
     import os.path as osp
-    out_line ='"'+  os.path.dirname(os.environ["WINPYDIR"]).replace("\\" ,"\\\\")
+    out_line = '"' + os.path.dirname(os.environ["WINPYDIR"]).replace("\\", "\\\\")
     end_line = r"\\settings\\.julia"
-    from  winpython.utils import patch_sourcelines
+    from winpython.utils import patch_sourcelines
 
-    in_line_start = '@checked_lib zmq ';
+    in_line_start = '@checked_lib zmq '
 
-    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\ZMQ\deps\deps.jl";
-    patch_sourcelines (fname, in_line_start, out_line, end_line);
-    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\ZMQ\deps\deps.jl";
-    patch_sourcelines (fname, in_line_start, out_line, end_line);
-    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\ZMQ\deps\deps.jl";
-    patch_sourcelines (fname, in_line_start, out_line, end_line);
+    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\ZMQ\deps\deps.jl";
+    patch_sourcelines(fname, in_line_start, out_line, end_line)
+    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\ZMQ\deps\deps.jl";
+    patch_sourcelines(fname, in_line_start, out_line, end_line)
+    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\ZMQ\deps\deps.jl";
+    patch_sourcelines(fname, in_line_start, out_line, end_line)
 
     in_line_start = '@checked_lib nettle ';
 
-    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\Nettle\deps\deps.jl";
-    patch_sourcelines (fname, in_line_start, out_line, end_line);
-    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\Nettle\deps\deps.jl";
-    patch_sourcelines (fname, in_line_start, out_line, end_line);
-    fname= os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\Nettle\deps\deps.jl";
-    patch_sourcelines (fname, in_line_start, out_line, end_line);
+    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\Nettle\deps\deps.jl";
+    patch_sourcelines(fname, in_line_start, out_line, end_line)
+    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\Nettle\deps\deps.jl";
+    patch_sourcelines(fname, in_line_start, out_line, end_line)
+    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\Nettle\deps\deps.jl";
+    patch_sourcelines(fname, in_line_start, out_line, end_line)
 
 
 # =============================================================================
@@ -484,6 +485,7 @@ SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz
 # "win32|win\_amd64" to replace per "win\_amd64" for 64bit
 WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]*)\-none\-(win32|win\_amd64)\.whl'
 
+
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
     match = re.match(SOURCE_PATTERN, osp.basename(fname))
@@ -491,78 +493,8 @@ def get_source_package_infos(fname):
         return match.groups()[:2]
 
 
-def build_wininst(root, python_exe=None, copy_to=None,
-                  architecture=None, verbose=False, installer='bdist_wininst'):
-    """Build wininst installer from Python package located in *root*
-    and eventually copy it to *copy_to* folder.
-    Return wininst installer full path."""
-    if python_exe is None:
-        python_exe = sys.executable
-    assert osp.isfile(python_exe)
-    cmd = [python_exe, 'setup.py', 'build']
-    if architecture is not None:
-        archstr = 'win32' if architecture == 32 else 'win-amd64'
-        cmd += ['--plat-name=%s' % archstr]
-    cmd += [installer]
-    # root = a tmp dir in windows\tmp,
-    if verbose:
-        subprocess.call(cmd, cwd=root)
-    else:
-        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-        p.communicate()
-        p.stdout.close()
-        p.stderr.close()
-    distdir = osp.join(root, 'dist')
-    if not osp.isdir(distdir):
-        raise RuntimeError("Build failed: see package README file for further"
-                   " details regarding installation requirements.\n\n"
-                   "For more concrete debugging infos, please try to build "
-                   "the package from the command line:\n"
-                   "1. Open a WinPython command prompt\n"
-                   "2. Change working directory to the appropriate folder\n"
-                   "3. Type `python setup.py build install`")
-    pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
-    for distname in os.listdir(distdir):
-        match = re.match(pattern, distname)
-        if match is not None:
-            break
-        # for wheels (winpython here)
-        match = re.match(SOURCE_PATTERN, distname)
-        if match is not None:
-            break
-        match = re.match(WHEELBIN_PATTERN, distname)
-        if match is not None:
-            break
-    else:
-        raise RuntimeError("Build failed: not a pure Python package? %s" %
-                           distdir)
-    src_fname = osp.join(distdir, distname)
-    if copy_to is None:
-        return src_fname
-    else:
-        dst_fname = osp.join(copy_to, distname)
-        shutil.move(src_fname, dst_fname)
-        if verbose:
-            print(("Move: %s --> %s" % (src_fname, (dst_fname))))
-            # remove tempo dir 'root' no more needed
-            shutil.rmtree(root, onerror=onerror)
-        return dst_fname
-
-
-def source_to_wininst(fname, python_exe=None,
-                      architecture=None, verbose=False):
-    """Extract source archive, build it and create a distutils installer"""
-    tmpdir = extract_archive(fname)
-    root = osp.join(tmpdir, '%s-%s' % get_source_package_infos(fname))
-    assert osp.isdir(root)
-    return build_wininst(root, python_exe=python_exe,
-                         copy_to=osp.dirname(fname),
-                         architecture=architecture, verbose=verbose)
-
-
-def direct_pip_install(fname, python_exe=None,
-                     architecture=None, verbose=False, install_options=None):
+def direct_pip_install(fname, python_exe=None, architecture=None,
+                       verbose=False, install_options=None):
     """Direct install via pip !"""
     copy_to = osp.dirname(fname)
 
@@ -599,8 +531,9 @@ def direct_pip_install(fname, python_exe=None,
             print("Installed %s" % src_fname)
         return src_fname
 
+
 def do_script(this_script, python_exe=None, copy_to=None,
-                architecture=None, verbose=False, install_options=None):
+              architecture=None, verbose=False, install_options=None):
     """Execute a script (get-pip typically)"""
     if python_exe is None:
         python_exe = sys.executable
