@@ -492,6 +492,64 @@ def get_source_package_infos(fname):
     if match is not None:
         return match.groups()[:2]
 
+def build_wininst(root, python_exe=None, copy_to=None,
+                  architecture=None, verbose=False, installer='bdist_wininst'):
+    """Build wininst installer from Python package located in *root*
+    and eventually copy it to *copy_to* folder.
+    Return wininst installer full path."""
+    if python_exe is None:
+        python_exe = sys.executable
+    assert osp.isfile(python_exe)
+    cmd = [python_exe, 'setup.py', 'build']
+    if architecture is not None:
+        archstr = 'win32' if architecture == 32 else 'win-amd64'
+        cmd += ['--plat-name=%s' % archstr]
+    cmd += [installer]
+    # root = a tmp dir in windows\tmp,
+    if verbose:
+        subprocess.call(cmd, cwd=root)
+    else:
+        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        p.communicate()
+        p.stdout.close()
+        p.stderr.close()
+    distdir = osp.join(root, 'dist')
+    if not osp.isdir(distdir):
+        raise RuntimeError("Build failed: see package README file for further"
+                   " details regarding installation requirements.\n\n"
+                   "For more concrete debugging infos, please try to build "
+                   "the package from the command line:\n"
+                   "1. Open a WinPython command prompt\n"
+                   "2. Change working directory to the appropriate folder\n"
+                   "3. Type `python setup.py build install`")
+    pattern = WININST_PATTERN.replace(r'(win32|win\-amd64)', archstr)
+    for distname in os.listdir(distdir):
+        match = re.match(pattern, distname)
+        if match is not None:
+            break
+        # for wheels (winpython here)
+        match = re.match(SOURCE_PATTERN, distname)
+        if match is not None:
+            break
+        match = re.match(WHEELBIN_PATTERN, distname)
+        if match is not None:
+            break
+    else:
+        raise RuntimeError("Build failed: not a pure Python package? %s" %
+                           distdir)
+    src_fname = osp.join(distdir, distname)
+    if copy_to is None:
+        return src_fname
+    else:
+        dst_fname = osp.join(copy_to, distname)
+        shutil.move(src_fname, dst_fname)
+        if verbose:
+            print(("Move: %s --> %s" % (src_fname, (dst_fname))))
+            # remove tempo dir 'root' no more needed
+            shutil.rmtree(root, onerror=onerror)
+        return dst_fname
+
 
 def direct_pip_install(fname, python_exe=None, architecture=None,
                        verbose=False, install_options=None):
