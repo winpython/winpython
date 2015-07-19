@@ -15,7 +15,14 @@ rem set my_preclear_build_directory=Yes
 set my_day=%date:/=-%
 set my_time=%time:~0,5%
 set my_time=%my_time::=_%
-set my_archive_log=report_winpython_build_%my_pyver%._.%my_release%_of_%my_day%_at_%my_time%.txt
+
+rem was the bug 
+set my_time=%my_time: =0%
+
+set my_archive_dir=%~dp0WinPython_build_logs
+if not exist %my_archive_dir% mkdir %my_archive_dir%
+
+set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%_of_%my_day%_at_%my_time%.txt
 
 
 echo ===============
@@ -68,6 +75,8 @@ set path=%my_original_path%
 echo call %my_buildenv%\scripts\env.bat>>%my_archive_log%
 call %my_buildenv%\scripts\env.bat
 
+rem build with this 
+cd /D %~dp0
 echo python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='')">>%my_archive_log%
 python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='')">>%my_archive_log%
 
