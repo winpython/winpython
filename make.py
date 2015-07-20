@@ -127,6 +127,11 @@ class WinPythonDistribution(object):
         self.rootdir = rootdir  # addded to build from winpython
         self.install_options = install_options
         self.flavor = flavor
+        self.QT_API='pyqt' # default Qt4
+        import glob
+        if len(glob.glob(osp.join(self.wheeldir, 'PyQt5*.*'))) > 0:
+            self.QT_API='pyqt5' # force Qt5 on Spyder
+        print('QT_API is "%s"' % self.QT_API)
 
     @property
     def package_index_wiki(self):
@@ -338,7 +343,8 @@ Name | Version | Description
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
                  ('JULIA_PKGDIR', '$EXEDIR%s' % r'\settings\.julia'),
                  ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
-                 ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe')]
+                 ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe'),
+                 ('QT_API', '%s' % self.QT_API)]
 
         if settingspath is not None:
             data += [('SETTINGSDIR', osp.dirname(settingspath)),
@@ -625,7 +631,10 @@ set JULIA=%JULIA_HOME%%JULIA_EXE%
 set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 :julia_bad
 
-set PATH=""" + path)
+set PATH=""" + path + """
+
+rem force default Qt kit for Spyder
+set QT_API=""" + self.QT_API)
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
@@ -641,29 +650,6 @@ launchers located in the parent directory.
 The environment variables are set-up in 'env.bat'.""")
         conv = lambda path: ";".join(['%WINPYDIR%\\'+pth for pth in path])
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
-        self.create_batch_script('env.bat', """@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
-set WINPYVER=""" + self.winpyver + r"""
-set HOME=%WINPYDIR%\..\settings
-set WINPYARCH="WIN32"
-if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
-
-rem handle R if included
-if not exist "%WINPYDIR%\..\tools\R\bin" goto r_bad
-set R_HOME=%WINPYDIR%\..\tools\R
-if %WINPYARCH%=="WIN32"     set R_HOMEbin=%R_HOME%\bin\i386
-if not %WINPYARCH%=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
-:r_bad
-
-rem handle Julia if included
-if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
-set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
-set JULIA_EXE=julia.exe
-set JULIA=%JULIA_HOME%%JULIA_EXE%
-set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
-:julia_bad
-
-set PATH=""" + path)
 
 
         self.create_batch_script('Add_or_removeLine.vbs',r"""
