@@ -72,6 +72,7 @@ def replace_in_nsis_file(fname, data):
                 lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
     fd = open(fname, 'w')
     fd.writelines(lines)
+    print('nsis for ', fname, 'is', lines)
     fd.close()
 
 
