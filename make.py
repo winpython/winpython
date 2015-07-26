@@ -653,41 +653,6 @@ The environment variables are set-up in 'env.bat'.""")
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
 
 
-        self.create_batch_script('Add_or_removeLine.vbs',r"""
-'from http://blogs.technet.com/b/heyscriptingguy/archive/2007/09/07/
-' how-can-i-remove-any-line-in-a-text-file-that-contains-a-specified-string-value.aspx
-If WScript.Arguments.Count <> 3 then
-  WScript.Echo "usage: Add_or_removeLine.vbs filename word_to_find line_to_add" &_
-  vbNewLine & "or         Add_or_removeLine.vbs filename word_to_find -remove"
-  WScript.Quit
-end If
-
-Set colArgs = WScript.Arguments
-Add_or_removeLine colArgs(0), colArgs(1), colArgs(2)
-
-function Add_or_removeLine(strFilename, strFind, strAction)
-    Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
-    a_change = False
-    Do Until inputFile.AtEndOfStream
-        strLine = inputFile.ReadLine
-        If InStr(strLine, strFind) = 0 Then
-            result_text= result_text & strLine & vbNewLine
-        else
-           a_change = True
-           if strAction <> "-remove" then result_text= result_text & strLine & vbNewLine & strAction & vbNewLine
-        End If
-    Loop
-    inputFile.Close
-
-    if a_change then
-        Set outputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename,2,true)
-        outputFile.Write result_text
-        outputFile.Close
-    end if
-end function
-""")
-
-
         # Prepare a live patch on python (shame we need it) to have mingw64ok
         patch_distutils = r"""
 
