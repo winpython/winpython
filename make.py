@@ -680,6 +680,10 @@ IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
 IF "%WINPYXX%"=="27" set WINPYSPEC=specs90
 
 cd %WINPYDIR%
+
+if not exist ..\tools\mingw32 echo no_mingw_in_tools
+if not exist ..\tools\mingw32 goto no_mingw_in_tools
+
 copy  /Y ..\tools\mingw32\%BASEMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
 
 REM copy the right version of gcc
@@ -695,6 +699,9 @@ REM generate python.34 import file
 ..\tools\mingw32\bin\dlltool -D python%WINPYXX%.dll -d python%WINPYXX%.def -l libpython%WINPYXX%.dll.a
 move /Y libpython%WINPYXX%.dll.a libs
 del python%WINPYXX%.def
+
+:no_mingw_in_tools
+
 """
 
         self.create_batch_script('Find_And_replace.vbs', r"""
