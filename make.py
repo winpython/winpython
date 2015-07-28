@@ -96,7 +96,6 @@ def build_nsis(srcname, dstname, data):
 class WinPythonDistribution(object):
     """WinPython distribution"""
     THG_PATH = r'\tools\TortoiseHg\thgw.exe'
-    WINMERGE_PATH = r'\tools\WinMerge\WinMergeU.exe'
     MINGW32_PATH = r'\tools\mingw32\bin'
     R_PATH = r'\tools\R\bin'
     JULIA_PATH = r'\tools\Julia\bin'
@@ -153,8 +152,6 @@ class WinPythonDistribution(object):
         if thgpath is not None:
             thgver = utils.get_thg_version(osp.dirname(thgpath))
             installed_tools += [('TortoiseHg', thgver)]
-        if get_tool_path(self.WINMERGE_PATH, osp.isfile) is not None:
-            installed_tools += [('WinMerge', '2.12.4')]
         gccpath = get_tool_path(self.MINGW32_PATH, osp.isdir)
         if gccpath is not None:
             gccver = utils.get_gcc_version(gccpath)
@@ -578,10 +575,6 @@ call %~dp0env.bat
         if osp.isfile(self.winpydir + self.THG_PATH):
             self.create_launcher('TortoiseHg.exe', 'tortoisehg.ico',
                                  command=r'${WINPYDIR}\..'+self.THG_PATH,
-                                 workdir=r'${WINPYDIR}')
-        if osp.isfile(self.winpydir + self.WINMERGE_PATH):
-            self.create_launcher('WinMergeU.exe', 'winmerge.ico',
-                                 command=r'${WINPYDIR}\..'+self.WINMERGE_PATH,
                                  workdir=r'${WINPYDIR}')
 
         # R console launchers
