@@ -637,95 +637,13 @@ The environment variables are set-up in 'env.bat'.""")
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
 
 
-        # Prepare a live patch on python (shame we need it) to have mingw64ok
-        patch_distutils = r"""
-
-set WINPYXX=%WINPYVER:~0,1%%WINPYVER:~2,1%
-
-set WINPYARCH="WIN32"
-if  "%WiNPYDIR:~-5%"=="amd64" set WINPYARCH="WIN-AMD64"
-
-if %WINPYARCH%=="WIN32"     set BASEMINGW=i686-w64-mingw32
-if %WINPYARCH%=="WIN-AMD64" set BASEMINGW=x86_64-w64-mingw32
-
-set WINMINGW=lib\gcc\%BASEMINGW%
-
-if not  %WINPYARCH%=="WIN-AMD64" goto no_distutil_patch
-%~dp0Find_And_replace.vbs "%WINPYDIR%\Lib\distutils\cygwinccompiler.py" "-O -W" "-O -DMS_WIN64 -W"
-:no_distutil_patch
-
-
-rem Python 3.3+ case
-set WINPYMSVCR=libmsvcr100.a
-set WINPYSPEC=specs100
-
-rem Python2.7 case
-IF "%WINPYXX%"=="27" set WINPYMSVCR=libmsvcr90.a
-IF "%WINPYXX%"=="27" set WINPYSPEC=specs90
-
-cd %WINPYDIR%
-
-if not exist ..\tools\mingw32 echo no_mingw_in_tools
-if not exist ..\tools\mingw32 goto no_mingw_in_tools
-
-copy  /Y ..\tools\mingw32\%BASEMINGW%\lib\%WINPYMSVCR%  libs\%WINPYMSVCR%
-
-REM copy the right version of gcc
-set dir482=..\tools\mingw32\%WINMINGW%\4.8.2\%WINPYSPEC%
-if exist %dir482% copy  /Y %dir482% ..\tools\mingw32\%WINMINGW%\4.8.2\specs
-
-set dir492=..\tools\mingw32\%WINMINGW%\4.9.2\%WINPYSPEC%
-if exist %dir492% copy  /Y %dir492% ..\tools\mingw32\%WINMINGW%\4.9.2\specs
-
-REM generate python.34 import file
-
-..\tools\mingw32\bin\gendef.exe python%WINPYXX%.dll
-..\tools\mingw32\bin\dlltool -D python%WINPYXX%.dll -d python%WINPYXX%.def -l libpython%WINPYXX%.dll.a
-move /Y libpython%WINPYXX%.dll.a libs
-del python%WINPYXX%.def
-
-:no_mingw_in_tools
-
-"""
-
-        self.create_batch_script('Find_And_replace.vbs', r"""
-' from http://stackoverflow.com/questions/15291341/
-'             a-batch-file-to-read-a-file-and-replace-a-string-with-a-new-one
-
-If WScript.Arguments.Count <> 3 then
-  WScript.Echo "usage: Find_And_replace.vbs filename word_to_find replace_with "
-  WScript.Quit
-end If
-
-FindAndReplace WScript.Arguments.Item(0), WScript.Arguments.Item(1), WScript.Arguments.Item(2)
-'WScript.Echo "Operation Complete"
-
-function FindAndReplace(strFilename, strFind, strReplace)
-    Set inputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename, 1)
-    strInputFile = inputFile.ReadAll
-    inputFile.Close
-    Set inputFile = Nothing
-    result_text = Replace(strInputFile, strFind, strReplace)
-    if result <> strInputFile then
-        Set outputFile = CreateObject("Scripting.FileSystemObject").OpenTextFile(strFilename,2,true)
-        outputFile.Write result_text
-        outputFile.Close
-        Set outputFile = Nothing
-    end if
-end function
-""")
-
         self.create_batch_script('make_cython_use_mingw.bat', r"""@echo off
 call %~dp0env.bat
 
 rem ******************
-rem mingw part (supposing you install it in \tools\mingw32)
+rem mingw part
 rem ******************
-set tmp_mingwdirectory=mingw32
-if not exist "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" goto mingw_end
 
-""" + patch_distutils +
-r"""
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 
 set tmp_blank=
@@ -741,12 +659,6 @@ echo compiler=mingw32>>%pydistutils_cfg%
 echo cython has been set to use mingw32
 echo to remove this, remove file "%pydistutils_cfg%"
 
-goto mingw_success
-
-:mingw_end
-echo "%WINPYDIR%\..\tools\%tmp_mingwdirectory%\bin" not found
-
-:mingw_success
 rem pause
 
 """)
@@ -1023,7 +935,5 @@ if __name__ == '__main__':
              verbose=False, archis=(64, ))
     #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='FlavorRfull')
     #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
     #          verbose=False, archis=(64, ), flavor='FlavorJulia')
