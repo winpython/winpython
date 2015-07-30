@@ -449,7 +449,13 @@ Binaries = ."""
             self.create_file(package, name, '.',
                              contents.replace('.', './Lib/site-packages/%s' % package.name))
             # pyuic script
-            tmp_string = r'''@echo off
+            if package.name.lower() == 'pyqt5':
+                # see http://code.activestate.com/lists/python-list/666469/
+                tmp_string = r'''@echo off
+python -m PyQt5.uic.pyuic %1 %2 %3 %4 %5 %6 %7 %8 %9'''
+
+            else:
+                tmp_string = r'''@echo off
 python "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
 
             self.create_file(package, 'pyuic%s.bat' % package.name[-1],
