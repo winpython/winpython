@@ -666,7 +666,7 @@ class PMWindow(QMainWindow):
         except AttributeError:
             status = self.parent().statusBar()
         progress = QProgressDialog(self, Qt.FramelessWindowHint)
-        progress.setMaximum(len(packages)-1)
+        progress.setMaximum(len(packages)) #  old vicious bug:len(packages)-1
         for index, package in enumerate(packages):
             progress.setValue(index)
             progress.setLabelText("%s %s %s..."
