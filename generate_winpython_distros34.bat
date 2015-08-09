@@ -8,6 +8,7 @@ set my_root_dir_for_builds=D:\Winpython
 set my_python_target=34
 set my_pyver=3.4
 set my_release=5
+set my_flavor=
 
 set my_arch=64
 set my_preclear_build_directory=Yes
