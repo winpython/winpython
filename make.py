@@ -548,25 +548,17 @@ call %~dp0env.bat
                     'qtlinguist.ico',
                     command=r'${WINPYDIR}\Lib\site-packages\%s\linguist.exe' %
                     PyQt, workdir=r'${WINPYDIR}')
-        if self.python_version[0] == '3':
-            ipython_exe = 'ipython3.exe'
-            ipython_scr = 'ipython3-script.py'
-        else:
-            ipython_exe = 'ipython.exe'
-            ipython_scr = 'ipython-script.py'
-        if osp.isfile(osp.join(self.python_dir, 'Scripts', ipython_exe)):
+
+
+        if osp.isfile(osp.join(self.python_dir, 'Scripts', 'jupyter.exe')):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
-                                 command='${WINPYDIR}\Scripts\%s' %
-                                        ipython_exe,
-                                 args=' qtconsole --matplotlib=inline',
+                                 command='${WINPYDIR}\python.exe',
+                                 args='${WINPYDIR}\Scripts\jupyter-qtconsole',
                                  workdir=r'${WINPYDIR}\..\notebooks')
-            self.create_launcher('IPython Notebook.exe', 'jupyter.ico',
-                                 command='${WINPYDIR}\Scripts\%s' %
-                                        ipython_exe,
-                                 args=' notebook --matplotlib=inline',
+            self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
+                                 command=r'${WINPYDIR}\python.exe',
+                                 args='${WINPYDIR}\Scripts\jupyter-notebook',
                                  workdir=r'${WINPYDIR}\..\notebooks')
-                                 # --notebook-dir=%~dp0
-                                 # workdir='${WINPYDIR}\Scripts')
 
         # R console launchers
         r_exe = self.R_PATH + r"\i386\R.exe"
