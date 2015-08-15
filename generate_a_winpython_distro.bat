@@ -8,6 +8,7 @@ rem set my_root_dir_for_builds=D:\Winpython
 rem set my_python_target=34
 rem set my_pyver=3.4
 rem set my_release=4
+rem set my_flavor=
 rem set my_arch=32
 rem set my_preclear_build_directory=Yes
 
@@ -77,8 +78,8 @@ call %my_buildenv%\scripts\env.bat
 
 rem build with this 
 cd /D %~dp0
-echo python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='%my_flavor%')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='%my_flavor%')">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%

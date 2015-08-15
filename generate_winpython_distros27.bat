@@ -7,7 +7,8 @@ set my_buildenv=D:\WinPython-64bit-3.4.3.3_b0
 set my_root_dir_for_builds=D:\Winpython
 set my_python_target=27
 set my_pyver=2.7
-set my_release=2
+set my_release=3
+set my_flavor=
 
 set my_arch=64
 set my_preclear_build_directory=Yes
