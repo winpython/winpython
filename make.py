@@ -553,11 +553,14 @@ call %~dp0env.bat
         if osp.isfile(osp.join(self.python_dir, 'Scripts', 'jupyter.exe')):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                                  command='${WINPYDIR}\python.exe',
-                                 args='${WINPYDIR}\Scripts\jupyter-qtconsole',
+                                 args='-c "from qtconsole.qtconsoleapp import main;main()"',
+                                 #args='${WINPYDIR}\Scripts\jupyter-qtconsole',
                                  workdir=r'${WINPYDIR}\..\notebooks')
             self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
-                                 command=r'${WINPYDIR}\python.exe',
-                                 args='${WINPYDIR}\Scripts\jupyter-notebook',
+                                 command='${WINPYDIR}\Scripts\%s' %
+                                         'jupyter-notebook.exe',
+                                 #command=r'${WINPYDIR}\python.exe',
+                                 #args='${WINPYDIR}\Scripts\jupyter-notebook',
                                  workdir=r'${WINPYDIR}\..\notebooks')
 
         # R console launchers
