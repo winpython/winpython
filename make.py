@@ -551,16 +551,17 @@ call %~dp0env.bat
 
 
         if osp.isfile(osp.join(self.python_dir, 'Scripts', 'jupyter.exe')):
+            #self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
+            #                     command='${WINPYDIR}\python.exe',
+            #                     args='${WINPYDIR}\Scripts\jupyter-qtconsole',
+            #                     workdir=r'${WINPYDIR}\..\notebooks')
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
-                                 command='${WINPYDIR}\python.exe',
-                                 args='-c "from qtconsole.qtconsoleapp import main;main()"',
-                                 #args='${WINPYDIR}\Scripts\jupyter-qtconsole',
-                                 workdir=r'${WINPYDIR}\..\notebooks')
+                             command='$SYSDIR\cmd.exe',
+                             args=r'/k jupyter_start_qtconsole.bat',
+                             workdir=r'${WINPYDIR}\..\Scripts')
             self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
                                  command='${WINPYDIR}\Scripts\%s' %
                                          'jupyter-notebook.exe',
-                                 #command=r'${WINPYDIR}\python.exe',
-                                 #args='${WINPYDIR}\Scripts\jupyter-notebook',
                                  workdir=r'${WINPYDIR}\..\notebooks')
 
         # R console launchers
@@ -658,7 +659,7 @@ rem pause
 
 """)
 
-        self.create_batch_script('make_cython_use_vc.bat', """@echo off
+        self.create_batch_script('make_cython_use_vc.bat', r"""@echo off
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 echo [config]>%pydistutils_cfg%
         """)
@@ -685,6 +686,15 @@ call %~dp0register_python.bat --all""")
              workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
         self.create_python_batch('pyqt5_demo.bat', 'qtdemo.pyw',
              workdir=r'Lib\site-packages\PyQt5\examples\qtdemo')
+
+        #workaround for Jupyter-qtconsole
+        self.create_batch_script('jupyter_start_qtconsole.bat', r"""@echo off
+call %~dp0env.bat
+cd /D %WINPYDIR%\..\notebooks
+%WINPYDIR%\python.exe  -c "from qtconsole.qtconsoleapp import main;main()"
+        """)
+
+
 
         # pre-run mingw batch
         print('now pre-running extra mingw')
