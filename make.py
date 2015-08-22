@@ -167,6 +167,11 @@ class WinPythonDistribution(object):
             metadata = wppm.get_package_metadata('tools.ini', name)
             url, desc = metadata['url'], metadata['description']
             tools += ['[%s](%s) | %s | %s' % (name, url, ver, desc)]
+
+        # get all packages installed in the changelog, whatever the method
+        self.installed_packages = []
+        self.installed_packages = self.distribution.get_installed_packages()
+
         packages = ['[%s](%s) | %s | %s'
                     % (pack.name, pack.url, pack.version, pack.description)
                     for pack in sorted(self.installed_packages,
