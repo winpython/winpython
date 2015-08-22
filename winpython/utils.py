@@ -287,26 +287,38 @@ def get_python_long_version(path):
 # =============================================================================
 # Patch chebang line (courtesy of Christoph Gohlke)
 # =============================================================================
-def patch_shebang_line(fname, pad=b' '):
-    """Remove absolute path to python.exe in shebang lines."""
+def patch_shebang_line(fname, pad=b' ', to_movable=True):
+    """Remove absolute path to python.exe in shebang lines, or re-add it"""
+
+    import re
+    import sys
+    target_dir = ""
+    if to_movable == False:
+        import os
+        target_dir = os.path.abspath(os.path.dirname(fname))
+        target_dir = os.path.abspath(os.path.join(target_dir, r'..')) + '\\'
+
+    executable= sys.executable
     if sys.version_info[0] == 2:
-        shebang_line = re.compile(r"(#!.+pythonw?\.exe)")  # Python2.7
+        shebang_line = re.compile(r"(#!.*pythonw?\.exe)")  # Python2.7
     else:
-        shebang_line = re.compile(b"(#!.+pythonw?\.exe)")  # Python3+
-
+        shebang_line = re.compile(b"(#!.*pythonw?\.exe)")  # Python3+
+        target_dir = target_dir.encode('utf-8')
     with open(fname, 'rb') as fh:
-        content = fh.read()
+        initial_content = fh.read()
 
-    content = shebang_line.split(content, maxsplit=1)
+    content = shebang_line.split(initial_content, maxsplit=1)
     if len(content) != 3:
         return
-    exe = os.path.basename(content[1][2:])
-    content[1] = b'#!' + exe + (pad * (len(content[1]) - len(exe) - 2))
-    content = b''.join(content)
 
+    exe = os.path.basename(content[1][2:])
+    content[1] = b'#!' + target_dir + exe + (pad * (len(content[1]) - len(exe) - 2))
+    final_content = b''.join(content)
+    if initial_content == final_content:
+        return
     try:
         with open(fname, 'wb') as fh:
-            fh.write(content)
+            fh.write(final_content)
             print("patched", fname)
     except Exception:
         print("failed to patch", fname)
