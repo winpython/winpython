@@ -764,6 +764,7 @@ call %~dp0register_python.bat --all""")
                 self._add_msvc_files()
             if not self.simulation:
                 self._create_batch_scripts_initial()
+                self._create_batch_scripts()  # which set mingwpy as compiler
                 self._run_complement_batch_scripts("run_required_first.bat")
             self._install_required_packages()
             self._install_all_other_packages()
@@ -771,9 +772,10 @@ call %~dp0register_python.bat --all""")
                 self._copy_dev_tools()
                 self._copy_dev_docs()
         if not self.simulation:
+            self._run_complement_batch_scripts()  # run_complement.bat
+            self.distribution.patch_all_shebang()
+            # launchers at the very end
             self._create_launchers()
-            self._create_batch_scripts()
-            self._run_complement_batch_scripts()
 
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
