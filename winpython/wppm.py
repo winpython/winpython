@@ -366,6 +366,16 @@ python "%~dpn0""" + ext + """" %*""")
         if pack is not None:
             self.uninstall(pack)
 
+    def patch_all_shebang(self, to_movable=True, max_exe_size=999999):
+        """make all python launchers relatives"""
+        import glob
+        import os
+        for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
+            size = os.path.getsize(ffname)
+            if size <= max_exe_size:
+                utils.patch_shebang_line(ffname, to_movable=to_movable)
+
+
     def install(self, package, install_options=None):
         """Install package in distribution"""
         assert package.is_compatible_with(self)
@@ -407,9 +417,7 @@ python "%~dpn0""" + ext + """" %*""")
         # touching pip at installation seems not working anymore
         # so brute force method is applied
         if package.name == "pip" or package.name == "get-pip" or 1 == 1:
-            import glob
-            for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
-                utils.patch_shebang_line(ffname)
+            self.patch_all_shebang()
             # ensure pip.exe and easy_install.exe
             problems = [('pip', 'pip'), ('easy_install', 'easy_install-')]
             solutions = [('%s.%s' % sys.version_info[:2]),

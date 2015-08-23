@@ -292,9 +292,9 @@ def patch_shebang_line(fname, pad=b' ', to_movable=True):
 
     import re
     import sys
+    import os
     target_dir = ""
     if to_movable == False:
-        import os
         target_dir = os.path.abspath(os.path.dirname(fname))
         target_dir = os.path.abspath(os.path.join(target_dir, r'..')) + '\\'
 
