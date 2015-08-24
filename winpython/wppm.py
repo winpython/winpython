@@ -394,54 +394,37 @@ python "%~dpn0""" + ext + """" %*""")
         elif bname.endswith('.msi'):
             self.install_bdist_msi(package)
         self.handle_specific_packages(package)
+        # minimal post-install actions
+        self.patch_standard_packages(package.name)
         if not package.fname.endswith(('.whl', '.tar.gz', '.zip')):
             package.save_log(self.logdir)
         if tmp_fname is not None:
             os.remove(tmp_fname)
 
-        # We minimal post-install pywin (pywin32_postinstall.py do too much)
-        if package.name == "pywin32":
+    def patch_standard_packages(self, package_name=None):
+        """patch Winpython packages in need"""
+        import filecmp
+        # 'pywin32' minimal post-install (pywin32_postinstall.py do too much)
+        if package_name == "pywin32" or package_name == None:
             origin = self.target + (r"\Lib\site-packages\pywin32_system32")
             destin = self.target
             for name in os.listdir(origin):
-                print("shutil.copy ", osp.join(origin, name), " ", osp.join(destin, name))
-                shutil.copyfile(osp.join(origin, name), osp.join(destin, name))
-
-        # We patch pip live (around line 100) !!!!
+                here, there = osp.join(origin, name), osp.join(destin, name)
+                if (not os.path.exists(there) or
+                   not filecmp.cmp(here, there)):
+                     shutil.copyfile(here, there)
+        # 'pip' to do movable launchers (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
-        if package.name == "get-pip":
-            # self.exec_script
-            my_script_is = osp.join(self.target, 'Scripts', 'get-pip.py')
-            self.install_script(my_script_is, install_options=None)
-        # change of method 2014-05-08:
-        # touching pip at installation seems not working anymore
-        # so brute force method is applied
-        if package.name == "pip" or package.name == "get-pip" or 1 == 1:
-            self.patch_all_shebang()
-            # ensure pip.exe and easy_install.exe
-            problems = [('pip', 'pip'), ('easy_install', 'easy_install-')]
-            solutions = [('%s.%s' % sys.version_info[:2]),
-                         ('%s' % sys.version_info[0])]
-            for p in problems:
-                problem = r'%s\Scripts\%s.exe' % (self.target, p[0])
-                for s in solutions:
-                    solution = r'%s\Scripts\%s%s.exe' % (self.target, p[1], s)
-                    if not osp.exists(problem) and osp.exists(solution):
-                        shutil.copyfile(solution, problem)
-
-        if package.name == "pip" or package.name == "get-pip":
+        if package_name == "pip" or package_name == None:
+            # ensure pip will create movable launchers
             utils.patch_sourcefile(
               self.target + (
               r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
               " executable = get_executable()",
               " executable = os.path.join(os.path.basename(get_executable()))")
-        # We patch IPython\kernel\kernelspec.py live (around line 51) !!!!
-        if package.name == "ipython":
-            utils.patch_sourcefile(
-              self.target + r"\Lib\site-packages\IPython\kernel\kernelspec.py",
-              r" kernel_dict = json.load(f)",
-              r" kernel_dict = json.loads(('\n'.join(f.readlines())).replace('[WINPYDIR]',(os.environ['WINPYDIR']).replace('\\','\\\\')))"+
-              ";" + "from  winpython.utils import patch_julia03; patch_julia03()")
+
+            # create movable launchers for previous package installations
+            self.patch_all_shebang()
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""

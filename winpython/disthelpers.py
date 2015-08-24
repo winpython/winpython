@@ -120,8 +120,8 @@ def get_msvc_version(python_version):
         # (i.e. Visual C++ 2010)
         return '10.0'
     elif python_version in ('3.5', '3.6'):
-         return '15.0'
-   else:
+        return '15.0'
+    else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
 def get_msvc_dlls(msvc_version, architecture=None):

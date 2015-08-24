@@ -456,7 +456,7 @@ call %~dp0env.bat
                 'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
                 % (self.python_version, self.pyqt_arch))
         # Install 'critical' packages first
-        for happy_few in['setuptools', 'pip', 'pywin32']:
+        for happy_few in['setuptools', 'pip']:
             self.install_package(
                 '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few,
                 install_options=self.install_options+['--upgrade'])
@@ -773,7 +773,7 @@ call %~dp0register_python.bat --all""")
                 self._copy_dev_docs()
         if not self.simulation:
             self._run_complement_batch_scripts()  # run_complement.bat
-            self.distribution.patch_all_shebang()
+            self.distribution.patch_standard_packages()
             # launchers at the very end
             self._create_launchers()
 
