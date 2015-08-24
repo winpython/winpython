@@ -376,33 +376,6 @@ def patch_sourcelines(fname, in_line_start, out_line, endline='\n', silent_mode=
                           "to", new_content)
 
 
-def patch_julia03():
-    """Ugly patch of Julia/ZMQ and Julia/Nettle to make them movable"""
-    import io
-    import os.path as osp
-    out_line = '"' + os.path.dirname(os.environ["WINPYDIR"]).replace("\\", "\\\\")
-    end_line = r"\\settings\\.julia"
-    from winpython.utils import patch_sourcelines
-
-    in_line_start = '@checked_lib zmq '
-
-    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\ZMQ\deps\deps.jl";
-    patch_sourcelines(fname, in_line_start, out_line, end_line)
-    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\ZMQ\deps\deps.jl";
-    patch_sourcelines(fname, in_line_start, out_line, end_line)
-    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\ZMQ\deps\deps.jl";
-    patch_sourcelines(fname, in_line_start, out_line, end_line)
-
-    in_line_start = '@checked_lib nettle ';
-
-    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.3\Nettle\deps\deps.jl";
-    patch_sourcelines(fname, in_line_start, out_line, end_line)
-    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.4\Nettle\deps\deps.jl";
-    patch_sourcelines(fname, in_line_start, out_line, end_line)
-    fname = os.path.dirname(os.environ["WINPYDIR"]) + r"\settings\.julia\v0.5\Nettle\deps\deps.jl";
-    patch_sourcelines(fname, in_line_start, out_line, end_line)
-
-
 # =============================================================================
 # Extract functions
 # =============================================================================
