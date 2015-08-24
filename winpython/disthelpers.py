@@ -119,7 +119,9 @@ def get_msvc_version(python_version):
         # Python 3.3+ were built with Visual Studio 10.0.30319.1
         # (i.e. Visual C++ 2010)
         return '10.0'
-    else:
+    elif python_version in ('3.5', '3.6'):
+         return '15.0'
+   else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
 def get_msvc_dlls(msvc_version, architecture=None):
@@ -134,6 +136,10 @@ def get_msvc_dlls(msvc_version, architecture=None):
 
     filelist = []
 
+    # simple vs2015 situation: nothing (system dll)
+    if msvc_version == '15.0':
+        return filelist
+    
     msvc_major = msvc_version.split('.')[0]
     msvc_minor = msvc_version.split('.')[1]
 
