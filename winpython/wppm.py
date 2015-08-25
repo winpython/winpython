@@ -225,13 +225,17 @@ class Distribution(object):
     # PyQt module is now like :PyQt4-...
     NSIS_PACKAGES = ('PyQt4', 'PyQwt', 'PyQt5')  # known NSIS packages
 
-    def __init__(self, target, verbose=False, indent=False):
+    def __init__(self, target=None, verbose=False, indent=False):
         self.target = target
         self.verbose = verbose
         self.indent = indent
         self.logdir = None
         self.init_log_dir()
         self.to_be_removed = []  # list of directories to be removed later
+
+        # if no target path given, take the current python interpreter one
+        if target == None:
+            target = os.path.dirname(sys.executable)
         self.version, self.architecture = utils.get_python_infos(target)
 
     def clean_up(self):
