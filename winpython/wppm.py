@@ -230,12 +230,14 @@ class Distribution(object):
         self.verbose = verbose
         self.indent = indent
         self.logdir = None
+
+        # if no target path given, take the current python interpreter one
+        if self.target is None:
+            self.target = os.path.dirname(sys.executable)
+
         self.init_log_dir()
         self.to_be_removed = []  # list of directories to be removed later
 
-        # if no target path given, take the current python interpreter one
-        if target == None:
-            target = os.path.dirname(sys.executable)
         self.version, self.architecture = utils.get_python_infos(target)
 
     def clean_up(self):
