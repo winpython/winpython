@@ -407,11 +407,11 @@ python "%~dpn0""" + ext + """" %*""")
         if tmp_fname is not None:
             os.remove(tmp_fname)
 
-    def patch_standard_packages(self, package_name=None):
+    def patch_standard_packages(self, package_name=''):
         """patch Winpython packages in need"""
         import filecmp
         # 'pywin32' minimal post-install (pywin32_postinstall.py do too much)
-        if package_name == "pywin32" or package_name == None:
+        if package_name.lower() == "pywin32" or package_name == '':
             origin = self.target + (r"\Lib\site-packages\pywin32_system32")
             destin = self.target
             for name in os.listdir(origin):
@@ -421,16 +421,31 @@ python "%~dpn0""" + ext + """" %*""")
                      shutil.copyfile(here, there)
         # 'pip' to do movable launchers (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
-        if package_name == "pip" or package_name == None:
+        if package_name.lower() == "pip" or package_name == '':
             # ensure pip will create movable launchers
             utils.patch_sourcefile(
               self.target + (
               r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
               " executable = get_executable()",
               " executable = os.path.join(os.path.basename(get_executable()))")
-
             # create movable launchers for previous package installations
             self.patch_all_shebang()
+
+        if package_name.lower() == "spyder" or package_name == '':
+            # spyder don't goes on internet without I ask
+            utils.patch_sourcefile(
+              self.target + (
+              r"\Lib\site-packages\spyderlib\config\main.py"),
+              "'check_updates_on_startup': True,",
+              "'check_updates_on_startup': False,")
+
+        if package_name.lower() == "pyqt5" or package_name == '':
+            # workaround Qt5.5.0 bug
+            utils.patch_sourcefile(
+              self.target + (
+              r"\Lib\site-packages\PyQt5\examples\qtdemo\demoitemanimation.py"),
+              "'.__init__(item, 'pos')",
+              "'.__init__(item, b'pos')")
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
