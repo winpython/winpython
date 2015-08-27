@@ -414,11 +414,12 @@ python "%~dpn0""" + ext + """" %*""")
         if package_name.lower() == "pywin32" or package_name == '':
             origin = self.target + (r"\Lib\site-packages\pywin32_system32")
             destin = self.target
-            for name in os.listdir(origin):
-                here, there = osp.join(origin, name), osp.join(destin, name)
-                if (not os.path.exists(there) or
-                   not filecmp.cmp(here, there)):
-                     shutil.copyfile(here, there)
+            if osp.isdir(origin):
+                for name in os.listdir(origin):
+                    here, there = osp.join(origin, name), osp.join(destin, name)
+                    if (not os.path.exists(there) or
+                       not filecmp.cmp(here, there)):
+                        shutil.copyfile(here, there)
         # 'pip' to do movable launchers (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
         if package_name.lower() == "pip" or package_name == '':
