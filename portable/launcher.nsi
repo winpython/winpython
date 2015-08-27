@@ -21,8 +21,6 @@ Licensed under the terms of the MIT License
 !define JULIA ""
 ;  Addition for JULIA_PKGDIR
 !define JULIA_PKGDIR ""
-;  Addition for QT_API(used by Spyder)
-!define QT_API ""
 
 !define COMMAND ""
 !define PARAMETERS ""
@@ -91,10 +89,9 @@ System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JULIA_PKGDIR", "${JULIA
 end_Julia_settings:
 
 
-;  Addition for QT_API if Qt5 detected
-StrCmp "${QT_API}" "" end_QT_API_settings
+;  Addition for QT_API=pyqt5 if Qt5 detected
 IfFileExists "${WINPYDIR}\Lib\site-packages\PyQt5\*.*" 0 end_QT_API_settings
-System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("QT_API", "${QT_API}").r0'
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("QT_API", "pyqt5").r0'
 
 end_QT_API_settings:
 

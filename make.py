@@ -126,11 +126,6 @@ class WinPythonDistribution(object):
         self.rootdir = rootdir  # addded to build from winpython
         self.install_options = install_options
         self.flavor = flavor
-        self.QT_API='pyqt' # default Qt4
-        import glob
-        if len(glob.glob(osp.join(self.wheeldir, 'PyQt5*.*'))) > 0:
-            self.QT_API='pyqt5' # force Qt5 on Spyder
-        print('QT_API is "%s"' % self.QT_API)
 
     @property
     def package_index_wiki(self):
@@ -341,8 +336,7 @@ Name | Version | Description
         data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
                  ('JULIA_PKGDIR', '$EXEDIR%s' % r'\settings\.julia'),
                  ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
-                 ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe'),
-                 ('QT_API', '%s' % self.QT_API)]
+                 ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe')]
 
         if settingspath is not None:
             data += [('SETTINGSDIR', osp.dirname(settingspath)),
@@ -616,8 +610,8 @@ set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 
 set PATH=""" + path + """
 
-rem force default Qt kit for Spyder
-set QT_API=""" + self.QT_API)
+rem force default pyqt5 kit for Spyder if PyQt5 module is there
+if exist %WINPYDIR%\Lib\site-packages\PyQt5 set QT_API=pyqt5""")
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
