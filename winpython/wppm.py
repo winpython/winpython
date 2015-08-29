@@ -455,7 +455,7 @@ python "%~dpn0""" + ext + """" %*""")
             self.create_pybat(['numba', 'pycc'])
         for checklist in("odo", "vitables", "cxfreeze"):
             if package_name.lower() == checklist or package_name == '':
-            self.create_pybat(checklist)
+                self.create_pybat(checklist)
 
 
     def create_pybat(self, names, contents="""@echo off
