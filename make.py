@@ -522,7 +522,7 @@ call %~dp0env.bat
 
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
                              command='${WINPYDIR}\pythonw.exe',
-                             args='wpcp', workdir='${WINPYDIR}\Scripts')
+                             args='-m winpython.controlpanel', workdir='${WINPYDIR}\Scripts')
 
         python_lib_dir = osp.join(self.winpydir, self.python_name,
                                   r"Lib\site-packages")
@@ -677,7 +677,7 @@ cmd.exe /k""")
                                  r"""@echo off
 call %~dp0env.bat
 call %~dp0register_python.bat --all""")
-        self.create_python_batch('wpcp.bat', 'wpcp', workdir='Scripts')
+        self.create_python_batch('wpcp.bat', '-m winpython.controlpanel', workdir='Scripts')
         self.create_python_batch('pyqt4_demo.bat', 'qtdemo.pyw',
              workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
         self.create_python_batch('pyqt5_demo.bat', 'qtdemo.pyw',
@@ -834,7 +834,7 @@ def make_winpython(build_number, release_level, architecture,
         os.mkdir(builddir)
 
     # Create 1 wheel directory to receive all packages whished  for build
-    wheeldir = osp.join(builddir, 'wheels_tmp' + suffix)
+    wheeldir = osp.join(builddir, 'wheels_tmp_%s' % architecture)
     if osp.isdir(wheeldir):
         shutil.rmtree(wheeldir, onerror=utils.onerror)
     os.mkdir(wheeldir)

@@ -13,11 +13,6 @@ The WinPython distribution tools (wppm, ...)
 
 # for wheels creation
 import setuptools
-try:
-    from wheel.bdist_wheel import bdist_wheel
-except ImportError:
-    pass
-
 
 from distutils.core import setup
 import os
@@ -71,7 +66,13 @@ including a package manager, WPPM.""" % PROJECT_NAME,
       # requires=["PyQt4 (>=4.5)"],
       scripts=[osp.join('scripts', fname) for fname in
                ('register_python', 'register_python.bat',
-                'wpcp', 'wpcp.bat', 'wppm', 'wppm.bat', '2to3.bat')],
+                'wppm', 'wppm.bat')],
+      # use setuptools functionalities
+      entry_points={
+        'console_scripts': [
+            'wpcp = winpython.controlpanel:main',
+                           ]
+        },
       classifiers=['License :: OSI Approved :: MIT License',
                    'Operating System :: MacOS',
                    'Operating System :: Microsoft :: Windows',
