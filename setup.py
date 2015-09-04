@@ -65,12 +65,12 @@ including a package manager, WPPM.""" % PROJECT_NAME,
                                                '.html', '.js', '.ini')), },
       # requires=["PyQt4 (>=4.5)"],
       scripts=[osp.join('scripts', fname) for fname in
-               ('register_python', 'register_python.bat',
-                'wppm', 'wppm.bat')],
+               ('register_python', 'register_python.bat')],
       # use setuptools functionalities
       entry_points={
         'console_scripts': [
             'wpcp = winpython.controlpanel:main',
+            'wppm = winpython.wppm:main',
                            ]
         },
       classifiers=['License :: OSI Approved :: MIT License',
