@@ -24,6 +24,11 @@ from winpython import utils
 from winpython.config import DATA_PATH
 from winpython.py3compat import configparser as cp
 
+# from former wppm separate script launcher
+from argparse import ArgumentParser
+from winpython import py3compat
+
+
 # Workaround for installing PyVISA on Windows from source:
 os.environ['HOME'] = os.environ['USERPROFILE']
 
@@ -645,41 +650,69 @@ python "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %
         self.copy_files(package, targetdir, '$_OUTDIR', outdir)
         self._print_done()
 
+def main(test=False):
+    if test:
+        sbdir = osp.join(osp.dirname(__file__),
+                     os.pardir, os.pardir, os.pardir, 'sandbox')
+        tmpdir = osp.join(sbdir, 'tobedeleted')
+
+        # fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
+        fname = osp.join(sbdir, 'VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe')
+        print(Package(fname))
+        sys.exit()
+        target = osp.join(utils.BASE_DIR, 'build',
+                      'winpython-2.7.3', 'python-2.7.3')
+        fname = osp.join(utils.BASE_DIR, 'packages.src', 'docutils-0.9.1.tar.gz')
+
+        dist = Distribution(target, verbose=True)
+        pack = Package(fname)
+        print(pack.description)
+        # dist.install(pack)
+        # dist.uninstall(pack)
+    else:
+
+        parser = ArgumentParser(description="WinPython Package Manager: install, "\
+                        "uninstall or upgrade Python packages on a Windows "\
+                        "Python distribution like WinPython.")
+        parser.add_argument('fname', metavar='package',
+                    type=str if py3compat.PY3 else unicode,
+                    help='path to a Python package')
+        parser.add_argument('-t', '--target', dest='target', default=sys.prefix,
+                    help='path to target Python distribution '\
+                         '(default: "%s")' % sys.prefix)
+        parser.add_argument('-i', '--install', dest='install',
+                    action='store_const', const=True, default=False,
+                    help='install package (this is the default action)')
+        parser.add_argument('-u', '--uninstall', dest='uninstall',
+                    action='store_const', const=True, default=False,
+                    help='uninstall package')
+        args = parser.parse_args()
+
+        if args.install and args.uninstall:
+            raise RuntimeError("Incompatible arguments: --install and --uninstall")
+
+        if not args.install and not args.uninstall:
+            args.install = True
+
+        if not osp.isfile(args.fname):
+            raise IOError("File not found: %s" % args.fname)
+
+        if utils.is_python_distribution(args.target):
+            dist = Distribution(args.target)
+            try:
+                package = Package(args.fname)
+                if package.is_compatible_with(dist):
+                    if args.install:
+                        dist.install(package)
+                    else:
+                        dist.uninstall(package)
+                else:
+                    raise RuntimeError("Package is not compatible with Python "\
+                               "%s %dbit" % (dist.version, dist.architecture))
+            except NotImplementedError:
+                raise RuntimeError("Package is not (yet) supported by WPPM")
+        else:
+            raise WindowsError("Invalid Python distribution %s" % args.target)
 
 if __name__ == '__main__':
-    sbdir = osp.join(osp.dirname(__file__),
-                     os.pardir, os.pardir, os.pardir, 'sandbox')
-    tmpdir = osp.join(sbdir, 'tobedeleted')
-
-    # for fname in os.listdir(sbdir):
-    #     try:
-    #         ins = Installation(fname)
-    #         print fname, '--->', ins.name, ins.version, ins.architecture
-    #     except NotImplementedError:
-    #         pass
-
-    # fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
-    fname = osp.join(sbdir, 'Cython-0.16.win-amd64-py2.7.exe')
-    fname = osp.join(sbdir, 'VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe')
-    fname = osp.join(sbdir, 'scikits.timeseries-0.91.3.win32-py2.7.exe')
-    print(Package(fname))
-    sys.exit()
-    # fname = osp.join(sbdir, 'pylzma-0.4.4dev.win-amd64-py2.7.exe')
-    # fname = osp.join(sbdir, 'cx_Freeze-4.3.win-amd64-py2.6.exe')
-    # fname = osp.join(sbdir, 'PyQtdoc-4.7.2.win-amd64.exe')
-    # fname = osp.join(sbdir, 'winpython-0.1dev.win-amd64.exe')
-    target = osp.join(sbdir, 'winpython-2.7.3.amd64', 'python-2.7.3.amd64')
-
-    target = osp.join(utils.BASE_DIR, 'build',
-                      'winpython-2.7.3', 'python-2.7.3')
-    # fname = osp.join(utils.BASE_DIR, 'packages.src', 'docutils-0.9.1.tar.gz')
-    fname = osp.join(utils.BASE_DIR, 'packages.win32',
-                     'PyQt-Py2.7-x32-gpl-4.8.6-1.exe')
-    fname = osp.join(utils.BASE_DIR, 'packages.win32',
-                     'scikits-image-0.6.1.win32-py2.7.exe')
-
-    dist = Distribution(target, verbose=True)
-    pack = Package(fname)
-    print(pack.description)
-    # dist.install(pack)
-    # dist.uninstall(pack)
+    main()
