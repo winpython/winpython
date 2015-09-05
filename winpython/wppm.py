@@ -450,8 +450,8 @@ python "%~dpn0""" + ext + """" %*""")
             utils.patch_sourcefile(
               self.target + (
               r"\Lib\site-packages\PyQt5\examples\qtdemo\demoitemanimation.py"),
-              "'.__init__(item, 'pos')",
-              "'.__init__(item, b'pos')")
+              ".__init__(item, 'pos')",
+              ".__init__(item, b'pos')")
 
         # workaround bad installers
         if package_name.lower() == "theano" or package_name == '':
