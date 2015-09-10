@@ -412,6 +412,32 @@ python "%~dpn0""" + ext + """" %*""")
         if tmp_fname is not None:
             os.remove(tmp_fname)
 
+    def do_pip_action(self, actions=None, install_options=None):
+        """Do pip action in a distribution"""
+        my_list = install_options
+        if my_list is None:
+            my_list = []
+        my_actions = actions
+        if my_actions is None:
+            my_actions = []
+        executing = osp.join(self.target, '..', 'scripts', 'env.bat')
+        if osp.isfile(executing):
+            complement = [r'&&' , 'cd' , '/D', self.target,
+                          r'&&', osp.join(self.target, 'python.exe') ]
+            complement += [ '-m', 'pip']
+        else:
+            executing = osp.join(self.target, 'python.exe')
+            complement = [ '-m', 'pip']
+        try:
+            fname = utils.do_script(this_script=None,
+                        python_exe=executing,
+                        architecture=self.architecture, verbose=self.verbose,
+                        install_options=complement + my_actions + my_list)
+        except RuntimeError:
+            if not self.verbose:
+                print("Failed!")
+                raise
+
     def patch_standard_packages(self, package_name=''):
         """patch Winpython packages in need"""
         import filecmp

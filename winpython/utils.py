@@ -580,7 +580,6 @@ def do_script(this_script, python_exe=None, copy_to=None,
     """Execute a script (get-pip typically)"""
     if python_exe is None:
         python_exe = sys.executable
-    assert osp.isfile(python_exe)
     myroot = os.path.dirname(python_exe)
 
     # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
@@ -588,7 +587,8 @@ def do_script(this_script, python_exe=None, copy_to=None,
     if install_options:
         cmd += install_options  # typically ['--no-deps']
         print('script install_options', install_options)
-    cmd += [this_script]
+    if this_script:
+        cmd += [this_script]
     # print('build_wheel', myroot, cmd)
     print("Executing ", cmd)
 
