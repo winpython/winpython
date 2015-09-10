@@ -621,7 +621,7 @@ r"""These batch files are not required to run WinPython.
 
 The purpose of these files is to help the user writing his/her own
 batch file to call Python scripts inside WinPython.
-The examples here ('spyder.bat', 'spyder_light.bat', 'wppm.bat',
+The examples here ('spyder.bat', 'spyder_light.bat', 'wpcp.bat',
 'pyqt_demo.bat', 'python.bat' and 'cmd.bat') are quite similar to the
 launchers located in the parent directory.
 The environment variables are set-up in 'env.bat'.""")
@@ -710,12 +710,13 @@ call %~dp0register_python.bat --all""")
 
         self._print_done()
 
-    def make(self, remove_existing=True):
+    def make(self, remove_existing=True, requirements=None):  #, find_links=None):
         """Make WinPython distribution in target directory from the installers
         located in wheeldir
 
         remove_existing=True: (default) install all from scratch
-        remove_existing=False: only for test purpose (launchers/scripts)"""
+        remove_existing=False: only for test purpose (launchers/scripts)
+        requirements=file(s) of requirements (separated by space if several)"""
         if self.simulation:
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
@@ -766,6 +767,21 @@ call %~dp0register_python.bat --all""")
                 self._copy_dev_tools()
                 self._copy_dev_docs()
         if not self.simulation:
+
+            if requirements:
+                if not list(requirements)==requirements:
+                    requirements = requirements.split()
+                for req in requirements:
+                    actions = ["install","-r", req]
+                    if self.install_options is not None:
+                        actions += self.install_options
+                    print("piping %s" % ' '.join(actions))
+                    self._print("piping %s" % ' '.join(actions))
+                    self.distribution.do_pip_action(actions)
+                    #actions=["install","-r", req, "--no-index",
+                    #         "--trusted-host=None"]+ links,
+                    #         install_options=None)
+
             self._run_complement_batch_scripts()  # run_complement.bat
             self.distribution.patch_standard_packages()
             # launchers at the very end
@@ -808,7 +824,8 @@ def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64)):
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
                    create_installer=True, simulation=False, rootdir=None,
-                   install_options=None, flavor=''):
+                   install_options=None, flavor='', requirements=None,
+                   find_links=None):
     """Make WinPython distribution, for a given base directory and
     architecture:
 
@@ -880,15 +897,21 @@ def make_winpython(build_number, release_level, architecture,
             if osp.isdir(flavor_docs):
                 docsdirs.append(flavor_docs)
 
-    install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
+    # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
 
+    if find_links is None:
+        find_links = ''
+    if not find_links == list(find_links):
+        find_links = find_links.split()
+    find_list = ['--find-links=%s' % l for l in find_links +[wheeldir]]
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
                                  verbose=verbose, simulation=simulation,
                                  rootdir=rootdir,
-                                 install_options=install_options,
+                                 install_options=install_options + find_list,
                                  flavor=flavor, docsdirs=docsdirs)
-    dist.make(remove_existing=remove_existing)
+    dist.make(remove_existing=remove_existing, requirements=requirements)
+    #          ,find_links=osp.join(basedir, 'packages.srcreq'))
     if create_installer and not simulation:
         dist.create_installer()
     return dist
@@ -897,7 +920,8 @@ def make_winpython(build_number, release_level, architecture,
 def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
              verbose=False, remove_existing=True, archis=(32, 64),
-             install_options=['--no-index'], flavor=''):
+             install_options=['--no-index'], flavor='', requirements=None,
+             find_links=None):
     """Make WinPython for both 32 and 64bit architectures:
 
     make_all(build_number, release_level, pyver, rootdir, simulation=False,
@@ -909,26 +933,31 @@ def make_all(build_number, release_level, pyver,
     `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
     """ + utils.ROOTDIR_DOC
+
+    if install_options:
+        if not list(install_options) == install_options:
+            install_options = install_options.split()
+        print('install_options', install_options)
     basedir = utils.get_basedir(pyver, rootdir=rootdir)
     rebuild_winpython(basedir=basedir, archis=archis)
     for architecture in archis:
         make_winpython(build_number, release_level, architecture, basedir,
                        verbose, remove_existing, create_installer, simulation,
                        rootdir=rootdir, install_options=install_options,
-                       flavor=flavor)
+                       flavor=flavor, requirements=requirements,
+                       find_links=find_links)
 
 
 if __name__ == '__main__':
     # DO create only one version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(32, ))
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='')
-    make_all(4, '', pyver='3.4', rootdir=r'D:\WinpythonQt5',
-             verbose=False, archis=(64, ))
+    #make_all(6, '', pyver='3.4', rootdir=r'D:\WinpythonQt5',
+    #         verbose=False, archis=(64, ))
     #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
     #         verbose=False, archis=(64, ))
-    #make_all(4, '', pyver='3.4', rootdir=r'D:\Winpython',
-    #          verbose=False, archis=(64, ), flavor='FlavorJulia')
+    make_all(6, '', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
+             archis=(64, ), flavor='',
+             requirements=r'D:\Winpython\basedir34\requirements.txt D:\Winpython\basedir34\requirements2.txt D:\Winpython\basedir34\requirements3.txt',
+             install_options=r'--no-index --pre --trusted-host=None',
+             find_links=r'D:\Winpython\basedir34\packages.srcreq')

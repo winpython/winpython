@@ -8,10 +8,15 @@ rem set my_root_dir_for_builds=D:\Winpython
 rem set my_python_target=34
 rem set my_pyver=3.4
 rem set my_release=4
+rem set my_release_level=build2
 rem set my_flavor=
 rem set my_arch=32
 rem set my_preclear_build_directory=Yes
 
+rem set my_requirements=d:\my_req1.txt d:\my_req2.txt d:\my_req3.txt  d:\my_req4.txt
+rem set my_find_links=%tmp_reqdir%\packages.srcreq
+
+rem set my_install_options=--no-index --pre
 
 set my_day=%date:/=-%
 set my_time=%time:~0,5%
@@ -23,15 +28,15 @@ set my_time=%my_time: =0%
 set my_archive_dir=%~dp0WinPython_build_logs
 if not exist %my_archive_dir% mkdir %my_archive_dir%
 
-set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%_of_%my_day%_at_%my_time%.txt
+set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%_%my_release_level%_of_%my_day%_at_%my_time%.txt
 
 
 echo ===============
-echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release%  *** %my_arch% bit *** 
+echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release% (%my_release_level%) *** %my_arch% bit *** 
 echo %date% %time%
 echo ===============
 echo ===============>>%my_archive_log%
-echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release% *** %my_arch% bit ***>>%my_archive_log%
+echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
 echo %date% %time%>>%my_archive_log%
 echo ===============>>%my_archive_log%
 
@@ -78,8 +83,8 @@ call %my_buildenv%\scripts\env.bat
 
 rem build with this 
 cd /D %~dp0
-echo python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='%my_flavor%')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=False, archis=(%my_arch%, ), flavor='%my_flavor%')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, archis=(%my_arch%, ), flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, archis=(%my_arch%, ), flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%')">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%
