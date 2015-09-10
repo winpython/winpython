@@ -12,6 +12,14 @@ set my_flavor=
 
 set my_arch=64
 set my_preclear_build_directory=Yes
+
+
+set tmp_reqdir=%my_root_dir_for_builds%\basedir%my_python_target%
+set my_requirements=%tmp_reqdir%\requirements.txt %tmp_reqdir%\requirements2.txt %tmp_reqdir%\requirements3.txt
+
+set my_find_links=%tmp_reqdir%\packages.srcreq
+
+set my_install_options=--no-index --pre --trusted-host=None
  
 call %~dp0\generate_a_winpython_distro.bat
 
