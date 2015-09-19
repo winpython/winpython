@@ -680,7 +680,7 @@ call %~dp0register_python.bat --all""")
         self.create_python_batch('wpcp.bat', '-m winpython.controlpanel', workdir='Scripts')
         self.create_python_batch('pyqt4_demo.bat', 'qtdemo.pyw',
              workdir=r'Lib\site-packages\PyQt4\examples\demos\qtdemo')
-        self.create_python_batch('pyqt5_demo.bat', 'qtdemo.pyw',
+        self.create_python_batch('pyqt5_demo.bat', 'qtdemo.py',
              workdir=r'Lib\site-packages\PyQt5\examples\qtdemo')
 
 
