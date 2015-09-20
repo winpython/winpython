@@ -299,7 +299,8 @@ Name | Version | Description
         fd.close()
 
     def create_launcher(self, name, icon, command=None,
-                        args=None, workdir=None, settingspath=None):
+                        args=None, workdir=None, settingspath=None,
+                        bettercommand=None, betterworkdir=None, betterargs=None):
         """Create exe launcher with NSIS"""
         assert name.endswith('.exe')
         portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
@@ -320,6 +321,13 @@ Name | Version | Description
         if workdir is None:
             workdir = ''
 
+        if bettercommand is None:
+            bettercommand = command
+        if betterworkdir is None:
+            betterworkdir = workdir
+        if betterargs is None:
+            betterargs = args
+
         fname = osp.join(self.winpydir, osp.splitext(name)[0]+'.nsi')
 
         data = [('WINPYDIR', '$EXEDIR\%s' % self.python_name),
@@ -329,6 +337,9 @@ Name | Version | Description
                 ('WORKDIR', workdir),
                 ('PREPATH', prepath),
                 ('POSTPATH', postpath),
+                ('BETTERCOMMAND', bettercommand),
+                ('BETTERWORKDIR', betterworkdir),
+                ('BETTERPARAMETERS', betterargs),
                 ('Icon', icon_fname),
                 ('OutFile', name)]
 
@@ -522,33 +533,38 @@ call %~dp0env.bat
 
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
                              command='${WINPYDIR}\pythonw.exe',
-                             args='-m winpython.controlpanel', workdir='${WINPYDIR}\Scripts')
+                             args='-m winpython.controlpanel',
+                             workdir='${WINPYDIR}\Scripts')
 
         python_lib_dir = osp.join(self.winpydir, self.python_name,
                                   r"Lib\site-packages")
-        # manage Qt4, Qt5
-        for QtV in (5, 4):
-            PyQt = 'PyQt%s' % QtV
-            QtDemo_path = 'demos\qtdemo' if QtV == 4 else 'qtdemo'
-            if osp.isdir(osp.join(python_lib_dir, PyQt)):
-                self.create_launcher('Qt%s Demo.exe' % QtV, 'qt.ico',
-                    args='qtdemo.pyw'  if QtV == 4 else 'qtdemo.py', workdir=
-                    r'${WINPYDIR}\Lib\site-packages\%s\examples\%s' %
-                         (PyQt, QtDemo_path) )
-                self.create_launcher('Qt%s Assistant.exe' % QtV,
-                    'qtassistant.ico',
-                    command=r'${WINPYDIR}\Lib\site-packages\%s\assistant.exe' %
-                    PyQt, workdir=r'${WINPYDIR}')
-                self.create_launcher('Qt%s Designer.exe' % QtV,
-                    'qtdesigner.ico',
-                    command=r'${WINPYDIR}\Lib\site-packages\%s\designer.exe' %
-                    PyQt, workdir=r'${WINPYDIR}')
-                self.create_launcher('Qt%s Linguist.exe' % QtV,
-                    'qtlinguist.ico',
-                    command=r'${WINPYDIR}\Lib\site-packages\%s\linguist.exe' %
-                    PyQt, workdir=r'${WINPYDIR}')
 
+        # Multi-Qt launchers (Qt5 has priority if found)
+        Qt4_dir = r'${WINPYDIR}\Lib\site-packages\PyQt4'
+        Qt5_dir = r'${WINPYDIR}\Lib\site-packages\PyQt5'
 
+        self.create_launcher('Qt Demo.exe', 'qt.ico',
+                             command=r'${WINPYDIR}\pythonw.exe',
+                             args='qtdemo.pyw',
+                             workdir=Qt4_dir+r'\examples\%s' % r'demos\qtdemo',
+                             bettercommand=r'${WINPYDIR}\python.exe',
+                             betterargs='qtdemo.py',
+                             betterworkdir=Qt5_dir+r'\examples\%s' % r'qtdemo')
+
+        self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
+                             command=Qt4_dir + r'\assistant.exe',
+                             workdir=r'${WINPYDIR}',
+                             bettercommand=Qt5_dir + r'\assistant.exe')
+        self.create_launcher('Qt Designer.exe', 'qtdesigner.ico',
+                             command=Qt4_dir + r'\designer.exe',
+                             workdir=r'${WINPYDIR}',
+                             bettercommand=Qt5_dir + r'\designer.exe')
+        self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
+                             command=(Qt4_dir + r'\linguist.exe'),
+                             workdir=r'${WINPYDIR}',
+                             bettercommand=Qt5_dir + r'\linguist.exe')
+
+        # Jupyter launchers
         if osp.isfile(osp.join(self.python_dir, 'Scripts', 'jupyter.exe')):
             self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                                  command='${WINPYDIR}\Scripts\%s' %

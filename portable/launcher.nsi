@@ -29,6 +29,12 @@ Licensed under the terms of the MIT License
 !define POSTPATH ""
 !define SETTINGSDIR ""
 !define SETTINGSNAME ""
+
+; prefered command (if it is a file)
+!define BETTERCOMMAND ""
+!define BETTERWORKDIR ""
+!define BETTERPARAMETERS ""
+
 Icon ""
 OutFile ""
 ;================================================================
@@ -52,6 +58,29 @@ Call Execute
 SectionEnd
 
 Function Execute
+
+; prefered command (if it is a file)
+StrCmp "${BETTERCOMMAND}" "" no_better_workdir
+StrCpy $R8 "${BETTERCOMMAND}"
+IfFileExists $R8 do_better_workdircheck
+Goto no_better_workdir
+
+do_better_workdircheck:
+StrCpy $R8 "${BETTERWORKDIR}"
+IfFileExists $R8 do_better_workdir
+Goto no_better_workdir
+
+do_better_workdir:
+StrCmp ${BETTERWORKDIR} "" 0 betterworkdir
+System::Call "kernel32::GetCurrentDirectory(i ${NSIS_MAX_STRLEN}, t .r0)"
+SetOutPath $0
+Goto end_workdir
+betterworkdir:
+SetOutPath "${BETTERWORKDIR}"
+Goto end_workdir
+
+no_better_workdir:
+;normal workdir
 StrCmp ${WORKDIR} "" 0 workdir
 System::Call "kernel32::GetCurrentDirectory(i ${NSIS_MAX_STRLEN}, t .r0)"
 SetOutPath $0
@@ -178,11 +207,36 @@ System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("PATH", R0).r0'
 ;================================================================
 
 
+
+
+; prefered command (if it is a file)
+StrCmp "${BETTERCOMMAND}" "" no_better_command
+StrCpy $R8 "${BETTERCOMMAND}"
+IfFileExists $R8 do_better_commandcheck
+Goto no_better_command
+
+do_better_commandcheck:
+StrCmp "${BETTERWORKDIR}" "" no_better_command
+StrCpy $R8 "${BETTERWORKDIR}"
+IfFileExists $R8 do_better_command
+Goto no_better_command
+
+do_better_command:
+; Command line parameters
+${GetParameters} $R1
+StrCmp "${BETTERPARAMETERS}" "" end_betterparam 0
+StrCpy $R1 "${BETTERPARAMETERS} $R1"
+end_betterparam:
+Exec '"${BETTERCOMMAND}" $R1'
+Goto end_of_command
+
+no_better_command:
 ; Command line parameters
 ${GetParameters} $R1
 StrCmp "${PARAMETERS}" "" end_param 0
 StrCpy $R1 "${PARAMETERS} $R1"
 end_param:
-
 Exec '"${COMMAND}" $R1'
+
+end_of_command:
 FunctionEnd
