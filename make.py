@@ -676,6 +676,24 @@ set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 echo [config]>%pydistutils_cfg%
         """)
 
+        self.create_batch_script('make_winpython_movable.bat',r"""@echo off
+call %~dp0env.bat
+echo patch pip and current launchers fopr move
+rem %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\pip\_vendor\distlib\scripts.py', 'executable = get_executable()', 'executable = os.path.join(os.path.basename(get_executable()))' )"
+
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip');dist.patch_all_shebang(to_movable=True)"
+pause
+        """)
+
+        self.create_batch_script('make_winpython_fix.bat',r"""@echo off
+call %~dp0env.bat
+echo patch pip and current launchers for non-move
+%WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\pip\_vendor\distlib\scripts.py', 'executable = os.path.join(os.path.basename(get_executable()))', 'executable = get_executable()' )"
+
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_all_shebang(to_movable=False)"
+pause
+        """)
+
         self.create_batch_script('cmd.bat', r"""@echo off
 call %~dp0env.bat
 cmd.exe /k""")
