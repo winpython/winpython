@@ -35,6 +35,9 @@ Licensed under the terms of the MIT License
 !define BETTERWORKDIR ""
 !define BETTERPARAMETERS ""
 
+; jupyter workaround to stay in one directory
+!define JUPYTER_DATA_DIR ""
+
 Icon ""
 OutFile ""
 ;================================================================
@@ -123,6 +126,12 @@ IfFileExists "${WINPYDIR}\Lib\site-packages\PyQt5\*.*" 0 end_QT_API_settings
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("QT_API", "pyqt5").r0'
 
 end_QT_API_settings:
+
+; jupyter
+StrCmp "${JUPYTER_DATA_DIR}" "" end_jupyter_data_setting
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JUPYTER_DATA_DIR", "${JUPYTER_DATA_DIR}").r0'
+
+end_jupyter_data_setting:
 
 ;================================================================
 ; Settings directory
