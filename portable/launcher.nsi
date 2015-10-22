@@ -131,6 +131,7 @@ end_QT_API_settings:
 StrCmp "${JUPYTER_DATA_DIR}" "" end_jupyter_data_setting
 System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i("JUPYTER_DATA_DIR", "${JUPYTER_DATA_DIR}").r0'
 
+end_jupyter_data_setting:
 
 ;================================================================
 ; Settings directory
