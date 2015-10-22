@@ -340,6 +340,7 @@ Name | Version | Description
                 ('BETTERCOMMAND', bettercommand),
                 ('BETTERWORKDIR', betterworkdir),
                 ('BETTERPARAMETERS', betterargs),
+                ('JUPYTER_DATA_DIR', '$EXEDIR\%s' % 'settings'),
                 ('Icon', icon_fname),
                 ('OutFile', name)]
 
@@ -627,7 +628,11 @@ set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 set PATH=""" + path + """
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
-if exist %WINPYDIR%\Lib\site-packages\PyQt5 set QT_API=pyqt5""")
+if exist %WINPYDIR%\Lib\site-packages\PyQt5 set QT_API=pyqt5
+
+rem keep nbextensions in Winpython directory, rather then %APPDATA% default
+set JUPYTER_DATA_DIR=%WINPYDIR%\..\settings
+""")
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
@@ -717,6 +722,11 @@ call %~dp0register_python.bat --all""")
         self.create_python_batch('pyqt5_demo.bat', 'qtdemo.py',
              workdir=r'Lib\site-packages\PyQt5\examples\qtdemo')
 
+        self.create_batch_script('ipython_notebook.bat', r"""@echo off
+call %~dp0env.bat
+cd %WINPYDIR%\Scripts
+%WINPYDIR%\scripts\jupyter-notebook.exe --notebook-dir=%WINPYDIR%\..\notebooks %*
+""")
 
         # pre-run mingw batch
         print('now pre-running extra mingw')
