@@ -463,7 +463,7 @@ WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(
 #         . joblib-0.8.3_r1-py2.py3-none-any.whl,
 #         . joblib-0.8.3-r1.tar.gz
 
-SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[0-9]?)(\.zip|\.tar\.gz|\-(py[2-7]*|py[2-7]*\.py[2-7]*)\-none\-any\.whl)'
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[\-]?[0-9]*)(\.zip|\.tar\.gz|\-(py[2-7]*|py[2-7]*\.py[2-7]*)\-none\-any\.whl)'
 
 # WHEELBIN_PATTERN defines what an acceptable binary wheel package is
 # "cp([0-9]*)" to replace per cp(34) for python3.4
