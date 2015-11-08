@@ -471,14 +471,6 @@ python "%~dpn0""" + ext + """" %*""")
               "'check_updates_on_startup': True,",
               "'check_updates_on_startup': False,")
 
-        if package_name.lower() == "pyqt5" or package_name == '':
-            # workaround Qt5.5.0 bug
-            utils.patch_sourcefile(
-              self.target + (
-              r"\Lib\site-packages\PyQt5\examples\qtdemo\demoitemanimation.py"),
-              ".__init__(item, 'pos')",
-              ".__init__(item, b'pos')")
-
         # workaround bad installers
         if package_name.lower() == "theano" or package_name == '':
             self.create_pybat(['theano-cache', 'theano-nose', 'theano-test'])

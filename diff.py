@@ -91,7 +91,7 @@ class PackageIndex(object):
         self.from_text(text)
 
     def from_text(self, text):
-        version = re.match(self.WINPYTHON_PATTERN, text).groups()[0]
+        version = re.match(self.WINPYTHON_PATTERN+self.flavor, text).groups()[0]
         assert version == self.version
         tools_flag = False
         python_flag = False
@@ -175,9 +175,11 @@ def compare_package_indexes(version2, version1=None, rootdir=None, flavor=''):
     if version1 is None:
         version1 = find_closer_version(version2, rootdir=rootdir,
                                        flavor=flavor)
-    text = '\r\n'.join(["## History of changes for WinPython %s" % version2,
+    text = '\r\n'.join(["## History of changes for WinPython %s" % 
+                        (version2+flavor),
                         "", "The following changes were made to WinPython "
-                        "distribution since version %s." % version1, "", ""])
+                        "distribution since version %s." % (version1+flavor),
+                        "", ""])
     pi1 = PackageIndex(version1, rootdir=rootdir, flavor=flavor)
     pi2 = PackageIndex(version2, rootdir=rootdir, flavor=flavor)
     tools_text = diff_package_dicts(pi1.other_packages, pi2.other_packages)
@@ -199,10 +201,12 @@ def _copy_all_changelogs(version, basedir, flavor=''):
                             osp.join(basedir, 'build%s' % flavor, name))
 
 
-def write_changelog(version2, version1=None, rootdir=None, flavor=''):
+def write_changelog(version2, version1=None, rootdir=None, flavor='',
+                    release_level=''):
     """Write changelog between version1 and version2 of WinPython"""
     basedir = get_basedir(version2, rootdir=rootdir)
     _copy_all_changelogs(version2, basedir, flavor=flavor)
+    print ('comparing_package_indexes', version2, rootdir, flavor)
     text = compare_package_indexes(version2, version1, rootdir=rootdir,
                                    flavor=flavor)
     fname = osp.join(basedir, 'build%s' % flavor,
@@ -213,9 +217,9 @@ def write_changelog(version2, version1=None, rootdir=None, flavor=''):
     shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
 
 
-def test_parse_package_index_wiki(version, rootdir=None):
+def test_parse_package_index_wiki(version, rootdir=None, flavor=''):
     """Parse the package index Wiki page"""
-    pi = PackageIndex(version, rootdir=rootdir)
+    pi = PackageIndex(version, rootdir=rootdir, flavor=flavor)
     utils.print_box("WinPython %s:" % pi.version)
     utils.print_box("Tools:")
     for package in pi.other_packages.values():
@@ -232,13 +236,9 @@ def test_compare(basedir, version2, version1):
 
 
 if __name__ == '__main__':
+    print (compare_package_indexes('3.4.3.7', None, 
+           rootdir='D:\WinpythonQt5', flavor='Qt5'))
     # test_parse_package_index_wiki('2.7.3.3')
     # print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
     # write_changelog('2.7.4.1', '2.7.4.0')
-    # write_changelog('2.7.5.0', '2.7.4.1')
-    write_changelog('3.3.2.1')  # , '2.7.5.0')
-    write_changelog('2.7.5.1')  # , '2.7.5.0')
     # write_changelog('3.3.0.0beta2', '3.3.0.0beta1')
-    # write_changelog('3.3.1.1', '3.3.1.0')
-    # write_changelog('3.3.2.0', '3.3.1.1')
-    # write_changelog('3.3.2.1', '3.3.2.0')
