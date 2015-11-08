@@ -8,8 +8,10 @@ rem set my_root_dir_for_builds=D:\Winpython
 rem set my_python_target=34
 rem set my_pyver=3.4
 rem set my_release=4
+
 rem set my_release_level=build2
-rem set my_flavor=
+rem set my_flavor=Qt5
+
 rem set my_arch=32
 rem set my_preclear_build_directory=Yes
 
@@ -28,15 +30,15 @@ set my_time=%my_time: =0%
 set my_archive_dir=%~dp0WinPython_build_logs
 if not exist %my_archive_dir% mkdir %my_archive_dir%
 
-set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%_%my_release_level%_of_%my_day%_at_%my_time%.txt
+set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%%my_flavor%_%my_release_level%_of_%my_day%_at_%my_time%.txt
 
 
 echo ===============
-echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release% (%my_release_level%) *** %my_arch% bit *** 
+echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit *** 
 echo %date% %time%
 echo ===============
 echo ===============>>%my_archive_log%
-echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
+echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
 echo %date% %time%>>%my_archive_log%
 echo ===============>>%my_archive_log%
 
@@ -50,15 +52,17 @@ echo ------------------>>%my_archive_log%
 
 cd /D  %my_root_dir_for_builds%\basedir%my_python_target%
 
+set build_det=\%my_flavor%
+if "%my_flavor%"=="" set build_det=
 
-dir buil*
-echo rmdir /S /Q build ?
+dir %build_det%
+echo rmdir /S /Q build%my_flavor%
 rem pause
-rmdir /S /Q build
-rmdir /S /Q build
-rmdir /S /Q build
-rmdir /S /Q build
-rmdir /S /Q build
+rmdir /S /Q build%my_flavor%
+rmdir /S /Q build%my_flavor%
+rmdir /S /Q build%my_flavor%
+rmdir /S /Q build%my_flavor%
+rmdir /S /Q build%my_flavor%
 rmdir /S /Q dist
 
 echo %date% %time%

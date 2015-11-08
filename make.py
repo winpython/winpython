@@ -172,7 +172,7 @@ class WinPythonDistribution(object):
                     for pack in sorted(self.installed_packages,
                                        key=lambda p: p.name.lower())]
         python_desc = 'Python programming language with standard library'
-        return """## WinPython %s
+        return """## WinPython %s 
 
 The following packages are included in WinPython v%s%s.
 
@@ -187,14 +187,15 @@ Name | Version | Description
 Name | Version | Description
 -----|---------|------------
 [Python](http://www.python.org/) | %s | %s
-%s""" % (self.winpyver, self.winpyver, self.flavor, '\n'.join(tools),
+%s""" % (self.winpyver2+self.flavor, self.winpyver2+self.flavor,
+(' %s' % self.release_level), '\n'.join(tools),
          self.python_fullversion, python_desc, '\n'.join(packages))
 
     @property
     def winpyver(self):
-        """Return WinPython version (with release level!)"""
-        return '%s.%d%s' % (self.python_fullversion, self.build_number,
-                            self.release_level)
+        """Return WinPython version (with flavor and release level!)"""
+        return '%s.%d%s%s' % (self.python_fullversion, self.build_number,
+                            self.flavor,self.release_level)
 
     @property
     def python_dir(self):
@@ -838,8 +839,10 @@ cd %WINPYDIR%\Scripts
 
         # Writing package index
         self._print("Writing package index")
+        # winpyver2 = need the version without build part
+        self.winpyver2 = '%s.%s' % (self.python_fullversion, self.build_number)
         fname = osp.join(self.winpydir, os.pardir,
-                         'WinPython%s-%s.txt' % (self.flavor, self.winpyver))
+                         'WinPython%s-%s.txt' % (self.flavor, self.winpyver2))
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
         shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
@@ -847,8 +850,8 @@ cd %WINPYDIR%\Scripts
 
         # Writing changelog
         self._print("Writing changelog")
-        diff.write_changelog(self.winpyver, rootdir=self.rootdir,
-                             flavor=self.flavor)
+        diff.write_changelog(self.winpyver2, rootdir=self.rootdir,
+                             flavor=self.flavor, release_level=self.release_level)
         self._print_done()
 
 
@@ -996,12 +999,14 @@ if __name__ == '__main__':
     # DO create only one version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(6, '', pyver='3.4', rootdir=r'D:\WinpythonQt5',
-    #         verbose=False, archis=(64, ))
-    #make_all(1, '', pyver='2.7', rootdir=r'D:\Winpython',
-    #         verbose=False, archis=(64, ))
-    make_all(6, '', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
-             archis=(64, ), flavor='',
-             requirements=r'D:\Winpython\basedir34\requirements.txt D:\Winpython\basedir34\requirements2.txt D:\Winpython\basedir34\requirements3.txt',
+    #make_all(7, release_level='build1', pyver='3.4', rootdir=r'D:\WinpythonQt5', verbose=True,
+    #         archis=(64, ), flavor='Qt5',
+    #         requirements=r'D:\WinpythonQt5\basedir34\requirements.txt D:\WinpythonQt5\basedir34\requirements2.txt D:\WinpythonQt5\basedir34\requirements3.txt',
+    #         install_options=r'--no-index --pre --trusted-host=None',
+    #         find_links=r'D:\Winpython\basedir34\packages.srcreq')
+
+    make_all(7, release_level='build1', pyver='3.4', rootdir=r'D:\WinpythonQt5', verbose=True,
+             archis=(64, ), flavor='Qt5',
+             requirements=r'D:\WinpythonQt5\basedir34\zerorequirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
              find_links=r'D:\Winpython\basedir34\packages.srcreq')
