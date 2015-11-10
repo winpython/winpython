@@ -10,13 +10,18 @@ rem set my_pyver=3.4
 rem set my_release=4
 
 rem set my_release_level=build2
-rem set my_flavor=Qt5
+rem set my_flavor=Slim
 
 rem set my_arch=32
 rem set my_preclear_build_directory=Yes
 
 rem set my_requirements=d:\my_req1.txt d:\my_req2.txt d:\my_req3.txt  d:\my_req4.txt
 rem set my_find_links=%tmp_reqdir%\packages.srcreq
+
+rem set my_source_dirs=D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win32.Slim
+rem set my_toolsdirs=D:\WinPython\basedir34\Tools.Slim
+rem set my_docsdirs=D:\WinPython\basedir34\docs.Slim
+
 
 rem set my_install_options=--no-index --pre
 
@@ -87,8 +92,8 @@ call %my_buildenv%\scripts\env.bat
 
 rem build with this 
 cd /D %~dp0
-echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, archis=(%my_arch%, ), flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, archis=(%my_arch%, ), flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, archis=(%my_arch%, ), flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, archis=(%my_arch%, ), flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%
