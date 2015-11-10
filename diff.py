@@ -170,17 +170,19 @@ def find_closer_version(version1, rootdir=None, flavor=''):
     return versions[index-1]
 
 
-def compare_package_indexes(version2, version1=None, rootdir=None, flavor=''):
+def compare_package_indexes(version2, version1=None, rootdir=None, flavor='',
+flavor1=None):
     """Compare two package index Wiki pages"""
     if version1 is None:
         version1 = find_closer_version(version2, rootdir=rootdir,
                                        flavor=flavor)
+    flavor1 = flavor1 if flavor1 else flavor    
     text = '\r\n'.join(["## History of changes for WinPython %s" % 
                         (version2+flavor),
                         "", "The following changes were made to WinPython "
-                        "distribution since version %s." % (version1+flavor),
+                        "distribution since version %s." % (version1+flavor1),
                         "", ""])
-    pi1 = PackageIndex(version1, rootdir=rootdir, flavor=flavor)
+    pi1 = PackageIndex(version1, rootdir=rootdir, flavor=flavor1)
     pi2 = PackageIndex(version2, rootdir=rootdir, flavor=flavor)
     tools_text = diff_package_dicts(pi1.other_packages, pi2.other_packages)
     if tools_text:
@@ -236,8 +238,8 @@ def test_compare(basedir, version2, version1):
 
 
 if __name__ == '__main__':
-    print (compare_package_indexes('3.4.3.7', None, 
-           rootdir='D:\WinpythonQt5', flavor='Qt5'))
+    print (compare_package_indexes('3.4.3.7', '3.4.3.7', 
+           rootdir='D:\Winpython', flavor='Slim', flavor1='Qt5'))
     # test_parse_package_index_wiki('2.7.3.3')
     # print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
     # write_changelog('2.7.4.1', '2.7.4.0')

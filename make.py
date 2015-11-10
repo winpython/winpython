@@ -872,7 +872,8 @@ def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
                    create_installer=True, simulation=False, rootdir=None,
                    install_options=None, flavor='', requirements=None,
-                   find_links=None):
+                   find_links=None, source_dirs=None, toolsdirs=None,
+                   docsdirs=None):
     """Make WinPython distribution, for a given base directory and
     architecture:
 
@@ -903,10 +904,20 @@ def make_winpython(build_number, release_level, architecture,
         shutil.rmtree(wheeldir, onerror=utils.onerror)
     os.mkdir(wheeldir)
     #  Copy Every package directory to the wheel directory
-    source_dirs = [osp.join(basedir, 'packages' + suffix),
-                   osp.join(basedir, 'packages.src'),
-                   osp.join(basedir, flavor, 'packages' + suffix),
-                   osp.join(basedir, flavor, 'packages.src')]
+
+    # Optional pre-defined source_dirs
+    if source_dirs is None:
+        source_dirs = ''
+    if not source_dirs == list(source_dirs):
+        source_dirs = source_dirs.split()
+    
+    # Default natural behavior
+    if source_dirs == []:
+        source_dirs = [osp.join(basedir, 'packages' + suffix),
+                       osp.join(basedir, 'packages.src'),
+                       osp.join(basedir, flavor, 'packages' + suffix),
+                       osp.join(basedir, flavor, 'packages.src')]
+    print('source_dirs=', source_dirs)
     for m in list(set(source_dirs)):
         if osp.isdir(m):
             src_files = os.listdir(m)
@@ -914,35 +925,54 @@ def make_winpython(build_number, release_level, architecture,
                 full_file_name = os.path.join(m, file_name)
                 shutil.copy(full_file_name, wheeldir)
 
-    # Define List of Tools directory to collect
-    toolsdir1 = osp.join(basedir, 'tools')
-    assert osp.isdir(toolsdir1)
-    toolsdirs = [toolsdir1]
-    toolsdir2 = osp.join(basedir, 'tools' + suffix)
-    if osp.isdir(toolsdir2):
-        toolsdirs.append(toolsdir2)
-    # add flavor tools
-    if flavor != '':
-        toolsdir3 = osp.join(basedir, flavor, 'tools')
-        toolsdir4 = osp.join(basedir, flavor, 'tools' + suffix)
-        for flavor_tools in [toolsdir3, toolsdir4]:
-            if osp.isdir(flavor_tools):
-                toolsdirs.append(flavor_tools)
+    # Optional pre-defined toolsdirs
+    if toolsdirs is None:
+        toolsdirs = ''
+    if not toolsdirs == list(toolsdirs):
+        toolsdirs = toolsdirs.split()
 
-    # Define List of docs directory to collect
-    docsdir1 = osp.join(basedir, 'docs')
-    assert osp.isdir(docsdir1)
-    docsdirs = [docsdir1]
-    docsdir2 = osp.join(basedir, 'docs' + suffix)
-    if osp.isdir(docsdir2):
-        docsdirs.append(docsdir2)
-    # add flavor docs
-    if flavor != '':
-        docsdir3 = osp.join(basedir, flavor, 'docs')
-        docsdir4 = osp.join(basedir, flavor, 'docs' + suffix)
-        for flavor_docs in [docsdir3, docsdir4]:
-            if osp.isdir(flavor_docs):
-                docsdirs.append(flavor_docs)
+    # Default natural behavior
+    if toolsdirs == []:
+
+        # Define List of Tools directory to collect
+        toolsdir1 = osp.join(basedir, 'tools')
+        assert osp.isdir(toolsdir1)
+        toolsdirs = [toolsdir1]
+        toolsdir2 = osp.join(basedir, 'tools' + suffix)
+        if osp.isdir(toolsdir2):
+            toolsdirs.append(toolsdir2)
+        # add flavor tools
+        if flavor != '':
+            toolsdir3 = osp.join(basedir, flavor, 'tools')
+            toolsdir4 = osp.join(basedir, flavor, 'tools' + suffix)
+            for flavor_tools in [toolsdir3, toolsdir4]:
+                if osp.isdir(flavor_tools):
+                    toolsdirs.append(flavor_tools)
+    print('toolsdirs=', toolsdirs)
+
+    # Optional pre-defined toolsdirs
+    if docsdirs is None:
+        docsdirs = ''
+    if not docsdirs == list(docsdirs):
+        docsdirs = docsdirs.split()
+
+    # Default natural behavior
+    if docsdirs == []:
+        # Define List of docs directory to collect
+        docsdir1 = osp.join(basedir, 'docs')
+        assert osp.isdir(docsdir1)
+        docsdirs = [docsdir1]
+        docsdir2 = osp.join(basedir, 'docs' + suffix)
+        if osp.isdir(docsdir2):
+            docsdirs.append(docsdir2)
+        # add flavor docs
+        if flavor != '':
+            docsdir3 = osp.join(basedir, flavor, 'docs')
+            docsdir4 = osp.join(basedir, flavor, 'docs' + suffix)
+            for flavor_docs in [docsdir3, docsdir4]:
+                if osp.isdir(flavor_docs):
+                    docsdirs.append(flavor_docs)
+    print('docsdirs=', docsdirs)
 
     # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
 
@@ -968,7 +998,7 @@ def make_all(build_number, release_level, pyver,
              rootdir=None, simulation=False, create_installer=True,
              verbose=False, remove_existing=True, archis=(32, 64),
              install_options=['--no-index'], flavor='', requirements=None,
-             find_links=None):
+             find_links=None, source_dirs=None, toolsdirs=None, docsdirs=None):
     """Make WinPython for both 32 and 64bit architectures:
 
     make_all(build_number, release_level, pyver, rootdir, simulation=False,
@@ -992,7 +1022,8 @@ def make_all(build_number, release_level, pyver,
                        verbose, remove_existing, create_installer, simulation,
                        rootdir=rootdir, install_options=install_options,
                        flavor=flavor, requirements=requirements,
-                       find_links=find_links)
+                       find_links=find_links, source_dirs=source_dirs,
+                       toolsdirs=toolsdirs, docsdirs=docsdirs)
 
 
 if __name__ == '__main__':
@@ -1005,8 +1036,12 @@ if __name__ == '__main__':
     #         install_options=r'--no-index --pre --trusted-host=None',
     #         find_links=r'D:\Winpython\basedir34\packages.srcreq')
 
-    make_all(7, release_level='build1', pyver='3.4', rootdir=r'D:\WinpythonQt5', verbose=True,
-             archis=(64, ), flavor='Qt5',
-             requirements=r'D:\WinpythonQt5\basedir34\zerorequirements.txt',
+    make_all(7, release_level='build1', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
+             archis=(32, ), flavor='Slim',
+             requirements=r'D:\Winpython\basedir34\slim_requirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
-             find_links=r'D:\Winpython\basedir34\packages.srcreq')
+             find_links=r'D:\Winpython\basedir34\packages.srcreq',
+             source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win32.Slim',
+             toolsdirs=r'D:\WinPython\basedir34\Tools.Slim',
+             docsdirs=r'D:\WinPython\basedir34\docs.Slim'
+)
