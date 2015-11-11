@@ -137,7 +137,7 @@ def get_msvc_dlls(msvc_version, architecture=None):
     filelist = []
 
     # simple vs2015 situation: nothing (system dll)
-    if msvc_version == '15.0':
+    if msvc_version == '14.0':
         return filelist
     
     msvc_major = msvc_version.split('.')[0]
@@ -192,13 +192,18 @@ def get_msvc_dlls(msvc_version, architecture=None):
                 raise RuntimeError("Microsoft Visual C++ %s DLLs version %s "\
                                     "were not found" % (group, msvc_version))
 
-    elif msvc_major == '10':
+    elif msvc_major == '10' or msvc_major == '15':  # 15 for vs 2015
         namelist = [name % (msvc_major + msvc_minor) for name in 
                     (
                      'msvcp%s.dll', 'msvcr%s.dll',
                      'vcomp%s.dll',
                      )]
-        
+        if msvc_major == '15':
+                    namelist = [name % ('14' + msvc_minor) for name in 
+                    (
+                     'vcruntime%s.dll', 'msvcp%s.dll', 'vccorlib%s.dll',
+                     'concrt%s.dll','vcomp%s.dll',
+                     )]
         windir = os.environ['windir']
         is_64bit_windows = osp.isdir(osp.join(windir, "SysWOW64"))
 
@@ -218,6 +223,7 @@ def get_msvc_dlls(msvc_version, architecture=None):
 
         for dllname in namelist:
             fname = osp.join(windir, sysdir, dllname)
+            print('searching', fname )
             if osp.exists(fname):
                 filelist.append(fname)
             else:
