@@ -941,13 +941,6 @@ def make_winpython(build_number, release_level, architecture,
         toolsdir2 = osp.join(basedir, 'tools' + suffix)
         if osp.isdir(toolsdir2):
             toolsdirs.append(toolsdir2)
-        # add flavor tools
-        if flavor != '':
-            toolsdir3 = osp.join(basedir, flavor, 'tools')
-            toolsdir4 = osp.join(basedir, flavor, 'tools' + suffix)
-            for flavor_tools in [toolsdir3, toolsdir4]:
-                if osp.isdir(flavor_tools):
-                    toolsdirs.append(flavor_tools)
     print('toolsdirs=', toolsdirs)
 
     # Optional pre-defined toolsdirs
@@ -965,13 +958,6 @@ def make_winpython(build_number, release_level, architecture,
         docsdir2 = osp.join(basedir, 'docs' + suffix)
         if osp.isdir(docsdir2):
             docsdirs.append(docsdir2)
-        # add flavor docs
-        if flavor != '':
-            docsdir3 = osp.join(basedir, flavor, 'docs')
-            docsdir4 = osp.join(basedir, flavor, 'docs' + suffix)
-            for flavor_docs in [docsdir3, docsdir4]:
-                if osp.isdir(flavor_docs):
-                    docsdirs.append(flavor_docs)
     print('docsdirs=', docsdirs)
 
     # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
