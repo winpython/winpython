@@ -410,10 +410,13 @@ call %~dp0env.bat
         """Extracting Python installer, creating distribution object"""
         self._print("Extracting Python installer")
         os.mkdir(self.python_dir)
-        utils.extract_msi(self.python_fname, targetdir=self.python_dir)
-        os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
-        if not os.path.exists(osp.join(self.python_dir, 'Scripts')):
-            os.mkdir(osp.join(self.python_dir, 'Scripts'))
+        if  self.python_fname[-3:] == 'zip':  # Python3.5
+           utils.extract_archive(self.python_fname, targetdir=self.python_dir+r'\..')
+        else:   
+           utils.extract_msi(self.python_fname, targetdir=self.python_dir)
+           os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
+           if not os.path.exists(osp.join(self.python_dir, 'Scripts')):
+               os.mkdir(osp.join(self.python_dir, 'Scripts'))
         self._print_done()
 
     def _add_msvc_files(self):
@@ -766,14 +769,14 @@ cd %WINPYDIR%\Scripts
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.rc]*)(\.amd64)?\.msi')
+                            r'python-([0-9\.rc]*)((\.|\-)amd64)?\.(msi|zip)')
         self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
                         ).groups()[0].split('.')
         self.python_version = '.'.join(vlst[:2])
         self.python_fullversion = '.'.join(vlst[:3])
-
+        print(self.python_fname,self.python_name , distname, self.python_version, self.python_fullversion)
         # Create the WinPython base directory
         self._print("Creating WinPython %s base directory"
                     % self.python_version)
@@ -1022,12 +1025,12 @@ if __name__ == '__main__':
     #         install_options=r'--no-index --pre --trusted-host=None',
     #         find_links=r'D:\Winpython\basedir34\packages.srcreq')
 
-    make_all(7, release_level='build1', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
-             archis=(32, ), flavor='Slim',
-             requirements=r'D:\Winpython\basedir34\slim_requirements.txt',
+    make_all(1, release_level='build3', pyver='3.5', rootdir=r'D:\Winpython', verbose=True,
+             archis=(64, ), flavor='Slim',
+             requirements=r'D:\Winpython\basedir35\slim_requirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
              find_links=r'D:\Winpython\basedir34\packages.srcreq',
-             source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win32.Slim',
+             source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir35\packages.win-amd64',
              toolsdirs=r'D:\WinPython\basedir34\Tools.Slim',
              docsdirs=r'D:\WinPython\basedir34\docs.Slim'
 )
