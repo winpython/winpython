@@ -371,9 +371,13 @@ python "%~dpn0""" + ext + """" %*""")
             if pack.name == name:
                 return pack
 
+
     def uninstall_existing(self, package):
-        """Uninstall existing package"""
-        pack = self.find_package(package.name)
+        """Uninstall existing package (or package name)"""
+        if isinstance(package ,str):
+            pack = self.find_package(package)
+        else:
+            pack = self.find_package(package.name)
         if pack is not None:
             self.uninstall(pack)
 
