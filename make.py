@@ -455,22 +455,6 @@ call %~dp0env.bat
                       (pack.name, ", ".join([p.version for p in duplicates])),
                       file=sys.stderr)
 
-    def _install_required_packages(self):
-        """Installing required packages"""
-        print("Installing required packages")
-
-        # Specific check for PyQt5 non-wheel:
-        import glob
-        if len(glob.glob(osp.join(self.wheeldir, 'PyQt5*.exe'))) > 0:
-            self.install_package(
-                'PyQt5-([0-9\.\-]*)-gpl-Py%s-Qt([0-9\.\-]*)%s.exe'
-                % (self.python_version, self.pyqt_arch))
-        # Install 'critical' packages first
-        for happy_few in['setuptools', 'pip']:
-            self.install_package(
-                '%s-([0-9\.]*[a-z\+]*[0-9]?)(.*)(\.exe|\.whl)' % happy_few,
-                install_options=self.install_options+['--upgrade'])
-
     def _install_all_other_packages(self):
         """Try to install all other packages in wheeldir"""
         print("Installing other packages")
@@ -809,7 +793,17 @@ cd %WINPYDIR%\Scripts
                 self._create_batch_scripts_initial()
                 self._create_batch_scripts()  # which set mingwpy as compiler
                 self._run_complement_batch_scripts("run_required_first.bat")
-            self._install_required_packages()
+
+            # force update of pip (FIRST) and setuptools here
+            for req in ('pip', 'setuptools'):   
+                actions = ["install","--upgrade", req]
+                if self.install_options is not None:
+                    actions += self.install_options
+                print("piping %s" % ' '.join(actions))
+                self._print("piping %s" % ' '.join(actions))
+                self.distribution.do_pip_action(actions)
+                
+            # install packages in source_dirs (not using requirements.txt)
             self._install_all_other_packages()
             if not self.simulation:
                 self._copy_dev_tools()
@@ -1025,12 +1019,12 @@ if __name__ == '__main__':
     #         install_options=r'--no-index --pre --trusted-host=None',
     #         find_links=r'D:\Winpython\basedir34\packages.srcreq')
 
-    make_all(1, release_level='build3', pyver='3.5', rootdir=r'D:\Winpython', verbose=True,
-             archis=(64, ), flavor='Slim',
-             requirements=r'D:\Winpython\basedir35\slim_requirements.txt',
+    make_all(1, release_level='build3', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
+             archis=(64, ), flavor='Barebone',
+             requirements=r'D:\Winpython\basedir34\barebone_requirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
-             find_links=r'D:\Winpython\basedir34\packages.srcreq',
-             source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir35\packages.win-amd64',
+             find_links=r'D:\Winpython\packages.srcreq',
+             source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win-amd64',
              toolsdirs=r'D:\WinPython\basedir34\Tools.Slim',
              docsdirs=r'D:\WinPython\basedir34\docs.Slim'
 )
