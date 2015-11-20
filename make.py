@@ -802,6 +802,7 @@ cd %WINPYDIR%\Scripts
                 print("piping %s" % ' '.join(actions))
                 self._print("piping %s" % ' '.join(actions))
                 self.distribution.do_pip_action(actions)
+                self.distribution.patch_standard_packages(req)
                 
             # install packages in source_dirs (not using requirements.txt)
             self._install_all_other_packages()
