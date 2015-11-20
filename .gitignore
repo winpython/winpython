@@ -1,5 +1,7 @@
-.pyc
-.pyo
+# Compiled python files
+*.py[oc]
+
+
 .exe
 .settings
 .spyderproject
