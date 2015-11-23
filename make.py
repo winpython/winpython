@@ -412,6 +412,9 @@ call %~dp0env.bat
         os.mkdir(self.python_dir)
         if  self.python_fname[-3:] == 'zip':  # Python3.5
            utils.extract_archive(self.python_fname, targetdir=self.python_dir+r'\..')
+           # new Python 3.5 trick (https://bugs.python.org/issue23955)
+           pyvenv_file = osp.join(self.python_dir, 'pyvenv.cfg')
+           open(pyvenv_file, 'w').write('applocal=True\n')
         else:   
            utils.extract_msi(self.python_fname, targetdir=self.python_dir)
            os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
