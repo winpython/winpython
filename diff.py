@@ -85,7 +85,7 @@ class PackageIndex(object):
 
     def from_file(self, basedir):
         fname = osp.join(basedir, 'build%s' % self.flavor,
-                         'WinPython%s-%s.txt' % (self.flavor, self.version))
+                         'WinPython%s-%s.md' % (self.flavor, self.version))
         with open(fname, 'r') as fdesc:  # python3 doesn't like 'rb'
             text = fdesc.read()
         self.from_text(text)
@@ -157,7 +157,7 @@ def diff_package_dicts(dict1_in, dict2_in):
 def find_closer_version(version1, rootdir=None, flavor=''):
     """Find version which is the closest to `version`"""
     builddir = osp.join(get_basedir(version1, rootdir), 'build%s' % flavor)
-    func = lambda name: re.match(r'WinPython%s-([0-9\.]*)\.txt' % flavor, name)
+    func = lambda name: re.match(r'WinPython%s-([0-9\.]*)\.(txt|md)' % flavor, name)
     versions = [func(name).groups()[0]
                 for name in os.listdir(builddir) if func(name)]
     try:
@@ -176,7 +176,7 @@ flavor1=None):
     if version1 is None:
         version1 = find_closer_version(version2, rootdir=rootdir,
                                        flavor=flavor)
-    flavor1 = flavor1 if flavor1 else flavor    
+    flavor1 = flavor1 if flavor1 is not None else flavor    
     text = '\r\n'.join(["## History of changes for WinPython %s" % 
                         (version2+flavor),
                         "", "The following changes were made to WinPython "
@@ -197,7 +197,7 @@ flavor1=None):
 def _copy_all_changelogs(version, basedir, flavor=''):
     basever = '.'.join(version.split('.')[:2])
     for name in os.listdir(CHANGELOGS_DIR):
-        if re.match(r'WinPython%s-%s([0-9\.]*)\.txt' %
+        if re.match(r'WinPython%s-%s([0-9\.]*)\.(txt|md)' %
                     (flavor, basever), name):
             shutil.copyfile(osp.join(CHANGELOGS_DIR, name),
                             osp.join(basedir, 'build%s' % flavor, name))
@@ -212,7 +212,7 @@ def write_changelog(version2, version1=None, rootdir=None, flavor='',
     text = compare_package_indexes(version2, version1, rootdir=rootdir,
                                    flavor=flavor)
     fname = osp.join(basedir, 'build%s' % flavor,
-                     'WinPython%s-%s_History.txt' % (flavor, version2))
+                     'WinPython%s-%s_History.md' % (flavor, version2))
     with open(fname, 'w', encoding='utf-8-sig') as fdesc:  # python 3 need
         fdesc.write(text)
     # Copy to winpython/changelogs
@@ -238,8 +238,8 @@ def test_compare(basedir, version2, version1):
 
 
 if __name__ == '__main__':
-    print (compare_package_indexes('3.4.3.7', '3.4.3.7', 
-           rootdir='D:\Winpython', flavor='Slim', flavor1='Qt5'))
+    print (compare_package_indexes('3.5.0.1', '3.4.3.6', 
+           rootdir='D:\Winpython', flavor='Slim', flavor1=''))
     # test_parse_package_index_wiki('2.7.3.3')
     # print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
     # write_changelog('2.7.4.1', '2.7.4.0')

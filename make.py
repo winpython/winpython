@@ -843,7 +843,7 @@ cd %WINPYDIR%\Scripts
         # winpyver2 = need the version without build part
         self.winpyver2 = '%s.%s' % (self.python_fullversion, self.build_number)
         fname = osp.join(self.winpydir, os.pardir,
-                         'WinPython%s-%s.txt' % (self.flavor, self.winpyver2))
+                         'WinPython%s-%s.md' % (self.flavor, self.winpyver2))
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
         shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
