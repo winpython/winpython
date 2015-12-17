@@ -668,6 +668,7 @@ rem pause
 """)
 
         self.create_batch_script('make_cython_use_vc.bat', r"""@echo off
+call %~dp0env.bat
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 echo [config]>%pydistutils_cfg%
         """)
