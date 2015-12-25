@@ -800,7 +800,7 @@ cd %WINPYDIR%\Scripts
 
             # force update of pip (FIRST) and setuptools here
             for req in ('pip', 'setuptools'):   
-                actions = ["install","--upgrade", req]
+                actions = ["install","--upgrade", "--force-reinstall", req]
                 if self.install_options is not None:
                     actions += self.install_options
                 print("piping %s" % ' '.join(actions))
