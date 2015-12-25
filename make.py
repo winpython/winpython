@@ -517,9 +517,9 @@ call %~dp0env.bat
                              args='-m spyderlib.start_app',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
-        self.create_launcher('Spyder (light).exe', 'spyder_light.ico',
+        self.create_launcher('Spyder (reset).exe', 'spyder_reset.ico',
                              command='${WINPYDIR}\python.exe',
-                             args='-m spyderlib.start_app --light',
+                             args='-m spyderlib.start_app --reset',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
 
@@ -633,7 +633,7 @@ r"""These batch files are not required to run WinPython.
 
 The purpose of these files is to help the user writing his/her own
 batch file to call Python scripts inside WinPython.
-The examples here ('spyder.bat', 'spyder_light.bat', 'wpcp.bat',
+The examples here ('spyder.bat', 'spyder_reset.bat', 'wpcp.bat',
 'pyqt_demo.bat', 'python.bat' and 'cmd.bat') are quite similar to the
 launchers located in the parent directory.
 The environment variables are set-up in 'env.bat'.""")
@@ -698,10 +698,10 @@ cmd.exe /k""")
         self.create_python_batch('spyder.bat', 'spyderlib.start_app',
                                  workdir='Scripts',
                                  command = '%WINPYDIR%\python.exe -m')
-        self.create_python_batch('spyder_light.bat', 'spyderlib.start_app',
+        self.create_python_batch('spyder_reset.bat', 'spyderlib.start_app',
                                  workdir='Scripts',
                                  command = '%WINPYDIR%\python.exe -m',
-                                 options='--light')
+                                 options='--reset')
         self.create_python_batch('register_python.bat', 'register_python',
                                  workdir='Scripts')
         self.create_batch_script('register_python_for_all.bat',
@@ -800,7 +800,7 @@ cd %WINPYDIR%\Scripts
 
             # force update of pip (FIRST) and setuptools here
             for req in ('pip', 'setuptools'):   
-                actions = ["install","--upgrade", req]
+                actions = ["install","--upgrade", "--force-reinstall", req]
                 if self.install_options is not None:
                     actions += self.install_options
                 print("piping %s" % ' '.join(actions))
