@@ -130,7 +130,7 @@ class WinPythonDistribution(object):
     @property
     def package_index_wiki(self):
         """Return Package Index page in Wiki format"""
-        installed_tools = [('SciTE', '3.3.7')]
+        installed_tools = []
 
         def get_tool_path(relpath, checkfunc):
             if self.simulation:
@@ -142,6 +142,10 @@ class WinPythonDistribution(object):
                 path = self.winpydir + relpath
                 if checkfunc(path):
                     return path
+        
+        if get_tool_path (r'\tools\SciTE.exe', osp.isfile):
+            installed_tools += [('SciTE', '3.3.7')]
+
         gccpath = get_tool_path(self.MINGW32_PATH, osp.isdir)
         if gccpath is not None:
             gccver = utils.get_gcc_version(gccpath)
@@ -156,6 +160,12 @@ class WinPythonDistribution(object):
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
             installed_tools += [('Julia', juliaver)]
+
+        pandocexe = get_tool_path (r'\tools\pandoc.exe', osp.isfile)
+        if pandocexe is not None:
+            pandocver = utils.get_pandoc_version(osp.dirname(pandocexe))
+            installed_tools += [('Pandoc', pandocver)]
+
 
         tools = []
         for name, ver in installed_tools:
