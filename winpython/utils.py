@@ -254,6 +254,9 @@ def get_thg_version(path):
     if match is not None:
         return match.groups()[0]
 
+def get_pandoc_version(path):
+    """Return version of the Pandoc executable in *path*"""
+    return exec_shell_cmd('pandoc -v', path).splitlines()[0].split(" ")[-1]
 
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
