@@ -18,12 +18,14 @@ language for Windows (http://winpython.github.io).
 This is the `winpython` Python package, not the distribution itself.
 It includes two main features:
 
-* The WinPython Package Manager (WPPM): let you install/uninstall 
+:The WinPython Package Manager (WPPM):
+  let you install/uninstall 
   to your WinPython distribution any standard Python package built  
   with distutils (e.g. "dummypackage-2.1.win-amd64-py3.4.‌exe") 
   or with wheels (e.g. "dummypackage-2.1-py2.py3-none-any.whl")
 			
-* The WinPython build toolchain: make.py is the script used to 
+:The WinPython build toolchain:
+  make.py is the script used to 
   build a WinPython distribution from (almost) scratch.
 
 Dependencies
