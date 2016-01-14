@@ -2,6 +2,9 @@ WinPython tools
 ===============
 
 Copyright © 2012-2013 Pierre Raybaut
+
+Copyright © 2014-2016 The Winpython development team https://github.com/winpython/
+
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
 
