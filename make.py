@@ -733,6 +733,15 @@ cd %WINPYDIR%\Scripts
 %WINPYDIR%\scripts\jupyter-notebook.exe --notebook-dir=%WINPYDIR%\..\notebooks %*
 """)
 
+        self.create_batch_script('upgrade_pip.bat', r"""@echo off
+call %~dp0env.bat
+echo this will upgrade pip with latest version, then patch it for WinPython portability ok ?
+pause
+%WINPYDIR%\python.exe -m pip install --upgrade --force-reinstall  pip
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip')
+pause
+""")
+
         # pre-run mingw batch
         print('now pre-running extra mingw')
         filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
