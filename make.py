@@ -518,9 +518,12 @@ call %~dp0env.bat
                              command='$SYSDIR\cmd.exe',
                              args='/k', workdir='${WINPYDIR}')
         self.create_launcher('WinPython Interpreter.exe', 'python.ico')
-        self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
-                             args='idle.pyw',
-                             workdir='${WINPYDIR}\Lib\idlelib')
+        #self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
+        #                     args='idle.pyw',
+        #                     workdir='${WINPYDIR}\Lib\idlelib')
+        self.create_launcher('IDLEX (Python GUI).exe', 'python.ico',
+                             args='idlex.pyw',
+                             workdir='${WINPYDIR}\Scripts')
         settingspath = osp.join('.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              command='${WINPYDIR}\python.exe',
