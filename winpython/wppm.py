@@ -464,6 +464,13 @@ python "%~dpn0""" + ext + """" %*""")
               r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
               " executable = get_executable()",
               " executable = os.path.join(os.path.basename(get_executable()))")
+            # ensure pip wheel will register relative PATH in 'RECORD' files
+            utils.patch_sourcefile(
+              self.target + (
+              r"\Lib\site-packages\pip\wheel.py"),
+              " writer.writerow((f, h, l))",
+              " writer.writerow((normpath(f, lib_dir), h, l))")
+
             # create movable launchers for previous package installations
             self.patch_all_shebang()
 
