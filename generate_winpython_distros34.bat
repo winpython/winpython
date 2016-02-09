@@ -2,14 +2,16 @@ rem  this replace running manually from spyder the make.py
 rem  to launch from a winpython module 'make' directory 
 
 set my_original_path=%path%
-set my_buildenv=D:\winpython-64bit-3.4.3.6Qt5
+set my_buildenv=D:\winpython-64bit-3.4.3.7Qt5
 
 set my_root_dir_for_builds=D:\Winpython
 set my_python_target=34
 set my_pyver=3.4
-set my_release=7
 
-set my_release_level=
+set my_release=1
+
+set my_release_level=build3
+
 set my_flavor=
 
 set my_arch=64

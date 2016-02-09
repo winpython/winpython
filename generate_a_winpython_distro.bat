@@ -9,7 +9,9 @@ rem  set my_python_target=34
 rem  set my_pyver=3.4
 rem  set my_release=84
 
-rem  set my_release_level=build2
+rem Override other scripts (simpler)
+set my_release_level=
+
 rem  set my_flavor=Slim
 
 rem  set my_arch=32
