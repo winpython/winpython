@@ -483,21 +483,22 @@ python "%~dpn0""" + ext + """" %*""")
               "'check_updates_on_startup': False,")
 
         # workaround bad installers
-        if package_name.lower() == "theano" or package_name == '':
-            self.create_pybat(['theano-cache', 'theano-nose', 'theano-test'])
-        if package_name.lower() == "numba" or package_name == '':
+        if package_name.lower() == "numba":
             self.create_pybat(['numba', 'pycc'])
-        for checklist in("odo", "vitables", "cxfreeze"):
-            if package_name.lower() == checklist or package_name == '':
-                self.create_pybat(checklist)
+        else:
+            self.create_pybat(package_name.lower())
 
 
-    def create_pybat(self, names, contents="""@echo off
-python "%~dpn0" %*"""):
+    def create_pybat(self, names='', contents=r"""@echo off
+..\python "%~dpn0" %*"""):
         """Create launcher batch script when missing"""
 
         scriptpy = osp.join(self.target, 'Scripts')  # std Scripts of python
-        my_list = names if list(names) == names else [names]
+        if not list(names) == names:
+            my_list = [f for f in os.listdir(scriptpy) if '.' not in f 
+                     and f.startswith(names)]
+        else:
+            my_list = names
         for name in my_list:
             if osp.isdir(scriptpy) and osp.isfile(osp.join(scriptpy, name)):
                 if (not osp.isfile(osp.join(scriptpy, name + '.exe')) and
