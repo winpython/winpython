@@ -515,8 +515,10 @@ call %~dp0env.bat
         """Create launchers"""
         self._print("Creating launchers")
         self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
-                             command='$SYSDIR\cmd.exe',
-                             args='/k', workdir='${WINPYDIR}')
+                             command=r'${WINPYDIR}\Scripts\ptpython.exe',
+                             args='/k', workdir=r'${WINPYDIR}\Scripts')
+        #                     command='$SYSDIR\cmd.exe',
+        #                     args='/k', workdir='${WINPYDIR}')
         self.create_launcher('WinPython Interpreter.exe', 'python.ico')
         #self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
         #                     args='idle.pyw',
@@ -688,19 +690,17 @@ echo [config]>%pydistutils_cfg%
 
         self.create_batch_script('make_winpython_movable.bat',r"""@echo off
 call %~dp0env.bat
-echo patch pip and current launchers fopr move
-rem %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\pip\_vendor\distlib\scripts.py', 'executable = get_executable()', 'executable = os.path.join(os.path.basename(get_executable()))' )"
+echo patch pip and current launchers for move
 
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip');dist.patch_all_shebang(to_movable=True)"
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True);dist.patch_all_shebang(to_movable=True)"
 pause
         """)
 
         self.create_batch_script('make_winpython_fix.bat',r"""@echo off
 call %~dp0env.bat
 echo patch pip and current launchers for non-move
-%WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\pip\_vendor\distlib\scripts.py', 'executable = os.path.join(os.path.basename(get_executable()))', 'executable = get_executable()' )"
 
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_all_shebang(to_movable=False)"
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False);dist.patch_all_shebang(to_movable=False)"
 pause
         """)
 

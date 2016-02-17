@@ -442,7 +442,7 @@ python "%~dpn0""" + ext + """" %*""")
                 print("Failed!")
                 raise
 
-    def patch_standard_packages(self, package_name=''):
+    def patch_standard_packages(self, package_name='', to_movable=True):
         """patch Winpython packages in need"""
         import filecmp
         # 'pywin32' minimal post-install (pywin32_postinstall.py do too much)
@@ -459,11 +459,25 @@ python "%~dpn0""" + ext + """" %*""")
         # rational: https://github.com/pypa/pip/issues/2328
         if package_name.lower() == "pip" or package_name == '':
             # ensure pip will create movable launchers
-            utils.patch_sourcefile(
-              self.target + (
-              r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"),
-              " executable = get_executable()",
-              " executable = os.path.join(os.path.basename(get_executable()))")
+            # sheb_mov1 = old way up to WinPython 2016-01, sheb_mov2 = new way
+            sheb_fix = " executable = get_executable()"
+            sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
+            sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
+            if to_movable:
+                utils.patch_sourcefile(self.target +
+                r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                sheb_fix, sheb_mov2)
+                utils.patch_sourcefile(self.target +
+                r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                sheb_mov1, sheb_mov2)
+            else:
+                utils.patch_sourcefile(self.target +
+                r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                sheb_mov1, sheb_fix)
+                utils.patch_sourcefile(self.target +
+                r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                sheb_mov2, sheb_fix)
+                
             # ensure pip wheel will register relative PATH in 'RECORD' files
             utils.patch_sourcefile(
               self.target + (
