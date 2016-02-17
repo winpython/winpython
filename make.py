@@ -515,11 +515,11 @@ call %~dp0env.bat
         """Create launchers"""
         self._print("Creating launchers")
         self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
+                             command='$SYSDIR\cmd.exe',
+                             args='/k', workdir='${WINPYDIR}')
+        self.create_launcher('WinPython Interpreter.exe', 'python.ico',
                              command=r'${WINPYDIR}\Scripts\ptpython.exe',
-                             args='/k', workdir=r'${WINPYDIR}\Scripts')
-        #                     command='$SYSDIR\cmd.exe',
-        #                     args='/k', workdir='${WINPYDIR}')
-        self.create_launcher('WinPython Interpreter.exe', 'python.ico')
+                             workdir=r'${WINPYDIR}\Scripts')
         #self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
         #                     args='idle.pyw',
         #                     workdir='${WINPYDIR}\Lib\idlelib')
