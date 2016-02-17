@@ -290,13 +290,13 @@ def get_python_long_version(path):
 # =============================================================================
 # Patch chebang line (courtesy of Christoph Gohlke)
 # =============================================================================
-def patch_shebang_line(fname, pad=b' ', to_movable=True):
+def patch_shebang_line(fname, pad=b' ', to_movable=True, targetdir="..\\"):
     """Remove absolute path to python.exe in shebang lines, or re-add it"""
 
     import re
     import sys
     import os
-    target_dir = ""
+    target_dir = targetdir # movable option
     if to_movable == False:
         target_dir = os.path.abspath(os.path.dirname(fname))
         target_dir = os.path.abspath(os.path.join(target_dir, r'..')) + '\\'
@@ -309,19 +309,22 @@ def patch_shebang_line(fname, pad=b' ', to_movable=True):
         target_dir = target_dir.encode('utf-8')
     with open(fname, 'rb') as fh:
         initial_content = fh.read()
-
+        fh.close
+        fh = None
     content = shebang_line.split(initial_content, maxsplit=1)
     if len(content) != 3:
         return
 
     exe = os.path.basename(content[1][2:])
-    content[1] = b'#!' + target_dir + exe + (pad * (len(content[1]) - len(exe) - 2))
+    content[1] = b'#!' + target_dir + exe #+ (pad * (len(content[1]) - len(exe) - 2))
     final_content = b''.join(content)
     if initial_content == final_content:
         return
     try:
-        with open(fname, 'wb') as fh:
-            fh.write(final_content)
+        with open(fname, 'wb') as fo:
+            fo.write(final_content)
+            fo.close
+            fo = None
             print("patched", fname)
     except Exception:
         print("failed to patch", fname)
