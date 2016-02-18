@@ -486,7 +486,7 @@ python "%~dpn0""" + ext + """" %*""")
               " writer.writerow((normpath(f, lib_dir), h, l))")
 
             # create movable launchers for previous package installations
-            self.patch_all_shebang()
+            self.patch_all_shebang(to_movable=to_movable)
 
         if package_name.lower() == "spyder" or package_name == '':
             # spyder don't goes on internet without I ask
