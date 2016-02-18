@@ -895,6 +895,17 @@ def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64), targetdir=No
                             architecture=architecture, verbose=verbose, installer='bdist_wheel')
 
 
+def transform_in_list(list_in, list_type=None):
+    """Transform a 'String or List' in List"""
+    if list_in is None:
+        list_in = ''
+    if not list_in == list(list_in):
+            list_in = list_in.split()
+    if list_type:
+        print(list_type, list_in) 
+    return list_in
+
+
 def make_winpython(build_number, release_level, architecture,
                    basedir=None, verbose=False, remove_existing=True,
                    create_installer=True, simulation=False, rootdir=None,
@@ -937,18 +948,8 @@ def make_winpython(build_number, release_level, architecture,
     #  Copy Every package directory to the wheel directory
 
     # Optional pre-defined source_dirs
-    if source_dirs is None:
-        source_dirs = ''
-    if not source_dirs == list(source_dirs):
-        source_dirs = source_dirs.split()
-    
-    # Default natural behavior
-    if source_dirs == []:
-        source_dirs = [osp.join(basedir, 'packages' + suffix),
-                       osp.join(basedir, 'packages.src'),
-                       osp.join(basedir, flavor, 'packages' + suffix),
-                       osp.join(basedir, flavor, 'packages.src')]
-    print('source_dirs=', source_dirs)
+    source_dirs = transform_in_list(source_dirs, 'source_dirs=')
+
     for m in list(set(source_dirs)):
         if osp.isdir(m):
             src_files = os.listdir(m)
@@ -957,46 +958,16 @@ def make_winpython(build_number, release_level, architecture,
                 shutil.copy(full_file_name, wheeldir)
 
     # Optional pre-defined toolsdirs
-    if toolsdirs is None:
-        toolsdirs = ''
-    if not toolsdirs == list(toolsdirs):
-        toolsdirs = toolsdirs.split()
-
-    # Default natural behavior
-    if toolsdirs == []:
-
-        # Define List of Tools directory to collect
-        toolsdir1 = osp.join(basedir, 'tools')
-        assert osp.isdir(toolsdir1)
-        toolsdirs = [toolsdir1]
-        toolsdir2 = osp.join(basedir, 'tools' + suffix)
-        if osp.isdir(toolsdir2):
-            toolsdirs.append(toolsdir2)
-    print('toolsdirs=', toolsdirs)
+    toolsdirs = transform_in_list(toolsdirs, 'toolsdirs=')
 
     # Optional pre-defined toolsdirs
-    if docsdirs is None:
-        docsdirs = ''
-    if not docsdirs == list(docsdirs):
-        docsdirs = docsdirs.split()
-
-    # Default natural behavior
-    if docsdirs == []:
-        # Define List of docs directory to collect
-        docsdir1 = osp.join(basedir, 'docs')
-        assert osp.isdir(docsdir1)
-        docsdirs = [docsdir1]
-        docsdir2 = osp.join(basedir, 'docs' + suffix)
-        if osp.isdir(docsdir2):
-            docsdirs.append(docsdir2)
-    print('docsdirs=', docsdirs)
+    docsdirs = transform_in_list(docsdirs, 'docsdirs=')
 
     # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
+    install_options = transform_in_list(install_options, 'install_options')
+        
+    find_links = transform_in_list(find_links, 'find_links')
 
-    if find_links is None:
-        find_links = ''
-    if not find_links == list(find_links):
-        find_links = find_links.split()
     find_list = ['--find-links=%s' % l for l in find_links +[wheeldir]]
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
@@ -1028,10 +999,6 @@ def make_all(build_number, release_level, pyver,
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
     """ + utils.ROOTDIR_DOC
 
-    if install_options:
-        if not list(install_options) == install_options:
-            install_options = install_options.split()
-        print('install_options', install_options)
     basedir = utils.get_basedir(pyver, rootdir=rootdir)
 
     for architecture in archis:
