@@ -23,11 +23,16 @@ set my_requirements=%tmp_reqdir%\requirements.txt %tmp_reqdir%\requirements2.txt
 
 set my_find_links=D:\WinPython\packages.srcreq
 
+set my_source_dirs=D:\WinPython\basedir34\packages.win-amd64
+set my_toolsdirs=
+
 set my_install_options=--no-index --pre --trusted-host=None
  
 call %~dp0\generate_a_winpython_distro.bat
 
 set my_arch=32
+set my_source_dirs=D:\WinPython\basedir34\packages.win32
+
 set my_preclear_build_directory=No
 call %~dp0\generate_a_winpython_distro.bat
 

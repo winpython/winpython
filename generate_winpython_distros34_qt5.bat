@@ -23,7 +23,7 @@ set my_requirements=%tmp_reqdir%\Qt5_requirements.txt %tmp_reqdir%\Qt5_requireme
 
 set my_find_links=D:\WinPython\packages.srcreq
 
-set my_source_dirs=D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win-amd64.Qt5
+set my_source_dirs=D:\WinPython\basedir34\packages.win-amd64.Qt5
 set my_toolsdirs=
 
 set my_install_options=--no-index --pre --trusted-host=None
@@ -34,7 +34,7 @@ set my_arch=32
 set my_preclear_build_directory=No
 
 
-set my_source_dirs=D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win32.Qt5
+set my_source_dirs=D:\WinPython\basedir34\packages.win32.Qt5
 set my_toolsdirs=
 
 
