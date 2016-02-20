@@ -290,7 +290,7 @@ def get_python_long_version(path):
 # =============================================================================
 # Patch chebang line (courtesy of Christoph Gohlke)
 # =============================================================================
-def patch_shebang_line(fname, pad=b' ', to_movable=True, targetdir="..\\"):
+def patch_shebang_line(fname, pad=b' ', to_movable=True, targetdir=""):
     """Remove absolute path to python.exe in shebang lines, or re-add it"""
 
     import re

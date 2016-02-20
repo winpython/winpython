@@ -381,14 +381,15 @@ python "%~dpn0""" + ext + """" %*""")
         if pack is not None:
             self.uninstall(pack)
 
-    def patch_all_shebang(self, to_movable=True, max_exe_size=999999):
+    def patch_all_shebang(self, to_movable=True, max_exe_size=999999, targetdir=""):
         """make all python launchers relatives"""
         import glob
         import os
         for ffname in glob.glob(r'%s\Scripts\*.exe' % self.target):
             size = os.path.getsize(ffname)
             if size <= max_exe_size:
-                utils.patch_shebang_line(ffname, to_movable=to_movable)
+                utils.patch_shebang_line(ffname, to_movable=to_movable,
+                                         targetdir=targetdir)
 
 
     def install(self, package, install_options=None):
@@ -459,17 +460,18 @@ python "%~dpn0""" + ext + """" %*""")
         # rational: https://github.com/pypa/pip/issues/2328
         if package_name.lower() == "pip" or package_name == '':
             # ensure pip will create movable launchers
-            # sheb_mov1 = old way up to WinPython 2016-01, sheb_mov2 = new way
+            # sheb_mov1 = classic way up to WinPython 2016-01
+            # sheb_mov2 = tried  way, but doesn't work for pip (at least)
             sheb_fix = " executable = get_executable()"
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
             sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
             if to_movable:
                 utils.patch_sourcefile(self.target +
                 r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
-                sheb_fix, sheb_mov2)
+                sheb_fix, sheb_mov1)
                 utils.patch_sourcefile(self.target +
                 r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
-                sheb_mov1, sheb_mov2)
+                sheb_mov2, sheb_mov1)
             else:
                 utils.patch_sourcefile(self.target +
                 r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
@@ -479,6 +481,7 @@ python "%~dpn0""" + ext + """" %*""")
                 sheb_mov2, sheb_fix)
                 
             # ensure pip wheel will register relative PATH in 'RECORD' files
+            # will be in standard pip 8.0.3
             utils.patch_sourcefile(
               self.target + (
               r"\Lib\site-packages\pip\wheel.py"),
