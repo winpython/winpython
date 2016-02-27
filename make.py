@@ -692,7 +692,7 @@ echo [config]>%pydistutils_cfg%
 call %~dp0env.bat
 echo patch pip and current launchers for move
 
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True);dist.patch_all_shebang(to_movable=True)"
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
 pause
         """)
 
@@ -700,7 +700,7 @@ pause
 call %~dp0env.bat
 echo patch pip and current launchers for non-move
 
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False);dist.patch_all_shebang(to_movable=False)"
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
 pause
         """)
 
@@ -738,7 +738,7 @@ call %~dp0env.bat
 echo this will upgrade pip with latest version, then patch it for WinPython portability ok ?
 pause
 %WINPYDIR%\python.exe -m pip install --upgrade --force-reinstall  pip
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip')
+%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 pause
 """)
 
@@ -820,6 +820,8 @@ pause
                 self._create_batch_scripts()  # which set mingwpy as compiler
                 self._run_complement_batch_scripts("run_required_first.bat")
 
+            # pre-patch current pip (until default python has pip 8.0.3)
+            self.distribution.patch_standard_packages('pip')
             # force update of pip (FIRST) and setuptools here
             for req in ('pip', 'setuptools'):   
                 actions = ["install","--upgrade", "--force-reinstall", req]
