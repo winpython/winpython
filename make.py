@@ -311,7 +311,8 @@ Name | Version | Description
 
     def create_launcher(self, name, icon, command=None,
                         args=None, workdir=None, settingspath=None,
-                        bettercommand=None, betterworkdir=None, betterargs=None):
+                        bettercommand=None, betterworkdir=None, betterargs=None,
+                        launcher='launcher.nsi'):
         """Create exe launcher with NSIS"""
         assert name.endswith('.exe')
         portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
@@ -365,7 +366,7 @@ Name | Version | Description
             data += [('SETTINGSDIR', osp.dirname(settingspath)),
                      ('SETTINGSNAME', osp.basename(settingspath))]
 
-        build_nsis('launcher.nsi', fname, data)
+        build_nsis(launcher, fname, data)
 
     def create_python_batch(self, name, script_name,
                             workdir=None, options=None, command=None):
@@ -513,6 +514,8 @@ call %~dp0env.bat
 
     def _create_launchers(self):
         """Create launchers"""
+
+
         self._print("Creating launchers")
         self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
                              command='$SYSDIR\cmd.exe',
@@ -526,13 +529,13 @@ call %~dp0env.bat
         self.create_launcher('IDLEX (Python GUI).exe', 'python.ico',
                              args='idlex.pyw',
                              workdir='${WINPYDIR}\Scripts')
-        settingspath = osp.join('.spyder2', '.spyder.ini')
+        settingspath = osp.join('.spyder-py3', '.spyder2', '.spyder.ini')
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              command='${WINPYDIR}\python.exe',
                              args='-m spyderlib.start_app',
                              workdir='${WINPYDIR}\Scripts',
                              settingspath=settingspath)
-        self.create_launcher('Spyder (reset).exe', 'spyder_reset.ico',
+        self.create_launcher('Spyder reset.exe', 'spyder_reset.ico',
                              command='${WINPYDIR}\python.exe',
                              args='-m spyderlib.start_app --reset',
                              workdir='${WINPYDIR}\Scripts',
@@ -572,35 +575,71 @@ call %~dp0env.bat
                              bettercommand=Qt5_dir + r'\linguist.exe')
 
         # Jupyter launchers
-        if osp.isfile(osp.join(self.python_dir, 'Scripts', 'jupyter.exe')):
-            self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
+        self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                                  command='${WINPYDIR}\Scripts\%s' %
                                          'jupyter-qtconsole.exe',
-                                 workdir=r'${WINPYDIR}\..\notebooks')
+                                 workdir=r'$EXEDIR\notebooks')
 
-            self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
+        self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
                                  command='${WINPYDIR}\Scripts\%s' %
                                          'jupyter-notebook.exe',
-                                 workdir=r'${WINPYDIR}\..\notebooks')
+                                 workdir=r'$EXEDIR\notebooks')
 
         # R console launchers
         r_exe = self.R_PATH + r"\i386\R.exe"
         if osp.isfile(self.winpydir + r_exe):
             self.create_launcher('R Console32.exe', 'r.ico',
-                                 command='${WINPYDIR}\..' + r_exe,
-                                 workdir=r'${WINPYDIR}\..\notebooks')
+                                 command='$EXEDIR' + r_exe,
+                                 workdir=r'$EXEDIR\notebooks')
         r_exe = self.R_PATH + r"\x64\R.exe"
         if osp.isfile(self.winpydir + r_exe):
             self.create_launcher('R Console64.exe', 'r.ico',
-                                 command='${WINPYDIR}\..' + r_exe,
-                                 workdir=r'${WINPYDIR}\..\notebooks')
+                                 command='$EXEDIR' + r_exe,
+                                 workdir=r'$EXEDIR\notebooks')
 
         # Julia console launcher
         julia_exe   =  self.JULIA_PATH + r"\julia.exe"
         if osp.isfile(self.winpydir + julia_exe):
             self.create_launcher('Julia Console.exe', 'julia.ico',
-                                 command='${WINPYDIR}\..'+ julia_exe,
-                                 workdir=r'${WINPYDIR}\..\notebooks')
+                                 command='$EXEDIR'+ julia_exe,
+                                 workdir=r'$EXEDIR\notebooks')
+
+        # ******* Student Experiment (start)
+
+        #self.create_launcher('IDLEX (students).exe', 'python.ico',
+        #                     command='$SYSDIR\cmd.exe',
+        #                     args= r'/k IDLEX_for_student.bat  %*',
+        #                     workdir='$EXEDIR\scripts')
+        self.create_launcher('IDLEX (student).exe', 'python.ico',
+                             command='wscript.exe',
+                             args= r'Noshell.vbs IDLEX_for_student.bat',
+                             workdir='$EXEDIR\scripts',
+                             launcher='launcher_basic.nsi')
+
+        self.create_launcher('Spyder (student).exe', 'spyder.ico',
+                             command='wscript.exe',
+                             args=r'Noshell.vbs spyder_for_student.bat',
+                             workdir='$EXEDIR\Scripts',
+                             launcher='launcher_basic.nsi')
+
+        self.create_launcher('Spyder reset (student).exe', 'spyder_reset.ico',
+                             command='wscript.exe',
+                             args=r'Noshell.vbs spyder_for_student.bat',
+                             workdir='$EXEDIR\Scripts',
+                             launcher='launcher_basic.nsi')
+
+        self.create_launcher('IPython Qt Console (student).exe', 'ipython.ico',
+                             command='wscript.exe',
+                             args=r'Noshell.vbs qtconsole_for_student.bat',
+                             workdir='$EXEDIR\Scripts',
+                             launcher='launcher_basic.nsi')
+
+        # this one needs a shell to kill fantom processes
+        self.create_launcher('Jupyter Notebook (student).exe', 'jupyter.ico',
+                             command='$SYSDIR\cmd.exe',
+                             args=r'/k ipython_notebook_for_student.bat',
+                             workdir='$EXEDIR\Scripts',
+                             launcher='launcher_basic.nsi')
 
         self._print_done()
 
@@ -639,6 +678,51 @@ if exist %WINPYDIR%\Lib\site-packages\PyQt5 set QT_API=pyqt5
 rem keep nbextensions in Winpython directory, rather then %APPDATA% default
 set JUPYTER_DATA_DIR=%WINPYDIR%\..\settings
 """)
+        
+        self.create_batch_script('env_for_student.bat', r"""
+@echo off
+rem to have WinPython working in a local account
+if "%WINPYDIR%"=="" call %~dp0env.bat
+
+rem ******* Classic WinPython *******
+rem set JUPYTER_DATA_DIR=%WINPYDIR%\..\settings
+rem set HOME=%WINPYDIR%\..\settings
+
+rem ******* Student WinPython *******
+set HOME=%HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%
+set JUPYTER_DATA_DIR=%HOME%
+
+if not exist "%HOME%\Notebooks" mkdir "%HOME%\Notebooks"
+
+if exist "%HOME%\Notebooks\docs" goto ok_docs
+mkdir "%HOME%\Notebooks\docs"
+xcopy /i "%WINPYDIR%\..\Notebooks\docs\*.ipynb" "%HOME%\Notebooks\docs"
+:ok_docs
+
+
+if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYVER:~0,1%"
+if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
+
+rem ******* make cython use mingwpy part *******
+if not exist "%HOME%\pydistutils.cfg" xcopy   "%WINPYDIR%\..\settings\pydistutils.cfg" "%HOME%" 
+""")   
+        
+        self.create_batch_script('Noshell.vbs', 
+            r"""
+'from http://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window/390129
+If WScript.Arguments.Count >= 1 Then
+    ReDim arr(WScript.Arguments.Count-1)
+    For i = 0 To WScript.Arguments.Count-1
+        Arg = WScript.Arguments(i)
+        If InStr(Arg, " ") > 0 Then Arg = chr(34) & Arg & chr(34)
+      arr(i) = Arg
+    Next
+
+    RunCmd = Join(arr)
+    CreateObject("Wscript.Shell").Run RunCmd, 0 , True
+End If
+        """)
+
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
@@ -708,6 +792,7 @@ pause
 call %~dp0env.bat
 cmd.exe /k""")
         self.create_python_batch('python.bat', '')
+                
         self.create_python_batch('spyder.bat', 'spyderlib.start_app',
                                  workdir='Scripts',
                                  command = '%WINPYDIR%\python.exe -m')
@@ -741,6 +826,41 @@ pause
 %WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 pause
 """)
+
+        # ******* Student Experiment (start)
+        self.create_batch_script('idlex_for_student.bat',r"""@echo off
+call "%~dp0env_for_student.bat"
+cd/D "%HOME%\Notebooks"
+"%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
+""")
+        
+        self.create_batch_script('spyder_for_student.bat',r"""@echo off
+call "%~dp0env_for_student.bat"
+cd/D "%HOME%\Notebooks"
+"%WINPYDIR%\python.exe" -m spyderlib.start_app %*
+""")
+        self.create_batch_script('spyder_reset_for_student.bat',r"""@echo off
+call "%~dp0env_for_student.bat"
+cd/D "%HOME%\Notebooks"
+%WINPYDIR%\python.exe -m spyderlib.start_app --reset %*
+echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
+rem legacy if ever needed
+echo %HOME%\Notebooks>"%HOME%\.spyder2\workingdir"
+echo %HOME%\Notebooks>"%HOME%\.spyder\workingdir"
+""")
+
+        self.create_batch_script('ipython_notebook_for_student.bat',r"""@echo off
+call "%~dp0env_for_student.bat"
+cd/D "%HOME%\Notebooks"
+"%WINPYDIR%\scripts\jupyter-notebook.exe" --notebook-dir="%HOME%\Notebooks" %*
+""")
+
+        self.create_batch_script('qtconsole_for_student.bat',r"""@echo off
+call "%~dp0env_for_student.bat"
+cd/D "%HOME%\Notebooks"
+"%WINPYDIR%\scripts\jupyter-qtconsole.exe"   %*
+""")
+        # ******* Student Experiment (end)
 
         # pre-run mingw batch
         print('now pre-running extra mingw')
