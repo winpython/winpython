@@ -750,18 +750,33 @@ rem ******************
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 
 set tmp_blank=
-echo [config]>%pydistutils_cfg%
-echo compiler=mingw32>>%pydistutils_cfg%
+echo [config]>"%pydistutils_cfg%"
+echo compiler=mingw32>>"%pydistutils_cfg%"
 
-echo [build]>>%pydistutils_cfg%
-echo compiler=mingw32>>%pydistutils_cfg%
+echo [build]>>"%pydistutils_cfg%"
+echo compiler=mingw32>>"%pydistutils_cfg%"
 
-echo [build_ext]>>%pydistutils_cfg%
-echo compiler=mingw32>>%pydistutils_cfg%
+echo [build_ext]>>"%pydistutils_cfg%"
+echo compiler=mingw32>>"%pydistutils_cfg%"
 
 echo cython has been set to use mingw32
 echo to remove this, remove file "%pydistutils_cfg%"
 
+rem ******************
+rem WinPython.ini part (removed from nsis)
+rem ******************
+set winpython_ini=%WINPYDIR%\..\settings\winpython.ini
+if exist "%winpython_ini%" goto after_winpython_ini
+
+echo "[debug]">>"%winpython_ini%"
+echo "state = disabled">>"%winpython_ini%"
+echo "[environment]">>"%winpython_ini%"
+echo "## <?> Uncomment lines to override environment variable"s>>"%winpython_ini%"
+echo "#PATH = ">>"%winpython_ini%"
+echo "#HOME = ">>"%winpython_ini%"
+echo "#JUPYTER_DATA_DIR">>"%winpython_ini%"
+
+:after_winpython_ini
 rem pause
 
 """)
