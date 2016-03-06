@@ -818,7 +818,7 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script('spyder_reset.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-%WINPYDIR%\python.exe -m spyderlib.start_app --reset %*
+%WINPYDIR%\scripts\spyder.exe --reset %*
 """)
 
         self.create_batch_script('ipython_notebook.bat',r"""@echo off
