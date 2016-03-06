@@ -17,10 +17,6 @@ OutFile ""
 !include "FileFunc.nsh"
 !include "TextReplace.nsh"
 
-# Custom NSIS plugins
-# unused !include "ReplaceInFileWithTextReplace.nsh"
-# unused !include "EnumIni.nsh"
-
 SilentInstall silent
 AutoCloseWindow true
 ShowInstDetails nevershow
