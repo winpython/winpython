@@ -310,9 +310,8 @@ Name | Version | Description
         fd.close()
 
     def create_launcher(self, name, icon, command=None,
-                        args=None, workdir=None, settingspath=None,
-                        bettercommand=None, betterworkdir=None, betterargs=None,
-                        launcher='launcher.nsi'):
+                        args=None, workdir=None,
+                        launcher='launcher_basic.nsi'):
         """Create exe launcher with NSIS"""
         assert name.endswith('.exe')
         portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
@@ -333,13 +332,6 @@ Name | Version | Description
         if workdir is None:
             workdir = ''
 
-        if bettercommand is None:
-            bettercommand = command
-        if betterworkdir is None:
-            betterworkdir = workdir
-        if betterargs is None:
-            betterargs = args
-
         fname = osp.join(self.winpydir, osp.splitext(name)[0]+'.nsi')
 
         data = [('WINPYDIR', '$EXEDIR\%s' % self.python_name),
@@ -347,24 +339,8 @@ Name | Version | Description
                 ('COMMAND', command),
                 ('PARAMETERS', args),
                 ('WORKDIR', workdir),
-                ('PREPATH', prepath),
-                ('POSTPATH', postpath),
-                ('BETTERCOMMAND', bettercommand),
-                ('BETTERWORKDIR', betterworkdir),
-                ('BETTERPARAMETERS', betterargs),
-                ('JUPYTER_DATA_DIR', '$EXEDIR\%s' % 'settings'),
                 ('Icon', icon_fname),
                 ('OutFile', name)]
-
-        # handle well Flavor with R or JULIA
-        data += [('R_HOME', '$EXEDIR%s' % r'\tools\R'),
-                 ('JULIA_PKGDIR', '$EXEDIR%s' % r'\settings\.julia'),
-                 ('JULIA_HOME', '$EXEDIR%s' % r'\tools\Julia\bin'),
-                 ('JULIA', '$EXEDIR%s' % r'\tools\Julia\bin\julia.exe')]
-
-        if settingspath is not None:
-            data += [('SETTINGSDIR', osp.dirname(settingspath)),
-                     ('SETTINGSNAME', osp.basename(settingspath))]
 
         build_nsis(launcher, fname, data)
 
@@ -522,14 +498,12 @@ call %~dp0env_for_icons.bat
         self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
                              command='$SYSDIR\cmd.exe',
                              args=r'/k cmd.bat',
-                             workdir='$EXEDIR\scripts',
-                             launcher='launcher_basic.nsi')        
+                             workdir='$EXEDIR\scripts')        
         
         self.create_launcher('WinPython Interpreter.exe', 'python.ico',
                              command='wscript.exe',
                              args= r'Noshell.vbs python.bat',
-                             workdir='$EXEDIR\scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\scripts')
 
         #self.create_launcher('IDLEX (students).exe', 'python.ico',
         #                     command='$SYSDIR\cmd.exe',
@@ -538,84 +512,55 @@ call %~dp0env_for_icons.bat
         self.create_launcher('IDLEX (Python GUI).exe', 'python.ico',
                              command='wscript.exe',
                              args= r'Noshell.vbs IDLEX.bat',
-                             workdir='$EXEDIR\scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\scripts')
 
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs spyder.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         self.create_launcher('Spyder reset.exe', 'spyder_reset.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs spyder_reset.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
-                             command='${WINPYDIR}\pythonw.exe',
-                             args='-m winpython.controlpanel',
-                             workdir='${WINPYDIR}\Scripts')
+                             command='wscript.exe',
+                             args=r'Noshell.vbs wpcp.bat',
+                             workdir='$EXEDIR\Scripts')
 
         # Multi-Qt launchers (Qt5 has priority if found)
         self.create_launcher('Qt Demo.exe', 'qt.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs qtdemo.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs qtassistant.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         self.create_launcher('Qt Designer.exe', 'qtdesigner.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs qtdesigner.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs qtlinguist.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         # Jupyter launchers
         self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs qtconsole.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
+                             workdir='$EXEDIR\Scripts')
 
         # this one needs a shell to kill fantom processes
         self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
                              command='$SYSDIR\cmd.exe',
                              args=r'/k ipython_notebook.bat',
-                             workdir='$EXEDIR\Scripts',
-                             launcher='launcher_basic.nsi')
-
-        # R console launchers
-        r_exe = self.R_PATH + r"\i386\R.exe"
-        if osp.isfile(self.winpydir + r_exe):
-            self.create_launcher('R Console32.exe', 'r.ico',
-                                 command='$EXEDIR' + r_exe,
-                                 workdir=r'$EXEDIR\notebooks')
-        r_exe = self.R_PATH + r"\x64\R.exe"
-        if osp.isfile(self.winpydir + r_exe):
-            self.create_launcher('R Console64.exe', 'r.ico',
-                                 command='$EXEDIR' + r_exe,
-                                 workdir=r'$EXEDIR\notebooks')
-
-        # Julia console launcher
-        julia_exe   =  self.JULIA_PATH + r"\julia.exe"
-        if osp.isfile(self.winpydir + julia_exe):
-            self.create_launcher('Julia Console.exe', 'julia.ico',
-                                 command='$EXEDIR'+ julia_exe,
-                                 workdir=r'$EXEDIR\notebooks')
-
+                             workdir='$EXEDIR\Scripts')
 
         self._print_done()
 
@@ -914,8 +859,15 @@ if not "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
                                  r"""@echo off
 call %~dp0env.bat
 call %~dp0register_python.bat --all""")
-        self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
-                                 workdir=r'"%WINPYDIR%\Scripts"')
+
+        self.create_batch_script('wpcp.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+%WINPYDIR%\python.exe -m winpython.controlpanel --reset %*
+""")
+
+        #self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
+        #                         workdir=r'"%WINPYDIR%\Scripts"')
 
         self.create_batch_script('upgrade_pip.bat', r"""@echo off
 call %~dp0env.bat
