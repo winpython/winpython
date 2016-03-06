@@ -812,7 +812,7 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
         self.create_batch_script('spyder.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-"%WINPYDIR%\python.exe" -m spyderlib.start_app %*
+"%WINPYDIR%\scripts\spyder.exe" %*
 """)
 
         self.create_batch_script('spyder_reset.bat',r"""@echo off
