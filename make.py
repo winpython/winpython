@@ -583,37 +583,39 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5" set QT_API=pyqt5
 rem ******************
 rem handle R if included
 rem ******************
-if not exist "%WINPYDIR%\..\tools\R\bin" goto r_bad
-set R_HOME=%WINPYDIR%\..\tools\R
-if "%WINPYARCH%"=="WIN32"     set R_HOMEbin=%R_HOME%\bin\i386
-if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
-:r_bad
+if exist "%WINPYDIR%\..\tools\R\bin" (
+    set R_HOME=%WINPYDIR%\..\tools\R
+    if "%WINPYARCH%"=="WIN32" (
+        set R_HOMEbin=%R_HOME%\bin\i386
+    ) else (
+        set R_HOMEbin=%R_HOME%\bin\x64
+    )
+)
 
 rem ******************
 rem handle Julia if included
 rem ******************
-if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
-set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
-set JULIA_EXE=julia.exe
-set JULIA=%JULIA_HOME%%JULIA_EXE%
-set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
-:julia_bad
+if exist "%WINPYDIR%\..\tools\Julia\bin" (
+    set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
+    set JULIA_EXE=julia.exe
+    set JULIA=%JULIA_HOME%%JULIA_EXE%
+    set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
+)
 
 rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
 if not exist "%WINPYDIR%\..\settings" mkdir "%WINPYDIR%\..\settings" 
 set winpython_ini=%WINPYDIR%\..\settings\winpython.ini
-if exist "%winpython_ini%" goto after_winpython_ini
-
-echo [debug]>>"%winpython_ini%"
-echo state = disabled>>"%winpython_ini%"
-echo [environment]>>"%winpython_ini%"
-echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
-echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%>>"%winpython_ini%"
-echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
-echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
-:after_winpython_ini
+if not exist "%winpython_ini%" (
+    echo [debug]>>"%winpython_ini%"
+    echo state = disabled>>"%winpython_ini%"
+    echo [environment]>>"%winpython_ini%"
+    echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
+    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%>>"%winpython_ini%"
+    echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
+    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
+)
 """)
  
         self.create_batch_script('env_for_icons.bat', r"""@echo off
@@ -789,16 +791,22 @@ cmd.exe /k""")
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 rem backward compatibility for non-ptpython users
-if exist "%WINPYDIR%\scripts\ptpython.exe" "%WINPYDIR%\scripts\ptpython.exe" %*
-if not exist "%WINPYDIR%\scripts\ptpython.exe" "%WINPYDIR%\python.exe"  %*
+if exist "%WINPYDIR%\scripts\ptpython.exe" (
+    "%WINPYDIR%\scripts\ptpython.exe" %*
+) else (
+    "%WINPYDIR%\scripts\ptpython.exe" "%WINPYDIR%\python.exe"  %*
+)
 """)                
 
         self.create_batch_script('idlex.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 rem backward compatibility for non-IDLEX users
-if exist "%WINPYDIR%\scripts\idlex.pyw" "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
-if not exist "%WINPYDIR%\scripts\idlex.pyw" "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
+if exist "%WINPYDIR%\scripts\idlex.pyw" (
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
+) else (
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
+)
 """)
 
         self.create_batch_script('spyder.bat',r"""@echo off
@@ -828,29 +836,43 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script('qtdemo.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-if     "%QT_API%"=="pyqt5" "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\demo.py"
-if not "%QT_API%"=="pyqt5" "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
+if "%QT_API%"=="pyqt5" (
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\demo.py"
+) else (
+    "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
+)
 """)
 
         self.create_batch_script('qtdesigner.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-if     "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
-if not "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt4\designer.exe" %*
+if "%QT_API%"=="pyqt5" (
+    "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
+) else (
+    "%WINPYDIR%\Lib\site-packages\PyQt4\designer.exe" %*
+)
 """)
 
         self.create_batch_script('qtassistant.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-if     "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
-if not "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt4\assistant.exe" %*
+if "%QT_API%"=="pyqt5" (
+    "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
+) else (
+    "%WINPYDIR%\Lib\site-packages\PyQt4\assistant.exe" %*
+)
 """)        
 
         self.create_batch_script('qtlinguist.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-if     "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
-if not "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
+if "%QT_API%"=="pyqt5" (
+    cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
+    "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
+) else (
+    cd/D "%WINPYDIR%\Lib\site-packages\PyQt4"
+    "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
+)
 """)        
         
         self.create_python_batch('register_python.bat', 'register_python',
