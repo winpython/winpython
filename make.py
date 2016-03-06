@@ -885,7 +885,7 @@ call %~dp0register_python.bat --all""")
         self.create_batch_script('wpcp.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-%WINPYDIR%\python.exe -m winpython.controlpanel --reset %*
+%WINPYDIR%\python.exe -m winpython.controlpanel %*
 """)
 
         #self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
