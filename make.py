@@ -849,8 +849,13 @@ if not "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt4\assistant.exe" %*
         self.create_batch_script('qtlinguist.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-if     "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
-if not "%QT_API%"=="pyqt5" "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
+if "%QT_API%"=="pyqt5" (
+cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
+"%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
+) else (
+cd/D "%WINPYDIR%\Lib\site-packages\PyQt4"
+"%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
+)
 """)        
         
         self.create_python_batch('register_python.bat', 'register_python',
