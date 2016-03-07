@@ -232,11 +232,6 @@ def exec_shell_cmd(args, path):
     return decode_fs_string(process.stdout.read())
 
 
-def get_gcc_version(path):
-    """Return version of the GCC compiler installed in *path*"""
-    return exec_shell_cmd('gcc --version', path).splitlines()[0].split()[-1]
-
-
 def get_r_version(path):
     """Return version of the R installed in *path*"""
     return exec_shell_cmd('dir ..\README.R*', path).splitlines()[-3].split("-")[-1]
@@ -611,9 +606,6 @@ def do_script(this_script, python_exe=None, copy_to=None,
 
 
 if __name__ == '__main__':
-    gcc = get_gcc_version(osp.join(BASE_DIR, 'tools.win32', 'mingw32', 'bin'))
-    print(("gcc version: %r" % gcc))
-
     thg = get_thg_version(osp.join(BASE_DIR, 'tools', 'tortoisehg'))
     print(("thg version: %r" % thg))
 
