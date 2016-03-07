@@ -48,12 +48,10 @@ def get_nsis_exe():
             for subdirname in ('.', 'App'):
                 exe = osp.join(dirname, subdirname, 'NSIS', 'makensis.exe')
                 include = osp.join(dirname, subdirname, 'NSIS', 'include')
-                if osp.isfile(exe) and\
-                   osp.isfile(osp.join(include, 'TextReplace.nsh')):
+                if osp.isfile(exe):
                     return exe
     else:
-        raise RuntimeError("NSIS (with TextReplace plugin) is not installed " +
-                           "on this computer.")
+        raise RuntimeError("NSIS is not installed on this computer.")
 
 NSIS_EXE = get_nsis_exe()
 
