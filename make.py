@@ -144,11 +144,6 @@ class WinPythonDistribution(object):
         if get_tool_path (r'\tools\SciTE.exe', osp.isfile):
             installed_tools += [('SciTE', '3.3.7')]
 
-        gccpath = get_tool_path(self.MINGW32_PATH, osp.isdir)
-        if gccpath is not None:
-            gccver = utils.get_gcc_version(gccpath)
-            installed_tools += [('MinGW32', gccver)]
-
         rpath = get_tool_path(self.R_PATH, osp.isdir)
         if rpath is not None:
             rver = utils.get_r_version(rpath)
