@@ -15,7 +15,6 @@ OutFile ""
 # Standard NSIS plugins
 !include "WordFunc.nsh"
 !include "FileFunc.nsh"
-!include "TextReplace.nsh"
 
 SilentInstall silent
 AutoCloseWindow true
