@@ -501,8 +501,8 @@ call %~dp0env_for_icons.bat
                              workdir='$EXEDIR\scripts')        
         
         self.create_launcher('WinPython Interpreter.exe', 'python.ico',
-                             command='wscript.exe',
-                             args= r'Noshell.vbs python.bat',
+                             command='$SYSDIR\cmd.exe',
+                             args= r'/k python.bat',
                              workdir='$EXEDIR\scripts')
 
         #self.create_launcher('IDLEX (students).exe', 'python.ico',
@@ -570,7 +570,7 @@ call %~dp0env_for_icons.bat
         conv = lambda path: ";".join(['%WINPYDIR%\\'+pth for pth in path])
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
         self.create_batch_script('env.bat', r"""@echo off
-set WINPYDIR=%~dp0..\\""" + self.python_name + r"""
+set WINPYDIR=%~dp0.."""+"\\" + self.python_name + r"""
 set WINPYVER=""" + self.winpyver + r"""
 set HOME=%~dp0..\settings
 set WINPYARCH=WIN32
@@ -794,7 +794,7 @@ rem backward compatibility for non-ptpython users
 if exist "%WINPYDIR%\scripts\ptpython.exe" (
     "%WINPYDIR%\scripts\ptpython.exe" %*
 ) else (
-    "%WINPYDIR%\scripts\ptpython.exe" "%WINPYDIR%\python.exe"  %*
+    "%WINPYDIR%\python.exe"  %*
 )
 """)                
 
