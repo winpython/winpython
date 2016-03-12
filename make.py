@@ -486,7 +486,6 @@ call %~dp0env_for_icons.bat
     def _create_launchers(self):
         """Create launchers"""
 
-
         self._print("Creating launchers")
         self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
                              command='$SYSDIR\cmd.exe',
@@ -958,6 +957,9 @@ pause
                 self._create_batch_scripts_initial()
                 self._create_batch_scripts()  # which set mingwpy as compiler
                 self._run_complement_batch_scripts("run_required_first.bat")
+                # launchers at the beginning
+                self._create_launchers()
+
 
             # pre-patch current pip (until default python has pip 8.0.3)
             self.distribution.patch_standard_packages('pip')
@@ -994,8 +996,6 @@ pause
 
             self._run_complement_batch_scripts()  # run_complement.bat
             self.distribution.patch_standard_packages()
-            # launchers at the very end
-            self._create_launchers()
 
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
@@ -1047,10 +1047,10 @@ def transform_in_list(list_in, list_type=None):
     return list_in
 
 
-def make_winpython(build_number, release_level, architecture,
+def make_all(build_number, release_level, pyver, architecture,
                    basedir=None, verbose=False, remove_existing=True,
                    create_installer=True, simulation=False, rootdir=None,
-                   install_options=None, flavor='', requirements=None,
+                   install_options=['--no-index'], flavor='', requirements=None,
                    find_links=None, source_dirs=None, toolsdirs=None,
                    docsdirs=None):
     """Make WinPython distribution, for a given base directory and
@@ -1062,15 +1062,20 @@ def make_winpython(build_number, release_level, architecture,
 
     `build_number`: build number [int]
     `release_level`: release level (e.g. 'beta1', '') [str]
+    `pyver`: python version ('3.4' or 3.5')
     `architecture`: [int] (32 or 64)
-    `basedir`: [str] if None, WINPYTHONBASEDIR env var must be set
+    `basedir`: where will be created  tmp_wheel dir. and Winpython-xyz dir.
     (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
     """ + utils.ROOTDIR_DOC
-    basedir = basedir if basedir is not None else utils.BASE_DIR
+    
+    if basedir is None:
+        basedir = utils.BASE_DIR
+    if basedir is None:
+        basedir = utils.get_basedir(pyver, rootdir=rootdir)
+
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
     utils.print_box("Making WinPython %dbits" % architecture)
-    suffix = '.win32' if architecture == 32 else '.win-amd64'
 
     # Create Build director, where Winpython will be constructed
     builddir = osp.join(basedir, 'build' + flavor)
@@ -1123,46 +1128,12 @@ def make_winpython(build_number, release_level, architecture,
     return dist
 
 
-def make_all(build_number, release_level, pyver,
-             rootdir=None, simulation=False, create_installer=True,
-             verbose=False, remove_existing=True, archis=(32, 64),
-             install_options=['--no-index'], flavor='', requirements=None,
-             find_links=None, source_dirs=None, toolsdirs=None, docsdirs=None):
-    """Make WinPython for both 32 and 64bit architectures:
-
-    make_all(build_number, release_level, pyver, rootdir, simulation=False,
-             create_installer=True, verbose=False, remove_existing=True)
-
-    `build_number`: build number [int]
-    `release_level`: release level (e.g. 'beta1', '') [str]
-    `pyver`: Python version (X.Y format) [str]
-    `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
-    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
-    """ + utils.ROOTDIR_DOC
-
-    basedir = utils.get_basedir(pyver, rootdir=rootdir)
-
-    for architecture in archis:
-        make_winpython(build_number, release_level, architecture, basedir,
-                       verbose, remove_existing, create_installer, simulation,
-                       rootdir=rootdir, install_options=install_options,
-                       flavor=flavor, requirements=requirements,
-                       find_links=find_links, source_dirs=source_dirs,
-                       toolsdirs=toolsdirs, docsdirs=docsdirs)
-
-
 if __name__ == '__main__':
     # DO create only one version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    #make_all(7, release_level='build1', pyver='3.4', rootdir=r'D:\WinpythonQt5', verbose=True,
-    #         archis=(64, ), flavor='Qt5',
-    #         requirements=r'D:\WinpythonQt5\basedir34\requirements.txt D:\WinpythonQt5\basedir34\requirements2.txt D:\WinpythonQt5\basedir34\requirements3.txt',
-    #         install_options=r'--no-index --pre --trusted-host=None',
-    #         find_links=r'D:\Winpython\basedir34\packages.srcreq')
-
     make_all(1, release_level='build3', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
-             archis=(64, ), flavor='Barebone',
+             architecture=64, flavor='Barebone',
              requirements=r'D:\Winpython\basedir34\barebone_requirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
              find_links=r'D:\Winpython\packages.srcreq',
