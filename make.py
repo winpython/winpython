@@ -602,7 +602,7 @@ if not exist "%winpython_ini%" (
         self.create_batch_script('env_for_icons.bat', r"""@echo off
 call %~dp0env.bat
 set WINPYWORKDIR=%~dp0..\Notebooks
-FOR /F "delims=" %%i IN ('cscript /nologo WinpythonIni.vbs') DO set winpythontoexec=%%i
+FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
 %winpythontoexec%set winpythontoexec=
 
 rem ******************
