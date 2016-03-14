@@ -507,10 +507,6 @@ call %~dp0env_for_icons.bat
                              command='wscript.exe',
                              args=r'Noshell.vbs spyder.bat')
 
-        self.create_launcher('Spyder reset.exe', 'spyder_reset.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs spyder_reset.bat')
-
         self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs wpcp.bat')
