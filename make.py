@@ -312,9 +312,6 @@ Name | Version | Description
         assert osp.isfile(icon_fname)
 
         # Customizing NSIS script
-        conv = lambda path: ";".join(['${WINPYDIR}\\'+pth for pth in path])
-        prepath = conv(self.prepath)
-        postpath = conv(self.postpath)
         if command is None:
             if args is not None and '.pyw' in args:
                 command = '${WINPYDIR}\pythonw.exe'
