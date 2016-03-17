@@ -121,7 +121,7 @@ class WinPythonDistribution(object):
         self.distribution = None
         self.installed_packages = []
         self.simulation = simulation
-        self.rootdir = rootdir  # addded to build from winpython
+        self.rootdir = rootdir  # added to build from winpython
         self.install_options = install_options
         self.flavor = flavor
 
@@ -899,7 +899,7 @@ pause
 
         self._print_done()
 
-    def make(self, remove_existing=True, requirements=None):  #, find_links=None):
+    def make(self, remove_existing=True, requirements=None, my_winpydir=None):  #, find_links=None):
         """Make WinPython distribution in target directory from the installers
         located in wheeldir
 
@@ -921,7 +921,10 @@ pause
         # Create the WinPython base directory
         self._print("Creating WinPython %s base directory"
                     % self.python_version)
-        self.winpydir = osp.join(self.target, distname)
+        if my_winpydir is None:        
+            self.winpydir = osp.join(self.target, distname)  
+        else: 
+            self.winpydir = osp.join(self.target, my_winpydir)
         if osp.isdir(self.winpydir) and remove_existing \
            and not self.simulation:
             shutil.rmtree(self.winpydir, onerror=utils.onerror)
@@ -1114,7 +1117,12 @@ def make_all(build_number, release_level, pyver, architecture,
                                  rootdir=rootdir,
                                  install_options=install_options + find_list,
                                  flavor=flavor, docsdirs=docsdirs)
-    dist.make(remove_existing=remove_existing, requirements=requirements)
+    # define a pre-defined winpydir, instead of having to guess
+    my_winpydir = ('winpython-' + ('%s' % architecture) +'bit-' + pyver +
+     '.x.' + ('%s' %build_number) )  # + flavor + release_level)   
+    
+    dist.make(remove_existing=remove_existing, requirements=requirements,
+              my_winpydir=my_winpydir)
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
     if create_installer and not simulation:
         dist.create_installer()
