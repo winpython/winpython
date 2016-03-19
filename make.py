@@ -1016,20 +1016,19 @@ pause
         self._print_done()
 
 
-def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64), targetdir=None):
+def rebuild_winpython(basedir=None, verbose=False, architecture=64, targetdir=None):
     """Rebuild winpython package from source"""
     basedir = basedir if basedir is not None else utils.BASE_DIR
-    for architecture in archis:
-        suffix = '.win32' if architecture == 32 else '.win-amd64'
-        if targetdir is not None:
-            packdir = targetdir
-        else:
-            packdir = osp.join(basedir, 'packages' + suffix)
-        for name in os.listdir(packdir):
-            if name.startswith('winpython-') and name.endswith(('.exe', '.whl')):
-                os.remove(osp.join(packdir, name))
-        utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
-                            architecture=architecture, verbose=verbose, installer='bdist_wheel')
+    suffix = '.win32' if architecture == 32 else '.win-amd64'
+    if targetdir is not None:
+        packdir = targetdir
+    else:
+        packdir = osp.join(basedir, 'packages' + suffix)
+    for name in os.listdir(packdir):
+        if name.startswith('winpython-') and name.endswith(('.exe', '.whl')):
+            os.remove(osp.join(packdir, name))
+    utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
+                        architecture=architecture, verbose=verbose, installer='bdist_wheel')
 
 
 def transform_in_list(list_in, list_type=None):
@@ -1085,7 +1084,7 @@ def make_all(build_number, release_level, pyver, architecture,
     os.mkdir(wheeldir)
 
     # Rebuild Winpython in this wheel dir
-    rebuild_winpython(basedir=basedir, archis=(architecture,), targetdir=wheeldir)
+    rebuild_winpython(basedir=basedir, architecture=architecture, targetdir=wheeldir)
 
     #  Copy Every package directory to the wheel directory
 
