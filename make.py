@@ -99,7 +99,7 @@ class WinPythonDistribution(object):
 
     def __init__(self, build_number, release_level, target, wheeldir,
                  toolsdirs=None, verbose=False, simulation=False,
-                 rootdir=None, install_options=None, flavor='', docsdirs=None):
+                 basedir=None, install_options=None, flavor='', docsdirs=None):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
@@ -121,7 +121,7 @@ class WinPythonDistribution(object):
         self.distribution = None
         self.installed_packages = []
         self.simulation = simulation
-        self.rootdir = rootdir  # added to build from winpython
+        self.basedir = basedir  # added to build from winpython
         self.install_options = install_options
         self.flavor = flavor
 
@@ -1011,25 +1011,24 @@ pause
 
         # Writing changelog
         self._print("Writing changelog")
-        diff.write_changelog(self.winpyver2, rootdir=self.rootdir,
+        diff.write_changelog(self.winpyver2, basedir=self.basedir,
                              flavor=self.flavor, release_level=self.release_level)
         self._print_done()
 
 
-def rebuild_winpython(basedir=None, verbose=False, archis=(32, 64), targetdir=None):
+def rebuild_winpython(basedir=None, verbose=False, architecture=64, targetdir=None):
     """Rebuild winpython package from source"""
     basedir = basedir if basedir is not None else utils.BASE_DIR
-    for architecture in archis:
-        suffix = '.win32' if architecture == 32 else '.win-amd64'
-        if targetdir is not None:
-            packdir = targetdir
-        else:
-            packdir = osp.join(basedir, 'packages' + suffix)
-        for name in os.listdir(packdir):
-            if name.startswith('winpython-') and name.endswith(('.exe', '.whl')):
-                os.remove(osp.join(packdir, name))
-        utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
-                            architecture=architecture, verbose=verbose, installer='bdist_wheel')
+    suffix = '.win32' if architecture == 32 else '.win-amd64'
+    if targetdir is not None:
+        packdir = targetdir
+    else:
+        packdir = osp.join(basedir, 'packages' + suffix)
+    for name in os.listdir(packdir):
+        if name.startswith('winpython-') and name.endswith(('.exe', '.whl')):
+            os.remove(osp.join(packdir, name))
+    utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
+                        architecture=architecture, verbose=verbose, installer='bdist_wheel')
 
 
 def transform_in_list(list_in, list_type=None):
@@ -1044,8 +1043,8 @@ def transform_in_list(list_in, list_type=None):
 
 
 def make_all(build_number, release_level, pyver, architecture,
-                   basedir=None, verbose=False, remove_existing=True,
-                   create_installer=True, simulation=False, rootdir=None,
+                   basedir, verbose=False, remove_existing=True,
+                   create_installer=True, simulation=False,
                    install_options=['--no-index'], flavor='', requirements=None,
                    find_links=None, source_dirs=None, toolsdirs=None,
                    docsdirs=None):
@@ -1061,13 +1060,10 @@ def make_all(build_number, release_level, pyver, architecture,
     `pyver`: python version ('3.4' or 3.5')
     `architecture`: [int] (32 or 64)
     `basedir`: where will be created  tmp_wheel dir. and Winpython-xyz dir.
-    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
     """ + utils.ROOTDIR_DOC
     
     if basedir is None:
         basedir = utils.BASE_DIR
-    if basedir is None:
-        basedir = utils.get_basedir(pyver, rootdir=rootdir)
 
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
@@ -1085,7 +1081,7 @@ def make_all(build_number, release_level, pyver, architecture,
     os.mkdir(wheeldir)
 
     # Rebuild Winpython in this wheel dir
-    rebuild_winpython(basedir=basedir, archis=(architecture,), targetdir=wheeldir)
+    rebuild_winpython(basedir=basedir, architecture=architecture, targetdir=wheeldir)
 
     #  Copy Every package directory to the wheel directory
 
@@ -1114,7 +1110,7 @@ def make_all(build_number, release_level, pyver, architecture,
     dist = WinPythonDistribution(build_number, release_level,
                                  builddir, wheeldir, toolsdirs,
                                  verbose=verbose, simulation=simulation,
-                                 rootdir=rootdir,
+                                 basedir=basedir,
                                  install_options=install_options + find_list,
                                  flavor=flavor, docsdirs=docsdirs)
     # define a pre-defined winpydir, instead of having to guess
@@ -1133,7 +1129,7 @@ if __name__ == '__main__':
     # DO create only one version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(1, release_level='build3', pyver='3.4', rootdir=r'D:\Winpython', verbose=True,
+    make_all(1, release_level='build3', pyver='3.4', basedir=r'D:\Winpython\basedir34', verbose=True,
              architecture=64, flavor='Barebone',
              requirements=r'D:\Winpython\basedir34\barebone_requirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
