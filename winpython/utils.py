@@ -48,19 +48,6 @@ ROOTDIR_DOC = """
       * (optional) `tools.win-amd64`: contains 64-bit-specific tools"""
 
 
-def get_basedir(pyver, rootdir=None):
-    """Get basedir from Python version
-
-    `pyver`: Python version (X.Y format) [str]
-    `rootdir`: [str] if None, WINPYTHONROOTDIR env var must be set
-    (rootdir: root directory containing 'basedir27', 'basedir33', etc.)
-    """ + ROOTDIR_DOC
-    assert re.match(r'[0-9]+\.[0-9]+', pyver) is not None
-    rootdir = rootdir if rootdir is not None else ROOT_DIR
-    assert rootdir is not None, "The *rootdir* directory must be specified"
-    return osp.join(rootdir, 'basedir%s' % pyver[::2][:2])
-
-
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`.
 

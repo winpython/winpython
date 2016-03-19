@@ -9,6 +9,12 @@ rem  set my_python_target=34
 rem  set my_pyver=3.4
 rem  set my_release=84
 
+rem *****************************
+rem v2 2016-03-19 change 
+rem we don't use building rootdir (D:\winPython) anymore
+rem we use only building basedir (D:\WinPython\basedir34Qt5)  
+set my_basedir=%my_root_dir_for_builds%\basedir%my_python_target%
+
 rem ***********************************************************
 rem Override other scripts (simpler maintenance)
 
@@ -102,8 +108,8 @@ call %my_buildenv%\scripts\env.bat
 
 rem  build with this 
 cd /D %~dp0
-echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', rootdir=r'%my_root_dir_for_builds%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%
