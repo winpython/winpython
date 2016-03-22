@@ -541,13 +541,13 @@ Binaries = ."""
             if package.name.lower() == 'pyqt5':
                 # see http://code.activestate.com/lists/python-list/666469/
                 tmp_string = r'''@echo off
-if "%WINPYDIR%"=="" call %~dp0..\..\scripts\env.bat
-python -m PyQt5.uic.pyuic %1 %2 %3 %4 %5 %6 %7 %8 %9'''
+if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
+"%WINPYDIR%\python.exe" -m PyQt5.uic.pyuic %1 %2 %3 %4 %5 %6 %7 %8 %9'''
 
             else:
                 tmp_string = r'''@echo off
-if "%WINPYDIR%"=="" call %~dp0..\..\scripts\env.bat
-python "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
+if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
+"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
 
             self.create_file(package, 'pyuic%s.bat' % package.name[-1],
                 'Scripts', tmp_string.replace('package.name', package.name))
