@@ -589,7 +589,7 @@ if not exist "%winpython_ini%" (
     echo [debug]>>"%winpython_ini%"
     echo state = disabled>>"%winpython_ini%"
     echo [environment]>>"%winpython_ini%"
-    echo ## <?> Uncomment lipnes to override environment variables>>"%winpython_ini%"
+    echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
     echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%>>"%winpython_ini%"
     echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
