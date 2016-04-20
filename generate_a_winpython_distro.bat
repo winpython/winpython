@@ -18,7 +18,7 @@ set my_basedir=%my_root_dir_for_builds%\basedir%my_python_target%
 rem ***********************************************************
 rem Override other scripts (simpler maintenance)
 
-set my_release_level=build2
+set my_release_level=
 
 if %my_python_target%==34 set my_release=2
 

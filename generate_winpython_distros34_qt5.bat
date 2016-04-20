@@ -8,9 +8,9 @@ set my_root_dir_for_builds=D:\Winpython
 set my_python_target=34
 set my_pyver=3.4
 
-set my_release=1
+set my_release=2
 
-set my_release_level=build3
+set my_release_level=
 
 set my_flavor=Qt5
 
@@ -24,7 +24,9 @@ set my_requirements=%tmp_reqdir%\Qt5_requirements.txt %tmp_reqdir%\Qt5_requireme
 set my_find_links=D:\WinPython\packages.srcreq
 
 set my_source_dirs=D:\WinPython\basedir34\packages.win-amd64.Qt5
-set my_toolsdirs=
+set my_toolsdirs=D:\WinPython\basedir34\tools
+set my_docsdirs=D:\WinPython\basedir34\docs
+
 
 set my_install_options=--no-index --pre --trusted-host=None
 
@@ -35,7 +37,8 @@ set my_preclear_build_directory=No
 
 
 set my_source_dirs=D:\WinPython\basedir34\packages.win32.Qt5
-set my_toolsdirs=
+set my_toolsdirs=D:\WinPython\basedir34\tools
+
 
 
 call %~dp0\generate_a_winpython_distro.bat
