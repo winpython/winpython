@@ -355,7 +355,7 @@ Name | Version | Description
         if script_name:
             script_name = ' ' + script_name
         self.create_batch_script(name, r"""@echo off
-call %~dp0env_for_icons.bat
+call "%~dp0env_for_icons.bat"
 """ + changedir + command + script_name + options + " %*")
 
     def create_installer(self):
@@ -763,7 +763,7 @@ echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\N
 """)
 
         self.create_batch_script('cmd.bat', r"""@echo off
-call %~dp0env_for_icons.bat
+call "%~dp0env_for_icons.bat"
 cmd.exe /k""")
         self.create_batch_script('python.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
