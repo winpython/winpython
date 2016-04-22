@@ -490,7 +490,7 @@ call "%~dp0env_for_icons.bat"
         
         self.create_launcher('WinPython Interpreter.exe', 'python.ico',
                              command='$SYSDIR\cmd.exe',
-                             args= r'/k python.bat')
+                             args= r'/k winpython.bat')
 
         #self.create_launcher('IDLEX (students).exe', 'python.ico',
         #                     command='$SYSDIR\cmd.exe',
@@ -766,6 +766,12 @@ echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\N
 call "%~dp0env_for_icons.bat"
 cmd.exe /k""")
         self.create_batch_script('python.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+rem backward compatibility for  python command-line users
+"%WINPYDIR%\python.exe"  %*
+""")                
+        self.create_batch_script('winpython.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 rem backward compatibility for non-ptpython users
