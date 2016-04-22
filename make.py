@@ -552,7 +552,8 @@ set WINPYVER=""" + self.winpyver + r"""
 set HOME=%~dp0..\settings
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
-set PATH=""" + path + r"""
+echo ;%PATH%; | find /C /I ";%WINPYDIR%\;" >nul
+if %ERRORLEVEL% NEQ 0 set PATH=""" + path + r"""
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5" set QT_API=pyqt5
