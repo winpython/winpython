@@ -344,9 +344,9 @@ Name | Version | Description
 
         if command is None:
             if script_name.endswith('.pyw'):
-                command = 'start %WINPYDIR%\pythonw.exe'
+                command = 'start "%WINPYDIR%\pythonw.exe"'
             else:
-                command = '%WINPYDIR%\python.exe'
+                command = '"%WINPYDIR%\python.exe"'
         changedir = ''
         if workdir is not None:
             workdir = (workdir)
@@ -597,7 +597,7 @@ if not exist "%winpython_ini%" (
 """)
  
         self.create_batch_script('env_for_icons.bat', r"""@echo off
-call %~dp0env.bat
+call "%~dp0env.bat"
 set WINPYWORKDIR=%~dp0..\Notebooks
 FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
 %winpythontoexec%set winpythontoexec=
@@ -693,7 +693,7 @@ The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""")
 
 
         self.create_batch_script('make_cython_use_mingw.bat', r"""@echo off
-call %~dp0env.bat
+call "%~dp0env.bat"
 
 rem ******************
 rem mingw part
@@ -719,24 +719,24 @@ rem pause
 """)
 
         self.create_batch_script('make_cython_use_vc.bat', r"""@echo off
-call %~dp0env.bat
+call "%~dp0env.bat"
 set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 echo [config]>%pydistutils_cfg%
         """)
 
         self.create_batch_script('make_winpython_movable.bat',r"""@echo off
-call %~dp0env.bat
+call "%~dp0env.bat"
 echo patch pip and current launchers for move
 
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
+"%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
 pause
         """)
 
         self.create_batch_script('make_winpython_fix.bat',r"""@echo off
-call %~dp0env.bat
+call "%~dp0env.bat"
 echo patch pip and current launchers for non-move
 
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
+"%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
 pause
         """)
 
@@ -802,7 +802,7 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script('spyder_reset.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-%WINPYDIR%\scripts\spyder.exe --reset %*
+"%WINPYDIR%\scripts\spyder.exe" --reset %*
 """)
 
         self.create_batch_script('ipython_notebook.bat',r"""@echo off
@@ -863,24 +863,24 @@ if "%QT_API%"=="pyqt5" (
                                  workdir=r'"%WINPYDIR%\Scripts"')
         self.create_batch_script('register_python_for_all.bat',
                                  r"""@echo off
-call %~dp0env.bat
-call %~dp0register_python.bat --all""")
+call "%~dp0env.bat"
+call "%~dp0register_python.bat" --all""")
 
         self.create_batch_script('wpcp.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-%WINPYDIR%\python.exe -m winpython.controlpanel %*
+"%WINPYDIR%\python.exe" -m winpython.controlpanel %*
 """)
 
         #self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
         #                         workdir=r'"%WINPYDIR%\Scripts"')
 
         self.create_batch_script('upgrade_pip.bat', r"""@echo off
-call %~dp0env.bat
+call "%~dp0env.bat"
 echo this will upgrade pip with latest version, then patch it for WinPython portability ok ?
 pause
-%WINPYDIR%\python.exe -m pip install --upgrade --force-reinstall  pip
-%WINPYDIR%\python.exe -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
+"%WINPYDIR%\python.exe" -m pip install --upgrade --force-reinstall  pip
+"%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 pause
 """)
 
