@@ -550,6 +550,7 @@ call "%~dp0env_for_icons.bat"
 set WINPYDIR=%~dp0.."""+"\\" + self.python_name + r"""
 set WINPYVER=""" + self.winpyver + r"""
 set HOME=%~dp0..\settings
+set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 echo ;%PATH%; | find /C /I ";%WINPYDIR%\;" >nul
@@ -821,7 +822,7 @@ cd/D "%WINPYWORKDIR%"
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\demo.py"
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
 ) else (
     "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
 )
