@@ -550,6 +550,7 @@ call "%~dp0env_for_icons.bat"
 set WINPYDIR=%~dp0.."""+"\\" + self.python_name + r"""
 set WINPYVER=""" + self.winpyver + r"""
 set HOME=%~dp0..\settings
+set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 echo ;%PATH%; | find /C /I ";%WINPYDIR%\;" >nul
