@@ -821,7 +821,7 @@ cd/D "%WINPYWORKDIR%"
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\demo.py"
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
 ) else (
     "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
 )
