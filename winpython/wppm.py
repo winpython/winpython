@@ -338,11 +338,11 @@ python "%~dpn0""" + ext + """" %*""")
         # Include package installed via pip (not via WPPM)
         try:
             if os.path.dirname(sys.executable) == self.target:
-                #  direct way: we interrogate ourself
-                import imp, pip
-                pip.utils.pkg_resources = imp.reload(pip.utils.pkg_resources)
+                #  direct way: we interrogate ourself, using official API
+                import pkg_resources, imp
+                imp.reload(pkg_resources)
                 pip_list = [(i.key, i.version)
-                             for i in pip.get_installed_distributions()]
+                             for i in pkg_resources.working_set]  
             else:
                 #  indirect way: we interrogate something else
                 cmdx=[osp.join(self.target, 'python.exe'), '-c',
