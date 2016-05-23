@@ -32,7 +32,10 @@ from winpython import py3compat
 # Workaround for installing PyVISA on Windows from source:
 os.environ['HOME'] = os.environ['USERPROFILE']
 
-
+# pep503 defines normalized package names: www.python.org/dev/peps/pep-0503
+def normalize(name):
+    return re.sub(r"[-_.]+", "-", name).lower()
+    
 def get_package_metadata(database, name):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on
@@ -44,7 +47,7 @@ def get_package_metadata(database, name):
         name1 = name.lower()
         # wheel replace '-' per '_' in key
         for name2 in (name1, name1.split('-')[0], name1.replace('-', '_'),
-                      '-'.join(name1.split('_'))):
+                      '-'.join(name1.split('_')), normalize(name)):
             try:
                 metadata[key] = db.get(name2, key)
                 break
@@ -368,7 +371,7 @@ python "%~dpn0""" + ext + """" %*""")
     def find_package(self, name):
         """Find installed package"""
         for pack in self.get_installed_packages():
-            if pack.name == name:
+            if normalize(pack.name) == normalize(name):
                 return pack
 
 
