@@ -393,6 +393,9 @@ python "%~dpn0""" + ext + """" %*""")
             if size <= max_exe_size:
                 utils.patch_shebang_line(ffname, to_movable=to_movable,
                                          targetdir=targetdir)
+        for ffname in glob.glob(r'%s\Scripts\*.py' % self.target):
+            utils.patch_shebang_line_py(ffname, to_movable=to_movable,
+                                        targetdir=targetdir)
 
 
     def install(self, package, install_options=None):

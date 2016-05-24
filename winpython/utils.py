@@ -313,6 +313,29 @@ def patch_shebang_line(fname, pad=b' ', to_movable=True, targetdir=""):
 
 
 # =============================================================================
+# Patch shebang line in .py files
+# =============================================================================
+def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
+    """Changes shebang line in '.py' file to relative or absolue path"""
+    import fileinput
+    import re
+    import sys
+    
+    if sys.version_info[0] == 2:
+        # Python 2.x doesn't create .py files for .exe files. So, Moving
+        # WinPython doesn't break running executable files.
+        return
+    if to_movable:
+        exec_path = '#!.\python.exe'
+    else:
+        exec_path = '#!' + sys.executable
+    for line in fileinput.input(fname, inplace=True):
+        if re.match('^#\!.*python\.exe$', line) is not None:
+            print(exec_path)
+        else:
+            print(line, end='')
+
+# =============================================================================
 # Patch sourcefile (instead of forking packages)
 # =============================================================================
 def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
