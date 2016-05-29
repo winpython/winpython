@@ -487,6 +487,9 @@ call "%~dp0env_for_icons.bat"
         self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
                              command='$SYSDIR\cmd.exe',
                              args=r'/k cmd.bat')        
+        self.create_launcher('WinPython Powershell Prompt.exe', 'powershell.ico',
+                             command='$SYSDIR\cmd.exe',
+                             args=r'/k cmd_ps.bat')        
         
         self.create_launcher('WinPython Interpreter.exe', 'python.ico',
                              command='$SYSDIR\cmd.exe',
@@ -547,7 +550,7 @@ call "%~dp0env_for_icons.bat"
         conv = lambda path: ";".join(['%WINPYDIR%\\'+pth for pth in path])
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
 
-        convps = lambda path: ";".join(['$env:WINPYDIR\\'+pth for pth in path])
+        convps = lambda path: ";".join(["$env:WINPYDIR\\"+pth for pth in path])
         pathps = convps(self.prepath) + ";$env:path;" + convps(self.postpath)
 
         self.create_batch_script('env.bat', r"""@echo off
@@ -605,42 +608,30 @@ if not exist "%winpython_ini%" (
 ###############################
 ### WinPython_PS_Prompt.ps1 ###
 ###############################
+$0 = $myInvocation.MyCommand.Definition
+$dp0 = [System.IO.Path]::GetDirectoryName($0)
 
+# avoid double_init (will only resize screen)
+if (-not $env:WINPYDIR -eq "$dp0\..\python-3.4.4.amd64")  {
 
-$env:WINPYDIR = '$pwd\.."""+'\\' + self.python_name + r"""'
+# $env:WINPYDIR = '$pwd\..\python-3.4.4.amd64'
+$env:WINPYDIR = "$dp0\..\python-3.4.4.amd64"
+
+$env:WINPYDIR = "$dp0\.."""+'\\' + self.python_name + '"' + r"""
 $env:WINPYVER = '""" + self.winpyver + r"""'
-$env:HOME = '$env:WINPYDIR\..\settings'
-$env:JUPYTER_DATA_DIR = '$env:HOME'
+$env:HOME = "$env:WINPYDIR\..\settings"
+$env:JUPYTER_DATA_DIR = "$env:HOME"
 $env:WINPYARCH = 'WIN32'
 if ($env:WINPYARCH.subString($env:WINPYARCH.length-5, 5) -eq 'amd64')  {
    $env:WINPYARCH = 'WIN-AMD64' } 
 
+
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
- $env:PATH = '""" +  pathps + r"""' }
+ $env:PATH = """ + '"' +  pathps + '"' + r""" }
 
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5") { $env:QT_API = "pyqt5" } 
 
-
-###############################
-### Set-WindowSize
-###############################
-Function Set-WindowSize {
-Param([int]$x=$host.ui.rawui.windowsize.width,
-      [int]$y=$host.ui.rawui.windowsize.heigth,
-      [int]$buffer=$host.UI.RawUI.BufferSize.heigth)
-    
-    $buffersize = new-object System.Management.Automation.Host.Size($x,$buffer)
-    $host.UI.RawUI.BufferSize = $buffersize
-    $size = New-Object System.Management.Automation.Host.Size($x,$y)
-    $host.ui.rawui.WindowSize = $size   
-}
-
-Set-WindowSize 150 40 6000 
-
-### Colorize to distinguish
-$host.ui.RawUI.BackgroundColor = "DarkBlue"
-$host.ui.RawUI.ForegroundColor = "White"
 
 
 #####################
@@ -678,10 +669,39 @@ if (-not (Test-Path $env:winpython_ini)) {
     "#JUPYTER_DATA_DIR = %%HOME%%" | Add-Content -Path $env:winpython_ini
     "#WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks" | Add-Content -Path $env:winpython_ini
 }
+
+
+} 
+###############################
+### Set-WindowSize
+###############################
+Function Set-WindowSize {
+Param([int]$x=$host.ui.rawui.windowsize.width,
+      [int]$y=$host.ui.rawui.windowsize.heigth,
+      [int]$buffer=$host.UI.RawUI.BufferSize.heigth)
+    
+    $buffersize = new-object System.Management.Automation.Host.Size($x,$buffer)
+    $host.UI.RawUI.BufferSize = $buffersize
+    $size = New-Object System.Management.Automation.Host.Size($x,$y)
+    $host.ui.rawui.WindowSize = $size   
+}
+
+Set-WindowSize 150 40 6000 
+
+### Colorize to distinguish
+$host.ui.RawUI.BackgroundColor = "DarkBlue"
+$host.ui.RawUI.ForegroundColor = "White"
+
 """)
 
+        self.create_batch_script('cmd_ps.bat', r"""@echo off
+rem safe bet 
+call "%~dp0env_for_icons.bat"
+Powershell.exe -executionpolicy RemoteSigned -noexit -file "%~dp0WinPython_PS_Prompt.ps1"
+""")
+             
         self.create_batch_script('WinPython_Interpreter_PS.bat', r"""@echo off
-rem call "%~dp0env_for_icons.bat"
+rem no safe bet (for comparisons)
 Powershell.exe -executionpolicy RemoteSigned -noexit -file "%~dp0WinPython_PS_Prompt.ps1"
 """)
  
