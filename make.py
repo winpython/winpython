@@ -515,15 +515,7 @@ call "%~dp0env_for_icons.bat"
                              command='wscript.exe',
                              args=r'Noshell.vbs wpcp.bat')
 
-        # Multi-Qt launchers (Qt5 has priority if found)
-        self.create_launcher('Qt Demo.exe', 'qt.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs qtdemo.bat')
-
-        self.create_launcher('Qt Assistant.exe', 'qtassistant.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs qtassistant.bat')
-
+        # Multi-Qt launchers
         self.create_launcher('Qt Designer.exe', 'qtdesigner.ico',
                              command='wscript.exe',
                              args=r'Noshell.vbs qtdesigner.bat')
@@ -930,10 +922,11 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script('qtdemo.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-if "%QT_API%"=="pyqt5" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
-) else (
-    "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
+if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
+  "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
+)  
+if exist "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw" (
+  "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
 )
 """)
 
