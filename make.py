@@ -677,8 +677,8 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
     $size = New-Object System.Management.Automation.Host.Size($x,$y)
     $host.ui.rawui.WindowSize = $size   
 }
-
-Set-WindowSize 150 40 6000 
+# Windows10 yelling at us with 150 40 6000
+Set-WindowSize 210 40 6000 
 
 ### Colorize to distinguish
 #$host.ui.RawUI.BackgroundColor = "DarkBlue"
