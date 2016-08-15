@@ -561,24 +561,22 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5" set QT_API=pyqt5
 rem ******************
 rem handle R if included
 rem ******************
-if exist "%WINPYDIR%\..\tools\R\bin" (
-    set R_HOME=%WINPYDIR%\..\tools\R
-    if "%WINPYARCH%"=="WIN32" (
-        set R_HOMEbin=%R_HOME%\bin\i386
-    ) else (
-        set R_HOMEbin=%R_HOME%\bin\x64
-    )
-)
+if not exist "%WINPYDIR%\..\tools\R\bin" goto r_bad
+set R_HOME=%WINPYDIR%\..\tools\R
+if     "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\i386
+if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
+:r_bad
+
 
 rem ******************
 rem handle Julia if included
 rem ******************
-if exist "%WINPYDIR%\..\tools\Julia\bin" (
-    set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
-    set JULIA_EXE=julia.exe
-    set JULIA=%JULIA_HOME%%JULIA_EXE%
-    set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
-)
+if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
+set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
+set JULIA_EXE=julia.exe
+set JULIA=%JULIA_HOME%%JULIA_EXE%
+set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
+:julia_bad
 
 rem ******************
 rem WinPython.ini part (removed from nsis)
