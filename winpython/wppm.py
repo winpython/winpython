@@ -754,20 +754,21 @@ def main(test=False):
         if not args.install and not args.uninstall:
             args.install = True
 
-        if not osp.isfile(args.fname):
+        if not osp.isfile(args.fname) and args.install:
             raise IOError("File not found: %s" % args.fname)
 
         if utils.is_python_distribution(args.target):
             dist = Distribution(args.target)
             try:
-                package = Package(args.fname)
-                if package.is_compatible_with(dist):
-                    if args.install:
-                        dist.install(package)
-                    else:
-                        dist.uninstall(package)
+                if args.uninstall:
+                    package = dist.find_package(args.fname)
+                    dist.uninstall(package)
                 else:
-                    raise RuntimeError("Package is not compatible with Python "\
+                    package = Package(args.fname)
+                    if args.install and package.is_compatible_with(dist):
+                       dist.install(package)
+                    else:
+                        raise RuntimeError("Package is not compatible with Python "\
                                "%s %dbit" % (dist.version, dist.architecture))
             except NotImplementedError:
                 raise RuntimeError("Package is not (yet) supported by WPPM")
