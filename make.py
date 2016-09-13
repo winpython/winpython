@@ -1022,7 +1022,7 @@ pause
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.rc]*)((\.|\-)amd64)?\.(msi|zip)')
+                            r'python-([0-9\.rcb]*)((\.|\-)amd64)?\.(msi|zip)')
         self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
@@ -1071,9 +1071,9 @@ pause
 
             # pre-patch current pip (until default python has pip 8.0.3)
             self.distribution.patch_standard_packages('pip')
-            # force update of pip (FIRST) and setuptools here
+            # not forced update of pip (FIRST) and setuptools here
             for req in ('pip', 'setuptools'):   
-                actions = ["install","--upgrade", "--force-reinstall", req]
+                actions = ["install","--upgrade", req]
                 if self.install_options is not None:
                     actions += self.install_options
                 print("piping %s" % ' '.join(actions))
