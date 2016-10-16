@@ -389,9 +389,14 @@ call "%~dp0env_for_icons.bat"
         os.mkdir(self.python_dir)
         if  self.python_fname[-3:] == 'zip':  # Python3.5
            utils.extract_archive(self.python_fname, targetdir=self.python_dir+r'\..')
-           # new Python 3.5 trick (https://bugs.python.org/issue23955)
-           pyvenv_file = osp.join(self.python_dir, 'pyvenv.cfg')
-           open(pyvenv_file, 'w').write('applocal=True\n')
+           if self.winpyver < "3.6":
+               # new Python 3.5 trick (https://bugs.python.org/issue23955)
+               pyvenv_file = osp.join(self.python_dir, 'pyvenv.cfg')
+               open(pyvenv_file, 'w').write('applocal=True\n')
+           else:
+               # new Python 3.6 trick (https://docs.python.org/3.6/using/windows.html#finding-modules)
+               pypath_file = osp.join(self.python_dir, 'python._pth')
+               open(pypath_file, 'w').write('.\nLib\nimport site\nDLLs\n#Lib/site-packages\n#python36.zip\n')
         else:   
            utils.extract_msi(self.python_fname, targetdir=self.python_dir)
            os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
