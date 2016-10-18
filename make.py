@@ -506,11 +506,11 @@ call "%~dp0env_for_icons.bat"
         #                     workdir='$EXEDIR\scripts')
         self.create_launcher('IDLEX (Python GUI).exe', 'python.ico',
                              command='wscript.exe',
-                             args= r'Noshell.vbs IDLEX.bat')
+                             args= r'Noshell.vbs winidlex.bat')
 
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              command='wscript.exe',
-                             args=r'Noshell.vbs spyder.bat')
+                             args=r'Noshell.vbs winspyder.bat')
 
         self.create_launcher('Spyder reset.exe', 'spyder_reset.ico',
                              command='wscript.exe',
@@ -532,12 +532,12 @@ call "%~dp0env_for_icons.bat"
         # Jupyter launchers
         self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
                              command='wscript.exe',
-                             args=r'Noshell.vbs qtconsole.bat')
+                             args=r'Noshell.vbs winqtconsole.bat')
 
         # this one needs a shell to kill fantom processes
         self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
                              command='$SYSDIR\cmd.exe',
-                             args=r'/k ipython_notebook.bat')
+                             args=r'/k winipython_notebook.bat')
 
         self._print_done()
 
@@ -889,7 +889,6 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
 
         self.create_batch_script('idlex.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
 rem backward compatibility for non-IDLEX users
 if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
@@ -898,7 +897,22 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
 )
 """)
 
+        self.create_batch_script('winidlex.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+rem backward compatibility for non-IDLEX users
+if exist "%WINPYDIR%\scripts\idlex.pyw" (
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
+) else (
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
+)
+""")
         self.create_batch_script('spyder.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+"%WINPYDIR%\scripts\spyder.exe" %*
+""")
+        self.create_batch_script('winspyder.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\spyder.exe" %*
@@ -916,7 +930,20 @@ cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
 """)
 
+        self.create_batch_script('winipython_notebook.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+"%WINPYDIR%\scripts\jupyter-notebook.exe" %*
+""")
+
         self.create_batch_script('qtconsole.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+"%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
+""")
+ 
+
+        self.create_batch_script('winqtconsole.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
