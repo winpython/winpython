@@ -551,9 +551,18 @@ call "%~dp0env_for_icons.bat"
         pathps = convps(self.prepath) + ";$env:path;" + convps(self.postpath)
 
         self.create_batch_script('env.bat', r"""@echo off
-set WINPYDIR=%~dp0.."""+"\\" + self.python_name + r"""
+set WINPYDIRBASE=%~dp0..
+rem get a normalize path
+CALL :NORMALIZEPATH "%WINPYDIRBASE%"
+set WINPYDIRBASE=%RETVAL%
+set RETVAL=
+
+set WINPYDIR=%WINPYDIRBASE%"""+"\\" + self.python_name + r"""
+
 set WINPYVER=""" + self.winpyver + r"""
-set HOME=%~dp0..\settings
+set HOME=%WINPYDIRBASE%\settings
+set WINPYDIRBASE=
+
 set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
@@ -598,6 +607,17 @@ if not exist "%winpython_ini%" (
     echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
 )
+
+rem *****
+rem http://stackoverflow.com/questions/1645843/resolve-absolute-path-from-relative-path-and-or-file-name
+rem *****
+:: ========== FUNCTIONS ==========
+EXIT /B
+
+:NORMALIZEPATH
+  SET RETVAL=%~dpfn1
+  EXIT /B
+
 """)
 
         self.create_batch_script('WinPython_PS_Prompt.ps1', r"""
@@ -607,15 +627,21 @@ if not exist "%winpython_ini%" (
 $0 = $myInvocation.MyCommand.Definition
 $dp0 = [System.IO.Path]::GetDirectoryName($0)
 
+$env:WINPYDIRBASE = "$dp0\.."
+# get a normalize path
+# http://stackoverflow.com/questions/1645843/resolve-absolute-path-from-relative-path-and-or-file-name
+$env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
+
 # avoid double_init (will only resize screen)
-if (-not $env:WINPYDIR -eq "$dp0\..\python-3.4.4.amd64")  {
+if (-not $env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""+'"\\' + self.python_name + '"' + r""") ) {
 
-# $env:WINPYDIR = '$pwd\..\python-3.4.4.amd64'
-$env:WINPYDIR = "$dp0\..\python-3.4.4.amd64"
 
-$env:WINPYDIR = "$dp0\.."""+'\\' + self.python_name + '"' + r"""
+$env:WINPYDIR = $env:WINPYDIRBASE+"""+ '"' + '\\' + self.python_name + '"' + r"""
+
+
 $env:WINPYVER = '""" + self.winpyver + r"""'
-$env:HOME = "$env:WINPYDIR\..\settings"
+$env:HOME = "$env:WINPYDIRBASE\settings"
+$env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
 $env:WINPYARCH = 'WIN32'
 if ($env:WINPYARCH.subString($env:WINPYARCH.length-5, 5) -eq 'amd64')  {
