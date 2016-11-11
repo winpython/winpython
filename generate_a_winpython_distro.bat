@@ -2,7 +2,7 @@ rem  to launch from a winpython package directory, where 'make.py' is
 @echo on
 rem  this is initialised per the calling .bat
 rem  set my_original_path=%path%
-rem  set my_buildenv=D:\WinPython-64bit-3.4.3.3_b0
+rem  set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
 rem  set my_root_dir_for_builds=D:\Winpython
 
 rem  set my_python_target=34
@@ -18,11 +18,17 @@ set my_basedir=%my_root_dir_for_builds%\basedir%my_python_target%
 rem ***********************************************************
 rem Override other scripts (simpler maintenance)
 
+set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
+
 set my_release_level=
 
-if %my_python_target%==34 set my_release=2
+if %my_python_target%==27 set my_release=4
+
+if %my_python_target%==34 set my_release=5
 
 if %my_python_target%==35 set my_release=3
+
+if %my_python_target%==36 set my_release=0
 
 rem ***********************************************************
 
