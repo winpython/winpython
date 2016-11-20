@@ -633,7 +633,7 @@ $env:WINPYDIRBASE = "$dp0\.."
 $env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
 
 # avoid double_init (will only resize screen)
-if (-not $env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""+'"\\' + self.python_name + '"' + r""") ) {
+if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""+'"\\' + self.python_name + '"' + r""")) ) {
 
 
 $env:WINPYDIR = $env:WINPYDIRBASE+"""+ '"' + '\\' + self.python_name + '"' + r"""
