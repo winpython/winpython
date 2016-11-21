@@ -708,7 +708,8 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
     $host.ui.rawui.WindowSize = $size   
 }
 # Windows10 yelling at us with 150 40 6000
-Set-WindowSize 210 40 6000 
+# no more needed ?
+# Set-WindowSize 195 40 6000 
 
 ### Colorize to distinguish
 #$host.ui.RawUI.BackgroundColor = "DarkBlue"
@@ -719,12 +720,13 @@ $host.ui.RawUI.ForegroundColor = "White"
         self.create_batch_script('cmd_ps.bat', r"""@echo off
 rem safe bet 
 call "%~dp0env_for_icons.bat"
-Powershell.exe -executionpolicy RemoteSigned -noexit -file "%~dp0WinPython_PS_Prompt.ps1"
+Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File""%~dp0WinPython_PS_Prompt.ps1""'}"
 """)
              
         self.create_batch_script('WinPython_Interpreter_PS.bat', r"""@echo off
 rem no safe bet (for comparisons)
-Powershell.exe -executionpolicy RemoteSigned -noexit -file "%~dp0WinPython_PS_Prompt.ps1"
+Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
+exit
 """)
  
         self.create_batch_script('env_for_icons.bat', r"""@echo off
