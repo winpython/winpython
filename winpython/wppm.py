@@ -140,15 +140,13 @@ class Package(BasePackage):
                 return
         # New : Binary wheel case
         elif bname.endswith(('32.whl', '64.whl')):
-            match = re.match(utils.WHEELBIN_PATTERN, bname)
-            # typical match is ('scipy', '0.14.1rc1', '34', 'win32')
-            if match is not None:
-                self.name, self.version,  self.pywheel , arch  = match.groups()
-                # self.pywheel version is '34' not 3.4
-                self.pyversion = self.pywheel[:1] + '.' + self.pywheel[1:]
-                # wheel arch is 'win32' or 'win_amd64'
-                self.architecture = 32 if arch == 'win32' else 64
-                return
+            # {name}-{version}-{python tag}-{abi tag}-{platform tag}.whl 
+            # ['sounddevice','0.3.5','py2.py3.cp34.cp35','none','win32']             
+            self.name, self.version, self.pywheel, abi, arch = bname[:-4].split("-")
+            self.pyversion = None # Let's ignore this  self.pywheel
+            # wheel arch is 'win32' or 'win_amd64'
+            self.architecture = 32 if arch == 'win32' else 64
+            return
         elif bname.endswith(('.zip', '.tar.gz', '.whl')):
             # distutils sdist
             infos = utils.get_source_package_infos(bname)
@@ -359,7 +357,7 @@ python "%~dpn0""" + ext + """" %*""")
 
             # create pip package list
             wppip = [Package('%s-%s-py2.py3-none-any.whl' %
-                     (i[0].lower(), i[1])) for i in pip_list]
+                     (i[0].replace('-', '_').lower(), i[1])) for i in pip_list]
             # pip package version is supposed better
             already = set(b.name.replace('-', '_') for b in wppip+wininst)
             wppm = wppip + [i for i in wppm

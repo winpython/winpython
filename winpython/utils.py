@@ -483,7 +483,9 @@ WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]
 
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
-    match = re.match(SOURCE_PATTERN, osp.basename(fname).replace("+mkl-","-"))
+    if fname[-4:] == '.whl':
+        return osp.basename(fname).split("-")[:2]
+    match = re.match(SOURCE_PATTERN, osp.basename(fname))
     if match is not None:
         return match.groups()[:2]
 
