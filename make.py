@@ -571,7 +571,7 @@ echo ;%PATH%; | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
 if %ERRORLEVEL% NEQ 0 set PATH=""" + path + r"""
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
-if exist "%WINPYDIR%\Lib\site-packages\PyQt5" set QT_API=pyqt5
+if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 
 rem ******************
 rem handle R if included
@@ -652,7 +652,7 @@ if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
  $env:PATH = """ + '"' +  pathps + '"' + r""" }
 
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
-if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5") { $env:QT_API = "pyqt5" } 
+if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
 
 
