@@ -141,8 +141,12 @@ class Package(BasePackage):
         # New : Binary wheel case
         elif bname.endswith(('32.whl', '64.whl')):
             # {name}-{version}-{python tag}-{abi tag}-{platform tag}.whl 
-            # ['sounddevice','0.3.5','py2.py3.cp34.cp35','none','win32']             
-            self.name, self.version, self.pywheel, abi, arch = bname[:-4].split("-")
+            # ['sounddevice','0.3.5','py2.py3.cp34.cp35','none','win32'] 
+            bname2 = bname[:-4].split("-")             
+            try:  # normal case: pep8-1.7.0-py2.py3-none-any.whl
+                self.name, self.version, self.pywheel, abi, arch = bname2
+            except:  # PyQt5-5.7.1-5.7.1-cp34.cp35.cp36-none-win_amd64.whl
+                self.name, self.version, dumb, self.pywheel, abi, arch = bname2
             self.pyversion = None # Let's ignore this  self.pywheel
             # wheel arch is 'win32' or 'win_amd64'
             self.architecture = 32 if arch == 'win32' else 64
