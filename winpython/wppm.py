@@ -145,7 +145,8 @@ class Package(BasePackage):
             # PyQt5-5.7.1-5.7.1-cp34.cp35.cp36-none-win_amd64.whl
             bname2 = bname[:-4].split("-")             
             self.name = bname2[0]
-            self.version, self.pywheel, abi, arch = bname2[-4:]
+            self.version = '-'.join(list(bname2[1:-3]))
+            self.pywheel, abi, arch = bname2[-3:]
             self.pyversion = None # Let's ignore this  self.pywheel
             # wheel arch is 'win32' or 'win_amd64'
             self.architecture = 32 if arch == 'win32' else 64
