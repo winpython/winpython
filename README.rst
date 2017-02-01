@@ -45,6 +45,9 @@ Requirements
 * NSIS:
     * "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
     * with TextReplace plugin installed
+    
+* PyQt4/5 is required to execute WinPython Control Panel/Ipython Qt and Qt related packages for both WinPython 2.x and 3.x releases.
+  if not installed, these packages will not execute.
 
 Installation
 ------------
