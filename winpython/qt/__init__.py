@@ -9,17 +9,25 @@
 
 import os
 
+# we shall respect QT_API is set
 try:
-    #be friendly with Pyqt5
-    are_you_here = __import__('PyQt5')
-    os.environ.setdefault('QT_API','pyqt5')
+    are_you_set = os.environ['QT_API']     
 except:
-    os.environ.setdefault('QT_API', 'pyqt')
+    try:
+        # be friendly with Pyqt5
+        are_you_here = __import__('PyQt5')
+        # this standard test (for everybody) may not work for WinPython, so...
+        from PyQt5.QtCore import PYQT_VERSION_STR as __version__ 
+    
+        os.environ.setdefault('QT_API','pyqt5')
+    except:
+        os.environ.setdefault('QT_API', 'pyqt')
 
-assert os.environ['QT_API'] in ('pyqt5', 'pyqt', 'pyside')
+assert os.environ['QT_API'] in ('pyqt5', 'pyqt', 'pyside', 'pyside2')
 
 API = os.environ['QT_API']
-API_NAME = {'pyqt5': 'PyQt5', 'pyqt': 'PyQt4', 'pyside': 'PySide'}[API]
+API_NAME = {'pyqt5': 'PyQt5', 'pyqt': 'PyQt4', 'pyside': 'PySide', 
+            'pyside2': 'PySide', 'pyqt4': 'PyQt4'}[API]
 
 PYQT5 = False
 
