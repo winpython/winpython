@@ -939,18 +939,30 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
         self.create_batch_script('spyder.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-"%WINPYDIR%\scripts\spyder.exe" %*
+if exist "%WINPYDIR%\scripts\spyder3.exe" (
+   "%WINPYDIR%\scripts\spyder3.exe" %*
+) else (
+   "%WINPYDIR%\scripts\spyder.exe" %*
+)   
 """)
         self.create_batch_script('winspyder.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-"%WINPYDIR%\scripts\spyder.exe" %*
+if exist "%WINPYDIR%\scripts\spyder3.exe" (
+   "%WINPYDIR%\scripts\spyder3.exe" %*
+) else (
+   "%WINPYDIR%\scripts\spyder.exe" %*
+) 
 """)
 
         self.create_batch_script('spyder_reset.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
-"%WINPYDIR%\scripts\spyder.exe" --reset %*
+if exist "%WINPYDIR%\scripts\spyder3.exe" (
+    "%WINPYDIR%\scripts\spyder3.exe" --reset %*
+) else (
+    "%WINPYDIR%\scripts\spyder.exe" --reset %*
+)
 """)
 
         self.create_batch_script('ipython_notebook.bat',r"""@echo off
