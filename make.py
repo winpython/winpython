@@ -395,7 +395,8 @@ call "%~dp0env_for_icons.bat"
                open(pyvenv_file, 'w').write('applocal=True\n')
            else:
                # new Python 3.6 trick (https://docs.python.org/3.6/using/windows.html#finding-modules)
-               pypath_file = osp.join(self.python_dir, 'python._pth')
+               # (on hold since 2017-02-16, http://bugs.python.org/issue29578)
+               pypath_file = osp.join(self.python_dir, 'python_onHold._pth')
                open(pypath_file, 'w').write('python36.zip\nDLLs\nLib\n.\nimport site\n')
         else:   
            utils.extract_msi(self.python_fname, targetdir=self.python_dir)
