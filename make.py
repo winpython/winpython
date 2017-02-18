@@ -714,6 +714,7 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
 
 ### Colorize to distinguish
 #$host.ui.RawUI.BackgroundColor = "DarkBlue"
+$host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
 
 """)
