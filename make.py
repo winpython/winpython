@@ -553,10 +553,13 @@ call "%~dp0env_for_icons.bat"
 
         self.create_batch_script('env.bat', r"""@echo off
 set WINPYDIRBASE=%~dp0..
+
 rem get a normalize path
-CALL :NORMALIZEPATH "%WINPYDIRBASE%"
-set WINPYDIRBASE=%RETVAL%
-set RETVAL=
+set WINPYDIRBASETMP=%~dp0..
+pushd %WINPYDIRBASETMP%
+set WINPYDIRBASE=%CD%
+set WINPYDIRBASETMP=
+popd
 
 set WINPYDIR=%WINPYDIRBASE%"""+"\\" + self.python_name + r"""
 
@@ -608,16 +611,6 @@ if not exist "%winpython_ini%" (
     echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
 )
-
-rem *****
-rem http://stackoverflow.com/questions/1645843/resolve-absolute-path-from-relative-path-and-or-file-name
-rem *****
-:: ========== FUNCTIONS ==========
-EXIT /B
-
-:NORMALIZEPATH
-  SET RETVAL=%~dpfn1
-  EXIT /B
 
 """)
 
