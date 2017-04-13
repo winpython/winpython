@@ -177,7 +177,7 @@ class WinPythonDistribution(object):
         python_desc = 'Python programming language with standard library'
         return """## WinPython %s 
 
-The following packages are included in WinPython v%s%s.
+The following packages are included in WinPython-%s v%s%s.
 
 ### Tools
 
@@ -190,7 +190,7 @@ Name | Version | Description
 Name | Version | Description
 -----|---------|------------
 [Python](http://www.python.org/) | %s | %s
-%s""" % (self.winpyver2+self.flavor, self.winpyver2+self.flavor,
+%s""" % (self.winpy_arch, self.winpyver2+self.flavor, self.winpyver2+self.flavor,
 (' %s' % self.release_level), '\n'.join(tools),
          self.python_fullversion, python_desc, '\n'.join(packages))
 
@@ -1181,9 +1181,11 @@ pause
         # Writing package index
         self._print("Writing package index")
         # winpyver2 = need the version without build part
+        # but with self.distribution.architecture
         self.winpyver2 = '%s.%s' % (self.python_fullversion, self.build_number)
         fname = osp.join(self.winpydir, os.pardir,
-                         'WinPython%s-%s.md' % (self.flavor, self.winpyver2))
+                         'WinPython%s-%sbit-%s.md' % (self.flavor,
+                         self.distribution.architecture, self.winpyver2))
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
         shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
@@ -1192,7 +1194,8 @@ pause
         # Writing changelog
         self._print("Writing changelog")
         diff.write_changelog(self.winpyver2, basedir=self.basedir,
-                             flavor=self.flavor, release_level=self.release_level)
+                             flavor=self.flavor, release_level=self.release_level,
+                             architecture=self.distribution.architecture)
         self._print_done()
 
 
