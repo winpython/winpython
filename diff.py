@@ -148,10 +148,11 @@ def diff_package_dicts(dict1_in, dict2_in):
     return text
 
 
-def find_closer_version(version1, basedir=None, flavor=''):
+def find_closer_version(version1, basedir=None, flavor='', architecture=64):
     """Find version which is the closest to `version`"""
     builddir = osp.join(basedir, 'build%s' % flavor)
-    func = lambda name: re.match(r'WinPython%s-([0-9\.]*)\.(txt|md)' % flavor, name)
+    func = lambda name: re.match(r'WinPython%s-%sbit-([0-9\.]*)\.(txt|md)' %
+                                (flavor, architecture), name)
     versions = [func(name).groups()[0]
                 for name in os.listdir(builddir) if func(name)]
     try:
@@ -165,16 +166,17 @@ def find_closer_version(version1, basedir=None, flavor=''):
 
 
 def compare_package_indexes(version2, version1=None, basedir=None, flavor='',
-flavor1=None):
+flavor1=None, architecture=64):
     """Compare two package index Wiki pages"""
     if version1 is None:
         version1 = find_closer_version(version2, basedir=basedir,
-                                       flavor=flavor)
+                                       flavor=flavor, architecture=architecture)
     flavor1 = flavor1 if flavor1 is not None else flavor    
-    text = '\r\n'.join(["## History of changes for WinPython %s" % 
-                        (version2+flavor),
-                        "", "The following changes were made to WinPython "
-                        "distribution since version %s." % (version1+flavor1),
+    text = '\r\n'.join(["## History of changes for WinPython-%sbit %s" % 
+                        (architecture, version2+flavor),
+                        "", "The following changes were made to WinPython-%sbit"
+                        " distribution since version %s." % (architecture,
+                                                            version1+flavor1),
                         "", ""])
     pi1 = PackageIndex(version1, basedir=basedir, flavor=flavor1)
     pi2 = PackageIndex(version2, basedir=basedir, flavor=flavor)
@@ -188,24 +190,25 @@ flavor1=None):
     return text
 
 
-def _copy_all_changelogs(version, basedir, flavor=''):
+def _copy_all_changelogs(version, basedir, flavor='', architecture=64):
     basever = '.'.join(version.split('.')[:2])
     for name in os.listdir(CHANGELOGS_DIR):
-        if re.match(r'WinPython%s-%s([0-9\.]*)\.(txt|md)' %
-                    (flavor, basever), name):
+        if re.match(r'WinPython%s-%sbit-%s([0-9\.]*)\.(txt|md)' %
+                    (flavor, architecture, basever), name):
             shutil.copyfile(osp.join(CHANGELOGS_DIR, name),
                             osp.join(basedir, 'build%s' % flavor, name))
 
 
 def write_changelog(version2, version1=None, basedir=None, flavor='',
-                    release_level=''):
+                    release_level='', architecture=64):
     """Write changelog between version1 and version2 of WinPython"""
-    _copy_all_changelogs(version2, basedir, flavor=flavor)
-    print ('comparing_package_indexes', version2, basedir, flavor)
+    _copy_all_changelogs(version2, basedir, flavor=flavor, architecture=architecture)
+    print ('comparing_package_indexes', version2, basedir, flavor, architecture)
     text = compare_package_indexes(version2, version1, basedir=basedir,
-                                   flavor=flavor)
+                                   flavor=flavor, architecture=architecture)
     fname = osp.join(basedir, 'build%s' % flavor,
-                     'WinPython%s-%s_History.md' % (flavor, version2))
+                     'WinPython%s-%sbit-%s_History.md' % (flavor, architecture,
+                                                          version2))
     with open(fname, 'w', encoding='utf-8-sig') as fdesc:  # python 3 need
         fdesc.write(text)
     # Copy to winpython/changelogs
@@ -226,8 +229,9 @@ def test_parse_package_index_wiki(version, basedir=None, flavor=''):
         print('')
 
 
-def test_compare(basedir, version2, version1):
-    print(compare_package_indexes(basedir, version2, version1))
+def test_compare(basedir, version2, version1, architecture=64):
+    print(compare_package_indexes(basedir, version2, version1,
+                                  architecture=architecture))
 
 
 if __name__ == '__main__':
