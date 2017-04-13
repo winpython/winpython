@@ -102,7 +102,6 @@ Name | Version | Description
 [jupyter_client](https://pypi.python.org/pypi/jupyter_client) | 5.0.0 | Jupyter protocol implementation and client libraries
 [jupyter_console](https://pypi.python.org/pypi/jupyter_console) | 5.1.0 | Jupyter terminal console
 [jupyter_core](https://pypi.python.org/pypi/jupyter_core) | 4.3.0 | Jupyter core package. A base package on which Jupyter projects rely.
-[jupyterlab](https://pypi.python.org/pypi/jupyterlab) | 0.18.1 | Jupyter lab environment notebook server extension
 [keras](https://pypi.python.org/pypi/keras) | 2.0.2 | Theano-based Deep Learning library
 [lasagne](https://pypi.python.org/pypi/lasagne) | 0.2.dev1 | neural network tools for Theano
 [lazy_object_proxy](https://pypi.python.org/pypi/lazy_object_proxy) | 1.2.2 | A fast and thorough lazy object proxy.

@@ -11,7 +11,6 @@ New packages:
   * [comtypes](https://pypi.python.org/pypi/comtypes) 1.1.3 (Pure Python COM package)
   * [edward](https://pypi.python.org/pypi/edward) 1.2.4 (A library for probabilistic modeling, inference, and criticism. Deep generative models, variational inference. Runs on TensorFlow.)
   * [gmpy2](https://pypi.python.org/pypi/gmpy2) 2.0.8 (GMP/MPIR, MPFR, and MPC interface to Python 2.6+ and 3.x)
-  * [jupyterlab](https://pypi.python.org/pypi/jupyterlab) 0.18.1 (Jupyter lab environment notebook server extension)
   * [packaging](https://pypi.python.org/pypi/packaging) 16.8 (Core utilities for Python packages)
   * [protobuf](https://pypi.python.org/pypi/protobuf) 3.2.0 (Protocol Buffers - Google's data interchange format)
   * [pywavelets](https://pypi.python.org/pypi/pywavelets) 0.5.2 (Wavelet transforms module)
