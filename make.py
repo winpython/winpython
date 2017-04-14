@@ -190,7 +190,7 @@ Name | Version | Description
 Name | Version | Description
 -----|---------|------------
 [Python](http://www.python.org/) | %s | %s
-%s""" % (self.winpy_arch, self.winpyver2+self.flavor, self.winpyver2+self.flavor,
+%s""" % (self.winpyver2+self.flavor, self.winpy_arch, self.winpyver2+self.flavor,
 (' %s' % self.release_level), '\n'.join(tools),
          self.python_fullversion, python_desc, '\n'.join(packages))
 

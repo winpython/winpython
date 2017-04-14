@@ -62,24 +62,26 @@ class Package(object):
 
 
 class PackageIndex(object):
-    WINPYTHON_PATTERN = r'\#\# WinPython ([0-9\.a-zA-Z]*)'
+    WINPYTHON_PATTERN = r'\#\# WinPython\-*[0-9b-t]* ([0-9\.a-zA-Z]*)'
     TOOLS_LINE = '### Tools'
     PYTHON_PACKAGES_LINE = '### Python packages'
     HEADER_LINE1 = 'Name | Version | Description'
     HEADER_LINE2 = '-----|---------|------------'
 
-    def __init__(self, version, basedir=None, flavor=''):
+    def __init__(self, version, basedir=None, flavor='', architecture=64):
         self.version = version
         self.other_packages = {}
         self.python_packages = {}
         self.flavor = flavor
         self.basedir = basedir
+        self.architecture = architecture
         self.from_file(basedir)
 
     def from_file(self, basedir):
         #fname = osp.join(basedir, 'build%s' % self.flavor,
         fname = osp.join(CHANGELOGS_DIR,
-                         'WinPython%s-%s.md' % (self.flavor, self.version))
+                         'WinPython%s-%sbit-%s.md' % (self.flavor,
+                         self.architecture, self.version))
         with open(fname, 'r') as fdesc:  # python3 doesn't like 'rb'
             text = fdesc.read()
         self.from_text(text)
@@ -178,8 +180,8 @@ flavor1=None, architecture=64):
                         " distribution since version %s." % (architecture,
                                                             version1+flavor1),
                         "", ""])
-    pi1 = PackageIndex(version1, basedir=basedir, flavor=flavor1)
-    pi2 = PackageIndex(version2, basedir=basedir, flavor=flavor)
+    pi1 = PackageIndex(version1, basedir=basedir, flavor=flavor1, architecture=architecture)
+    pi2 = PackageIndex(version2, basedir=basedir, flavor=flavor, architecture=architecture)
     tools_text = diff_package_dicts(pi1.other_packages, pi2.other_packages)
     if tools_text:
         text += PackageIndex.TOOLS_LINE + '\r\n\r\n' + tools_text
@@ -215,9 +217,9 @@ def write_changelog(version2, version1=None, basedir=None, flavor='',
     shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
 
 
-def test_parse_package_index_wiki(version, basedir=None, flavor=''):
+def test_parse_package_index_wiki(version, basedir=None, flavor='', architecture=64):
     """Parse the package index Wiki page"""
-    pi = PackageIndex(version, basedir=basedir, flavor=flavor)
+    pi = PackageIndex(version, basedir=basedir, flavor=flavor, architecture=architecture)
     utils.print_box("WinPython %s:" % pi.version)
     utils.print_box("Tools:")
     for package in pi.other_packages.values():
@@ -235,8 +237,8 @@ def test_compare(basedir, version2, version1, architecture=64):
 
 
 if __name__ == '__main__':
-    print (compare_package_indexes('3.4.4.1', '3.4.3.6', 
-           basedir='D:\Winpython\basedir34', flavor='Slim', flavor1=''))
+    print (compare_package_indexes('3.6.1.1', '3.6.1.0', 
+           basedir='D:\Winpython\basedir36', flavor='Qt5', flavor1='Qt5', architecture=32))
     # test_parse_package_index_wiki('2.7.3.3')
     # print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
     # write_changelog('2.7.4.1', '2.7.4.0')
