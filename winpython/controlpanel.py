@@ -16,16 +16,19 @@ import sys
 import platform
 import locale
 
-from winpython.qt.QtGui import (QApplication, QMainWindow, QWidget, QLineEdit,
-                                QHBoxLayout, QVBoxLayout, QColor, QMessageBox,
+# winpython.qt becomes winpython._vendor.qtpy
+from winpython._vendor.qtpy.QtWidgets import (QApplication, QMainWindow, QWidget, QLineEdit,
+                                QHBoxLayout, QVBoxLayout, QMessageBox,
                                 QAbstractItemView, QProgressDialog, QTableView,
-                                QPushButton, QLabel, QTabWidget, QToolTip,
-                                QDesktopServices)
-from winpython.qt.QtCore import (Qt, QAbstractTableModel, QModelIndex, Signal,
+                                QPushButton, QLabel, QTabWidget, QToolTip)                             
+
+from winpython._vendor.qtpy.QtGui import (QColor, QDesktopServices)
+     
+from winpython._vendor.qtpy.QtCore import (Qt, QAbstractTableModel, QModelIndex, Signal,
                                  QThread, QTimer, QUrl)
-from winpython.qt.compat import (to_qvariant, getopenfilenames,
+from winpython._vendor.qtpy.compat import (to_qvariant, getopenfilenames,
                                  getexistingdirectory)
-import winpython.qt
+import winpython._vendor.qtpy
 
 from winpython.qthelpers import (get_icon, add_actions, create_action,
                                  keybinding, get_std_icon, action2button,
@@ -722,8 +725,8 @@ What is the expected output? What do you see instead?
 Please provide any additional information below.
 """ % (python_distribution_infos(),
        __version__, platform.python_version(),
-       winpython.qt.QtCore.__version__, winpython.qt.API_NAME,
-       winpython.qt.__version__)
+       winpython._vendor.qtpy.QtCore.__version__, winpython.qt.API_NAME,
+       winpython._vendor.qtpy.__version__)
 
         url = QUrl("%s/issues/entry" % __project_url__)
         url.addQueryItem("comment", issue_template)
@@ -742,11 +745,11 @@ Please provide any additional information below.
             discussions, etc.</p>
             <p>This program is executed by:<br>
             <b>%s</b><br>
-            Python %s, Qt %s, %s %s"""
+            Python %s, Qt %s, %s qtpy %s"""
             % (self.NAME, __version__, __project_url__,
                python_distribution_infos(),
-               platform.python_version(), winpython.qt.QtCore.__version__,
-               winpython.qt.API_NAME, winpython.qt.__version__,))
+               platform.python_version(), winpython._vendor.qtpy.QtCore.__version__,
+               winpython._vendor.qtpy.API_NAME, winpython._vendor.qtpy.__version__,))
 
 
 def main(test=False):
