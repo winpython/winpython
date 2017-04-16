@@ -10,13 +10,16 @@
 
 """Qt utilities"""
 
-from winpython.qt.QtGui import (QAction, QStyle, QWidget, QIcon, QApplication,
+# winpython.qt becomes winpython._vendor.qtpy
+from winpython._vendor.qtpy.QtWidgets import (QAction, QStyle, QWidget, QApplication,
                                 QLabel, QVBoxLayout, QHBoxLayout, QLineEdit,
-                                QKeyEvent, QMenu, QKeySequence, QToolButton,
-                                QPixmap)
-from winpython.qt.QtCore import (Signal, QObject, Qt, QLocale, QTranslator,
+                                QMenu, QToolButton)
+                                
+from winpython._vendor.qtpy.QtGui import (QIcon, QKeyEvent, QKeySequence, QPixmap)
+
+from winpython._vendor.qtpy.QtCore import (Signal, QObject, Qt, QLocale, QTranslator,
                                  QLibraryInfo, QEvent, Slot)
-from winpython.qt.compat import to_qvariant, from_qvariant
+from winpython._vendor.qtpy.compat import to_qvariant, from_qvariant
 
 import os
 import re
