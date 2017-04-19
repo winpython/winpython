@@ -222,7 +222,7 @@ Name | Version | Description
 [snowballstemmer](https://pypi.python.org/pypi/snowballstemmer) | 1.2.1 | This package provides 16 stemmer algorithms (15 + Poerter English stemmer) generated from Snowball algorithms.
 [sortedcollections](https://pypi.python.org/pypi/sortedcollections) | 0.4.2 | Python Sorted Collections
 [sortedcontainers](https://pypi.python.org/pypi/sortedcontainers) | 1.5.7 | Python Sorted Container Types: SortedList, SortedDict, and SortedSet
-[sounddevice](https://pypi.python.org/pypi/sounddevice) | 0.3.7 | Python Sorted Container Types: SortedList, SortedDict, and SortedSet
+[sounddevice](https://pypi.python.org/pypi/sounddevice) | 0.3.7 | Play and Record Sound with Python
 [sphinx](https://pypi.python.org/pypi/sphinx) | 1.5.2 | Tool for generating documentation which uses reStructuredText as its markup language
 [sphinx_rtd_theme](https://pypi.python.org/pypi/sphinx_rtd_theme) | 0.2.4 | ReadTheDocs.org theme for Sphinx, 2013 version.
 [spyder](https://pypi.python.org/pypi/spyder) | 3.1.4.dev0 | Scientific PYthon Development EnviRonment: designed for interactive computing and data visualisation with a simple and intuitive user interface

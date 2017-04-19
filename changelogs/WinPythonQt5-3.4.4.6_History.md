@@ -23,7 +23,7 @@ New packages:
   * [snakeviz](http://pypi.python.org/pypi/snakeviz) 0.4.1 (An in-browser Python profile viewer)
   * [sortedcollections](http://pypi.python.org/pypi/sortedcollections) 0.4.2 (Python Sorted Collections)
   * [sortedcontainers](http://pypi.python.org/pypi/sortedcontainers) 1.5.7 (Python Sorted Container Types: SortedList, SortedDict, and SortedSet)
-  * [sounddevice](http://pypi.python.org/pypi/sounddevice) 0.3.6 (Python Sorted Container Types: SortedList, SortedDict, and SortedSet)
+  * [sounddevice](http://pypi.python.org/pypi/sounddevice) 0.3.6 (Play and Record Sound with Python)
   * [testpath](http://pypi.python.org/pypi/testpath) 0.3 (Test utilities for code working with files and commands)
 
 Upgraded packages:

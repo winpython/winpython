@@ -89,7 +89,7 @@ Upgraded packages:
   * [scipy](http://www.scipy.org) 0.18.1 → 0.19.0 (SciPy: Scientific Library for Python (advanced math, signal processing, optimization, statistics, ...))
   * [setuptools](https://pypi.python.org/pypi/setuptools) 33.1.1 → 34.3.2 (Download, build, install, upgrade, and uninstall Python packages - easily)
   * [sip](https://pypi.python.org/pypi/sip) 4.19 → 4.19.1 (Python extension module generator for C and C++ libraries)
-  * [sounddevice](https://pypi.python.org/pypi/sounddevice) 0.3.6 → 0.3.7 (Python Sorted Container Types: SortedList, SortedDict, and SortedSet)
+  * [sounddevice](https://pypi.python.org/pypi/sounddevice) 0.3.6 → 0.3.7 (Play and Record Sound with Python)
   * [sphinx](https://pypi.python.org/pypi/sphinx) 1.5.1 → 1.5.2 (Tool for generating documentation which uses reStructuredText as its markup language)
   * [sphinx_rtd_theme](https://pypi.python.org/pypi/sphinx_rtd_theme) 0.1.9 → 0.2.4 (ReadTheDocs.org theme for Sphinx, 2013 version.)
   * [spyder](https://pypi.python.org/pypi/spyder) 3.1.2 → 3.1.4.dev0 (Scientific PYthon Development EnviRonment: designed for interactive computing and data visualisation with a simple and intuitive user interface)
