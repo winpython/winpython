@@ -540,6 +540,10 @@ call "%~dp0env_for_icons.bat"
                              command='$SYSDIR\cmd.exe',
                              args=r'/k winipython_notebook.bat')
 
+        self.create_launcher('Jupyter Lab.exe', 'jupyter.ico',
+                             command='$SYSDIR\cmd.exe',
+                             args=r'/k winjupyter_lab.bat')
+
         self._print_done()
 
     def _create_batch_scripts_initial(self):
@@ -970,6 +974,12 @@ cd/D "%WINPYWORKDIR%"
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
+""")
+
+        self.create_batch_script('winjupyter_lab.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+"%WINPYDIR%\scripts\jupyter-lab.exe" %*
 """)
 
         self.create_batch_script('qtconsole.bat',r"""@echo off
