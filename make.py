@@ -526,9 +526,9 @@ call "%~dp0env_for_icons.bat"
                              command='wscript.exe',
                              args=r'Noshell.vbs qtdesigner.bat')
 
-        self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs qtlinguist.bat')
+        # self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
+        #                     command='wscript.exe',
+        #                     args=r'Noshell.vbs qtlinguist.bat')
 
         # Jupyter launchers
         self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
