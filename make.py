@@ -96,6 +96,7 @@ class WinPythonDistribution(object):
     MINGW32_PATH = r'\tools\mingw32\bin'
     R_PATH = r'\tools\R\bin'
     JULIA_PATH = r'\tools\Julia\bin'
+    NODEJS_PATH = r'\tools\n'
 
     def __init__(self, build_number, release_level, target, wheeldir,
                  toolsdirs=None, verbose=False, simulation=False,
@@ -153,6 +154,11 @@ class WinPythonDistribution(object):
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
             installed_tools += [('Julia', juliaver)]
+
+        nodepath = get_tool_path(self.NODEJS_PATH, osp.isdir)
+        if nodepath is not None:
+            nodever = utils.get_nodejs_version(nodepath)
+            installed_tools += [('Nodejs', nodever)]
 
         pandocexe = get_tool_path (r'\tools\pandoc.exe', osp.isfile)
         if pandocexe is not None:
@@ -242,6 +248,8 @@ Name | Version | Description
             path += [r".." + self.R_PATH + r"\x64"]
 
         path += [r".." + self.JULIA_PATH]
+
+        path += [r".." + self.NODEJS_PATH]
 
         return path
 
