@@ -228,6 +228,9 @@ def get_julia_version(path):
     """Return version of the Julia installed in *path*"""
     return exec_shell_cmd('julia.exe -v', path).splitlines()[0].split(" ")[-1]
 
+def get_nodejs_version(path):
+    """Return version of the Nodejs installed in *path*"""
+    return exec_shell_cmd('npm version', path).split(" node: '")[1].split("'")[0]
 
 def get_thg_version(path):
     """Return version of TortoiseHg installed in *path*"""
