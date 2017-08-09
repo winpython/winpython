@@ -165,6 +165,10 @@ class WinPythonDistribution(object):
             pandocver = utils.get_pandoc_version(osp.dirname(pandocexe))
             installed_tools += [('Pandoc', pandocver)]
 
+        ffmpegexe = get_tool_path (r'\tools\ffmpeg.exe', osp.isfile)
+        if ffmpegexe is not None:
+            ffmpegver = utils.get_ffmpeg_version(osp.dirname(ffmpegexe))
+            installed_tools += [('ffmpeg', ffmpegver)]
 
         tools = []
         for name, ver in installed_tools:
@@ -610,6 +614,14 @@ set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
 :julia_bad
 
 rem ******************
+rem handle ffmpeg if included
+rem ******************
+if not exist "%WINPYDIR%\..\tools\ffmpeg.exe" goto ffmpeg_bad
+set IMAGEIO_FFMPEG_EXE=%WINPYDIR%\..\tools\ffmpeg.exe
+
+:ffmpeg_bad
+
+rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
 if not exist "%WINPYDIR%\..\settings" mkdir "%WINPYDIR%\..\settings" 
@@ -681,6 +693,13 @@ if (Test-Path "$env:WINPYDIR\..\tools\Julia\bin") {
     $env:JULIA_EXE = "julia.exe"
     $env:JULIA = "$env:JULIA_HOME$env:JULIA_EXE"
     $env:JULIA_PKGDIR = "$env:WINPYDIR\..\settings\.julia"
+}
+
+#####################
+### handle ffmpeg if included
+#####################
+if (Test-Path "$env:WINPYDIR\..\tools\ffmpeg.exe") {
+    $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIR%\..\tools\ffmpeg.exe"
 }
 
 #####################
