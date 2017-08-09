@@ -230,7 +230,7 @@ def get_julia_version(path):
 
 def get_nodejs_version(path):
     """Return version of the Nodejs installed in *path*"""
-    return exec_shell_cmd('npm version', path).split(" node: '")[1].split("'")[0]
+    return exec_shell_cmd('node -v', path).splitlines()[0]
 
 def get_thg_version(path):
     """Return version of TortoiseHg installed in *path*"""
@@ -242,6 +242,10 @@ def get_thg_version(path):
 def get_pandoc_version(path):
     """Return version of the Pandoc executable in *path*"""
     return exec_shell_cmd('pandoc -v', path).splitlines()[0].split(" ")[-1]
+
+def get_ffmpeg_version(path):
+    """Return version of the Pandoc executable in *path*"""
+    return exec_shell_cmd('ffmpeg -version', path).splitlines()[0].split(" ")[2]
 
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
