@@ -1026,10 +1026,10 @@ cd/D "%WINPYWORKDIR%"
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
-  "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
 )  
 if exist "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw" (
-  "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
+    "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
 )
 """)
 
@@ -1037,7 +1037,11 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw" (
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
-    "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
+    if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
+    )
 ) else (
     "%WINPYDIR%\Lib\site-packages\PyQt4\designer.exe" %*
 )
@@ -1047,7 +1051,11 @@ if "%QT_API%"=="pyqt5" (
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
-    "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
+    if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
+    )
 ) else (
     "%WINPYDIR%\Lib\site-packages\PyQt4\assistant.exe" %*
 )
@@ -1057,8 +1065,11 @@ if "%QT_API%"=="pyqt5" (
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
-    cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
-    "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
+    if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" %*
+    ) else (
+        cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
+        "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
 ) else (
     cd/D "%WINPYDIR%\Lib\site-packages\PyQt4"
     "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
