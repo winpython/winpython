@@ -55,5 +55,17 @@ def pytest_report_header(config):
         versions += 'unknown version'
 
     versions += os.linesep
+    versions += 'PySide2: '
+
+    try:
+        import PySide2
+        from PySide2 import QtCore
+        versions += "PySide: {0} - Qt: {1}".format(PySide2.__version__, QtCore.__version__)
+    except ImportError:
+        versions += 'not installed'
+    except AttributeError:
+        versions += 'unknown version'
+
+    versions += os.linesep
     
     return versions

@@ -13,6 +13,15 @@ def assert_pyside():
     assert QtWidgets.QWidget is PySide.QtGui.QWidget
     assert QtWebEngineWidgets.QWebEnginePage is PySide.QtWebKit.QWebPage
 
+def assert_pyside2():
+    """
+    Make sure that we are using PySide
+    """
+    import PySide2
+    assert QtCore.QEvent is PySide2.QtCore.QEvent
+    assert QtGui.QPainter is PySide2.QtGui.QPainter
+    assert QtWidgets.QWidget is PySide2.QtWidgets.QWidget
+    assert QtWebEngineWidgets.QWebEnginePage is PySide2.QtWebEngineWidgets.QWebEnginePage
 
 def assert_pyqt4():
     """
@@ -52,6 +61,8 @@ def test_qt_api():
         assert_pyqt4()
     elif QT_API == 'pyqt5':
         assert_pyqt5()
+    elif QT_API == 'pyside2':
+        assert_pyside2()
     else:
         # If the tests are run locally, USE_QT_API and QT_API may not be
         # defined, but we still want to make sure qtpy is behaving sensibly.
