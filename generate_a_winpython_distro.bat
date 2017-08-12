@@ -13,7 +13,9 @@ rem *****************************
 rem v2 2016-03-19 change 
 rem we don't use building rootdir (D:\winPython) anymore
 rem we use only building basedir (D:\WinPython\basedir34Qt5)  
+
 set my_basedir=%my_root_dir_for_builds%\basedir%my_python_target%
+rem set my_basedir=%my_root_dir_for_builds%\build%my_python_target%\%my_arch%
 
 rem ***********************************************************
 rem Override other scripts (simpler maintenance)
@@ -22,11 +24,11 @@ set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
 
 set my_release_level=
 
-if %my_python_target%==27 set my_release=4
+if %my_python_target%==27 set my_release=2
 
-if %my_python_target%==34 set my_release=5
+if %my_python_target%==34 set my_release=8
 
-if %my_python_target%==35 set my_release=3
+if %my_python_target%==35 set my_release=0
 
 if %my_python_target%==36 set my_release=0
 

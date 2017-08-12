@@ -1,12 +1,17 @@
 from __future__ import absolute_import
 
-from qtpy import PYSIDE, PYQT4
+import sys
+
+import pytest
+from qtpy import PYSIDE, PYSIDE2, PYQT4
 from qtpy.QtWidgets import QApplication
 from qtpy.QtWidgets import QHeaderView
 from qtpy.QtCore import Qt
 from qtpy.QtCore import QAbstractListModel
 
-import pytest
+
+PY3 = sys.version[0] == "3"
+
 
 def get_qapp(icon_path=None):
     qapp = QApplication.instance()
@@ -14,6 +19,8 @@ def get_qapp(icon_path=None):
         qapp = QApplication([''])
     return qapp
 
+
+@pytest.mark.skipif(PY3 or PYSIDE2, reason="It fails on Python 3 and PySide2")
 def test_patched_qheaderview():
     """
     This will test whether QHeaderView has the new methods introduced in Qt5.

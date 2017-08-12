@@ -13,36 +13,46 @@ Provides widget classes and functions.
     were the ``PyQt5.QtWidgets`` module.
 """
 
-from . import PYQT5, PYQT4, PYSIDE, PythonQtError
+from . import PYQT5, PYSIDE2, PYQT4, PYSIDE, PythonQtError
 from ._patch.qcombobox import patch_qcombobox
 from ._patch.qheaderview import introduce_renamed_methods_qheaderview
 
 
 if PYQT5:
     from PyQt5.QtWidgets import *
+elif PYSIDE2:
+    from PySide2.QtWidgets import *
 elif PYQT4:
     from PyQt4.QtGui import *
     QStyleOptionViewItem = QStyleOptionViewItemV4
     del QStyleOptionViewItemV4
 
     # These objects belong to QtGui
+    try:
+        # Older versions of PyQt4 do not provide these
+        del (QGlyphRun,
+             QMatrix2x2, QMatrix2x3, QMatrix2x4, QMatrix3x2, QMatrix3x3,
+             QMatrix3x4, QMatrix4x2, QMatrix4x3, QMatrix4x4,
+             QQuaternion, QRadialGradient, QRawFont, QRegExpValidator,
+             QStaticText, QTouchEvent, QVector2D, QVector3D, QVector4D,
+             qFuzzyCompare)
+    except NameError:
+        pass
     del (QAbstractTextDocumentLayout, QActionEvent, QBitmap, QBrush, QClipboard,
          QCloseEvent, QColor, QConicalGradient, QContextMenuEvent, QCursor,
          QDesktopServices, QDoubleValidator, QDrag, QDragEnterEvent,
          QDragLeaveEvent, QDragMoveEvent, QDropEvent, QFileOpenEvent,
          QFocusEvent, QFont, QFontDatabase, QFontInfo, QFontMetrics,
-         QFontMetricsF, QGlyphRun, QGradient, QHelpEvent, QHideEvent,
+         QFontMetricsF, QGradient, QHelpEvent, QHideEvent,
          QHoverEvent, QIcon, QIconDragEvent, QIconEngine, QImage,
          QImageIOHandler, QImageReader, QImageWriter, QInputEvent,
          QInputMethodEvent, QKeyEvent, QKeySequence, QLinearGradient,
-         QMatrix2x2, QMatrix2x3, QMatrix2x4, QMatrix3x2, QMatrix3x3,
-         QMatrix3x4, QMatrix4x2, QMatrix4x3, QMatrix4x4, QMouseEvent,
-         QMoveEvent, QMovie, QPaintDevice, QPaintEngine, QPaintEngineState,
-         QPaintEvent, QPainter, QPainterPath, QPainterPathStroker, QPalette,
-         QPen, QPicture, QPictureIO, QPixmap, QPixmapCache, QPolygon,
-         QPolygonF, QQuaternion, QRadialGradient, QRawFont, QRegExpValidator,
+         QMouseEvent, QMoveEvent, QMovie, QPaintDevice, QPaintEngine,
+         QPaintEngineState, QPaintEvent, QPainter, QPainterPath,
+         QPainterPathStroker, QPalette, QPen, QPicture, QPictureIO, QPixmap,
+         QPixmapCache, QPolygon, QPolygonF,
          QRegion, QResizeEvent, QSessionManager, QShortcutEvent, QShowEvent,
-         QStandardItem, QStandardItemModel, QStaticText, QStatusTipEvent,
+         QStandardItem, QStandardItemModel, QStatusTipEvent,
          QSyntaxHighlighter, QTabletEvent, QTextBlock, QTextBlockFormat,
          QTextBlockGroup, QTextBlockUserData, QTextCharFormat, QTextCursor,
          QTextDocument, QTextDocumentFragment, QTextDocumentWriter,
@@ -50,9 +60,9 @@ elif PYQT4:
          QTextImageFormat, QTextInlineObject, QTextItem, QTextLayout,
          QTextLength, QTextLine, QTextList, QTextListFormat, QTextObject,
          QTextObjectInterface, QTextOption, QTextTable, QTextTableCell,
-         QTextTableCellFormat, QTextTableFormat, QTouchEvent, QTransform,
-         QValidator, QVector2D, QVector3D, QVector4D, QWhatsThisClickedEvent,
-         QWheelEvent, QWindowStateChangeEvent, qAlpha, qBlue, qFuzzyCompare,
+         QTextTableCellFormat, QTextTableFormat, QTransform,
+         QValidator, QWhatsThisClickedEvent,
+         QWheelEvent, QWindowStateChangeEvent, qAlpha, qBlue,
          qGray, qGreen, qIsGray, qRed, qRgb, qRgba, QIntValidator,
          QStringListModel)
 

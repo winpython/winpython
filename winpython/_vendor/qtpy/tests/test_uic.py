@@ -2,7 +2,8 @@ import os
 import sys
 import contextlib
 
-from qtpy import QtWidgets
+import pytest
+from qtpy import PYSIDE2, QtWidgets
 from qtpy.QtWidgets import QComboBox
 from qtpy import uic
 from qtpy.uic import loadUi
@@ -69,6 +70,7 @@ def test_load_ui_custom_auto(tmpdir):
     assert isinstance(ui.comboBox, _QComboBoxSubclass)
 
 
+@pytest.mark.skipif(PYSIDE2, reason="It fails on PySide2")
 def test_load_full_uic():
     """Test that we load the full uic objects for PyQt5 and PyQt4."""
     QT_API = os.environ.get('QT_API', '').lower()
