@@ -2,7 +2,6 @@
 """
 Created on Tue Jun 23 21:30:06 2015
 
-@author: famille
 """
 
 import io
@@ -18,7 +17,7 @@ def give_hash(file_in, with_this):
 
 if __name__ == '__main__':
  if (len(sys.argv) < 2):
-    print ("Usage: " + sys.argv[0] + " github-user [github-project]")
+    print ("Usage: " + sys.argv[0] + " filename_to_hash")
     exit(1)
  file = sys.argv[1]
         
