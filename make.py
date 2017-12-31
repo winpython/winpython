@@ -159,6 +159,8 @@ class WinPythonDistribution(object):
         if nodepath is not None:
             nodever = utils.get_nodejs_version(nodepath)
             installed_tools += [('Nodejs', nodever)]
+            npmver = utils.get_npmjs_version(nodepath)
+            installed_tools += [('npmjs', npmver)]
 
         pandocexe = get_tool_path (r'\tools\pandoc.exe', osp.isfile)
         if pandocexe is not None:

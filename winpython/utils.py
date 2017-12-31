@@ -232,6 +232,10 @@ def get_nodejs_version(path):
     """Return version of the Nodejs installed in *path*"""
     return exec_shell_cmd('node -v', path).splitlines()[0]
 
+def get_npmjs_version(path):
+    """Return version of the Nodejs installed in *path*"""
+    return exec_shell_cmd('npm -v', path).splitlines()[0]
+    
 def get_thg_version(path):
     """Return version of TortoiseHg installed in *path*"""
     txt = exec_shell_cmd('thg version', path).splitlines()[0]
