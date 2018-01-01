@@ -1140,7 +1140,7 @@ pause
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.rcb]*)((\.|\-)amd64)?\.(msi|zip)')
+                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(msi|zip)')
         self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
