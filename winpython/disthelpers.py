@@ -121,6 +121,8 @@ def get_msvc_version(python_version):
         return '10.0'
     elif python_version in ('3.5', '3.6'):
         return '15.0'
+    elif python_version in ('3.7', '3.8'):
+        return '15.0'
     else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
