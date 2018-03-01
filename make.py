@@ -583,7 +583,7 @@ set WINPYDIR=%WINPYDIRBASE%"""+"\\" + self.python_name + r"""
 
 set WINPYVER=""" + self.winpyver + r"""
 set HOME=%WINPYDIRBASE%\settings
-set WINPYDIRBASE=
+rem set WINPYDIRBASE=
 
 set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
@@ -598,8 +598,8 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 rem ******************
 rem handle R if included
 rem ******************
-if not exist "%WINPYDIR%\..\tools\R\bin" goto r_bad
-set R_HOME=%WINPYDIR%\..\tools\R
+if not exist "%WINPYDIRBASE%\tools\R\bin" goto r_bad
+set R_HOME=%WINPYDIRBASE%\tools\R
 if     "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\i386
 if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
 :r_bad
@@ -608,26 +608,26 @@ if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
 rem ******************
 rem handle Julia if included
 rem ******************
-if not exist "%WINPYDIR%\..\tools\Julia\bin" goto julia_bad
-set JULIA_HOME=%WINPYDIR%\..\tools\Julia\bin\
+if not exist "%WINPYDIRBASE%\tools\Julia\bin" goto julia_bad
+set JULIA_HOME=%WINPYDIRBASE%\tools\Julia\bin\
 set JULIA_EXE=julia.exe
 set JULIA=%JULIA_HOME%%JULIA_EXE%
-set JULIA_PKGDIR=%WINPYDIR%\..\settings\.julia
+set JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 :julia_bad
 
 rem ******************
 rem handle ffmpeg if included
 rem ******************
-if not exist "%WINPYDIR%\..\tools\ffmpeg.exe" goto ffmpeg_bad
-set IMAGEIO_FFMPEG_EXE=%WINPYDIR%\..\tools\ffmpeg.exe
+if not exist "%WINPYDIRBASE%\tools\ffmpeg.exe" goto ffmpeg_bad
+set IMAGEIO_FFMPEG_EXE=%WINPYDIRBASE%\tools\ffmpeg.exe
 
 :ffmpeg_bad
 
 rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
-if not exist "%WINPYDIR%\..\settings" mkdir "%WINPYDIR%\..\settings" 
-set winpython_ini=%WINPYDIR%\..\settings\winpython.ini
+if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
+set winpython_ini=%WINPYDIRBASE%\settings\winpython.ini
 if not exist "%winpython_ini%" (
     echo [debug]>>"%winpython_ini%"
     echo state = disabled>>"%winpython_ini%"
@@ -701,7 +701,7 @@ if (Test-Path "$env:WINPYDIR\..\tools\Julia\bin") {
 ### handle ffmpeg if included
 #####################
 if (Test-Path "$env:WINPYDIR\..\tools\ffmpeg.exe") {
-    $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIR%\..\tools\ffmpeg.exe"
+    $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIRBASE%\tools\ffmpeg.exe"
 }
 
 #####################
@@ -774,8 +774,8 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYV
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
 
 rem ******* make cython use mingwpy part *******
-if not exist "%WINPYDIR%\..\settings\pydistutils.cfg" goto no_cython
-if not exist "%HOME%\pydistutils.cfg" xcopy   "%WINPYDIR%\..\settings\pydistutils.cfg" "%HOME%" 
+if not exist "%WINPYDIRBASE%\settings\pydistutils.cfg" goto no_cython
+if not exist "%HOME%\pydistutils.cfg" xcopy   "%WINPYDIRBASE%\settings\pydistutils.cfg" "%HOME%" 
 :no_cython 
 """)
       
@@ -861,7 +861,7 @@ rem ******************
 rem mingw part
 rem ******************
 
-set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
+set pydistutils_cfg=%WINPYDIRBASE%\settings\pydistutils.cfg
 
 set tmp_blank=
 echo [config]>"%pydistutils_cfg%"
@@ -882,7 +882,7 @@ rem pause
 
         self.create_batch_script('make_cython_use_vc.bat', r"""@echo off
 call "%~dp0env.bat"
-set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
+set pydistutils_cfg=%WINPYDIRBASE%\settings\pydistutils.cfg
 echo [config]>%pydistutils_cfg%
         """)
 
@@ -1303,7 +1303,7 @@ def make_all(build_number, release_level, pyver, architecture,
     utils.print_box("Making WinPython %dbits" % architecture)
 
     # Create Build director, where Winpython will be constructed
-    builddir = osp.join(basedir, 'build' + flavor)
+    builddir = osp.join(basedir, 'bu' + flavor)
     if not osp.isdir(builddir):
         os.mkdir(builddir)
 
@@ -1347,7 +1347,7 @@ def make_all(build_number, release_level, pyver, architecture,
                                  install_options=install_options + find_list,
                                  flavor=flavor, docsdirs=docsdirs)
     # define a pre-defined winpydir, instead of having to guess
-    my_winpydir = ('winpython-' + ('%s' % architecture) +'bit-' + pyver +
+    my_winpydir = ('winp' + ('%s' % architecture) +'-' + pyver +
      '.x.' + ('%s' %build_number) )  # + flavor + release_level)   
     
     dist.make(remove_existing=remove_existing, requirements=requirements,

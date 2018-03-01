@@ -152,7 +152,7 @@ def diff_package_dicts(dict1_in, dict2_in):
 
 def find_closer_version(version1, basedir=None, flavor='', architecture=64):
     """Find version which is the closest to `version`"""
-    builddir = osp.join(basedir, 'build%s' % flavor)
+    builddir = osp.join(basedir, 'bu%s' % flavor)
     func = lambda name: re.match(r'WinPython%s-%sbit-([0-9\.]*)\.(txt|md)' %
                                 (flavor, architecture), name)
     versions = [func(name).groups()[0]
@@ -192,23 +192,25 @@ flavor1=None, architecture=64):
     return text
 
 
-def _copy_all_changelogs(version, basedir, flavor='', architecture=64):
+def _copy_all_changelogs(version, basedir, flavor='',
+                         architecture=64):
     basever = '.'.join(version.split('.')[:2])
     for name in os.listdir(CHANGELOGS_DIR):
         if re.match(r'WinPython%s-%sbit-%s([0-9\.]*)\.(txt|md)' %
                     (flavor, architecture, basever), name):
             shutil.copyfile(osp.join(CHANGELOGS_DIR, name),
-                            osp.join(basedir, 'build%s' % flavor, name))
+                            osp.join(basedir, 'bu%s' % flavor, name))
 
 
 def write_changelog(version2, version1=None, basedir=None, flavor='',
                     release_level='', architecture=64):
     """Write changelog between version1 and version2 of WinPython"""
-    _copy_all_changelogs(version2, basedir, flavor=flavor, architecture=architecture)
+    _copy_all_changelogs(version2, basedir, flavor=flavor,
+                         architecture=architecture)
     print ('comparing_package_indexes', version2, basedir, flavor, architecture)
     text = compare_package_indexes(version2, version1, basedir=basedir,
                                    flavor=flavor, architecture=architecture)
-    fname = osp.join(basedir, 'build%s' % flavor,
+    fname = osp.join(basedir, 'bu%s' % flavor,
                      'WinPython%s-%sbit-%s_History.md' % (flavor, architecture,
                                                           version2))
     with open(fname, 'w', encoding='utf-8-sig') as fdesc:  # python 3 need
