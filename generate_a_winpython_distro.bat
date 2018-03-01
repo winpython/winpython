@@ -3,7 +3,7 @@ rem  to launch from a winpython package directory, where 'make.py' is
 rem  this is initialised per the calling .bat
 rem  set my_original_path=%path%
 rem  set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
-rem  set my_root_dir_for_builds=D:\Winpython
+rem  set my_root_dir_for_builds=D:\Winp
 
 rem  set my_python_target=34
 rem  set my_pyver=3.4
@@ -14,7 +14,7 @@ rem v2 2016-03-19 change
 rem we don't use building rootdir (D:\winPython) anymore
 rem we use only building basedir (D:\WinPython\basedir34Qt5)  
 
-set my_basedir=%my_root_dir_for_builds%\basedir%my_python_target%
+set my_basedir=%my_root_dir_for_builds%\bd%my_python_target%
 rem set my_basedir=%my_root_dir_for_builds%\build%my_python_target%\%my_arch%
 
 rem ***********************************************************
@@ -22,15 +22,18 @@ rem Override other scripts (simpler maintenance)
 
 set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
 
-set my_release_level=
+rem handle alpha
+if "%my_release_level%"=="" set my_release_level=b5
 
 if %my_python_target%==27 set my_release=2
 
 if %my_python_target%==34 set my_release=8
 
-if %my_python_target%==35 set my_release=0
+if %my_python_target%==35 set my_release=2
 
 if %my_python_target%==36 set my_release=0
+
+if %my_python_target%==37 set my_release=0
 
 rem ***********************************************************
 
@@ -39,12 +42,12 @@ rem  set my_flavor=Slim
 rem  set my_arch=32
 rem  set my_preclear_build_directory=Yes
 
-rem  set my_requirements=d:\my_req1.txt d:\my_req2.txt d:\my_req3.txt  d:\my_req4.txt
+rem  set my_requi=C:\Winpents=d:\my_req1.txt d:\my_req2.txt d:\my_req3.txt  d:\my_req4.txt
 rem  set my_find_links=D:\WinPython\packages.srcreq
 
-rem  set my_source_dirs=D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win32.Slim
-rem  set my_toolsdirs=D:\WinPython\basedir34\Tools.Slim
-rem  set my_docsdirs=D:\WinPython\basedir34\docs.Slim
+rem  set my_source_dirs=D:\WinPython\bd34\packages.src D:\WinPython\bd34\packages.win32.Slim
+rem  set my_toolsdirs=D:\WinPython\bd34\Tools.Slim
+rem  set my_docsdirs=D:\WinPython\bd34\docs.Slim
 
 
 rem  set my_install_options=--no-index --pre
@@ -79,19 +82,19 @@ echo 1.0 Do Pre-clear  >>%my_archive_log%
 echo ------------------>>%my_archive_log%
 
 
-cd /D  %my_root_dir_for_builds%\basedir%my_python_target%
+cd /D  %my_root_dir_for_builds%\bd%my_python_target%
 
 set build_det=\%my_flavor%
 if "%my_flavor%"=="" set build_det=
 
 dir %build_det%
-echo rmdir /S /Q build%my_flavor%
+echo rmdir /S /Q bu%my_flavor%
 rem  pause
-rmdir /S /Q build%my_flavor%
-rmdir /S /Q build%my_flavor%
-rmdir /S /Q build%my_flavor%
-rmdir /S /Q build%my_flavor%
-rmdir /S /Q build%my_flavor%
+rmdir /S /Q bu%my_flavor%
+rmdir /S /Q bu%my_flavor%
+rmdir /S /Q bu%my_flavor%
+rmdir /S /Q bu%my_flavor%
+rmdir /S /Q bu%my_flavor%
 rmdir /S /Q dist
 
 echo %date% %time%
