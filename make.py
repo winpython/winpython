@@ -189,7 +189,7 @@ class WinPythonDistribution(object):
         python_desc = 'Python programming language with standard library'
         return """## WinPython %s 
 
-The following packages are included in WinPython-%s v%s%s.
+The following packages are included in WinPython-%sbit v%s%s.
 
 ### Tools
 
@@ -220,7 +220,7 @@ Name | Version | Description
     @property
     def winpy_arch(self):
         """Return WinPython architecture"""
-        return '%dbit' % self.distribution.architecture
+        return '%d' % self.distribution.architecture
 
     @property
     def pyqt_arch(self):

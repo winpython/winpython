@@ -18,6 +18,7 @@ Licensed under the terms of the MIT License
 ;================================================================
 
 !define ID "WinPython"
+!define ID_INSTALL "WinPy"
 !define FILE_DESCRIPTION "${ID} Installer"
 !define COMPANY "${ID}"
 !define BRANDING "${ID}, the portable Python Distribution for Scientists"
@@ -34,8 +35,11 @@ SetCompressorDictSize 16 ; MB
 ; General
 ;------------------------------------------------------------------------------
 Name "${ID} ${ARCH} ${VERSION}${RELEASELEVEL}"
-OutFile "${DISTDIR}\..\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}.exe"
-InstallDir "$EXEDIR\${ID}-${ARCH}-${VERSION}${RELEASELEVEL}"
+OutFile "${DISTDIR}\..\${ID}${ARCH}-${VERSION}${RELEASELEVEL}.exe"
+
+; 2018-03-31 need to minimize path length of installation:
+;InstallDir "$EXEDIR\${ID}${ARCH}-${VERSION}${RELEASELEVEL}"
+InstallDir "$EXEDIR\${ID_INSTALL}${ARCH}-${VERSION}${RELEASELEVEL}"
 BrandingText "${BRANDING}"
 XPStyle on
 RequestExecutionLevel user
