@@ -20,7 +20,7 @@ Licensed under the terms of the MIT License
 ;================================================================
 
 !define ID "WinPython"
-!define ID_INSTALL "WinPy"
+!define ID_INSTALL "WinPython"
 !define FILE_DESCRIPTION "${ID} Installer"
 !define COMPANY "${ID}"
 !define BRANDING "${ID}, the portable Python Distribution for Scientists"
@@ -43,7 +43,8 @@ OutFile "${DISTDIR}\..\${ID}${ARCH}-${VERSION}${RELEASELEVEL}.exe"
 ;InstallDir "$EXEDIR\${ID}${ARCH}-${VERSION}${RELEASELEVEL}"
 ; 2018-04-04 need to minimize path length of installation further: remove arch + flavor
 ;InstallDir "$EXEDIR\${ID_INSTALL}${ARCH}-${VERSION}${RELEASELEVEL}"
-InstallDir "$EXEDIR\${ID_INSTALL}-${VERSION_INSTALL}${RELEASELEVEL}"
+;InstallDir "$EXEDIR\${ID_INSTALL}-${VERSION_INSTALL}${RELEASELEVEL}"
+InstallDir "$EXEDIR\${ID_INSTALL}"
 BrandingText "${BRANDING}"
 XPStyle on
 RequestExecutionLevel user
