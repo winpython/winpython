@@ -381,6 +381,8 @@ call "%~dp0env_for_icons.bat"
                 ('ARCH', self.winpy_arch),
                 ('VERSION', '%s.%d%s' % (self.python_fullversion,
                                        self.build_number, self.flavor)),
+                ('VERSION_INSTALL', '%s.%d' % (self.python_fullversion,
+                                       self.build_number)),
                 ('RELEASELEVEL', self.release_level),)
         build_nsis('installer.nsi', fname, data)
         self._print_done()
