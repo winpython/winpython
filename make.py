@@ -93,10 +93,10 @@ def build_nsis(srcname, dstname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
-    MINGW32_PATH = r'\tools\mingw32\bin'
-    R_PATH = r'\tools\R\bin'
-    JULIA_PATH = r'\tools\Julia\bin'
-    NODEJS_PATH = r'\tools\n'
+    MINGW32_PATH = r'\t\mingw32\bin'
+    R_PATH = r'\t\R\bin'
+    JULIA_PATH = r'\t\Julia\bin'
+    NODEJS_PATH = r'\t\n'
 
     def __init__(self, build_number, release_level, target, wheeldir,
                  toolsdirs=None, verbose=False, simulation=False,
@@ -134,7 +134,7 @@ class WinPythonDistribution(object):
         def get_tool_path(relpath, checkfunc):
             if self.simulation:
                 for dirname in self.toolsdirs:
-                    path = dirname + relpath.replace(r'\tools', '')
+                    path = dirname + relpath.replace(r'\t', '')
                     if checkfunc(path):
                         return path
             else:
@@ -142,7 +142,7 @@ class WinPythonDistribution(object):
                 if checkfunc(path):
                     return path
         
-        if get_tool_path (r'\tools\SciTE.exe', osp.isfile):
+        if get_tool_path (r'\t\SciTE.exe', osp.isfile):
             installed_tools += [('SciTE', '3.3.7')]
 
         rpath = get_tool_path(self.R_PATH, osp.isdir)
@@ -162,12 +162,12 @@ class WinPythonDistribution(object):
             npmver = utils.get_npmjs_version(nodepath)
             installed_tools += [('npmjs', npmver)]
 
-        pandocexe = get_tool_path (r'\tools\pandoc.exe', osp.isfile)
+        pandocexe = get_tool_path (r'\t\pandoc.exe', osp.isfile)
         if pandocexe is not None:
             pandocver = utils.get_pandoc_version(osp.dirname(pandocexe))
             installed_tools += [('Pandoc', pandocver)]
 
-        ffmpegexe = get_tool_path (r'\tools\ffmpeg.exe', osp.isfile)
+        ffmpegexe = get_tool_path (r'\t\ffmpeg.exe', osp.isfile)
         if ffmpegexe is not None:
             ffmpegver = utils.get_ffmpeg_version(osp.dirname(ffmpegexe))
             installed_tools += [('ffmpeg', ffmpegver)]
@@ -241,7 +241,7 @@ Name | Version | Description
         """Return PATH contents to be prepend to the environment variable"""
         path = [r"Lib\site-packages\PyQt5", r"Lib\site-packages\PyQt4",
                 "",  # Python root directory (python.exe)
-                "DLLs", "Scripts", r"..\tools", r"..\tools\mingw32\bin"
+                "DLLs", "Scripts", r"..\t", r"..\t\mingw32\bin"
                 ]
         if self.distribution.architecture == 32 \
            and osp.isdir(self.winpydir + self.MINGW32_PATH):
@@ -264,13 +264,13 @@ Name | Version | Description
         """Return PATH contents to be append to the environment variable"""
         path = []
         # if osp.isfile(self.winpydir + self.THG_PATH):
-        #     path += [r"..\tools\TortoiseHg"]
+        #     path += [r"..\t\TortoiseHg"]
         return path
 
     @property
     def toolsdirs(self):
         """Return tools directory list"""
-        return [osp.join(osp.dirname(osp.abspath(__file__)), 'tools')] + self._toolsdirs
+        return [osp.join(osp.dirname(osp.abspath(__file__)), 't')] + self._toolsdirs
 
     @property
     def docsdirs(self):
@@ -381,6 +381,8 @@ call "%~dp0env_for_icons.bat"
                 ('ARCH', self.winpy_arch),
                 ('VERSION', '%s.%d%s' % (self.python_fullversion,
                                        self.build_number, self.flavor)),
+                ('VERSION_INSTALL', '%s.%d' % (self.python_fullversion,
+                                       self.build_number)),
                 ('RELEASELEVEL', self.release_level),)
         build_nsis('installer.nsi', fname, data)
         self._print_done()
@@ -471,15 +473,15 @@ call "%~dp0env_for_icons.bat"
     def _copy_dev_tools(self):
         """Copy dev tools"""
         self._print("Copying tools")
-        toolsdir = osp.join(self.winpydir, 'tools')
+        toolsdir = osp.join(self.winpydir, 't')
         os.mkdir(toolsdir)
-        for dirname in self.toolsdirs:
+        for dirname in self.toolsdirs: # the ones in the make.py script environment
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
                 copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
-                copy(path, osp.join(toolsdir, name))
                 if self.verbose:
                     print(path + ' --> ' + osp.join(toolsdir, name))
+                copy(path, osp.join(toolsdir, name))
         self._print_done()
 
     def _copy_dev_docs(self):
@@ -598,8 +600,8 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 rem ******************
 rem handle R if included
 rem ******************
-if not exist "%WINPYDIRBASE%\tools\R\bin" goto r_bad
-set R_HOME=%WINPYDIRBASE%\tools\R
+if not exist "%WINPYDIRBASE%\t\R\bin" goto r_bad
+set R_HOME=%WINPYDIRBASE%\t\R
 if     "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\i386
 if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
 :r_bad
@@ -608,8 +610,8 @@ if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
 rem ******************
 rem handle Julia if included
 rem ******************
-if not exist "%WINPYDIRBASE%\tools\Julia\bin" goto julia_bad
-set JULIA_HOME=%WINPYDIRBASE%\tools\Julia\bin\
+if not exist "%WINPYDIRBASE%\t\Julia\bin" goto julia_bad
+set JULIA_HOME=%WINPYDIRBASE%\t\Julia\bin\
 set JULIA_EXE=julia.exe
 set JULIA=%JULIA_HOME%%JULIA_EXE%
 set JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
@@ -618,8 +620,8 @@ set JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 rem ******************
 rem handle ffmpeg if included
 rem ******************
-if not exist "%WINPYDIRBASE%\tools\ffmpeg.exe" goto ffmpeg_bad
-set IMAGEIO_FFMPEG_EXE=%WINPYDIRBASE%\tools\ffmpeg.exe
+if not exist "%WINPYDIRBASE%\t\ffmpeg.exe" goto ffmpeg_bad
+set IMAGEIO_FFMPEG_EXE=%WINPYDIRBASE%\t\ffmpeg.exe
 
 :ffmpeg_bad
 
@@ -679,8 +681,8 @@ if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API
 #####################
 ### handle R if included
 #####################
-if (Test-Path "$env:WINPYDIR\..\tools\R\bin") { 
-    $env:R_HOME = "$env:WINPYDIR\..\tools\R"
+if (Test-Path "$env:WINPYDIR\..\t\R\bin") { 
+    $env:R_HOME = "$env:WINPYDIR\..\t\R"
     $env:R_HOMEbin = "$env:R_HOME\bin\x64"
     if ("$env:WINPYARCH" -eq "WIN32") {
         $env:R_HOMEbin = "$env:R_HOME\bin\i386"
@@ -690,8 +692,8 @@ if (Test-Path "$env:WINPYDIR\..\tools\R\bin") {
 #####################
 ### handle Julia if included
 #####################
-if (Test-Path "$env:WINPYDIR\..\tools\Julia\bin") {
-    $env:JULIA_HOME = "$env:WINPYDIR\..\tools\Julia\bin\"
+if (Test-Path "$env:WINPYDIR\..\t\Julia\bin") {
+    $env:JULIA_HOME = "$env:WINPYDIR\..\t\Julia\bin\"
     $env:JULIA_EXE = "julia.exe"
     $env:JULIA = "$env:JULIA_HOME$env:JULIA_EXE"
     $env:JULIA_PKGDIR = "$env:WINPYDIR\..\settings\.julia"
@@ -700,8 +702,8 @@ if (Test-Path "$env:WINPYDIR\..\tools\Julia\bin") {
 #####################
 ### handle ffmpeg if included
 #####################
-if (Test-Path "$env:WINPYDIR\..\tools\ffmpeg.exe") {
-    $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIRBASE%\tools\ffmpeg.exe"
+if (Test-Path "$env:WINPYDIR\..\t\ffmpeg.exe") {
+    $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIRBASE%\t\ffmpeg.exe"
 }
 
 #####################
@@ -1368,6 +1370,6 @@ if __name__ == '__main__':
              install_options=r'--no-index --pre --trusted-host=None',
              find_links=r'D:\Winpython\packages.srcreq',
              source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win-amd64',
-             toolsdirs=r'D:\WinPython\basedir34\Tools.Slim',
+             toolsdirs=r'D:\WinPython\basedir34\t.Slim',
              docsdirs=r'D:\WinPython\basedir34\docs.Slim'
 )

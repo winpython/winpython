@@ -14,11 +14,13 @@ Licensed under the terms of the MIT License
 !define DISTDIR "D:\Pierre\maketest\winpython-2.7.3.amd64"
 !define ARCH "16bit"
 !define VERSION "2.7.3.0"
+; 2018-04-04 need to minimize path length of installation further: remove flavor in install path
+!define VERSION_INSTALL "2.7.3.0"
 !define RELEASELEVEL "beta2" ; empty means final release
 ;================================================================
 
 !define ID "WinPython"
-!define ID_INSTALL "WinPy"
+!define ID_INSTALL "WinPython"
 !define FILE_DESCRIPTION "${ID} Installer"
 !define COMPANY "${ID}"
 !define BRANDING "${ID}, the portable Python Distribution for Scientists"
@@ -39,7 +41,10 @@ OutFile "${DISTDIR}\..\${ID}${ARCH}-${VERSION}${RELEASELEVEL}.exe"
 
 ; 2018-03-31 need to minimize path length of installation:
 ;InstallDir "$EXEDIR\${ID}${ARCH}-${VERSION}${RELEASELEVEL}"
-InstallDir "$EXEDIR\${ID_INSTALL}${ARCH}-${VERSION}${RELEASELEVEL}"
+; 2018-04-04 need to minimize path length of installation further: remove arch + flavor
+;InstallDir "$EXEDIR\${ID_INSTALL}${ARCH}-${VERSION}${RELEASELEVEL}"
+;InstallDir "$EXEDIR\${ID_INSTALL}-${VERSION_INSTALL}${RELEASELEVEL}"
+InstallDir "$EXEDIR\${ID_INSTALL}"
 BrandingText "${BRANDING}"
 XPStyle on
 RequestExecutionLevel user

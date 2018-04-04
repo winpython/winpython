@@ -30,7 +30,7 @@ from winpython.py3compat import winreg
 
 
 # Development only
-TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 'tools'))
+TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 't'))
 if osp.isdir(TOOLS_DIR):
     os.environ['PATH'] += ';%s' % TOOLS_DIR
 ROOT_DIR = os.environ.get('WINPYTHONROOTDIR')
@@ -629,7 +629,7 @@ def do_script(this_script, python_exe=None, copy_to=None,
 
 
 if __name__ == '__main__':
-    thg = get_thg_version(osp.join(BASE_DIR, 'tools', 'tortoisehg'))
+    thg = get_thg_version(osp.join(BASE_DIR, 't', 'tortoisehg'))
     print(("thg version: %r" % thg))
 
     print_box("Test")
