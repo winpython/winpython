@@ -351,7 +351,7 @@ python "%~dpn0""" + ext + """" %*""")
             else:
                 #  indirect way: we interrogate something else
                 cmdx=[osp.join(self.target, 'python.exe'), '-c',
-                      "import pip;print('+!+'.join(['%s@+@%s@+@' % (i.key,i.version)  for i in pip.get_installed_distributions()]))"]
+                      "import pip;from pip._internal.utils.misc import  get_installed_distributions as pip_get_installed_distributions ;print('+!+'.join(['%s@+@%s@+@' % (i.key,i.version)  for i in pip_get_installed_distributions()]))"]
                 p = subprocess.Popen(cmdx, shell=True, stdout=subprocess.PIPE,
                                      cwd=self.target)
                 stdout, stderr = p.communicate()
