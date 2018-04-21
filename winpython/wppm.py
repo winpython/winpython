@@ -42,7 +42,7 @@ def get_package_metadata(database, name):
     # machine which is not connected to the internet
     db = cp.ConfigParser()
     db.readfp(open(osp.join(DATA_PATH, database)))
-    metadata = dict(description='', url='https://pypi.python.org/pypi/' + name)
+    metadata = dict(description='', url='https://pypi.org/project/' + name)
     for key in metadata:
         name1 = name.lower()
         # wheel replace '-' per '_' in key
