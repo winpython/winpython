@@ -521,7 +521,7 @@ call "%~dp0env_for_icons.bat"
         #                     command='$SYSDIR\cmd.exe',
         #                     args= r'/k IDLEX_for_student.bat  %*',
         #                     workdir='$EXEDIR\scripts')
-        self.create_launcher('IDLEX (Python GUI).exe', 'python.ico',
+        self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
                              command='wscript.exe',
                              args= r'Noshell.vbs winidlex.bat')
 
@@ -559,6 +559,10 @@ call "%~dp0env_for_icons.bat"
         self.create_launcher('Jupyter Lab.exe', 'jupyter.ico',
                              command='$SYSDIR\cmd.exe',
                              args=r'/k winjupyter_lab.bat')
+
+        self.create_launcher('Pyzo.exe', 'pyzologo.ico',
+                             command='wscript.exe',
+                             args=r'Noshell.vbs winpyzo.bat')
 
         self._print_done()
 
@@ -1103,6 +1107,20 @@ pause
 "%WINPYDIR%\python.exe" -m pip install --upgrade pip
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 pause
+""")
+
+        self.create_batch_script('winpyzo.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+mkdir %HOME%\.pyzo
+if exist "%HOME%\.pyzo\config.ssdf"  goto after_create
+set tmp_pyz="%HOME%\.pyzo\config.ssdf"
+echo shellConfigs2 = list:>>%tmp_pyz%
+echo  dict:>>%tmp_pyz%
+echo    name = 'Python'>>%tmp_pyz%
+echo    exe = '.\\python.exe'>>%tmp_pyz%
+:after_create
+cd/D "%WINPYDIR%"
+"%WINPYDIR%\scripts\pyzo.exe" %*
 """)
 
         # pre-run mingw batch
