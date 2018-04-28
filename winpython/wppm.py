@@ -539,7 +539,7 @@ python "%~dpn0""" + ext + """" %*""")
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
-        if package.name.lower() in ('pyqt4', 'pyqt5'):
+        if package.name.lower() in ('pyqt4', 'pyqt5', 'pyside2'):
             # Qt configuration file (where to find Qt)
             name = 'qt.conf'
             contents = """[Paths]

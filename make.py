@@ -629,6 +629,44 @@ set IMAGEIO_FFMPEG_EXE=%WINPYDIRBASE%\t\ffmpeg.exe
 
 :ffmpeg_bad
 
+
+rem ******************
+rem handle PySide2 if included
+rem ******************
+set tmp_pyz=%WINPYDIR%\Lib\site-packages\PySide2
+if not exist "%tmp_pyz%" goto pyside2_conf_exist
+set tmp_pyz=%tmp_pyz%\qt.conf
+if  exist "%tmp_pyz%" goto pyside2_conf_exist
+echo [Paths]>>"%tmp_pyz%"
+echo Prefix = .>>"%tmp_pyz%"
+echo Binaries = .>>"%tmp_pyz%"
+:pyside2_conf_exist
+
+rem ******************
+rem handle PyQt5 if included
+rem ******************
+set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt5
+if not exist "%tmp_pyz%" goto pyqt5_conf_exist
+set tmp_pyz=%tmp_pyz%\qt.conf
+if  exist "%tmp_pyz%" goto pyqt5_conf_exist
+echo [Paths]>>"%tmp_pyz%"
+echo Prefix = .>>"%tmp_pyz%"
+echo Binaries = .>>"%tmp_pyz%"
+:pyqt5_conf_exist
+
+rem ******************
+rem handle PyQt4 if included
+rem ******************
+set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt4
+if not exist "%tmp_pyz%" goto pyqt4_conf_exist
+set tmp_pyz=%tmp_pyz%\qt.conf
+if  exist "%tmp_pyz%" goto pyqt4_conf_exist
+echo [Paths]>>"%tmp_pyz%"
+echo Prefix = .>>"%tmp_pyz%"
+echo Binaries = .>>"%tmp_pyz%"
+:pyqt4_conf_exist
+
+
 rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
@@ -709,6 +747,47 @@ if (Test-Path "$env:WINPYDIR\..\t\Julia\bin") {
 if (Test-Path "$env:WINPYDIR\..\t\ffmpeg.exe") {
     $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIRBASE%\t\ffmpeg.exe"
 }
+
+#####################
+### handle PySide2 if included
+#####################
+
+$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PySide2"
+if (Test-Path "$env:tmp_pyz") {
+   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
+   if (-not (Test-Path "$env:tmp_pyz")) {
+      "[Paths]"| Add-Content -Path $env:tmp_pyz
+      "Prefix = ."| Add-Content -Path $env:tmp_pyz
+      "Binaries = ."| Add-Content -Path $env:tmp_pyz
+   }
+}
+
+#####################
+### handle PyQt5 if included
+#####################
+$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PyQt5"
+if (Test-Path "$env:tmp_pyz") {
+   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
+   if (-not (Test-Path "$env:tmp_pyz")) {
+      "[Paths]"| Add-Content -Path $env:tmp_pyz
+      "Prefix = ."| Add-Content -Path $env:tmp_pyz
+      "Binaries = ."| Add-Content -Path $env:tmp_pyz
+   }
+}
+
+#####################
+### handle PyQt4 if included
+#####################
+$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PyQt4"
+if (Test-Path "$env:tmp_pyz") {
+   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
+   if (-not (Test-Path "$env:tmp_pyz")) {
+      "[Paths]"| Add-Content -Path $env:tmp_pyz
+      "Prefix = ."| Add-Content -Path $env:tmp_pyz
+      "Binaries = ."| Add-Content -Path $env:tmp_pyz
+   }
+}
+
 
 #####################
 ### WinPython.ini part (removed from nsis)
@@ -1050,8 +1129,10 @@ if "%QT_API%"=="pyqt5" (
     ) else (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
     )
-) else (
+) else if exist "%WINPYDIR%\Lib\site-packages\pyqt4\designer.exe" (
     "%WINPYDIR%\Lib\site-packages\PyQt4\designer.exe" %*
+) else (
+    "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
 )
 """)
 
