@@ -240,7 +240,7 @@ Name | Version | Description
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
         path = [r"Lib\site-packages\PyQt5", r"Lib\site-packages\PyQt4",
-                "",  # Python root directory (python.exe)
+                r"Lib\site-packages\PySide2", "",  # Python root directory 
                 "DLLs", "Scripts", r"..\t", r"..\t\mingw32\bin"
                 ]
         if self.distribution.architecture == 32 \
