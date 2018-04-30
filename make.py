@@ -666,6 +666,21 @@ echo Prefix = .>>"%tmp_pyz%"
 echo Binaries = .>>"%tmp_pyz%"
 :pyqt4_conf_exist
 
+rem ******************
+rem handle Pyzo configuration part
+rem ******************
+mkdir %HOME%\.pyzo
+if exist "%HOME%\.pyzo\config.ssdf"  goto after_pyzo_conf
+set tmp_pyz="%HOME%\.pyzo\config.ssdf"
+echo shellConfigs2 = list:>>%tmp_pyz%
+echo  dict:>>%tmp_pyz%
+echo    name = 'Python'>>%tmp_pyz%
+echo    exe = '.\\python.exe'>>%tmp_pyz%
+echo    ipython = 'yes'>>%tmp_pyz%
+echo    gui = 'none'>>%tmp_pyz%
+
+:after_pyzo_conf
+
 
 rem ******************
 rem WinPython.ini part (removed from nsis)
@@ -788,6 +803,20 @@ if (Test-Path "$env:tmp_pyz") {
    }
 }
 
+#####################
+### handle Pyzo configuration part
+#####################
+$env:tmp_pyz = "$env:HOME\.pyzo"
+if (-not (Test-Path "$env:tmp_pyz")) { md -Path "$env:tmp_pyz" }
+$env:tmp_pyz = "$env:HOME\.pyzo\config.ssdf"
+if (-not (Test-Path "$env:tmp_pyz")) {
+shellConfigs2 = list:| Add-Content -Path $env:tmp_pyz
+ dict:| Add-Content -Path $env:tmp_pyz
+   name = 'Python'| Add-Content -Path $env:tmp_pyz
+   exe = '.\\python.exe'| Add-Content -Path $env:tmp_pyz
+   ipython = 'yes'| Add-Content -Path $env:tmp_pyz
+   gui = 'none'| Add-Content -Path $env:tmp_pyz
+}
 
 #####################
 ### WinPython.ini part (removed from nsis)
@@ -1192,14 +1221,6 @@ pause
 
         self.create_batch_script('winpyzo.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
-mkdir %HOME%\.pyzo
-if exist "%HOME%\.pyzo\config.ssdf"  goto after_create
-set tmp_pyz="%HOME%\.pyzo\config.ssdf"
-echo shellConfigs2 = list:>>%tmp_pyz%
-echo  dict:>>%tmp_pyz%
-echo    name = 'Python'>>%tmp_pyz%
-echo    exe = '.\\python.exe'>>%tmp_pyz%
-:after_create
 cd/D "%WINPYDIR%"
 "%WINPYDIR%\scripts\pyzo.exe" %*
 """)
