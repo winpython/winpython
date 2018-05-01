@@ -542,9 +542,9 @@ call "%~dp0env_for_icons.bat"
                              command='wscript.exe',
                              args=r'Noshell.vbs qtdesigner.bat')
 
-        # self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
-        #                     command='wscript.exe',
-        #                     args=r'Noshell.vbs qtlinguist.bat')
+        self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
+                             command='wscript.exe',
+                             args=r'Noshell.vbs qtlinguist.bat')
 
         # Jupyter launchers
         self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
@@ -669,7 +669,7 @@ echo Binaries = .>>"%tmp_pyz%"
 rem ******************
 rem handle Pyzo configuration part
 rem ******************
-mkdir %HOME%\.pyzo
+if not exist "%HOME%\.pyzo" mkdir %HOME%\.pyzo
 if exist "%HOME%\.pyzo\config.ssdf"  goto after_pyzo_conf
 set tmp_pyz="%HOME%\.pyzo\config.ssdf"
 echo shellConfigs2 = list:>>%tmp_pyz%
@@ -1188,10 +1188,14 @@ if "%QT_API%"=="pyqt5" (
     ) else (
         cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
         "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
-) else (
+    )
+) else if exist "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" (
     cd/D "%WINPYDIR%\Lib\site-packages\PyQt4"
     "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
+) else (
+    "%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" %*
 )
+
 """)        
         
         self.create_python_batch('register_python.bat', 'register_python',
