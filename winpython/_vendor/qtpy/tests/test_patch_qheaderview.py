@@ -82,17 +82,17 @@ def test_patched_qheaderview():
 
     # test that the old methods in Qt4 raise exceptions
     if PYQT4 or PYSIDE:
-        with pytest.raises(Exception):
+        with pytest.warns(UserWarning):
             headerview.isClickable()
-        with pytest.raises(Exception):
+        with pytest.warns(UserWarning):
             headerview.isMovable()
-        with pytest.raises(Exception):
+        with pytest.warns(UserWarning):
             headerview.resizeMode(0)
-        with pytest.raises(Exception):
+        with pytest.warns(UserWarning):
             headerview.setClickable(True)
-        with pytest.raises(Exception):
-            headerview.setMovableClickable(True)
-        with pytest.raises(Exception):
+        with pytest.warns(UserWarning):
+            headerview.setMovable(True)
+        with pytest.warns(UserWarning):
             headerview.setResizeMode(0, QHeaderView.Interactive)
 
 

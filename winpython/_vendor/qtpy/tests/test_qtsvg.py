@@ -1,9 +1,8 @@
 from __future__ import absolute_import
 
 import pytest
-from qtpy import PYSIDE2
 
-@pytest.mark.skipif(PYSIDE2, reason="It fails on PySide2")
+
 def test_qtsvg():
     """Test the qtpy.QtSvg namespace"""
     from qtpy import QtSvg
