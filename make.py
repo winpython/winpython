@@ -517,13 +517,13 @@ call "%~dp0env_for_icons.bat"
                              command='$SYSDIR\cmd.exe',
                              args= r'/k winpython.bat')
 
-        #self.create_launcher('IDLEX (students).exe', 'python.ico',
-        #                     command='$SYSDIR\cmd.exe',
-        #                     args= r'/k IDLEX_for_student.bat  %*',
-        #                     workdir='$EXEDIR\scripts')
-        self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
+        self.create_launcher('IDLEX.exe', 'python.ico',
                              command='wscript.exe',
                              args= r'Noshell.vbs winidlex.bat')
+
+        self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
+                             command='wscript.exe',
+                             args= r'Noshell.vbs winidle.bat')
 
         self.create_launcher('Spyder.exe', 'spyder.ico',
                              command='wscript.exe',
@@ -1068,6 +1068,11 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
 )
 """)
 
+        self.create_batch_script('idle.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
+
+""")
         self.create_batch_script('winidlex.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
@@ -1078,6 +1083,12 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 )
 """)
+        self.create_batch_script('winidle.bat',r"""@echo off
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
+""")
+
         self.create_batch_script('spyder.bat',r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
