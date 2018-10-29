@@ -3,7 +3,7 @@ WinPython tools
 
 Copyright © 2012-2013 Pierre Raybaut
 
-Copyright © 2014-2017 The Winpython development team https://github.com/winpython/
+Copyright © 2014-2018+ The Winpython development team https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
@@ -31,11 +31,11 @@ WinPython build toolchain
 Dependencies
 ------------   
 
-* Python2 >= 2.7 or Python3 >= 3.4
+* Python2 >= 2.7 or Python3 >= 3.4 (Python>= 3.6 is recommanded)
 
-* PyQt4 >= 4.11 or PyQt5 >= 5.4 (PyQt4 is recommended)
+* PyQt4 >= 4.11 or PyQt5 >= 5.4 or PySide2>=5.11 (PyQt5.9 or Pyside2-5.12 is recommanded)
 
-* pip >= 7.1.0 and setuptools >= 17.1.1
+* pip >= 9.0 and setuptools >= 30.0
 
 Requirements
 ------------
@@ -46,7 +46,7 @@ Requirements
     * "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
     * with TextReplace plugin installed
     
-* PyQt4/5 is required to execute WinPython Control Panel/Ipython Qt and Qt related packages for both WinPython 2.x and 3.x releases.
+* PyQt4/5 or Pyside2 is required to execute WinPython Control Panel/Ipython Qt and Qt related packages.
   if not installed, these packages will not execute.
 
 Installation
