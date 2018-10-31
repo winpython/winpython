@@ -56,9 +56,9 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 
 ;non portable mode if ever wanted FLIPFLAP
-;DefaultDirName={pf}\{#MyInstallerDir}
+;DefaultDirName={pf}\{#ID_INSTALL}-{#VERSION_INSTALL}{#RELEASELEVEL}
 ;non portable mode
-DefaultDirName={src}\{#MyInstallerDir}
+DefaultDirName={src}\{#ID_INSTALL}-{#VERSION_INSTALL}{#RELEASELEVEL}
 
 DefaultGroupName={#ID}
 DisableProgramGroupPage=yes
