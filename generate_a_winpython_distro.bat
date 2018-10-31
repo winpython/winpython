@@ -2,7 +2,7 @@ rem  to launch from a winpython package directory, where 'make.py' is
 @echo on
 rem  this is initialised per the calling .bat
 rem  set my_original_path=%path%
-rem  set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
+rem  set my_buildenv=C:\WinPython-64bit-3.4.3.7Qt5
 rem  set my_root_dir_for_builds=D:\Winp
 
 rem  set my_python_target=34
@@ -29,12 +29,14 @@ if %my_python_target%==27 set my_release=2
 
 if %my_python_target%==34 set my_release=8
 
-if %my_python_target%==35 set my_release=2
+if %my_python_target%==35 set my_release=3
 
 if %my_python_target%==36 set my_release=0
 
 if %my_python_target%==37 set my_release=0
 
+rem **** 2018-10-30 create_installer **
+if "%my_create_installer%"=="" set my_create_installer=True
 rem ***********************************************************
 
 rem  set my_flavor=Slim
@@ -119,8 +121,8 @@ call %my_buildenv%\scripts\env.bat
 
 rem  build with this 
 cd /D %~dp0
-echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer=%my_create_installer%)">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer=%my_create_installer%)">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%

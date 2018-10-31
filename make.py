@@ -53,8 +53,27 @@ def get_nsis_exe():
     else:
         raise RuntimeError("NSIS is not installed on this computer.")
 
-NSIS_EXE = get_nsis_exe()
+NSIS_EXE = get_nsis_exe()  # NSIS Compiler
 
+def get_iscc_exe():
+    """Return ISCC executable"""
+    localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    for drive in get_drives():
+        for dirname in (r'C:\Program Files', r'C:\Program Files (x86)',
+                        # drive+r'PortableApps\NSISPortableANSI',
+                        #drive+r'PortableApps\NSISPortable',
+                        # osp.join(localdir, 'NSISPortableANSI'),
+                        osp.join(localdir, 'NSISPortable'),
+                        ):
+            for subdirname in ('.', 'App'):
+                exe = osp.join(dirname, subdirname, 'Inno Setup 5', 'iscc.exe')
+                # include = osp.join(dirname, subdirname, 'Inno Setup 5', 'include')
+                if osp.isfile(exe):
+                    return exe
+    else:
+        raise RuntimeError("NSIS is not installed on this computer.")
+
+ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
 
 def replace_in_nsis_file(fname, data):
     """Replace text in line starting with *start*, from this position:
@@ -66,6 +85,23 @@ def replace_in_nsis_file(fname, data):
         for start, text in data:
             if start not in ('Icon', 'OutFile') and not start.startswith('!'):
                 start = '!define ' + start
+            if line.startswith(start + ' '):
+                lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
+    fd = open(fname, 'w')
+    fd.writelines(lines)
+    print('iss for ', fname, 'is', lines)
+    fd.close()
+
+def replace_in_iss_file(fname, data):
+    """Replace text in line starting with *start*, from this position:
+    data is a list of (start, text) tuples"""
+    fd = open(fname, 'U')
+    lines = fd.readlines()
+    fd.close()
+    for idx, line in enumerate(lines):
+        for start, text in data:
+            if start not in ('Icon', 'OutFile') and not start.startswith('!'):
+                start = '#define ' + start
             if line.startswith(start + ' '):
                 lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
     fd = open(fname, 'w')
@@ -89,6 +125,22 @@ def build_nsis(srcname, dstname, data):
     except OSError as e:
         print("Execution failed:", e, file=sys.stderr)
     os.remove(dstname)
+    
+def build_iss(srcname, dstname, data):
+    """Build Inno Setup Script"""
+    portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+    shutil.copy(osp.join(portable_dir, srcname), dstname)
+    data = [('PORTABLE_DIR', portable_dir)
+            ] + list(data)
+    replace_in_iss_file(dstname, data)
+    try:
+        retcode = subprocess.call('"%s"  "%s"' % (ISCC_EXE, dstname),
+                                  shell=True, stdout=sys.stderr)
+        if retcode < 0:
+            print("Child was terminated by signal", -retcode, file=sys.stderr)
+    except OSError as e:
+        print("Execution failed:", e, file=sys.stderr)
+    # os.remove(dstname)
 
 
 class WinPythonDistribution(object):
@@ -387,6 +439,21 @@ call "%~dp0env_for_icons.bat"
         build_nsis('installer.nsi', fname, data)
         self._print_done()
 
+    def create_installer_inno(self):
+        """Create installer with INNO"""
+        self._print("Creating WinPython installer INNO")
+        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+        fname = osp.join(portable_dir, 'installer_INNO-tmp.iss')
+        data = (('DISTDIR', self.winpydir),
+                ('ARCH', self.winpy_arch),
+                ('VERSION', '%s.%d%s' % (self.python_fullversion,
+                                       self.build_number, self.flavor)),
+                ('VERSION_INSTALL', '%s%d' % (self.python_fullversion.replace(
+                 '.' , ''), self.build_number)),
+                ('RELEASELEVEL', self.release_level),)
+        build_iss('installer_INNO.iss', fname, data)
+        self._print_done()
+
     def _print(self, text):
         """Print action text indicating progress"""
         if self.verbose:
@@ -676,7 +743,7 @@ echo shellConfigs2 = list:>>%tmp_pyz%
 echo  dict:>>%tmp_pyz%
 echo    name = 'Python'>>%tmp_pyz%
 echo    exe = '.\\python.exe'>>%tmp_pyz%
-echo    ipython = 'yes'>>%tmp_pyz%
+echo    ipython = 'no'>>%tmp_pyz%
 echo    gui = 'none'>>%tmp_pyz%
 
 :after_pyzo_conf
@@ -814,7 +881,7 @@ shellConfigs2 = list:| Add-Content -Path $env:tmp_pyz
  dict:| Add-Content -Path $env:tmp_pyz
    name = 'Python'| Add-Content -Path $env:tmp_pyz
    exe = '.\\python.exe'| Add-Content -Path $env:tmp_pyz
-   ipython = 'yes'| Add-Content -Path $env:tmp_pyz
+   ipython = 'no'| Add-Content -Path $env:tmp_pyz
    gui = 'none'| Add-Content -Path $env:tmp_pyz
 }
 
@@ -1166,8 +1233,6 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\designer.exe" %*
     ) else (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
     )
@@ -1184,8 +1249,6 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" %*
     ) else (
         "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
     )
@@ -1200,8 +1263,6 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
     ) else (
         cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
         "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
@@ -1497,7 +1558,8 @@ def make_all(build_number, release_level, pyver, architecture,
               my_winpydir=my_winpydir)
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
     if create_installer and not simulation:
-        dist.create_installer()
+        # dist.create_installer()
+        dist.create_installer_inno()
     return dist
 
 
