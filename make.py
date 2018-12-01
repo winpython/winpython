@@ -1551,8 +1551,17 @@ def make_all(build_number, release_level, pyver, architecture,
                                  install_options=install_options + find_list,
                                  flavor=flavor, docsdirs=docsdirs)
     # define a pre-defined winpydir, instead of having to guess
-    my_winpydir = ('winp' + ('%s' % architecture) +'-' + pyver +
-     '.x.' + ('%s' %build_number) )  # + flavor + release_level)   
+
+    # extract the python subversion to get WPy64-3671b1
+    dist.python_fname = dist.get_package_fname(
+                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(msi|zip)')
+    my_x = ''.join(dist.python_fname.replace('.amd64','').split('.')[-2:-1])
+    while not my_x.isdigit() and len(my_x)>0:
+        my_x = my_x[:-1]
+        
+    my_winpydir = ('WPy' + ('%s' % architecture) +'-' + pyver.replace('.','') +
+                  '' + my_x + '' + ('%s' %build_number) ) + release_level
+                  # + flavor   
     
     dist.make(remove_existing=remove_existing, requirements=requirements,
               my_winpydir=my_winpydir)
