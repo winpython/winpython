@@ -148,7 +148,7 @@ class WinPythonDistribution(object):
     MINGW32_PATH = r'\t\mingw32\bin'
     R_PATH = r'\t\R\bin'
     JULIA_PATH = r'\t\Julia\bin'
-    NODEJS_PATH = r'\t\n'
+    NODEJS_PATH = r'\n'  # r'\t\n'
 
     def __init__(self, build_number, release_level, target, wheeldir,
                  toolsdirs=None, verbose=False, simulation=False,
@@ -550,6 +550,11 @@ call "%~dp0env_for_icons.bat"
                     print(path + ' --> ' + osp.join(toolsdir, name))
                 copy(path, osp.join(toolsdir, name))
         self._print_done()
+        # move node higher
+        nodejs_current = osp.join(toolsdir, 'n')
+        nodejs_target = self.winpydir + self.NODEJS_PATH
+        if nodejs_current != nodejs_target and osp.isdir(nodejs_current):
+            shutil.move(nodejs_current, nodejs_target)
 
     def _copy_dev_docs(self):
         """Copy dev docs"""
