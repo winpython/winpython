@@ -71,7 +71,7 @@ def get_iscc_exe():
                 if osp.isfile(exe):
                     return exe
     else:
-        raise RuntimeError("NSIS is not installed on this computer.")
+        raise RuntimeError("Inno Setup 5 is not installed on this computer.")
 
 ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
 
