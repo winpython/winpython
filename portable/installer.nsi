@@ -12,7 +12,7 @@ Licensed under the terms of the MIT License
 ; These lines are automatically replaced when creating installer:
 ; (see winpython/make.py)
 !define DISTDIR "D:\Pierre\maketest\winpython-2.7.3.amd64"
-!define ARCH "16bit"
+!define ARCH "64"
 !define VERSION "2.7.3.0"
 ; 2018-04-04 need to minimize path length of installation further: remove flavor in install path
 !define VERSION_INSTALL "2.7.3.0"
@@ -49,7 +49,8 @@ OutFile "${DISTDIR}\..\${ID}${ARCH}-${VERSION}${RELEASELEVEL}.exe"
 ;InstallDir "$EXEDIR\${ID_INSTALL}-${VERSION_INSTALL}${RELEASELEVEL}"
 ; 2018-04-20 need to minimize path length of installation:
 ;InstallDir "$EXEDIR\${ID_INSTALL}"
-InstallDir "$EXEDIR\${ID_INSTALL}-${VERSION_INSTALL}${RELEASELEVEL}"
+; 2018-12-10 keep 64 for 7zip similarity
+InstallDir "$EXEDIR\${ID_INSTALL}${ARCH}-${VERSION_INSTALL}${RELEASELEVEL}"
 
 BrandingText "${BRANDING}"
 XPStyle on
