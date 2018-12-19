@@ -10,7 +10,7 @@
 ; These lines are automatically replaced when creating installer:
 ; (see winpython/make.py)
 #define DISTDIR "C:\WinP\bd36\buPs2\winp64-3.6.x.0"
-#define ARCH "64bit"
+#define ARCH "64"
 #define VERSION "3.6.7.0Ps2"
 ; 2018-04-04 need to minimize path length of installation further: remove flavor in install path
 #define VERSION_INSTALL "3670"
@@ -58,7 +58,10 @@ AppUpdatesURL={#MyAppURL}
 ;non portable mode if ever wanted FLIPFLAP
 ;DefaultDirName={pf}\{#ID_INSTALL}-{#VERSION_INSTALL}{#RELEASELEVEL}
 ;non portable mode
-DefaultDirName={src}\{#ID_INSTALL}-{#VERSION_INSTALL}{#RELEASELEVEL}
+;
+;2018-12-10: making 64 art of the install path (7zip similarity)
+;DefaultDirName={src}\{#ID_INSTALL}-{#VERSION_INSTALL}{#RELEASELEVEL}
+DefaultDirName={src}\{#ID_INSTALL}{#ARCH}-{#VERSION_INSTALL}{#RELEASELEVEL}
 
 DefaultGroupName={#ID}
 DisableProgramGroupPage=yes
