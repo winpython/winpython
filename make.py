@@ -63,7 +63,7 @@ def get_iscc_exe():
                         # drive+r'PortableApps\NSISPortableANSI',
                         #drive+r'PortableApps\NSISPortable',
                         # osp.join(localdir, 'NSISPortableANSI'),
-                        osp.join(localdir, 'NSISPortable'),
+                        osp.join(localdir, 'Inno Setup 5'),
                         ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(dirname, subdirname, 'Inno Setup 5', 'iscc.exe')
@@ -74,6 +74,23 @@ def get_iscc_exe():
         raise RuntimeError("Inno Setup 5 is not installed on this computer.")
 
 ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
+
+def get_7zip_exe():
+    """Return 7zip executable"""
+    localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    for drive in get_drives():
+        for dirname in (r'C:\Program Files', r'C:\Program Files (x86)',
+                        osp.join(localdir, '7-Zip'),
+                        ):
+            for subdirname in ('.', 'App'):
+                exe = osp.join(dirname, subdirname, '7-Zip', '7z.exe')
+                # include = osp.join(dirname, subdirname, '7-Zip', 'include')
+                if osp.isfile(exe):
+                    return exe
+    else:
+        raise RuntimeError("7-Zip is not installed on this computer.")
+
+SEVENZIP_EXE = get_7zip_exe()  # Inno Setup Compiler (iscc.exe)
 
 def replace_in_nsis_file(fname, data):
     """Replace text in line starting with *start*, from this position:
@@ -106,7 +123,25 @@ def replace_in_iss_file(fname, data):
                 lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
     fd = open(fname, 'w')
     fd.writelines(lines)
-    print('nsis for ', fname, 'is', lines)
+    print('Inno Setup for ', fname, 'is', lines)
+    fd.close()
+
+
+def replace_in_7zip_file(fname, data):
+    """Replace text in line starting with *start*, from this position:
+    data is a list of (start, text) tuples"""
+    fd = open(fname, 'U')
+    lines = fd.readlines()
+    fd.close()
+    for idx, line in enumerate(lines):
+        for start, text in data:
+            if start not in ('Icon', 'OutFile') and not start.startswith('!'):
+                start = 'set ' + start
+            if line.startswith(start + '='):
+                lines[idx] = line[:len(start)+1] + ('%s' % text) + '\n'
+    fd = open(fname, 'w')
+    fd.writelines(lines)
+    print('7-zip for ', fname, 'is', lines)
     fd.close()
 
 
@@ -135,6 +170,24 @@ def build_iss(srcname, dstname, data):
     replace_in_iss_file(dstname, data)
     try:
         retcode = subprocess.call('"%s"  "%s"' % (ISCC_EXE, dstname),
+                                  shell=True, stdout=sys.stderr)
+        if retcode < 0:
+            print("Child was terminated by signal", -retcode, file=sys.stderr)
+    except OSError as e:
+        print("Execution failed:", e, file=sys.stderr)
+    # os.remove(dstname)
+    
+def build_7zip(srcname, dstname, data):
+    """7-Zip Setup Script"""
+    portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+    shutil.copy(osp.join(portable_dir, srcname), dstname)
+    data = [('PORTABLE_DIR', portable_dir),('SEVENZIP_EXE', SEVENZIP_EXE)
+            ] + list(data)
+    replace_in_7zip_file(dstname, data)
+    try:
+        # insted of a 7zip command line, we launch a script that does it
+        #retcode = subprocess.call('"%s"  "%s"' % (SEVENZIP_EXE, dstname),
+        retcode = subprocess.call('"%s"  ' % (dstname),
                                   shell=True, stdout=sys.stderr)
         if retcode < 0:
             print("Child was terminated by signal", -retcode, file=sys.stderr)
@@ -452,6 +505,21 @@ call "%~dp0env_for_icons.bat"
                  '.' , ''), self.build_number)),
                 ('RELEASELEVEL', self.release_level),)
         build_iss('installer_INNO.iss', fname, data)
+        self._print_done()
+
+    def create_installer_7zip(self):
+        """Create installer with 7-ZIP"""
+        self._print("Creating WinPython installer 7-ZIP")
+        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+        fname = osp.join(portable_dir, 'installer_7zip-tmp.bat')
+        data = (('DISTDIR', self.winpydir),
+                ('ARCH', self.winpy_arch),
+                ('VERSION', '%s.%d%s' % (self.python_fullversion,
+                                       self.build_number, self.flavor)),
+                ('VERSION_INSTALL', '%s%d' % (self.python_fullversion.replace(
+                 '.' , ''), self.build_number)),
+                ('RELEASELEVEL', self.release_level),)
+        build_7zip('installer_7zip.bat', fname, data)
         self._print_done()
 
     def _print(self, text):
@@ -1572,8 +1640,9 @@ def make_all(build_number, release_level, pyver, architecture,
               my_winpydir=my_winpydir)
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
     if create_installer and not simulation:
-        # dist.create_installer()
-        dist.create_installer_inno()
+        #dist.create_installer()  # NSIS installer (can't handle big build)
+        dist.create_installer_inno()  # INNO Setup 5 (not 7zip friendly)
+        #dist.create_installer_7zip()  # 7-zip (no licence splash screen)
     return dist
 
 

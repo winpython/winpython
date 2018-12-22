@@ -2,7 +2,7 @@
 
 WinPython installer script
 
-Copyright © 2012 Pierre Raybaut
+Copyright © 2012 Pierre Raybaut, 2016+ WinPython team
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
  
