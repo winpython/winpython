@@ -111,35 +111,7 @@ class Package(BasePackage):
         """Extract package infos (name, version, architecture)
         from filename (installer basename)"""
         bname = osp.basename(self.fname)
-        if bname.endswith('.exe'):
-            # distutils bdist_wininst
-            match = re.match(utils.WININST_PATTERN, bname)
-            if match is not None:
-                (self.name, self.version,
-                 _t0, _qtver, arch, _t1, self.pyversion, _t2) = match.groups()
-                self.architecture = 32 if arch == 'win32' else 64
-                return
-            # NSIS
-            pat = r'([a-zA-Z0-9\-\_]*)-Py([0-9\.]*)-x(64|32)-gpl-([0-9\.\-]*[a-z]*)\.exe'
-            match = re.match(pat, bname)
-            if match is not None:
-                self.name, self.pyversion, arch, self.version = match.groups()
-                self.architecture = int(arch)
-                return
-            # NSIS complement to match PyQt4-4.10.4-gpl-Py3.4-Qt4.8.6-x32.exe
-            pat = r'([a-zA-Z0-9\_]*)-([0-9\.]*[a-z]*)-gpl-Py([0-9\.]*)-.*-x(64|32)\.exe'
-            match = re.match(pat, bname)
-            if match is not None:
-                self.name, self.version, self.pyversion, arch = match.groups()
-                self.architecture = int(arch)
-                return
-            match = re.match(r'([a-zA-Z0-9\-\_]*)-([0-9\.]*[a-z]*)-py([0-9\.]*)-x(64|32)-([a-z0-9\.\-]*).exe', bname)
-            if match is not None:
-                self.name, self.version, self.pyversion, arch, _pyqt = match.groups()
-                self.architecture = int(arch)
-                return
-        # New : Binary wheel case
-        elif bname.endswith(('32.whl', '64.whl')):
+        if bname.endswith(('32.whl', '64.whl')):
             # {name}[-{bloat}]-{version}-{python tag}-{abi tag}-{platform tag}.whl 
             # ['sounddevice','0.3.5','py2.py3.cp34.cp35','none','win32'] 
             # PyQt5-5.7.1-5.7.1-cp34.cp35.cp36-none-win_amd64.whl
