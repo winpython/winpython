@@ -1,4 +1,4 @@
-rem Copyright Â© 2018 WinPython team
+﻿rem Copyright Â© 2018 WinPython team
 rem Licensed under the terms of the MIT License
 rem (see winpython/__init__.py for details)
 
@@ -18,6 +18,7 @@ set VERSION_INSTALL=3670
 
 set RELEASELEVEL=beta3
 set PORTABLE_DIR=C:\WinPython-64bit-3.4.3.7Qt5\winpython_github20181029\portable
+set INSTALLER_OPTION=.exe
 
 rem ================================================================
 rem these lines are static definitions
@@ -43,15 +44,28 @@ rem 7-zip uncompress the directory compressed %DISTDIR% (no option to change it 
 echo %time%
 
 rem compression + include auto_extract in GUI mode
-"%SEVENZIP_EXE%" -mx5 a "%MyBinaryOutputDir%\%OutputBaseFilename%.exe" %DISTDIR% -sfx7z.sfx
+if "%INSTALLER_OPTION%"==".exe" (
+    "%SEVENZIP_EXE%" -mx5 a "%MyBinaryOutputDir%\%OutputBaseFilename%.exe" %DISTDIR% -sfx7z.sfx
+    echo  autoextract using command line options 
+    echo "%MyBinaryOutputDir%\%OutputBaseFilename%.exe" -y -o%MyBinaryOutputDir%\zz > NUL
+    )
+
+if "%INSTALLER_OPTION%"==".7z" (
+    "%SEVENZIP_EXE%" -mx5 a "%MyBinaryOutputDir%\%OutputBaseFilename%.7z" %DISTDIR%
+    echo  no autoextract 
+    )
+if "%INSTALLER_OPTION%"==".zip" (
+    "%SEVENZIP_EXE%" -tzip -mx5 a "%MyBinaryOutputDir%\%OutputBaseFilename%.zip" %DISTDIR%
+    echo  no autoextract 
+    )
 
 
-
-echo  autoextract using command line options 
-echo "%MyBinaryOutputDir%\%OutputBaseFilename%.exe" -y -o%MyBinaryOutputDir%\zz > NUL
 
 rem -mx1 = speed fastest
 rem -mx3 = speed fast
 rem -mx5 = speed normal
 rem -mx7 = compress maximum
 rem -mx9 = compress ultra
+
+rem -t7z  = [by default] 7 zip compression , the only choice with auto-extract 
+rem -tzip = Zip compatible compression.

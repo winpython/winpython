@@ -47,7 +47,6 @@ def get_nsis_exe():
                         ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(dirname, subdirname, 'NSIS', 'makensis.exe')
-                include = osp.join(dirname, subdirname, 'NSIS', 'include')
                 if osp.isfile(exe):
                     return exe
     else:
@@ -67,7 +66,6 @@ def get_iscc_exe():
                         ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(dirname, subdirname, 'Inno Setup 5', 'iscc.exe')
-                # include = osp.join(dirname, subdirname, 'Inno Setup 5', 'include')
                 if osp.isfile(exe):
                     return exe
     else:
@@ -507,7 +505,7 @@ call "%~dp0env_for_icons.bat"
         build_iss('installer_INNO.iss', fname, data)
         self._print_done()
 
-    def create_installer_7zip(self):
+    def create_installer_7zip(self, installer_option=''):
         """Create installer with 7-ZIP"""
         self._print("Creating WinPython installer 7-ZIP")
         portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
@@ -519,6 +517,7 @@ call "%~dp0env_for_icons.bat"
                 ('VERSION_INSTALL', '%s%d' % (self.python_fullversion.replace(
                  '.' , ''), self.build_number)),
                 ('RELEASELEVEL', self.release_level),)
+        data += (('INSTALLER_OPTION', installer_option),)
         build_7zip('installer_7zip.bat', fname, data)
         self._print_done()
 
@@ -1639,10 +1638,18 @@ def make_all(build_number, release_level, pyver, architecture,
     dist.make(remove_existing=remove_existing, requirements=requirements,
               my_winpydir=my_winpydir)
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
-    if create_installer and not simulation:
-        #dist.create_installer()  # NSIS installer (can't handle big build)
-        dist.create_installer_inno()  # INNO Setup 5 (not 7zip friendly)
-        #dist.create_installer_7zip()  # 7-zip (no licence splash screen)
+    if str(create_installer).lower() != 'false' and not simulation:
+        if 'nsis' in str(create_installer).lower():
+            dist.create_installer()  # NSIS installer (can't handle big build)
+        if 'inno' in str(create_installer).lower() or (
+                        str(create_installer).lower() == 'true'):
+            dist.create_installer_inno()  # INNO Setup 5 (not 7zip friendly)
+        if '7zip' in str(create_installer).lower():
+            dist.create_installer_7zip('.exe')  # 7-zip (no licence splash screen)
+        if '.7z' in str(create_installer).lower():
+            dist.create_installer_7zip('.7z')  # 7-zip (no licence splash screen)
+        if '.zip' in str(create_installer).lower():
+            dist.create_installer_7zip('.zip')  # 7-zip (no licence splash screen)
     return dist
 
 
