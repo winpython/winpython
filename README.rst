@@ -3,7 +3,7 @@ WinPython tools
 
 Copyright © 2012-2013 Pierre Raybaut
 
-Copyright © 2014-2018+ The Winpython development team https://github.com/winpython/
+Copyright © 2014-2019+ The Winpython development team https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
@@ -19,10 +19,10 @@ This is the `winpython` Python package, not the distribution itself.
 It includes two main features:
 
 WinPython Package Manager (WPPM)
-  let you install/uninstall 
+  a graphical layer over pip, to let you install/uninstall 
   to your WinPython distribution any standard Python package built  
-  with distutils (e.g. "dummypackage-2.1.win-amd64-py3.4.‌exe") 
-  or with wheels (e.g. "dummypackage-2.1-py2.py3-none-any.whl")
+  as source  (e.g. "dummypackage-2.1.zip" or "dummypackage-2.1.tar.gz") 
+  or as wheel (e.g. "dummypackage-2.1-py2.py3-none-any.whl")
 			
 WinPython build toolchain
   make.py is the script used to 
@@ -33,20 +33,16 @@ Dependencies
 
 * Python2 >= 2.7 or Python3 >= 3.4 (Python>= 3.6 is recommanded)
 
-* PyQt4 >= 4.11 or PyQt5 >= 5.4 or PySide2>=5.11 (PyQt5.9 or Pyside2-5.12 is recommanded)
+* PyQt5 >= 5.6 or PySide2>=5.11 (PyQt5.9 or Pyside2-5.12 is recommanded)
 
-* pip >= 9.0 and setuptools >= 30.0
+* pip >= 10.0 and setuptools >= 38.0
 
 Requirements
 ------------
 
-* 7zip (directory has to be available in PATH)
-
-* NSIS:
-    * "Large strings" special build (http://nsis.sourceforge.net/Special_Builds)
-    * with TextReplace plugin installed
+* NSIS (for icon shortcut creations, installer can be NSIS, INNO, 7-Zip, or nothing)
     
-* PyQt4/5 or Pyside2 is required to execute WinPython Control Panel/Ipython Qt and Qt related packages.
+* PyQt5 or Pyside2 is required to execute WinPython Control Panel/Ipython Qt and Qt related packages.
   if not installed, these packages will not execute.
 
 Installation
