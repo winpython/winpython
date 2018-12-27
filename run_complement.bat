@@ -133,6 +133,13 @@ echo finish install of holoviews jupyterlab 2018-02-27
 rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\holoviews" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @pyviz/jupyterlab_pyviz
 
+
+rem * ==================
+echo finish install of nteract_on_jupyter (2018-12-27)
+rem * ================= 
+if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
+
+
 rem * =================
 echo finish install seaborn iris example
 rem * =================
@@ -206,7 +213,8 @@ if exist "%WINPYDIR%\share\jupyter\lab\staging" rmdir /S /Q "%WINPYDIR%\share\ju
 rem * ===================
 echo clear Pyside2 QML (2018-04-29 : it's too big)
 rem * ===================
-if exist  "%WINPYDIR%\Lib\site-packages\PySide2\qml"  rmdir /S /Q "%WINPYDIR%\Lib\site-packages\PySide2\qml"
+rem 20181222
+rem if exist  "%WINPYDIR%\Lib\site-packages\PySide2\qml"  rmdir /S /Q "%WINPYDIR%\Lib\site-packages\PySide2\qml"
 
 @echo on
 goto the_end
