@@ -734,7 +734,7 @@ set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 set FINDDIR=%WINDIR%\system32
-echo ;%PATH%; | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
+echo ";%PATH%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
 if %ERRORLEVEL% NEQ 0 set PATH=""" + path + r"""
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
