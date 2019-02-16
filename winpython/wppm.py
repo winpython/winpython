@@ -483,6 +483,11 @@ python "%~dpn0""" + ext + """" %*""")
               r"\Lib\site-packages\spyder\config\main.py"),
               "'check_updates_on_startup': True,",
               "'check_updates_on_startup': False,")
+            utils.patch_sourcefile(
+              self.target + (
+              r"\Lib\site-packages\spyder\config\main.py"),
+              "'icon_theme': 'spyder 3'",
+              "'icon_theme': 'spyder 2'")
 
         # workaround bad installers
         if package_name.lower() == "numba":
