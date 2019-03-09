@@ -23,7 +23,7 @@ rem Override other scripts (simpler maintenance)
 set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
 
 rem handle alpha
-if "%my_release_level%"=="" set my_release_level=b2
+if "%my_release_level%"=="" set my_release_level=
 
 if %my_python_target%==27 set my_release=2
 
