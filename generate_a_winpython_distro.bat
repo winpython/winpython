@@ -31,9 +31,11 @@ if %my_python_target%==34 set my_release=8
 
 if %my_python_target%==35 set my_release=3
 
-if %my_python_target%==36 set my_release=0
+if %my_python_target%==36 set my_release=1
 
 if %my_python_target%==37 set my_release=0
+
+if %my_python_target%==38 set my_release=0
 
 rem **** 2018-10-30 create_installer **
 if "%my_create_installer%"=="" set my_create_installer=True
