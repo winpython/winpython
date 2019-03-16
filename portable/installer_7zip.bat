@@ -1,4 +1,4 @@
-﻿rem Copyright Â© 2018 WinPython team
+﻿rem Copyright @ 2018 WinPython team
 rem Licensed under the terms of the MIT License
 rem (see winpython/__init__.py for details)
 
@@ -40,6 +40,12 @@ set OutputBaseFilename=%ID%%ARCH%-%VERSION%%RELEASELEVEL%
 
 rem 7-zip uncompress the directory compressed %DISTDIR% (no option to change it in gui)
 
+rem ================================================================
+rem  2019-03-16 copy license at source (due to 7zip limitations)
+
+copy/Y %PORTABLE_DIR%\license.txt %DISTDIR%\license.txt
+
+rem ================================================================
 
 echo %time%
 
