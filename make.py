@@ -1305,6 +1305,8 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\designer.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\designer.exe" %*
     ) else (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
     )
@@ -1321,6 +1323,8 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" %*
     ) else (
         "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
     )
@@ -1335,6 +1339,8 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
     ) else (
         cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
         "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
