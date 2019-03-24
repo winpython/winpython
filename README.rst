@@ -31,11 +31,10 @@ WinPython build toolchain
 Dependencies
 ------------   
 
-* Python2 >= 2.7 or Python3 >= 3.4 (Python>= 3.6 is recommended)
+* Python2 >= 2.7 or Python3 >= 3.4 (Python>= 3.7 is recommended)
 
-* PyQt5 >= 5.6 or PySide2>=5.11 (PyQt5.9 or Pyside2-5.12 is recommended)
+* PyQt5 >= 5.6 or PySide2>=5.11 (PyQt5 >=5.12 or Pyside2 >= 5.12 is recommended)
 
-* pip >= 10.0 and setuptools >= 38.0
 
 Requirements
 ------------
