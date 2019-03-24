@@ -342,7 +342,7 @@ Name | Version | Description
     @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
-        path = [r"Lib\site-packages\PyQt5", r"Lib\site-packages\PyQt4",
+        path = [r"Lib\site-packages\PyQt5",
                 r"Lib\site-packages\PySide2", "",  # Python root directory 
                 "DLLs", "Scripts", r"..\t", r"..\t\mingw32\bin"
                 ]
@@ -793,17 +793,6 @@ echo Prefix = .>>"%tmp_pyz%"
 echo Binaries = .>>"%tmp_pyz%"
 :pyqt5_conf_exist
 
-rem ******************
-rem handle PyQt4 if included
-rem ******************
-set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt4
-if not exist "%tmp_pyz%" goto pyqt4_conf_exist
-set tmp_pyz=%tmp_pyz%\qt.conf
-if  exist "%tmp_pyz%" goto pyqt4_conf_exist
-echo [Paths]>>"%tmp_pyz%"
-echo Prefix = .>>"%tmp_pyz%"
-echo Binaries = .>>"%tmp_pyz%"
-:pyqt4_conf_exist
 
 rem ******************
 rem handle Pyzo configuration part
@@ -929,18 +918,6 @@ if (Test-Path "$env:tmp_pyz") {
    }
 }
 
-#####################
-### handle PyQt4 if included
-#####################
-$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PyQt4"
-if (Test-Path "$env:tmp_pyz") {
-   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
-   if (-not (Test-Path "$env:tmp_pyz")) {
-      "[Paths]"| Add-Content -Path $env:tmp_pyz
-      "Prefix = ."| Add-Content -Path $env:tmp_pyz
-      "Binaries = ."| Add-Content -Path $env:tmp_pyz
-   }
-}
 
 #####################
 ### handle Pyzo configuration part
@@ -1294,8 +1271,8 @@ cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
 )  
-if exist "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw" (
-    "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\Lib\site-packages\PyQt4\examples\demos\qtdemo\qtdemo.pyw"
+if exist "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py" (
+    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py"
 )
 """)
 
@@ -1310,8 +1287,6 @@ if "%QT_API%"=="pyqt5" (
     ) else (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
     )
-) else if exist "%WINPYDIR%\Lib\site-packages\pyqt4\designer.exe" (
-    "%WINPYDIR%\Lib\site-packages\PyQt4\designer.exe" %*
 ) else (
     "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
 )
@@ -1325,11 +1300,9 @@ if "%QT_API%"=="pyqt5" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" %*
-    ) else (
-        "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
     )
 ) else (
-    "%WINPYDIR%\Lib\site-packages\PyQt4\assistant.exe" %*
+    "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
 )
 """)        
 
@@ -1345,9 +1318,6 @@ if "%QT_API%"=="pyqt5" (
         cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
         "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
     )
-) else if exist "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" (
-    cd/D "%WINPYDIR%\Lib\site-packages\PyQt4"
-    "%WINPYDIR%\Lib\site-packages\PyQt4\linguist.exe" %*
 ) else (
     "%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" %*
 )
