@@ -548,11 +548,6 @@ call "%~dp0env_for_icons.bat"
                # (on hold since 2017-02-16, http://bugs.python.org/issue29578)
                pypath_file = osp.join(self.python_dir, 'python_onHold._pth')
                open(pypath_file, 'w').write('python36.zip\nDLLs\nLib\n.\nimport site\n')
-        else:   
-           utils.extract_msi(self.python_fname, targetdir=self.python_dir)
-           os.remove(osp.join(self.python_dir, osp.basename(self.python_fname)))
-           if not os.path.exists(osp.join(self.python_dir, 'Scripts')):
-               os.mkdir(osp.join(self.python_dir, 'Scripts'))
         self._print_done()
 
     def _add_msvc_files(self):
@@ -1392,7 +1387,7 @@ cd/D "%WINPYDIR%"
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(msi|zip)')
+                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)')
         self.python_name = osp.basename(self.python_fname)[:-4]
         distname = 'win%s' % self.python_name
         vlst = re.match(r'winpython-([0-9\.]*)', distname
@@ -1602,7 +1597,7 @@ def make_all(build_number, release_level, pyver, architecture,
 
     # extract the python subversion to get WPy64-3671b1
     dist.python_fname = dist.get_package_fname(
-                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(msi|zip)')
+                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)')
     my_x = ''.join(dist.python_fname.replace('.amd64','').split('.')[-2:-1])
     while not my_x.isdigit() and len(my_x)>0:
         my_x = my_x[:-1]
