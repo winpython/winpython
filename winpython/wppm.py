@@ -387,8 +387,6 @@ python "%~dpn0""" + ext + """" %*""")
                 self.install_nsis_package(package)
             else:
                 self.install_bdist_wininst(package)
-        elif bname.endswith('.msi'):
-            self.install_bdist_msi(package)
         self.handle_specific_packages(package)
         # minimal post-install actions
         self.patch_standard_packages(package.name)
@@ -629,7 +627,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
     def install_bdist_direct(self, package, install_options=None):
         """Install a package directly !"""
         self._print(package, "Installing %s" % package.fname.split(".")[-1])
-        # targetdir = utils.extract_msi(package.fname, targetdir=self.target)
         try:
             fname = utils.direct_pip_install(package.fname,
                         python_exe=osp.join(self.target, 'python.exe'),
@@ -653,13 +650,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 print("Failed!")
                 raise
 
-    def install_bdist_msi(self, package):
-        """Install a distutils package built with the bdist_msi option
-        (binary distribution, .msi file)"""
-        raise NotImplementedError
-        # self._print(package, "Extracting")
-        # targetdir = utils.extract_msi(package.fname, targetdir=self.target)
-        # self._print_done()
 
     def install_nsis_package(self, package):
         """Install a Python package built with NSIS (e.g. PyQt or PyQwt)

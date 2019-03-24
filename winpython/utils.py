@@ -408,34 +408,6 @@ def _create_temp_dir():
     return tmpdir
 
 
-def extract_msi(fname, targetdir=None, verbose=False):
-    """Extract .msi installer to a temporary directory (if targetdir
-    is None). Return the temporary directory path"""
-    assert fname.endswith('.msi')
-    if targetdir is None:
-        targetdir = _create_temp_dir()
-    extract = 'msiexec.exe'
-    bname = osp.basename(fname)
-    args = ['/a', '%s' % bname]
-    if not verbose:
-        args += ['/qn']
-    args += ['TARGETDIR=%s' % targetdir]
-    subprocess.call([extract]+args, cwd=osp.dirname(fname))
-    print('fname=%s' % fname)
-    print('TARGETDIR=%s' % targetdir)
-    # ensure pip if it's not 3.3
-    if '-3.3' not in targetdir:
-        subprocess.call(
-            [r'%s\%s' % (targetdir, 'python.exe'), '-m', 'ensurepip'],
-            cwd=osp.dirname(r'%s\%s' % (targetdir, 'pythons.exe')))
-        # We patch ensurepip live (shame) !!!!
-        # rational: https://github.com/pypa/pip/issues/2328
-        import glob
-        for fname in glob.glob(r'%s\Scripts\*.exe' % targetdir):
-            patch_shebang_line(fname)
-    return targetdir
-
-
 def extract_exe(fname, targetdir=None, verbose=False):
     """Extract .exe archive to a temporary directory (if targetdir
     is None). Return the temporary directory path"""
