@@ -236,20 +236,11 @@ def get_npmjs_version(path):
     """Return version of the Nodejs installed in *path*"""
     return exec_shell_cmd('npm -v', path).splitlines()[0]
     
-def get_thg_version(path):
-    """Return version of TortoiseHg installed in *path*"""
-    txt = exec_shell_cmd('thg version', path).splitlines()[0]
-    match = re.match('TortoiseHg Dialogs \(version ([0-9\.]*)\)', txt)
-    if match is not None:
-        return match.groups()[0]
 
 def get_pandoc_version(path):
     """Return version of the Pandoc executable in *path*"""
     return exec_shell_cmd('pandoc -v', path).splitlines()[0].split(" ")[-1]
 
-def get_ffmpeg_version(path):
-    """Return version of the Pandoc executable in *path*"""
-    return exec_shell_cmd('ffmpeg -version', path).splitlines()[0].split(" ")[2]
 
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
@@ -601,8 +592,6 @@ def do_script(this_script, python_exe=None, copy_to=None,
 
 
 if __name__ == '__main__':
-    thg = get_thg_version(osp.join(BASE_DIR, 't', 'tortoisehg'))
-    print(("thg version: %r" % thg))
 
     print_box("Test")
     dname = sys.prefix

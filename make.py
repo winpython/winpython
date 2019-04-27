@@ -270,10 +270,6 @@ class WinPythonDistribution(object):
             pandocver = utils.get_pandoc_version(osp.dirname(pandocexe))
             installed_tools += [('Pandoc', pandocver)]
 
-        ffmpegexe = get_tool_path (r'\t\ffmpeg.exe', osp.isfile)
-        if ffmpegexe is not None:
-            ffmpegver = utils.get_ffmpeg_version(osp.dirname(ffmpegexe))
-            installed_tools += [('ffmpeg', ffmpegver)]
 
         tools = []
         for name, ver in installed_tools:
@@ -755,14 +751,6 @@ set JULIA=%JULIA_HOME%%JULIA_EXE%
 set JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 :julia_bad
 
-rem ******************
-rem handle ffmpeg if included
-rem ******************
-if not exist "%WINPYDIRBASE%\t\ffmpeg.exe" goto ffmpeg_bad
-set IMAGEIO_FFMPEG_EXE=%WINPYDIRBASE%\t\ffmpeg.exe
-
-:ffmpeg_bad
-
 
 rem ******************
 rem handle PySide2 if included
@@ -877,13 +865,6 @@ if (Test-Path "$env:WINPYDIR\..\t\Julia\bin") {
     $env:JULIA_EXE = "julia.exe"
     $env:JULIA = "$env:JULIA_HOME$env:JULIA_EXE"
     $env:JULIA_PKGDIR = "$env:WINPYDIR\..\settings\.julia"
-}
-
-#####################
-### handle ffmpeg if included
-#####################
-if (Test-Path "$env:WINPYDIR\..\t\ffmpeg.exe") {
-    $env:IMAGEIO_FFMPEG_EXE = "%WINPYDIRBASE%\t\ffmpeg.exe"
 }
 
 #####################
@@ -1429,7 +1410,6 @@ cd/D "%WINPYDIR%"
             if not self.simulation:
                 self._create_batch_scripts_initial()
                 self._create_batch_scripts()  # which set mingwpy as compiler
-                self._run_complement_batch_scripts("run_required_first.bat")
                 # launchers at the beginning
                 self._create_launchers()
 
