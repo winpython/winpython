@@ -501,24 +501,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             # no more legacy, no package are installed by old non-pip means
         self._print_done()
 
-    def install_bdist_wininst(self, package):
-        """Install a distutils package built with the bdist_wininst option
-        (binary distribution, .exe file)"""
-        self._print(package, "Extracting")
-        targetdir = utils.extract_archive(package.fname)
-        self._print_done()
-
-        self._print(package, "Installing %s from " % targetdir)
-        self.copy_files(package, targetdir, 'PURELIB',
-                        osp.join('Lib', 'site-packages'))
-        self.copy_files(package, targetdir, 'PLATLIB',
-                        osp.join('Lib', 'site-packages'))
-        self.copy_files(package, targetdir, 'SCRIPTS', 'Scripts',
-                        create_bat_files=True)
-        self.copy_files(package, targetdir, 'DLLs', 'DLLs')
-        self.copy_files(package, targetdir, 'DATA', '.')
-        self._print_done()
-
     def install_bdist_direct(self, package, install_options=None):
         """Install a package directly !"""
         self._print(package, "Installing %s" % package.fname.split(".")[-1])
@@ -545,29 +527,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 print("Failed!")
                 raise
 
-
-    def install_nsis_package(self, package):
-        """Install a Python package built with NSIS (e.g. PyQt or PyQwt)
-        (binary distribution, .exe file)"""
-        bname = osp.basename(package.fname)
-        assert bname.startswith(self.NSIS_PACKAGES)
-        self._print(package, "Extracting")
-        targetdir = utils.extract_exe(package.fname)
-        self._print_done()
-
-        self._print(package, "Installing")
-        self.copy_files(package, targetdir, 'Lib', 'Lib')
-        if bname.startswith('PyQt5'):
-            # PyQt5
-            outdir = osp.join('Lib', 'site-packages', 'PyQt5')
-        elif bname.startswith('PyQt'):
-            # PyQt4
-            outdir = osp.join('Lib', 'site-packages', 'PyQt4')
-        else:
-            # Qwt5
-            outdir = osp.join('Lib', 'site-packages', 'PyQt4', 'Qwt5')
-        self.copy_files(package, targetdir, '$_OUTDIR', outdir)
-        self._print_done()
 
 def main(test=False):
     if test:
