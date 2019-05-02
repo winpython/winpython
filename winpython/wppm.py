@@ -131,38 +131,6 @@ class Package(BasePackage):
                 return
         raise NotImplementedError("Not supported package type %s" % bname)
 
-    def logpath(self, logdir):
-        """Return full log path"""
-        return osp.join(logdir, osp.basename(self.fname+'.log'))
-
-    def save_log(self, logdir):
-        """Save log (pickle)"""
-        header = ['# WPPM package installation log',
-                  '# ',
-                  '# Package: %s v%s' % (self.name, self.version),
-                  '']
-        open(self.logpath(logdir), 'w').write('\n'.join(header + self.files))
-
-    def load_log(self, logdir):
-        """Load log (pickle)"""
-        try:
-            data = open(self.logpath(logdir), 'U').readlines()
-        except (IOError, OSError):
-            data = []  # it can be now ()
-        self.files = []
-        for line in data:
-            relpath = line.strip()
-            if relpath.startswith('#') or len(relpath) == 0:
-                continue
-            self.files.append(relpath)
-
-    def remove_log(self, logdir):
-        """Remove log (after uninstalling package)"""
-        try:
-            os.remove(self.logpath(logdir))
-        except WindowsError:
-            pass
-
 
 class WininstPackage(BasePackage):
     def __init__(self, fname, distribution):
@@ -204,20 +172,16 @@ class WininstPackage(BasePackage):
 
 
 class Distribution(object):
-    # PyQt module is now like :PyQt4-...
-    NSIS_PACKAGES = ('PyQt4', 'PyQwt', 'PyQt5')  # known NSIS packages
 
     def __init__(self, target=None, verbose=False, indent=False):
         self.target = target
         self.verbose = verbose
         self.indent = indent
-        self.logdir = None
 
         # if no target path given, take the current python interpreter one
         if self.target is None:
             self.target = os.path.dirname(sys.executable)
 
-        self.init_log_dir()
         self.to_be_removed = []  # list of directories to be removed later
 
         self.version, self.architecture = utils.get_python_infos(target)
@@ -237,13 +201,6 @@ class Distribution(object):
             shutil.rmtree(path)
         except WindowsError:
             self.to_be_removed.append(path)
-
-    def init_log_dir(self):
-        """Init log path"""
-        path = osp.join(self.target, 'Logs')
-        if not osp.exists(path):
-            os.mkdir(path)
-        self.logdir = path
 
     def copy_files(self, package, targetdir,
                    srcdir, dstdir, create_bat_files=False):
@@ -299,20 +256,9 @@ python "%~dpn0""" + ext + """" %*""")
 
     def get_installed_packages(self):
         """Return installed packages"""
-        # Packages installed with WPPM
-        wppm = [Package(logname[:-4]) for logname in os.listdir(self.logdir)
-                if '.whl.log' not in logname ]
-        # Packages installed with distutils wininst
-        wininst = []
-        for name in os.listdir(self.target):
-            if name.startswith('Remove') and name.endswith('.exe'):
-                try:
-                    pack = WininstPackage(name, self)
-                except IOError:
-                    continue
-                if pack.name is not None and pack.version is not None:
-                    wininst.append(pack)
+
         # Include package installed via pip (not via WPPM)
+        wppm = []
         try:
             if os.path.dirname(sys.executable) == self.target:
                 #  direct way: we interrogate ourself, using official API
@@ -331,16 +277,14 @@ python "%~dpn0""" + ext + """" %*""")
                 pip_list = [line.split("@+@")[:2] for line in
                             ("%s" % stdout)[start_at:].split("+!+")]
 
+            # there are only Packages installed with pip now
             # create pip package list
-            wppip = [Package('%s-%s-py2.py3-none-any.whl' %
+            wppm = [Package('%s-%s-py2.py3-none-any.whl' %
                      (i[0].replace('-', '_').lower(), i[1])) for i in pip_list]
-            # pip package version is supposed better
-            already = set(b.name.replace('-', '_') for b in wppip+wininst)
-            wppm = wppip + [i for i in wppm
-                            if i.name.replace('-', '_').lower() not in already]
+            
         except:
             pass
-        return sorted(wppm + wininst, key=lambda tup: tup.name.lower())
+        return sorted(wppm, key=lambda tup: tup.name.lower())
 
     def find_package(self, name):
         """Find installed package"""
@@ -375,25 +319,14 @@ python "%~dpn0""" + ext + """" %*""")
     def install(self, package, install_options=None):
         """Install package in distribution"""
         assert package.is_compatible_with(self)
-        tmp_fname = None
 
         # wheel addition
         if package.fname.endswith(('.whl', '.tar.gz', '.zip')):
             self.install_bdist_direct(package, install_options=install_options)
 
-        bname = osp.basename(package.fname)
-        if bname.endswith('.exe'):
-            if re.match(r'(' + ('|'.join(self.NSIS_PACKAGES)) + r')-', bname):
-                self.install_nsis_package(package)
-            else:
-                self.install_bdist_wininst(package)
         self.handle_specific_packages(package)
         # minimal post-install actions
         self.patch_standard_packages(package.name)
-        if not package.fname.endswith(('.whl', '.tar.gz', '.zip')):
-            package.save_log(self.logdir)
-        if tmp_fname is not None:
-            os.remove(tmp_fname)
 
     def do_pip_action(self, actions=None, install_options=None):
         """Do pip action in a distribution"""
@@ -559,51 +492,13 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
     def uninstall(self, package):
         """Uninstall package from distribution"""
         self._print(package, "Uninstalling")
-        if isinstance(package, WininstPackage):
-            package.uninstall()
-            package.remove_log(self.logdir)
-        elif not package.name == 'pip':
+        if not package.name == 'pip':
             # trick to get true target (if not current)
-            this_executable_path = os.path.dirname(self.logdir)
+            this_executable_path = self.target
             subprocess.call([this_executable_path + r'\python.exe',
                             '-m', 'pip', 'uninstall', package.name, '-y'],
                             cwd=this_executable_path)
-            # legacy, if some package installed by old non-pip means
-            package.load_log(self.logdir)
-            for fname in reversed(package.files):
-                path = osp.join(self.target, fname)
-                if osp.isfile(path):
-                    if self.verbose:
-                        print("remove: %s" % fname)
-                    os.remove(path)
-                    if fname.endswith('.py'):
-                        for suffix in ('c', 'o'):
-                            if osp.exists(path+suffix):
-                                if self.verbose:
-                                    print("remove: %s" % (fname+suffix))
-                                os.remove(path+suffix)
-                elif osp.isdir(path):
-                    if self.verbose:
-                        print("rmdir:  %s" % fname)
-                    pycache = osp.join(path, '__pycache__')
-                    if osp.exists(pycache):
-                        try:
-                            shutil.rmtree(pycache, onerror=utils.onerror)
-                            if self.verbose:
-                                print("rmtree: %s" % pycache)
-                        except WindowsError:
-                            print("Directory %s could not be removed"
-                                  % pycache, file=sys.stderr)
-                    try:
-                        os.rmdir(path)
-                    except OSError:
-                        if self.verbose:
-                            print("unable to remove directory: %s" % fname,
-                                  file=sys.stderr)
-                else:
-                    if self.verbose:
-                        print("file not found: %s" % fname, file=sys.stderr)
-            package.remove_log(self.logdir)
+            # no more legacy, no package are installed by old non-pip means
         self._print_done()
 
     def install_bdist_wininst(self, package):
