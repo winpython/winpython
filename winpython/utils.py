@@ -429,6 +429,11 @@ def extract_archive(fname, targetdir=None, verbose=False):
     Return the temporary directory path"""
     if targetdir is None:
         targetdir = _create_temp_dir()
+    else:
+        try:
+            os.mkdir(targetdir)
+        except:
+            pass
     if osp.splitext(fname)[1] in ('.zip', '.exe'):
         obj = zipfile.ZipFile(fname, mode="r")
     elif fname.endswith('.tar.gz'):

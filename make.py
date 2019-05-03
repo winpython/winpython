@@ -390,22 +390,6 @@ Name | Version | Description
             raise RuntimeError(
                 'Could not find required package matching %s' % pattern)
 
-    def install_package(self, pattern, install_options=None):
-        """Install package matching pattern"""
-        fname = self.get_package_fname(pattern)
-        if fname not in [p.fname for p in self.installed_packages]:
-            pack = wppm.Package(fname)
-            if self.simulation:
-                self.distribution._print(pack, "Installing")
-                self.distribution._print_done()
-            else:
-                if install_options:
-                    self.distribution.install(pack, install_options)
-                else:
-                    self.distribution.install(pack,
-                                         install_options=self.install_options)
-            self.installed_packages.append(pack)
-
     def create_batch_script(self, name, contents):
         """Create batch script %WINPYDIR%/name"""
         scriptdir = osp.join(self.winpydir, 'scripts')
@@ -531,19 +515,8 @@ call "%~dp0env_for_icons.bat"
 
     def _extract_python(self):
         """Extracting Python installer, creating distribution object"""
-        self._print("Extracting Python installer")
-        os.mkdir(self.python_dir)
-        if  self.python_fname[-3:] == 'zip':  # Python3.5
-           utils.extract_archive(self.python_fname, targetdir=self.python_dir+r'\..')
-           if self.winpyver < "3.6":
-               # new Python 3.5 trick (https://bugs.python.org/issue23955)
-               pyvenv_file = osp.join(self.python_dir, 'pyvenv.cfg')
-               open(pyvenv_file, 'w').write('applocal=True\n')
-           else:
-               # new Python 3.6 trick (https://docs.python.org/3.6/using/windows.html#finding-modules)
-               # (on hold since 2017-02-16, http://bugs.python.org/issue29578)
-               pypath_file = osp.join(self.python_dir, 'python_onHold._pth')
-               open(pypath_file, 'w').write('python36.zip\nDLLs\nLib\n.\nimport site\n')
+        self._print("Extracting Python .zip version")
+        utils.extract_archive(self.python_fname, targetdir=self.python_dir+r'\..')
         self._print_done()
 
     def _add_msvc_files(self):
@@ -581,19 +554,6 @@ call "%~dp0env_for_icons.bat"
                 print("WARNING: duplicate packages %s (%s)" %
                       (pack.name, ", ".join([p.version for p in duplicates])),
                       file=sys.stderr)
-
-    def _install_all_other_packages(self):
-        """Try to install all other packages in wheeldir"""
-        print("Installing other packages")
-        my_list = []
-        my_list += os.listdir(self.wheeldir)
-        for fname in my_list:
-            if osp.basename(fname) != osp.basename(self.python_fname):
-                try:
-                    self.install_package(fname)
-                except NotImplementedError:
-                    print("WARNING: unable to install package %s"
-                          % osp.basename(fname), file=sys.stderr)
 
     def _copy_dev_tools(self):
         """Copy dev tools"""
@@ -1417,7 +1377,7 @@ cd/D "%WINPYDIR%"
             # pre-patch current pip (until default python has pip 8.0.3)
             self.distribution.patch_standard_packages('pip')
             # not forced update of pip (FIRST) and setuptools here
-            for req in ('pip', 'setuptools'):   
+            for req in ('pip', 'setuptools', 'winpython'):   
                 actions = ["install","--upgrade", req]
                 if self.install_options is not None:
                     actions += self.install_options
@@ -1426,8 +1386,8 @@ cd/D "%WINPYDIR%"
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(req)
                 
-            # install packages in source_dirs (not using requirements.txt)
-            self._install_all_other_packages()
+            # no more directory base package install: use requirements.txt
+            #2019-05-03 removed self._install_all_other_packages()
             if not self.simulation:
                 self._copy_dev_tools()
                 self._copy_dev_docs()
