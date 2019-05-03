@@ -527,34 +527,6 @@ call "%~dp0env_for_icons.bat"
                                   architecture=self.distribution.architecture):
             shutil.copy(fname, self.python_dir)
 
-    def _check_packages(self):
-        """Check packages for duplicates or unsupported packages"""
-        print("Checking packages")
-        packages = []
-        my_plist = []
-        my_plist += os.listdir(self.wheeldir)
-        for fname0 in my_plist:
-            fname = self.get_package_fname(fname0)
-            if fname == self.python_fname:
-                continue
-            try:
-                pack = wppm.Package(fname)
-            except NotImplementedError:
-                print("WARNING: package %s is not supported"
-                      % osp.basename(fname), file=sys.stderr)
-                continue
-            packages.append(pack)
-        all_duplicates = []
-        for pack in packages:
-            if pack.name in all_duplicates:
-                continue
-            all_duplicates.append(pack.name)
-            duplicates = [p for p in packages if p.name == pack.name]
-            if len(duplicates) > 1:
-                print("WARNING: duplicate packages %s (%s)" %
-                      (pack.name, ", ".join([p.version for p in duplicates])),
-                      file=sys.stderr)
-
     def _copy_dev_tools(self):
         """Copy dev tools"""
         self._print("Copying tools")
@@ -1016,9 +988,6 @@ r"""These batch files are required to run WinPython icons.
 These files should help the user writing his/her own
 specific batch file to call Python scripts inside WinPython.
 The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""")
-        conv = lambda path: ";".join(['%WINPYDIR%\\'+pth for pth in path])
-        path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
-
 
         self.create_batch_script('make_cython_use_mingw.bat', r"""@echo off
 call "%~dp0env.bat"
@@ -1361,8 +1330,6 @@ cd/D "%WINPYDIR%"
         self.distribution = wppm.Distribution(self.python_dir,
                                               verbose=self.verbose,
                                               indent=True)
-
-        self._check_packages()
 
         if remove_existing:
             if not self.simulation:
