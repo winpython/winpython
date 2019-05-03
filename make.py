@@ -218,16 +218,22 @@ class WinPythonDistribution(object):
         self._docsdirs = docsdirs
         self.verbose = verbose
         self.winpydir = None
-        self.python_fname = None
-        self.python_name = None
-        self.python_version = None
-        self.python_fullversion = None
         self.distribution = None
         self.installed_packages = []
         self.simulation = simulation
         self.basedir = basedir  # added to build from winpython
         self.install_options = install_options
         self.flavor = flavor
+
+        self.python_fname = self.get_package_fname(
+                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)')
+        self.python_name = osp.basename(self.python_fname)[:-4]
+        self.distname = 'win%s' % self.python_name
+        vlst = re.match(r'winpython-([0-9\.]*)', self.distname
+                        ).groups()[0].split('.')
+        self.python_version = '.'.join(vlst[:2])
+        self.python_fullversion = '.'.join(vlst[:3])
+
 
     @property
     def package_index_wiki(self):
@@ -278,7 +284,6 @@ class WinPythonDistribution(object):
             tools += ['[%s](%s) | %s | %s' % (name, url, ver, desc)]
 
         # get all packages installed in the changelog, whatever the method
-        self.installed_packages = []
         self.installed_packages = self.distribution.get_installed_packages()
 
         packages = ['[%s](%s) | %s | %s'
@@ -305,6 +310,7 @@ Name | Version | Description
 (' %s' % self.release_level), '\n'.join(tools),
          self.python_fullversion, python_desc, '\n'.join(packages))
 
+    # @property makes self.winpyver becomes a call to self.winpyver()
     @property
     def winpyver(self):
         """Return WinPython version (with flavor and release level!)"""
@@ -320,11 +326,6 @@ Name | Version | Description
     def winpy_arch(self):
         """Return WinPython architecture"""
         return '%d' % self.distribution.architecture
-
-    @property
-    def pyqt_arch(self):
-        """Return distribution architecture, in PyQt format: x32/x64"""
-        return 'x%d' % self.distribution.architecture
 
     @property
     def py_arch(self):
@@ -1296,20 +1297,12 @@ cd/D "%WINPYDIR%"
         if self.simulation:
             print("WARNING: this is just a simulation!", file=sys.stderr)
 
-        self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)')
-        self.python_name = osp.basename(self.python_fname)[:-4]
-        distname = 'win%s' % self.python_name
-        vlst = re.match(r'winpython-([0-9\.]*)', distname
-                        ).groups()[0].split('.')
-        self.python_version = '.'.join(vlst[:2])
-        self.python_fullversion = '.'.join(vlst[:3])
-        print(self.python_fname,self.python_name , distname, self.python_version, self.python_fullversion)
+        print(self.python_fname,self.python_name , self.distname, self.python_version, self.python_fullversion)
         # Create the WinPython base directory
         self._print("Creating WinPython %s base directory"
                     % self.python_version)
         if my_winpydir is None:        
-            self.winpydir = osp.join(self.target, distname)  
+            self.winpydir = osp.join(self.target, self.distname)  
         else: 
             self.winpydir = osp.join(self.target, my_winpydir)
         if osp.isdir(self.winpydir) and remove_existing \
@@ -1334,10 +1327,9 @@ cd/D "%WINPYDIR%"
         if remove_existing:
             if not self.simulation:
                 self._add_msvc_files()
-            if not self.simulation:
                 self._create_batch_scripts_initial()
-                self._create_batch_scripts()  # which set mingwpy as compiler
-                # launchers at the beginning
+                self._create_batch_scripts()
+                # always create all launchers (as long as it is NSIS-based)
                 self._create_launchers()
 
 
@@ -1499,8 +1491,6 @@ def make_all(build_number, release_level, pyver, architecture,
     # define a pre-defined winpydir, instead of having to guess
 
     # extract the python subversion to get WPy64-3671b1
-    dist.python_fname = dist.get_package_fname(
-                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)')
     my_x = ''.join(dist.python_fname.replace('.amd64','').split('.')[-2:-1])
     while not my_x.isdigit() and len(my_x)>0:
         my_x = my_x[:-1]
