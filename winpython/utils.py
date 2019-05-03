@@ -29,25 +29,6 @@ import locale
 from winpython.py3compat import winreg
 
 
-# Development only
-TOOLS_DIR = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, 't'))
-if osp.isdir(TOOLS_DIR):
-    os.environ['PATH'] += ';%s' % TOOLS_DIR
-ROOT_DIR = os.environ.get('WINPYTHONROOTDIR')
-BASE_DIR = os.environ.get('WINPYTHONBASEDIR')
-
-ROOTDIR_DOC = """
-
-    The WinPython root directory (WINPYTHONROOTDIR environment variable which
-    may be overriden with the `rootdir` option) contains the following folders:
-      * (required) `packages.win32`: contains distutils 32-bit packages
-      * (required) `packages.win-amd64`: contains distutils 64-bit packages
-      * (optional) `packages.src`: contains distutils source distributions
-      * (required) `tools`: contains architecture-independent tools
-      * (optional) `tools.win32`: contains 32-bit-specific tools
-      * (optional) `tools.win-amd64`: contains 64-bit-specific tools"""
-
-
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`.
 
@@ -607,12 +588,8 @@ if __name__ == '__main__':
     tmpdir = r'D:\Tests\winpython_tests'
     if not osp.isdir(tmpdir):
         os.mkdir(tmpdir)
-    print((extract_archive(osp.join(BASE_DIR, 'packages.win-amd64',
-                           'winpython-0.3dev.win-amd64.exe'),
+    print((extract_archive(osp.join(r'D:\WinP\bd37', 'packages.win-amd64',
+                           'python-3.7.3.amd64.zip'),
                            tmpdir)))
-    # extract_exe(osp.join(tmpdir,
-    #                      'PyQwt-5.2.0-py2.6-x64-pyqt4.8.6-numpy1.6.1-1.exe'))
-    # extract_exe(osp.join(tmpdir, 'PyQt-Py2.7-x64-gpl-4.8.6-1.exe'))
 
-    # path = r'D:\Pierre\_test\xlrd-0.8.0.tar.gz'
-    # source_to_wininst(path)
+
