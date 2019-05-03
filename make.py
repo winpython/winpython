@@ -1425,20 +1425,19 @@ def make_all(build_number, release_level, pyver, architecture,
                    docsdirs=None):
     """Make WinPython distribution, for a given base directory and
     architecture:
-
-    make_winpython(build_number, release_level, architecture,
-                   basedir=None, verbose=False, remove_existing=True,
-                   create_installer=True, simulation=False)
-
     `build_number`: build number [int]
     `release_level`: release level (e.g. 'beta1', '') [str]
     `pyver`: python version ('3.4' or 3.5')
     `architecture`: [int] (32 or 64)
-    `basedir`: where will be created  tmp_wheel dir. and Winpython-xyz dir.
-    """ + utils.ROOTDIR_DOC
+    `basedir`: where will be created tmp_wheel and Winpython build
+              r'D:\Winpython\basedir34'.
+    `requirements`: the package list for pip r'D:\requirements.txt',
+    `install_options`: pip options r'--no-index --pre --trusted-host=None',
+    `find_links`: package directories r'D:\Winpython\packages.srcreq',
+    `source_dirs`: the python.zip + rebuilt winpython wheel package directory,
+    `toolsdirs`: r'D:\WinPython\basedir34\t.Slim',
+    `docsdirs`: r'D:\WinPython\basedir34\docs.Slim'    """ 
     
-    if basedir is None:
-        basedir = utils.BASE_DIR
 
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
@@ -1449,26 +1448,11 @@ def make_all(build_number, release_level, pyver, architecture,
     if not osp.isdir(builddir):
         os.mkdir(builddir)
 
-    # Create 1 wheel directory to receive all packages whished  for build
-    wheeldir = osp.join(builddir, 'wheels_tmp_%s' % architecture)
-    if osp.isdir(wheeldir):
-        shutil.rmtree(wheeldir, onerror=utils.onerror)
-    os.mkdir(wheeldir)
+    # use source_dirs as the directory to re-build Winpython wheel
+    wheeldir = source_dirs
 
     # Rebuild Winpython in this wheel dir
     rebuild_winpython(basedir=basedir, targetdir=wheeldir, architecture=architecture)
-
-    #  Copy Every package directory to the wheel directory
-
-    # Optional pre-defined source_dirs
-    source_dirs = transform_in_list(source_dirs, 'source_dirs=')
-
-    for m in list(set(source_dirs)):
-        if osp.isdir(m):
-            src_files = os.listdir(m)
-            for file_name in src_files:
-                full_file_name = os.path.join(m, file_name)
-                shutil.copy(full_file_name, wheeldir)
 
     # Optional pre-defined toolsdirs
     toolsdirs = transform_in_list(toolsdirs, 'toolsdirs=')
@@ -1526,7 +1510,7 @@ if __name__ == '__main__':
              requirements=r'D:\Winpython\basedir34\barebone_requirements.txt',
              install_options=r'--no-index --pre --trusted-host=None',
              find_links=r'D:\Winpython\packages.srcreq',
-             source_dirs=r'D:\WinPython\basedir34\packages.src D:\WinPython\basedir34\packages.win-amd64',
+             source_dirs=r'D:\WinPython\basedir34\packages.win-amd64',
              toolsdirs=r'D:\WinPython\basedir34\t.Slim',
              docsdirs=r'D:\WinPython\basedir34\docs.Slim'
 )
