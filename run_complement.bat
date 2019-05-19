@@ -113,6 +113,8 @@ echo finish install of pdvega
 rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\vega3" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix vega3
 
+rem 2019-03-30 workaround altair-3
+rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyterlab/vega3-extension
 
 rem * ==================
 echo finish install of rise
@@ -138,6 +140,13 @@ rem * ==================
 echo finish install of nteract_on_jupyter (2018-12-27)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
+
+
+rem * ==================
+echo finish install of Qgrid(2019-04-26)
+rem * ================= 
+if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix qgrid
+if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build  qgrid  
 
 
 rem * =================
@@ -171,9 +180,15 @@ if  exist "%WINPYDIR%\..\settings\.spyder-py3\temp.py" del  "%WINPYDIR%\..\setti
 
 
 rem * ====================
-echo patch spyder update reflex (2017-03-25)
+echo patch spyder update reflex (2019-05-18 : spyder, not spyderlib !)
 rem * ====================
-%WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyderlib\config\main.py', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': True', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': False' )"
+%WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyder\config\main.py', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': True', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': False' )"
+
+rem * ====================
+echo patch spyder keep default white theme (2019-05-18)
+rem * ====================
+%WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyder\config\main.py', 'selected'+chr(39)+': '+chr(39)+'spyder/dark'+chr(39) , 'selected'+chr(39)+': '+chr(39)+'spyder'+chr(39) )"
+
 
 
 rem * ===================
