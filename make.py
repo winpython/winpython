@@ -25,70 +25,107 @@ from winpython import wppm, utils
 import diff
 
 
-CHANGELOGS_DIR = osp.join(osp.dirname(__file__), 'changelogs')
+CHANGELOGS_DIR = osp.join(
+    osp.dirname(__file__), 'changelogs'
+)
 assert osp.isdir(CHANGELOGS_DIR)
 
 
 def get_drives():
     """Return all active drives"""
     import win32api
-    return win32api.GetLogicalDriveStrings().split('\000')[:-1]
+
+    return win32api.GetLogicalDriveStrings().split('\000')[
+        :-1
+    ]
 
 
 def get_nsis_exe():
     """Return NSIS executable"""
     localdir = osp.join(sys.prefix, os.pardir, os.pardir)
     for drive in get_drives():
-        for dirname in (r'C:\Program Files', r'C:\Program Files (x86)',
-                        drive+r'PortableApps\NSISPortableANSI',
-                        drive+r'PortableApps\NSISPortable',
-                        osp.join(localdir, 'NSISPortableANSI'),
-                        osp.join(localdir, 'NSISPortable'),
-                        ):
+        for dirname in (
+            r'C:\Program Files',
+            r'C:\Program Files (x86)',
+            drive + r'PortableApps\NSISPortableANSI',
+            drive + r'PortableApps\NSISPortable',
+            osp.join(localdir, 'NSISPortableANSI'),
+            osp.join(localdir, 'NSISPortable'),
+        ):
             for subdirname in ('.', 'App'):
-                exe = osp.join(dirname, subdirname, 'NSIS', 'makensis.exe')
+                exe = osp.join(
+                    dirname,
+                    subdirname,
+                    'NSIS',
+                    'makensis.exe',
+                )
                 if osp.isfile(exe):
                     return exe
     else:
-        raise RuntimeError("NSIS is not installed on this computer.")
+        raise RuntimeError(
+            "NSIS is not installed on this computer."
+        )
+
 
 NSIS_EXE = get_nsis_exe()  # NSIS Compiler
+
 
 def get_iscc_exe():
     """Return ISCC executable"""
     localdir = osp.join(sys.prefix, os.pardir, os.pardir)
     for drive in get_drives():
-        for dirname in (r'C:\Program Files', r'C:\Program Files (x86)',
-                        # drive+r'PortableApps\NSISPortableANSI',
-                        #drive+r'PortableApps\NSISPortable',
-                        # osp.join(localdir, 'NSISPortableANSI'),
-                        osp.join(localdir, 'Inno Setup 5'),
-                        ):
+        for dirname in (
+            r'C:\Program Files',
+            r'C:\Program Files (x86)',
+            # drive+r'PortableApps\NSISPortableANSI',
+            # drive+r'PortableApps\NSISPortable',
+            # osp.join(localdir, 'NSISPortableANSI'),
+            osp.join(localdir, 'Inno Setup 5'),
+        ):
             for subdirname in ('.', 'App'):
-                exe = osp.join(dirname, subdirname, 'Inno Setup 5', 'iscc.exe')
+                exe = osp.join(
+                    dirname,
+                    subdirname,
+                    'Inno Setup 5',
+                    'iscc.exe',
+                )
                 if osp.isfile(exe):
                     return exe
     else:
-        raise RuntimeError("Inno Setup 5 is not installed on this computer.")
+        raise RuntimeError(
+            "Inno Setup 5 is not installed on this computer."
+        )
+
 
 ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
+
 
 def get_7zip_exe():
     """Return 7zip executable"""
     localdir = osp.join(sys.prefix, os.pardir, os.pardir)
     for drive in get_drives():
-        for dirname in (r'C:\Program Files', r'C:\Program Files (x86)',
-                        osp.join(localdir, '7-Zip'),
-                        ):
+        for dirname in (
+            r'C:\Program Files',
+            r'C:\Program Files (x86)',
+            osp.join(localdir, '7-Zip'),
+        ):
             for subdirname in ('.', 'App'):
-                exe = osp.join(dirname, subdirname, '7-Zip', '7z.exe')
+                exe = osp.join(
+                    dirname, subdirname, '7-Zip', '7z.exe'
+                )
                 # include = osp.join(dirname, subdirname, '7-Zip', 'include')
                 if osp.isfile(exe):
                     return exe
     else:
-        raise RuntimeError("7-Zip is not installed on this computer.")
+        raise RuntimeError(
+            "7-Zip is not installed on this computer."
+        )
 
-SEVENZIP_EXE = get_7zip_exe()  # Inno Setup Compiler (iscc.exe)
+
+SEVENZIP_EXE = (
+    get_7zip_exe()
+)  # Inno Setup Compiler (iscc.exe)
+
 
 def replace_in_nsis_file(fname, data):
     """Replace text in line starting with *start*, from this position:
@@ -98,14 +135,22 @@ def replace_in_nsis_file(fname, data):
     fd.close()
     for idx, line in enumerate(lines):
         for start, text in data:
-            if start not in ('Icon', 'OutFile') and not start.startswith('!'):
+            if start not in (
+                'Icon',
+                'OutFile',
+            ) and not start.startswith('!'):
                 start = '!define ' + start
             if line.startswith(start + ' '):
-                lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
+                lines[idx] = (
+                    line[: len(start) + 1]
+                    + ('"%s"' % text)
+                    + '\n'
+                )
     fd = open(fname, 'w')
     fd.writelines(lines)
     print('iss for ', fname, 'is', lines)
     fd.close()
+
 
 def replace_in_iss_file(fname, data):
     """Replace text in line starting with *start*, from this position:
@@ -115,10 +160,17 @@ def replace_in_iss_file(fname, data):
     fd.close()
     for idx, line in enumerate(lines):
         for start, text in data:
-            if start not in ('Icon', 'OutFile') and not start.startswith('!'):
+            if start not in (
+                'Icon',
+                'OutFile',
+            ) and not start.startswith('!'):
                 start = '#define ' + start
             if line.startswith(start + ' '):
-                lines[idx] = line[:len(start)+1] + ('"%s"' % text) + '\n'
+                lines[idx] = (
+                    line[: len(start) + 1]
+                    + ('"%s"' % text)
+                    + '\n'
+                )
     fd = open(fname, 'w')
     fd.writelines(lines)
     print('Inno Setup for ', fname, 'is', lines)
@@ -133,10 +185,17 @@ def replace_in_7zip_file(fname, data):
     fd.close()
     for idx, line in enumerate(lines):
         for start, text in data:
-            if start not in ('Icon', 'OutFile') and not start.startswith('!'):
+            if start not in (
+                'Icon',
+                'OutFile',
+            ) and not start.startswith('!'):
                 start = 'set ' + start
             if line.startswith(start + '='):
-                lines[idx] = line[:len(start)+1] + ('%s' % text) + '\n'
+                lines[idx] = (
+                    line[: len(start) + 1]
+                    + ('%s' % text)
+                    + '\n'
+                )
     fd = open(fname, 'w')
     fd.writelines(lines)
     print('7-zip for ', fname, 'is', lines)
@@ -145,50 +204,84 @@ def replace_in_7zip_file(fname, data):
 
 def build_nsis(srcname, dstname, data):
     """Build NSIS script"""
-    portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+    portable_dir = osp.join(
+        osp.dirname(osp.abspath(__file__)), 'portable'
+    )
     shutil.copy(osp.join(portable_dir, srcname), dstname)
-    data = [('!addincludedir', osp.join(portable_dir, 'include'))
-            ] + list(data)
+    data = [
+        (
+            '!addincludedir',
+            osp.join(portable_dir, 'include'),
+        )
+    ] + list(data)
     replace_in_nsis_file(dstname, data)
     try:
-        retcode = subprocess.call('"%s" -V2 "%s"' % (NSIS_EXE, dstname),
-                                  shell=True, stdout=sys.stderr)
+        retcode = subprocess.call(
+            '"%s" -V2 "%s"' % (NSIS_EXE, dstname),
+            shell=True,
+            stdout=sys.stderr,
+        )
         if retcode < 0:
-            print("Child was terminated by signal", -retcode, file=sys.stderr)
+            print(
+                "Child was terminated by signal",
+                -retcode,
+                file=sys.stderr,
+            )
     except OSError as e:
         print("Execution failed:", e, file=sys.stderr)
     os.remove(dstname)
-    
+
+
 def build_iss(srcname, dstname, data):
     """Build Inno Setup Script"""
-    portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+    portable_dir = osp.join(
+        osp.dirname(osp.abspath(__file__)), 'portable'
+    )
     shutil.copy(osp.join(portable_dir, srcname), dstname)
-    data = [('PORTABLE_DIR', portable_dir)
-            ] + list(data)
+    data = [('PORTABLE_DIR', portable_dir)] + list(data)
     replace_in_iss_file(dstname, data)
     try:
-        retcode = subprocess.call('"%s"  "%s"' % (ISCC_EXE, dstname),
-                                  shell=True, stdout=sys.stderr)
+        retcode = subprocess.call(
+            '"%s"  "%s"' % (ISCC_EXE, dstname),
+            shell=True,
+            stdout=sys.stderr,
+        )
         if retcode < 0:
-            print("Child was terminated by signal", -retcode, file=sys.stderr)
+            print(
+                "Child was terminated by signal",
+                -retcode,
+                file=sys.stderr,
+            )
     except OSError as e:
         print("Execution failed:", e, file=sys.stderr)
     # os.remove(dstname)
-    
+
+
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
-    portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+    portable_dir = osp.join(
+        osp.dirname(osp.abspath(__file__)), 'portable'
+    )
     shutil.copy(osp.join(portable_dir, srcname), dstname)
-    data = [('PORTABLE_DIR', portable_dir),('SEVENZIP_EXE', SEVENZIP_EXE)
-            ] + list(data)
+    data = [
+        ('PORTABLE_DIR', portable_dir),
+        ('SEVENZIP_EXE', SEVENZIP_EXE),
+    ] + list(data)
     replace_in_7zip_file(dstname, data)
     try:
         # insted of a 7zip command line, we launch a script that does it
-        #retcode = subprocess.call('"%s"  "%s"' % (SEVENZIP_EXE, dstname),
-        retcode = subprocess.call('"%s"  ' % (dstname),
-                                  shell=True, stdout=sys.stderr)
+        # retcode = subprocess.call('"%s"  "%s"' % (SEVENZIP_EXE, dstname),
+        retcode = subprocess.call(
+            '"%s"  ' % (dstname),
+            shell=True,
+            stdout=sys.stderr,
+        )
         if retcode < 0:
-            print("Child was terminated by signal", -retcode, file=sys.stderr)
+            print(
+                "Child was terminated by signal",
+                -retcode,
+                file=sys.stderr,
+            )
     except OSError as e:
         print("Execution failed:", e, file=sys.stderr)
     # os.remove(dstname)
@@ -196,14 +289,26 @@ def build_7zip(srcname, dstname, data):
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
+
     MINGW32_PATH = r'\t\mingw32\bin'
     R_PATH = r'\t\R\bin'
     JULIA_PATH = r'\t\Julia\bin'
     NODEJS_PATH = r'\n'  # r'\t\n'
 
-    def __init__(self, build_number, release_level, target, wheeldir,
-                 toolsdirs=None, verbose=False, simulation=False,
-                 basedir=None, install_options=None, flavor='', docsdirs=None):
+    def __init__(
+        self,
+        build_number,
+        release_level,
+        target,
+        wheeldir,
+        toolsdirs=None,
+        verbose=False,
+        simulation=False,
+        basedir=None,
+        install_options=None,
+        flavor='',
+        docsdirs=None,
+    ):
         assert isinstance(build_number, int)
         assert isinstance(release_level, str)
         self.build_number = build_number
@@ -221,19 +326,26 @@ class WinPythonDistribution(object):
         self.distribution = None
         self.installed_packages = []
         self.simulation = simulation
-        self.basedir = basedir  # added to build from winpython
+        self.basedir = (
+            basedir
+        )  # added to build from winpython
         self.install_options = install_options
         self.flavor = flavor
 
         self.python_fname = self.get_package_fname(
-                            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)')
-        self.python_name = osp.basename(self.python_fname)[:-4]
+            r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)'
+        )
+        self.python_name = osp.basename(self.python_fname)[
+            :-4
+        ]
         self.distname = 'win%s' % self.python_name
-        vlst = re.match(r'winpython-([0-9\.]*)', self.distname
-                        ).groups()[0].split('.')
+        vlst = (
+            re.match(r'winpython-([0-9\.]*)', self.distname)
+            .groups()[0]
+            .split('.')
+        )
         self.python_version = '.'.join(vlst[:2])
         self.python_fullversion = '.'.join(vlst[:3])
-
 
     @property
     def package_index_wiki(self):
@@ -243,53 +355,75 @@ class WinPythonDistribution(object):
         def get_tool_path(relpath, checkfunc):
             if self.simulation:
                 for dirname in self.toolsdirs:
-                    path = dirname + relpath.replace(r'\t', '')
+                    path = dirname + relpath.replace(
+                        r'\t', ''
+                    )
                     if checkfunc(path):
                         return path
             else:
                 path = self.winpydir + relpath
                 if checkfunc(path):
                     return path
-        
-        if get_tool_path (r'\t\SciTE.exe', osp.isfile):
-            installed_tools += [('SciTE', '3.3.7')]
 
+        if get_tool_path(r'\t\SciTE.exe', osp.isfile):
+            installed_tools += [('SciTE', '3.3.7')]
         rpath = get_tool_path(self.R_PATH, osp.isdir)
         if rpath is not None:
             rver = utils.get_r_version(rpath)
             installed_tools += [('R', rver)]
-
-        juliapath = get_tool_path(self.JULIA_PATH, osp.isdir)
+        juliapath = get_tool_path(
+            self.JULIA_PATH, osp.isdir
+        )
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
             installed_tools += [('Julia', juliaver)]
-
-        nodepath = get_tool_path(self.NODEJS_PATH, osp.isdir)
+        nodepath = get_tool_path(
+            self.NODEJS_PATH, osp.isdir
+        )
         if nodepath is not None:
             nodever = utils.get_nodejs_version(nodepath)
             installed_tools += [('Nodejs', nodever)]
             npmver = utils.get_npmjs_version(nodepath)
             installed_tools += [('npmjs', npmver)]
-
-        pandocexe = get_tool_path (r'\t\pandoc.exe', osp.isfile)
+        pandocexe = get_tool_path(
+            r'\t\pandoc.exe', osp.isfile
+        )
         if pandocexe is not None:
-            pandocver = utils.get_pandoc_version(osp.dirname(pandocexe))
+            pandocver = utils.get_pandoc_version(
+                osp.dirname(pandocexe)
+            )
             installed_tools += [('Pandoc', pandocver)]
-
-
         tools = []
         for name, ver in installed_tools:
-            metadata = wppm.get_package_metadata('tools.ini', name)
-            url, desc = metadata['url'], metadata['description']
-            tools += ['[%s](%s) | %s | %s' % (name, url, ver, desc)]
-
+            metadata = wppm.get_package_metadata(
+                'tools.ini', name
+            )
+            url, desc = (
+                metadata['url'],
+                metadata['description'],
+            )
+            tools += [
+                '[%s](%s) | %s | %s'
+                % (name, url, ver, desc)
+            ]
         # get all packages installed in the changelog, whatever the method
-        self.installed_packages = self.distribution.get_installed_packages()
+        self.installed_packages = (
+            self.distribution.get_installed_packages()
+        )
 
-        packages = ['[%s](%s) | %s | %s'
-                    % (pack.name, pack.url, pack.version, pack.description)
-                    for pack in sorted(self.installed_packages,
-                                       key=lambda p: p.name.lower())]
+        packages = [
+            '[%s](%s) | %s | %s'
+            % (
+                pack.name,
+                pack.url,
+                pack.version,
+                pack.description,
+            )
+            for pack in sorted(
+                self.installed_packages,
+                key=lambda p: p.name.lower(),
+            )
+        ]
         python_desc = 'Python programming language with standard library'
         return """## WinPython %s 
 
@@ -306,16 +440,27 @@ Name | Version | Description
 Name | Version | Description
 -----|---------|------------
 [Python](http://www.python.org/) | %s | %s
-%s""" % (self.winpyver2+self.flavor, self.winpy_arch, self.winpyver2+self.flavor,
-(' %s' % self.release_level), '\n'.join(tools),
-         self.python_fullversion, python_desc, '\n'.join(packages))
+%s""" % (
+            self.winpyver2 + self.flavor,
+            self.winpy_arch,
+            self.winpyver2 + self.flavor,
+            (' %s' % self.release_level),
+            '\n'.join(tools),
+            self.python_fullversion,
+            python_desc,
+            '\n'.join(packages),
+        )
 
     # @property makes self.winpyver becomes a call to self.winpyver()
     @property
     def winpyver(self):
         """Return WinPython version (with flavor and release level!)"""
-        return '%s.%d%s%s' % (self.python_fullversion, self.build_number,
-                            self.flavor,self.release_level)
+        return '%s.%d%s%s' % (
+            self.python_fullversion,
+            self.build_number,
+            self.flavor,
+            self.release_level,
+        )
 
     @property
     def python_dir(self):
@@ -339,20 +484,24 @@ Name | Version | Description
     @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
-        path = [r"Lib\site-packages\PyQt5",
-                r"Lib\site-packages\PySide2", "",  # Python root directory 
-                "DLLs", "Scripts", r"..\t", r"..\t\mingw32\bin"
-                ]
-        if self.distribution.architecture == 32 \
-           and osp.isdir(self.winpydir + self.MINGW32_PATH):
+        path = [
+            r"Lib\site-packages\PyQt5",
+            r"Lib\site-packages\PySide2",
+            "",  # Python root directory
+            "DLLs",
+            "Scripts",
+            r"..\t",
+            r"..\t\mingw32\bin",
+        ]
+        if (
+            self.distribution.architecture == 32
+            and osp.isdir(self.winpydir + self.MINGW32_PATH)
+        ):
             path += [r".." + self.MINGW32_PATH]
-
         if self.distribution.architecture == 32:
             path += [r".." + self.R_PATH + r"\i386"]
-
         if self.distribution.architecture == 64:
             path += [r".." + self.R_PATH + r"\x64"]
-
         path += [r".." + self.JULIA_PATH]
 
         path += [r".." + self.NODEJS_PATH]
@@ -370,13 +519,26 @@ Name | Version | Description
     @property
     def toolsdirs(self):
         """Return tools directory list"""
-        return [osp.join(osp.dirname(osp.abspath(__file__)), 't')] + self._toolsdirs
+        return [
+            osp.join(
+                osp.dirname(osp.abspath(__file__)), 't'
+            )
+        ] + self._toolsdirs
 
     @property
     def docsdirs(self):
         """Return docs directory list"""
-        if osp.isdir(osp.join(osp.dirname(osp.abspath(__file__)), 'docs')):
-            return [osp.join(osp.dirname(osp.abspath(__file__)), 'docs')] + self._docsdirs
+        if osp.isdir(
+            osp.join(
+                osp.dirname(osp.abspath(__file__)), 'docs'
+            )
+        ):
+            return [
+                osp.join(
+                    osp.dirname(osp.abspath(__file__)),
+                    'docs',
+                )
+            ] + self._docsdirs
         else:
             return self._docsdirs
 
@@ -389,7 +551,9 @@ Name | Version | Description
                 return osp.abspath(osp.join(path, fname))
         else:
             raise RuntimeError(
-                'Could not find required package matching %s' % pattern)
+                'Could not find required package matching %s'
+                % pattern
+            )
 
     def create_batch_script(self, name, contents):
         """Create batch script %WINPYDIR%/name"""
@@ -400,12 +564,20 @@ Name | Version | Description
         fd.write(contents)
         fd.close()
 
-    def create_launcher(self, name, icon, command=None,
-                        args=None, workdir=r'$EXEDIR\scripts',
-                        launcher='launcher_basic.nsi'):
+    def create_launcher(
+        self,
+        name,
+        icon,
+        command=None,
+        args=None,
+        workdir=r'$EXEDIR\scripts',
+        launcher='launcher_basic.nsi',
+    ):
         """Create exe launcher with NSIS"""
         assert name.endswith('.exe')
-        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+        portable_dir = osp.join(
+            osp.dirname(osp.abspath(__file__)), 'portable'
+        )
         icon_fname = osp.join(portable_dir, 'icons', icon)
         assert osp.isfile(icon_fname)
 
@@ -419,27 +591,35 @@ Name | Version | Description
             args = ''
         if workdir is None:
             workdir = ''
+        fname = osp.join(
+            self.winpydir, osp.splitext(name)[0] + '.nsi'
+        )
 
-        fname = osp.join(self.winpydir, osp.splitext(name)[0]+'.nsi')
-
-        data = [('WINPYDIR', '$EXEDIR\%s' % self.python_name),
-                ('WINPYVER', self.winpyver),
-                ('COMMAND', command),
-                ('PARAMETERS', args),
-                ('WORKDIR', workdir),
-                ('Icon', icon_fname),
-                ('OutFile', name)]
+        data = [
+            ('WINPYDIR', '$EXEDIR\%s' % self.python_name),
+            ('WINPYVER', self.winpyver),
+            ('COMMAND', command),
+            ('PARAMETERS', args),
+            ('WORKDIR', workdir),
+            ('Icon', icon_fname),
+            ('OutFile', name),
+        ]
 
         build_nsis(launcher, fname, data)
 
-    def create_python_batch(self, name, script_name,
-                            workdir=None, options=None, command=None):
+    def create_python_batch(
+        self,
+        name,
+        script_name,
+        workdir=None,
+        options=None,
+        command=None,
+    ):
         """Create batch file to run a Python script"""
         if options is None:
             options = ''
         else:
             options = ' ' + options
-
         if command is None:
             if script_name.endswith('.pyw'):
                 command = 'start "%WINPYDIR%\pythonw.exe"'
@@ -447,57 +627,129 @@ Name | Version | Description
                 command = '"%WINPYDIR%\python.exe"'
         changedir = ''
         if workdir is not None:
-            workdir = (workdir)
-            changedir = r"""cd/D %s
-""" % workdir
+            workdir = workdir
+            changedir = (
+                r"""cd/D %s
+"""
+                % workdir
+            )
         if script_name:
             script_name = ' ' + script_name
-        self.create_batch_script(name, r"""@echo off
+        self.create_batch_script(
+            name,
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
-""" + changedir + command + script_name + options + " %*")
+"""
+            + changedir
+            + command
+            + script_name
+            + options
+            + " %*",
+        )
 
     def create_installer(self):
         """Create installer with NSIS"""
         self._print("Creating WinPython installer")
-        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
+        portable_dir = osp.join(
+            osp.dirname(osp.abspath(__file__)), 'portable'
+        )
         fname = osp.join(portable_dir, 'installer-tmp.nsi')
-        data = (('DISTDIR', self.winpydir),
-                ('ARCH', self.winpy_arch),
-                ('VERSION', '%s.%d%s' % (self.python_fullversion,
-                                       self.build_number, self.flavor)),
-                ('VERSION_INSTALL', '%s%d' % (self.python_fullversion.replace(
-                 '.' , ''), self.build_number)),
-                ('RELEASELEVEL', self.release_level),)
+        data = (
+            ('DISTDIR', self.winpydir),
+            ('ARCH', self.winpy_arch),
+            (
+                'VERSION',
+                '%s.%d%s'
+                % (
+                    self.python_fullversion,
+                    self.build_number,
+                    self.flavor,
+                ),
+            ),
+            (
+                'VERSION_INSTALL',
+                '%s%d'
+                % (
+                    self.python_fullversion.replace(
+                        '.', ''
+                    ),
+                    self.build_number,
+                ),
+            ),
+            ('RELEASELEVEL', self.release_level),
+        )
         build_nsis('installer.nsi', fname, data)
         self._print_done()
 
     def create_installer_inno(self):
         """Create installer with INNO"""
         self._print("Creating WinPython installer INNO")
-        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
-        fname = osp.join(portable_dir, 'installer_INNO-tmp.iss')
-        data = (('DISTDIR', self.winpydir),
-                ('ARCH', self.winpy_arch),
-                ('VERSION', '%s.%d%s' % (self.python_fullversion,
-                                       self.build_number, self.flavor)),
-                ('VERSION_INSTALL', '%s%d' % (self.python_fullversion.replace(
-                 '.' , ''), self.build_number)),
-                ('RELEASELEVEL', self.release_level),)
+        portable_dir = osp.join(
+            osp.dirname(osp.abspath(__file__)), 'portable'
+        )
+        fname = osp.join(
+            portable_dir, 'installer_INNO-tmp.iss'
+        )
+        data = (
+            ('DISTDIR', self.winpydir),
+            ('ARCH', self.winpy_arch),
+            (
+                'VERSION',
+                '%s.%d%s'
+                % (
+                    self.python_fullversion,
+                    self.build_number,
+                    self.flavor,
+                ),
+            ),
+            (
+                'VERSION_INSTALL',
+                '%s%d'
+                % (
+                    self.python_fullversion.replace(
+                        '.', ''
+                    ),
+                    self.build_number,
+                ),
+            ),
+            ('RELEASELEVEL', self.release_level),
+        )
         build_iss('installer_INNO.iss', fname, data)
         self._print_done()
 
     def create_installer_7zip(self, installer_option=''):
         """Create installer with 7-ZIP"""
         self._print("Creating WinPython installer 7-ZIP")
-        portable_dir = osp.join(osp.dirname(osp.abspath(__file__)), 'portable')
-        fname = osp.join(portable_dir, 'installer_7zip-tmp.bat')
-        data = (('DISTDIR', self.winpydir),
-                ('ARCH', self.winpy_arch),
-                ('VERSION', '%s.%d%s' % (self.python_fullversion,
-                                       self.build_number, self.flavor)),
-                ('VERSION_INSTALL', '%s%d' % (self.python_fullversion.replace(
-                 '.' , ''), self.build_number)),
-                ('RELEASELEVEL', self.release_level),)
+        portable_dir = osp.join(
+            osp.dirname(osp.abspath(__file__)), 'portable'
+        )
+        fname = osp.join(
+            portable_dir, 'installer_7zip-tmp.bat'
+        )
+        data = (
+            ('DISTDIR', self.winpydir),
+            ('ARCH', self.winpy_arch),
+            (
+                'VERSION',
+                '%s.%d%s'
+                % (
+                    self.python_fullversion,
+                    self.build_number,
+                    self.flavor,
+                ),
+            ),
+            (
+                'VERSION_INSTALL',
+                '%s%d'
+                % (
+                    self.python_fullversion.replace(
+                        '.', ''
+                    ),
+                    self.build_number,
+                ),
+            ),
+            ('RELEASELEVEL', self.release_level),
+        )
         data += (('INSTALLER_OPTION', installer_option),)
         build_7zip('installer_7zip.bat', fname, data)
         self._print_done()
@@ -517,15 +769,22 @@ call "%~dp0env_for_icons.bat"
     def _extract_python(self):
         """Extracting Python installer, creating distribution object"""
         self._print("Extracting Python .zip version")
-        utils.extract_archive(self.python_fname, targetdir=self.python_dir+r'\..')
+        utils.extract_archive(
+            self.python_fname,
+            targetdir=self.python_dir + r'\..',
+        )
         self._print_done()
 
     def _add_msvc_files(self):
         """Adding Microsoft Visual C++ DLLs"""
-        print("Adding Microsoft Visual C++ DLLs""")
-        msvc_version = dh.get_msvc_version(self.distribution.version)
-        for fname in dh.get_msvc_dlls(msvc_version,
-                                  architecture=self.distribution.architecture):
+        print("Adding Microsoft Visual C++ DLLs" "")
+        msvc_version = dh.get_msvc_version(
+            self.distribution.version
+        )
+        for fname in dh.get_msvc_dlls(
+            msvc_version,
+            architecture=self.distribution.architecture,
+        ):
             shutil.copy(fname, self.python_dir)
 
     def _copy_dev_tools(self):
@@ -533,18 +792,32 @@ call "%~dp0env_for_icons.bat"
         self._print("Copying tools")
         toolsdir = osp.join(self.winpydir, 't')
         os.mkdir(toolsdir)
-        for dirname in self.toolsdirs: # the ones in the make.py script environment
+        for (
+            dirname
+        ) in (
+            self.toolsdirs
+        ):  # the ones in the make.py script environment
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
-                copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
+                copy = (
+                    shutil.copytree
+                    if osp.isdir(path)
+                    else shutil.copyfile
+                )
                 if self.verbose:
-                    print(path + ' --> ' + osp.join(toolsdir, name))
+                    print(
+                        path
+                        + ' --> '
+                        + osp.join(toolsdir, name)
+                    )
                 copy(path, osp.join(toolsdir, name))
         self._print_done()
         # move node higher
         nodejs_current = osp.join(toolsdir, 'n')
         nodejs_target = self.winpydir + self.NODEJS_PATH
-        if nodejs_current != nodejs_target and osp.isdir(nodejs_current):
+        if nodejs_current != nodejs_target and osp.isdir(
+            nodejs_current
+        ):
             shutil.move(nodejs_current, nodejs_target)
 
     def _copy_dev_docs(self):
@@ -553,92 +826,158 @@ call "%~dp0env_for_icons.bat"
         docsdir = osp.join(self.winpydir, 'notebooks')
         if not osp.isdir(docsdir):
             os.mkdir(docsdir)
-        docsdir = osp.join(self.winpydir, 'notebooks', 'docs')
+        docsdir = osp.join(
+            self.winpydir, 'notebooks', 'docs'
+        )
         if not osp.isdir(docsdir):
             os.mkdir(docsdir)
         for dirname in self.docsdirs:
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
-                copy = shutil.copytree if osp.isdir(path) else shutil.copyfile
+                copy = (
+                    shutil.copytree
+                    if osp.isdir(path)
+                    else shutil.copyfile
+                )
                 copy(path, osp.join(docsdir, name))
                 if self.verbose:
-                    print(path + ' --> ' + osp.join(docsdir, name))
+                    print(
+                        path
+                        + ' --> '
+                        + osp.join(docsdir, name)
+                    )
         self._print_done()
 
     def _create_launchers(self):
         """Create launchers"""
 
         self._print("Creating launchers")
-        self.create_launcher('WinPython Command Prompt.exe', 'cmd.ico',
-                             command='$SYSDIR\cmd.exe',
-                             args=r'/k cmd.bat')        
-        self.create_launcher('WinPython Powershell Prompt.exe', 'powershell.ico',
-                             command='$SYSDIR\cmd.exe',
-                             args=r'/k cmd_ps.bat')        
-        
-        self.create_launcher('WinPython Interpreter.exe', 'python.ico',
-                             command='$SYSDIR\cmd.exe',
-                             args= r'/k winpython.bat')
+        self.create_launcher(
+            'WinPython Command Prompt.exe',
+            'cmd.ico',
+            command='$SYSDIR\cmd.exe',
+            args=r'/k cmd.bat',
+        )
+        self.create_launcher(
+            'WinPython Powershell Prompt.exe',
+            'powershell.ico',
+            command='$SYSDIR\cmd.exe',
+            args=r'/k cmd_ps.bat',
+        )
 
-        self.create_launcher('IDLEX.exe', 'python.ico',
-                             command='wscript.exe',
-                             args= r'Noshell.vbs winidlex.bat')
+        self.create_launcher(
+            'WinPython Interpreter.exe',
+            'python.ico',
+            command='$SYSDIR\cmd.exe',
+            args=r'/k winpython.bat',
+        )
 
-        self.create_launcher('IDLE (Python GUI).exe', 'python.ico',
-                             command='wscript.exe',
-                             args= r'Noshell.vbs winidle.bat')
+        self.create_launcher(
+            'IDLEX.exe',
+            'python.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs winidlex.bat',
+        )
 
-        self.create_launcher('Spyder.exe', 'spyder.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs winspyder.bat')
+        self.create_launcher(
+            'IDLE (Python GUI).exe',
+            'python.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs winidle.bat',
+        )
 
-        self.create_launcher('Spyder reset.exe', 'spyder_reset.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs spyder_reset.bat')
+        self.create_launcher(
+            'Spyder.exe',
+            'spyder.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs winspyder.bat',
+        )
 
-        self.create_launcher('WinPython Control Panel.exe', 'winpython.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs wpcp.bat')
+        self.create_launcher(
+            'Spyder reset.exe',
+            'spyder_reset.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs spyder_reset.bat',
+        )
+
+        self.create_launcher(
+            'WinPython Control Panel.exe',
+            'winpython.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs wpcp.bat',
+        )
 
         # Multi-Qt launchers
-        self.create_launcher('Qt Designer.exe', 'qtdesigner.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs qtdesigner.bat')
+        self.create_launcher(
+            'Qt Designer.exe',
+            'qtdesigner.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs qtdesigner.bat',
+        )
 
-        self.create_launcher('Qt Linguist.exe', 'qtlinguist.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs qtlinguist.bat')
+        self.create_launcher(
+            'Qt Linguist.exe',
+            'qtlinguist.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs qtlinguist.bat',
+        )
 
         # Jupyter launchers
-        self.create_launcher('IPython Qt Console.exe', 'ipython.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs winqtconsole.bat')
+        self.create_launcher(
+            'IPython Qt Console.exe',
+            'ipython.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs winqtconsole.bat',
+        )
 
         # this one needs a shell to kill fantom processes
-        self.create_launcher('Jupyter Notebook.exe', 'jupyter.ico',
-                             command='$SYSDIR\cmd.exe',
-                             args=r'/k winipython_notebook.bat')
+        self.create_launcher(
+            'Jupyter Notebook.exe',
+            'jupyter.ico',
+            command='$SYSDIR\cmd.exe',
+            args=r'/k winipython_notebook.bat',
+        )
 
-        self.create_launcher('Jupyter Lab.exe', 'jupyter.ico',
-                             command='$SYSDIR\cmd.exe',
-                             args=r'/k winjupyter_lab.bat')
+        self.create_launcher(
+            'Jupyter Lab.exe',
+            'jupyter.ico',
+            command='$SYSDIR\cmd.exe',
+            args=r'/k winjupyter_lab.bat',
+        )
 
-        self.create_launcher('Pyzo.exe', 'pyzologo.ico',
-                             command='wscript.exe',
-                             args=r'Noshell.vbs winpyzo.bat')
+        self.create_launcher(
+            'Pyzo.exe',
+            'pyzologo.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs winpyzo.bat',
+        )
 
         self._print_done()
 
     def _create_batch_scripts_initial(self):
         """Create batch scripts"""
         self._print("Creating batch scripts initial")
-        conv = lambda path: ";".join(['%WINPYDIR%\\'+pth for pth in path])
-        path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
+        conv = lambda path: ";".join(
+            ['%WINPYDIR%\\' + pth for pth in path]
+        )
+        path = (
+            conv(self.prepath)
+            + ";%PATH%;"
+            + conv(self.postpath)
+        )
 
-        convps = lambda path: ";".join(["$env:WINPYDIR\\"+pth for pth in path])
-        pathps = convps(self.prepath) + ";$env:path;" + convps(self.postpath)
+        convps = lambda path: ";".join(
+            ["$env:WINPYDIR\\" + pth for pth in path]
+        )
+        pathps = (
+            convps(self.prepath)
+            + ";$env:path;"
+            + convps(self.postpath)
+        )
 
-        self.create_batch_script('env.bat', r"""@echo off
+        self.create_batch_script(
+            'env.bat',
+            r"""@echo off
 set WINPYDIRBASE=%~dp0..
 
 rem get a normalize path
@@ -648,9 +987,14 @@ set WINPYDIRBASE=%CD%
 set WINPYDIRBASETMP=
 popd
 
-set WINPYDIR=%WINPYDIRBASE%"""+"\\" + self.python_name + r"""
+set WINPYDIR=%WINPYDIRBASE%"""
+            + "\\"
+            + self.python_name
+            + r"""
 
-set WINPYVER=""" + self.winpyver + r"""
+set WINPYVER="""
+            + self.winpyver
+            + r"""
 set HOME=%WINPYDIRBASE%\settings
 rem set WINPYDIRBASE=
 
@@ -659,7 +1003,9 @@ set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 set FINDDIR=%WINDIR%\system32
 echo ";%PATH%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
-if %ERRORLEVEL% NEQ 0 set PATH=""" + path + r"""
+if %ERRORLEVEL% NEQ 0 set PATH="""
+            + path
+            + r"""
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
@@ -741,9 +1087,12 @@ if not exist "%winpython_ini%" (
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
 )
 
-""")
+""",
+        )
 
-        self.create_batch_script('WinPython_PS_Prompt.ps1', r"""
+        self.create_batch_script(
+            'WinPython_PS_Prompt.ps1',
+            r"""
 ###############################
 ### WinPython_PS_Prompt.ps1 ###
 ###############################
@@ -756,13 +1105,24 @@ $env:WINPYDIRBASE = "$dp0\.."
 $env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
 
 # avoid double_init (will only resize screen)
-if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""+'"\\' + self.python_name + '"' + r""")) ) {
+if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""
+            + '"\\'
+            + self.python_name
+            + '"'
+            + r""")) ) {
 
 
-$env:WINPYDIR = $env:WINPYDIRBASE+"""+ '"' + '\\' + self.python_name + '"' + r"""
+$env:WINPYDIR = $env:WINPYDIRBASE+"""
+            + '"'
+            + '\\'
+            + self.python_name
+            + '"'
+            + r"""
 
 
-$env:WINPYVER = '""" + self.winpyver + r"""'
+$env:WINPYVER = '"""
+            + self.winpyver
+            + r"""'
 $env:HOME = "$env:WINPYDIRBASE\settings"
 $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
@@ -772,7 +1132,11 @@ if ($env:WINPYARCH.subString($env:WINPYARCH.length-5, 5) -eq 'amd64')  {
 
 
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
- $env:PATH = """ + '"' +  pathps + '"' + r""" }
+ $env:PATH = """
+            + '"'
+            + pathps
+            + '"'
+            + r""" }
 
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
@@ -882,22 +1246,31 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
 $host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
 
-""")
+""",
+        )
 
-        self.create_batch_script('cmd_ps.bat', r"""@echo off
+        self.create_batch_script(
+            'cmd_ps.bat',
+            r"""@echo off
 rem safe bet 
 call "%~dp0env_for_icons.bat"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 exit
-""")
-             
-        self.create_batch_script('WinPython_Interpreter_PS.bat', r"""@echo off
+""",
+        )
+
+        self.create_batch_script(
+            'WinPython_Interpreter_PS.bat',
+            r"""@echo off
 rem no safe bet (for comparisons)
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 exit
-""")
- 
-        self.create_batch_script('env_for_icons.bat', r"""@echo off
+""",
+        )
+
+        self.create_batch_script(
+            'env_for_icons.bat',
+            r"""@echo off
 call "%~dp0env.bat"
 set WINPYWORKDIR=%~dp0..\Notebooks
 FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
@@ -916,9 +1289,11 @@ rem ******* make cython use mingwpy part *******
 if not exist "%WINPYDIRBASE%\settings\pydistutils.cfg" goto no_cython
 if not exist "%HOME%\pydistutils.cfg" xcopy   "%WINPYDIRBASE%\settings\pydistutils.cfg" "%HOME%" 
 :no_cython 
-""")
-      
-        self.create_batch_script('Noshell.vbs', 
+""",
+        )
+
+        self.create_batch_script(
+            'Noshell.vbs',
             r"""
 'from http://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window/390129
 If WScript.Arguments.Count >= 1 Then
@@ -932,9 +1307,11 @@ If WScript.Arguments.Count >= 1 Then
     RunCmd = Join(arr)
     CreateObject("Wscript.Shell").Run RunCmd, 0 , True
 End If
-        """)
-        
-        self.create_batch_script('WinPythonIni.vbs', 
+        """,
+        )
+
+        self.create_batch_script(
+            'WinPythonIni.vbs',
             r"""
 Set colArgs = WScript.Arguments
 If colArgs.Count> 0 Then 
@@ -978,19 +1355,24 @@ Function translate(line)
     next
     translate =  Join(tab, "") 
 end function
-        """)
+        """,
+        )
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
         self._print("Creating batch scripts")
-        self.create_batch_script('readme.txt',
-r"""These batch files are required to run WinPython icons.
+        self.create_batch_script(
+            'readme.txt',
+            r"""These batch files are required to run WinPython icons.
 
 These files should help the user writing his/her own
 specific batch file to call Python scripts inside WinPython.
-The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""")
+The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""",
+        )
 
-        self.create_batch_script('make_cython_use_mingw.bat', r"""@echo off
+        self.create_batch_script(
+            'make_cython_use_mingw.bat',
+            r"""@echo off
 call "%~dp0env.bat"
 
 rem ******************
@@ -1014,31 +1396,43 @@ echo to remove this, remove file "%pydistutils_cfg%"
 
 rem pause
 
-""")
+""",
+        )
 
-        self.create_batch_script('make_cython_use_vc.bat', r"""@echo off
+        self.create_batch_script(
+            'make_cython_use_vc.bat',
+            r"""@echo off
 call "%~dp0env.bat"
 set pydistutils_cfg=%WINPYDIRBASE%\settings\pydistutils.cfg
 echo [config]>%pydistutils_cfg%
-        """)
+        """,
+        )
 
-        self.create_batch_script('make_winpython_movable.bat',r"""@echo off
+        self.create_batch_script(
+            'make_winpython_movable.bat',
+            r"""@echo off
 call "%~dp0env.bat"
 echo patch pip and current launchers for move
 
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
 pause
-        """)
+        """,
+        )
 
-        self.create_batch_script('make_winpython_fix.bat',r"""@echo off
+        self.create_batch_script(
+            'make_winpython_fix.bat',
+            r"""@echo off
 call "%~dp0env.bat"
 echo patch pip and current launchers for non-move
 
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
 pause
-        """)
+        """,
+        )
 
-        self.create_batch_script('make_working_directory_be_not_winpython.bat', r"""@echo off
+        self.create_batch_script(
+            'make_working_directory_be_not_winpython.bat',
+            r"""@echo off
 set winpython_ini=%~dp0..\\settings\winpython.ini
 echo [debug]>"%winpython_ini%"
 echo state = disabled>>"%winpython_ini%"
@@ -1047,9 +1441,12 @@ echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
 echo HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings>>"%winpython_ini%"
 echo JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
 echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
-""")
+""",
+        )
 
-        self.create_batch_script('make_working_directory_be_winpython.bat', r"""@echo off
+        self.create_batch_script(
+            'make_working_directory_be_winpython.bat',
+            r"""@echo off
 set winpython_ini=%~dp0..\\settings\winpython.ini
 echo [debug]>"%winpython_ini%"
 echo state = disabled>>"%winpython_ini%"
@@ -1058,18 +1455,27 @@ echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
 echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings>>"%winpython_ini%"
 echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
 echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
-""")
+""",
+        )
 
-        self.create_batch_script('cmd.bat', r"""@echo off
+        self.create_batch_script(
+            'cmd.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
-cmd.exe /k""")
-       
-        self.create_batch_script('python.bat',r"""@echo off
+cmd.exe /k""",
+        )
+
+        self.create_batch_script(
+            'python.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 rem backward compatibility for  python command-line users
 "%WINPYDIR%\python.exe"  %*
-""")                
-        self.create_batch_script('winpython.bat',r"""@echo off
+""",
+        )
+        self.create_batch_script(
+            'winpython.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 rem backward compatibility for non-ptpython users
@@ -1078,9 +1484,12 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
 ) else (
     "%WINPYDIR%\python.exe"  %*
 )
-""")                
+""",
+        )
 
-        self.create_batch_script('idlex.bat',r"""@echo off
+        self.create_batch_script(
+            'idlex.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 rem backward compatibility for non-IDLEX users
 if exist "%WINPYDIR%\scripts\idlex.pyw" (
@@ -1088,14 +1497,20 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
 ) else (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 )
-""")
+""",
+        )
 
-        self.create_batch_script('idle.bat',r"""@echo off
+        self.create_batch_script(
+            'idle.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 
-""")
-        self.create_batch_script('winidlex.bat',r"""@echo off
+""",
+        )
+        self.create_batch_script(
+            'winidlex.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 rem backward compatibility for non-IDLEX users
@@ -1104,14 +1519,20 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
 ) else (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 )
-""")
-        self.create_batch_script('winidle.bat',r"""@echo off
+""",
+        )
+        self.create_batch_script(
+            'winidle.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
-""")
+""",
+        )
 
-        self.create_batch_script('spyder.bat',r"""@echo off
+        self.create_batch_script(
+            'spyder.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
@@ -1119,8 +1540,11 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
 ) else (
    "%WINPYDIR%\scripts\spyder.exe" %*
 )   
-""")
-        self.create_batch_script('winspyder.bat',r"""@echo off
+""",
+        )
+        self.create_batch_script(
+            'winspyder.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
@@ -1128,9 +1552,12 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
 ) else (
    "%WINPYDIR%\scripts\spyder.exe" %*
 ) 
-""")
+""",
+        )
 
-        self.create_batch_script('spyder_reset.bat',r"""@echo off
+        self.create_batch_script(
+            'spyder_reset.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
@@ -1138,40 +1565,57 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
 ) else (
     "%WINPYDIR%\scripts\spyder.exe" --reset %*
 )
-""")
+""",
+        )
 
-        self.create_batch_script('ipython_notebook.bat',r"""@echo off
+        self.create_batch_script(
+            'ipython_notebook.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
-""")
+""",
+        )
 
-        self.create_batch_script('winipython_notebook.bat',r"""@echo off
+        self.create_batch_script(
+            'winipython_notebook.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
-""")
+""",
+        )
 
-        self.create_batch_script('winjupyter_lab.bat',r"""@echo off
+        self.create_batch_script(
+            'winjupyter_lab.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-lab.exe" %*
-""")
+""",
+        )
 
-        self.create_batch_script('qtconsole.bat',r"""@echo off
+        self.create_batch_script(
+            'qtconsole.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
-""")
- 
+""",
+        )
 
-        self.create_batch_script('winqtconsole.bat',r"""@echo off
+        self.create_batch_script(
+            'winqtconsole.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
-""")
- 
-        self.create_batch_script('qtdemo.bat',r"""@echo off
+""",
+        )
+
+        self.create_batch_script(
+            'qtdemo.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
@@ -1180,9 +1624,12 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
 if exist "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py"
 )
-""")
+""",
+        )
 
-        self.create_batch_script('qtdesigner.bat',r"""@echo off
+        self.create_batch_script(
+            'qtdesigner.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
@@ -1196,9 +1643,12 @@ if "%QT_API%"=="pyqt5" (
 ) else (
     "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
 )
-""")
+""",
+        )
 
-        self.create_batch_script('qtassistant.bat',r"""@echo off
+        self.create_batch_script(
+            'qtassistant.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
@@ -1210,9 +1660,12 @@ if "%QT_API%"=="pyqt5" (
 ) else (
     "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
 )
-""")        
+""",
+        )
 
-        self.create_batch_script('qtlinguist.bat',r"""@echo off
+        self.create_batch_script(
+            'qtlinguist.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
@@ -1228,66 +1681,109 @@ if "%QT_API%"=="pyqt5" (
     "%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" %*
 )
 
-""")        
-        
-        self.create_python_batch('register_python.bat', 'register_python',
-                                 workdir=r'"%WINPYDIR%\Scripts"')
-        self.create_batch_script('register_python_for_all.bat',
-                                 r"""@echo off
-call "%~dp0env.bat"
-call "%~dp0register_python.bat" --all""")
+""",
+        )
 
-        self.create_batch_script('wpcp.bat',r"""@echo off
+        self.create_python_batch(
+            'register_python.bat',
+            'register_python',
+            workdir=r'"%WINPYDIR%\Scripts"',
+        )
+        self.create_batch_script(
+            'register_python_for_all.bat',
+            r"""@echo off
+call "%~dp0env.bat"
+call "%~dp0register_python.bat" --all""",
+        )
+
+        self.create_batch_script(
+            'wpcp.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\python.exe" -m winpython.controlpanel %*
-""")
+""",
+        )
 
-        #self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
+        # self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
         #                         workdir=r'"%WINPYDIR%\Scripts"')
 
-        self.create_batch_script('upgrade_pip.bat', r"""@echo off
+        self.create_batch_script(
+            'upgrade_pip.bat',
+            r"""@echo off
 call "%~dp0env.bat"
 echo this will upgrade pip with latest version, then patch it for WinPython portability ok ?
 pause
 "%WINPYDIR%\python.exe" -m pip install --upgrade pip
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 pause
-""")
+""",
+        )
 
-        self.create_batch_script('winpyzo.bat',r"""@echo off
+        self.create_batch_script(
+            'winpyzo.bat',
+            r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYDIR%"
 "%WINPYDIR%\scripts\pyzo.exe" %*
-""")
+""",
+        )
 
         # pre-run mingw batch
         print('now pre-running extra mingw')
-        filepath = osp.join(self.winpydir, 'scripts', 'make_cython_use_mingw.bat')
-        p = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
+        filepath = osp.join(
+            self.winpydir,
+            'scripts',
+            'make_cython_use_mingw.bat',
+        )
+        p = subprocess.Popen(
+            filepath, shell=True, stdout=subprocess.PIPE
+        )
         stdout, stderr = p.communicate()
 
         self._print_done()
 
-    def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
+    def _run_complement_batch_scripts(
+        self, this_batch="run_complement.bat"
+    ):
         """ tools\..\run_complement.bat for final complements"""
         print('now %s in tooldirs\..' % this_batch)
-        for post_complement in list(set([osp.dirname(s)
-                                         for s in self._toolsdirs])):
+        for post_complement in list(
+            set([osp.dirname(s) for s in self._toolsdirs])
+        ):
             filepath = osp.join(post_complement, this_batch)
             if osp.isfile(filepath):
-                print('launch "%s"  for  "%s"' % (filepath,  self.winpydir))
+                print(
+                    'launch "%s"  for  "%s"'
+                    % (filepath, self.winpydir)
+                )
                 try:
-                    retcode = subprocess.call('"%s"   "%s"' % (filepath,  self.winpydir),
-                                              shell=True, stdout=sys.stderr)
+                    retcode = subprocess.call(
+                        '"%s"   "%s"'
+                        % (filepath, self.winpydir),
+                        shell=True,
+                        stdout=sys.stderr,
+                    )
                     if retcode < 0:
-                        print("Child was terminated by signal", -retcode, file=sys.stderr)
+                        print(
+                            "Child was terminated by signal",
+                            -retcode,
+                            file=sys.stderr,
+                        )
                 except OSError as e:
-                    print("Execution failed:", e, file=sys.stderr)
-
+                    print(
+                        "Execution failed:",
+                        e,
+                        file=sys.stderr,
+                    )
         self._print_done()
 
-    def make(self, remove_existing=True, requirements=None, my_winpydir=None):  #, find_links=None):
+    def make(
+        self,
+        remove_existing=True,
+        requirements=None,
+        my_winpydir=None,
+    ):  # , find_links=None):
         """Make WinPython distribution in target directory from the installers
         located in wheeldir
 
@@ -1295,19 +1791,38 @@ cd/D "%WINPYDIR%"
         remove_existing=False: only for test purpose (launchers/scripts)
         requirements=file(s) of requirements (separated by space if several)"""
         if self.simulation:
-            print("WARNING: this is just a simulation!", file=sys.stderr)
-
-        print(self.python_fname,self.python_name , self.distname, self.python_version, self.python_fullversion)
+            print(
+                "WARNING: this is just a simulation!",
+                file=sys.stderr,
+            )
+        print(
+            self.python_fname,
+            self.python_name,
+            self.distname,
+            self.python_version,
+            self.python_fullversion,
+        )
         # Create the WinPython base directory
-        self._print("Creating WinPython %s base directory"
-                    % self.python_version)
-        if my_winpydir is None:        
-            self.winpydir = osp.join(self.target, self.distname)  
-        else: 
-            self.winpydir = osp.join(self.target, my_winpydir)
-        if osp.isdir(self.winpydir) and remove_existing \
-           and not self.simulation:
-            shutil.rmtree(self.winpydir, onerror=utils.onerror)
+        self._print(
+            "Creating WinPython %s base directory"
+            % self.python_version
+        )
+        if my_winpydir is None:
+            self.winpydir = osp.join(
+                self.target, self.distname
+            )
+        else:
+            self.winpydir = osp.join(
+                self.target, my_winpydir
+            )
+        if (
+            osp.isdir(self.winpydir)
+            and remove_existing
+            and not self.simulation
+        ):
+            shutil.rmtree(
+                self.winpydir, onerror=utils.onerror
+            )
         if not osp.isdir(self.winpydir):
             os.mkdir(self.winpydir)
         if remove_existing and not self.simulation:
@@ -1320,9 +1835,11 @@ cd/D "%WINPYDIR%"
 
         if remove_existing and not self.simulation:
             self._extract_python()
-        self.distribution = wppm.Distribution(self.python_dir,
-                                              verbose=self.verbose,
-                                              indent=True)
+        self.distribution = wppm.Distribution(
+            self.python_dir,
+            verbose=self.verbose,
+            indent=True,
+        )
 
         if remove_existing:
             if not self.simulation:
@@ -1331,79 +1848,103 @@ cd/D "%WINPYDIR%"
                 self._create_batch_scripts()
                 # always create all launchers (as long as it is NSIS-based)
                 self._create_launchers()
-
-
             # pre-patch current pip (until default python has pip 8.0.3)
             self.distribution.patch_standard_packages('pip')
             # not forced update of pip (FIRST) and setuptools here
-            for req in ('pip', 'setuptools', 'winpython'):   
-                actions = ["install","--upgrade", req]
+            for req in ('pip', 'setuptools', 'winpython'):
+                actions = ["install", "--upgrade", req]
                 if self.install_options is not None:
                     actions += self.install_options
                 print("piping %s" % ' '.join(actions))
                 self._print("piping %s" % ' '.join(actions))
                 self.distribution.do_pip_action(actions)
-                self.distribution.patch_standard_packages(req)
-                
+                self.distribution.patch_standard_packages(
+                    req
+                )
             # no more directory base package install: use requirements.txt
-            #2019-05-03 removed self._install_all_other_packages()
+            # 2019-05-03 removed self._install_all_other_packages()
             if not self.simulation:
                 self._copy_dev_tools()
                 self._copy_dev_docs()
         if not self.simulation:
 
             if requirements:
-                if not list(requirements)==requirements:
+                if not list(requirements) == requirements:
                     requirements = requirements.split()
                 for req in requirements:
-                    actions = ["install","-r", req]
+                    actions = ["install", "-r", req]
                     if self.install_options is not None:
                         actions += self.install_options
                     print("piping %s" % ' '.join(actions))
-                    self._print("piping %s" % ' '.join(actions))
+                    self._print(
+                        "piping %s" % ' '.join(actions)
+                    )
                     self.distribution.do_pip_action(actions)
-                    #actions=["install","-r", req, "--no-index",
+                    # actions=["install","-r", req, "--no-index",
                     #         "--trusted-host=None"]+ links,
                     #         install_options=None)
-
             self._run_complement_batch_scripts()  # run_complement.bat
             self.distribution.patch_standard_packages()
-
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
-
         # Writing package index
         self._print("Writing package index")
         # winpyver2 = need the version without build part
         # but with self.distribution.architecture
-        self.winpyver2 = '%s.%s' % (self.python_fullversion, self.build_number)
-        fname = osp.join(self.winpydir, os.pardir,
-                         'WinPython%s-%sbit-%s.md' % (self.flavor,
-                         self.distribution.architecture, self.winpyver2))
+        self.winpyver2 = '%s.%s' % (
+            self.python_fullversion,
+            self.build_number,
+        )
+        fname = osp.join(
+            self.winpydir,
+            os.pardir,
+            'WinPython%s-%sbit-%s.md'
+            % (
+                self.flavor,
+                self.distribution.architecture,
+                self.winpyver2,
+            ),
+        )
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
-        shutil.copyfile(fname, osp.join(CHANGELOGS_DIR, osp.basename(fname)))
+        shutil.copyfile(
+            fname,
+            osp.join(CHANGELOGS_DIR, osp.basename(fname)),
+        )
         self._print_done()
 
         # Writing changelog
         self._print("Writing changelog")
-        diff.write_changelog(self.winpyver2, basedir=self.basedir,
-                             flavor=self.flavor, release_level=self.release_level,
-                             architecture=self.distribution.architecture)
+        diff.write_changelog(
+            self.winpyver2,
+            basedir=self.basedir,
+            flavor=self.flavor,
+            release_level=self.release_level,
+            architecture=self.distribution.architecture,
+        )
         self._print_done()
 
 
-def rebuild_winpython(basedir, targetdir, architecture=64, verbose=False):
+def rebuild_winpython(
+    basedir, targetdir, architecture=64, verbose=False
+):
     """Rebuild winpython package from source"""
     basedir = basedir
     packdir = targetdir
     for name in os.listdir(packdir):
-        if name.startswith('winpython-') and name.endswith(('.exe', '.whl')):
+        if name.startswith('winpython-') and name.endswith(
+            ('.exe', '.whl')
+        ):
             os.remove(osp.join(packdir, name))
-    utils.build_wininst(osp.dirname(osp.abspath(__file__)), copy_to=packdir,
-        architecture=architecture, verbose=verbose, installer='bdist_wheel')
+    utils.build_wininst(
+        osp.dirname(osp.abspath(__file__)),
+        copy_to=packdir,
+        architecture=architecture,
+        verbose=verbose,
+        installer='bdist_wheel',
+    )
 
 
 def transform_in_list(list_in, list_type=None):
@@ -1411,18 +1952,30 @@ def transform_in_list(list_in, list_type=None):
     if list_in is None:
         list_in = ''
     if not list_in == list(list_in):
-            list_in = list_in.split()
+        list_in = list_in.split()
     if list_type:
-        print(list_type, list_in) 
+        print(list_type, list_in)
     return list_in
 
 
-def make_all(build_number, release_level, pyver, architecture,
-                   basedir, verbose=False, remove_existing=True,
-                   create_installer=True, simulation=False,
-                   install_options=['--no-index'], flavor='', requirements=None,
-                   find_links=None, source_dirs=None, toolsdirs=None,
-                   docsdirs=None):
+def make_all(
+    build_number,
+    release_level,
+    pyver,
+    architecture,
+    basedir,
+    verbose=False,
+    remove_existing=True,
+    create_installer=True,
+    simulation=False,
+    install_options=['--no-index'],
+    flavor='',
+    requirements=None,
+    find_links=None,
+    source_dirs=None,
+    toolsdirs=None,
+    docsdirs=None,
+):
     """Make WinPython distribution, for a given base directory and
     architecture:
     `build_number`: build number [int]
@@ -1436,23 +1989,29 @@ def make_all(build_number, release_level, pyver, architecture,
     `find_links`: package directories r'D:\Winpython\packages.srcreq',
     `source_dirs`: the python.zip + rebuilt winpython wheel package directory,
     `toolsdirs`: r'D:\WinPython\basedir34\t.Slim',
-    `docsdirs`: r'D:\WinPython\basedir34\docs.Slim'    """ 
-    
+    `docsdirs`: r'D:\WinPython\basedir34\docs.Slim'    """
 
-    assert basedir is not None, "The *basedir* directory must be specified"
+    assert (
+        basedir is not None
+    ), "The *basedir* directory must be specified"
     assert architecture in (32, 64)
-    utils.print_box("Making WinPython %dbits" % architecture)
+    utils.print_box(
+        "Making WinPython %dbits" % architecture
+    )
 
     # Create Build director, where Winpython will be constructed
     builddir = osp.join(basedir, 'bu' + flavor)
     if not osp.isdir(builddir):
         os.mkdir(builddir)
-
     # use source_dirs as the directory to re-build Winpython wheel
     wheeldir = source_dirs
 
     # Rebuild Winpython in this wheel dir
-    rebuild_winpython(basedir=basedir, targetdir=wheeldir, architecture=architecture)
+    rebuild_winpython(
+        basedir=basedir,
+        targetdir=wheeldir,
+        architecture=architecture,
+    )
 
     # Optional pre-defined toolsdirs
     toolsdirs = transform_in_list(toolsdirs, 'toolsdirs=')
@@ -1461,43 +2020,79 @@ def make_all(build_number, release_level, pyver, architecture,
     docsdirs = transform_in_list(docsdirs, 'docsdirs=')
 
     # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
-    install_options = transform_in_list(install_options, 'install_options')
-        
+    install_options = transform_in_list(
+        install_options, 'install_options'
+    )
+
     find_links = transform_in_list(find_links, 'find_links')
 
-    find_list = ['--find-links=%s' % l for l in find_links +[wheeldir]]
-    dist = WinPythonDistribution(build_number, release_level,
-                                 builddir, wheeldir, toolsdirs,
-                                 verbose=verbose, simulation=simulation,
-                                 basedir=basedir,
-                                 install_options=install_options + find_list,
-                                 flavor=flavor, docsdirs=docsdirs)
+    find_list = [
+        '--find-links=%s' % l
+        for l in find_links + [wheeldir]
+    ]
+    dist = WinPythonDistribution(
+        build_number,
+        release_level,
+        builddir,
+        wheeldir,
+        toolsdirs,
+        verbose=verbose,
+        simulation=simulation,
+        basedir=basedir,
+        install_options=install_options + find_list,
+        flavor=flavor,
+        docsdirs=docsdirs,
+    )
     # define a pre-defined winpydir, instead of having to guess
 
     # extract the python subversion to get WPy64-3671b1
-    my_x = ''.join(dist.python_fname.replace('.amd64','').split('.')[-2:-1])
-    while not my_x.isdigit() and len(my_x)>0:
+    my_x = ''.join(
+        dist.python_fname.replace('.amd64', '').split('.')[
+            -2:-1
+        ]
+    )
+    while not my_x.isdigit() and len(my_x) > 0:
         my_x = my_x[:-1]
-        
-    my_winpydir = ('WPy' + ('%s' % architecture) +'-' + pyver.replace('.','') +
-                  '' + my_x + '' + ('%s' %build_number) ) + release_level
-                  # + flavor   
-    
-    dist.make(remove_existing=remove_existing, requirements=requirements,
-              my_winpydir=my_winpydir)
+    my_winpydir = (
+        'WPy'
+        + ('%s' % architecture)
+        + '-'
+        + pyver.replace('.', '')
+        + ''
+        + my_x
+        + ''
+        + ('%s' % build_number)
+    ) + release_level
+    # + flavor
+
+    dist.make(
+        remove_existing=remove_existing,
+        requirements=requirements,
+        my_winpydir=my_winpydir,
+    )
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
-    if str(create_installer).lower() != 'false' and not simulation:
+    if (
+        str(create_installer).lower() != 'false'
+        and not simulation
+    ):
         if 'nsis' in str(create_installer).lower():
             dist.create_installer()  # NSIS installer (can't handle big build)
         if 'inno' in str(create_installer).lower() or (
-                        str(create_installer).lower() == 'true'):
+            str(create_installer).lower() == 'true'
+        ):
             dist.create_installer_inno()  # INNO Setup 5 (not 7zip friendly)
         if '7zip' in str(create_installer).lower():
-            dist.create_installer_7zip('.exe')  # 7-zip (no licence splash screen)
+            dist.create_installer_7zip(
+                '.exe'
+            )  # 7-zip (no licence splash screen)
         if '.7z' in str(create_installer).lower():
-            dist.create_installer_7zip('.7z')  # 7-zip (no licence splash screen)
+            dist.create_installer_7zip(
+                '.7z'
+            )  # 7-zip (no licence splash screen)
         if '.zip' in str(create_installer).lower():
-            dist.create_installer_7zip('.zip')  # 7-zip (no licence splash screen)
+            dist.create_installer_7zip(
+                '.zip'
+            )  # 7-zip (no licence splash screen)
     return dist
 
 
@@ -1505,12 +2100,18 @@ if __name__ == '__main__':
     # DO create only one version at a time
     # You may have to manually delete previous build\winpython-.. directory
 
-    make_all(1, release_level='build3', pyver='3.4', basedir=r'D:\Winpython\basedir34', verbose=True,
-             architecture=64, flavor='Barebone',
-             requirements=r'D:\Winpython\basedir34\barebone_requirements.txt',
-             install_options=r'--no-index --pre --trusted-host=None',
-             find_links=r'D:\Winpython\packages.srcreq',
-             source_dirs=r'D:\WinPython\basedir34\packages.win-amd64',
-             toolsdirs=r'D:\WinPython\basedir34\t.Slim',
-             docsdirs=r'D:\WinPython\basedir34\docs.Slim'
-)
+    make_all(
+        1,
+        release_level='build3',
+        pyver='3.4',
+        basedir=r'D:\Winpython\basedir34',
+        verbose=True,
+        architecture=64,
+        flavor='Barebone',
+        requirements=r'D:\Winpython\basedir34\barebone_requirements.txt',
+        install_options=r'--no-index --pre --trusted-host=None',
+        find_links=r'D:\Winpython\packages.srcreq',
+        source_dirs=r'D:\WinPython\basedir34\packages.win-amd64',
+        toolsdirs=r'D:\WinPython\basedir34\t.Slim',
+        docsdirs=r'D:\WinPython\basedir34\docs.Slim',
+    )
