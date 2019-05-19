@@ -16,10 +16,14 @@ import os.path as osp
 
 def get_module_path(modname):
     """Return module *modname* base path"""
-    return osp.abspath(osp.dirname(sys.modules[modname].__file__))
+    return osp.abspath(
+        osp.dirname(sys.modules[modname].__file__)
+    )
 
 
-def get_module_data_path(modname, relpath=None, attr_name='DATAPATH'):
+def get_module_data_path(
+    modname, relpath=None, attr_name='DATAPATH'
+):
     """Return module *modname* data path
     Note: relpath is ignored if module has an attribute named *attr_name*
 
@@ -33,12 +37,21 @@ def get_module_data_path(modname, relpath=None, attr_name='DATAPATH'):
         if osp.isfile(parentdir):
             # Parent directory is not a directory but the 'library.zip' file:
             # this is either a py2exe or a cx_Freeze distribution
-            datapath = osp.abspath(osp.join(osp.join(parentdir, osp.pardir),
-                                            modname))
+            datapath = osp.abspath(
+                osp.join(
+                    osp.join(parentdir, osp.pardir), modname
+                )
+            )
         if relpath is not None:
-            datapath = osp.abspath(osp.join(datapath, relpath))
+            datapath = osp.abspath(
+                osp.join(datapath, relpath)
+            )
         return datapath
 
 
-DATA_PATH = get_module_data_path('winpython', relpath='data')
-IMAGE_PATH = get_module_data_path('winpython', relpath='images')
+DATA_PATH = get_module_data_path(
+    'winpython', relpath='data'
+)
+IMAGE_PATH = get_module_data_path(
+    'winpython', relpath='images'
+)
