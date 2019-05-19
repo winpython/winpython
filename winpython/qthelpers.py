@@ -11,15 +11,40 @@
 """Qt utilities"""
 
 # winpython.qt becomes winpython._vendor.qtpy
-from winpython._vendor.qtpy.QtWidgets import (QAction, QStyle, QWidget, QApplication,
-                                QLabel, QVBoxLayout, QHBoxLayout, QLineEdit,
-                                QMenu, QToolButton)
-                                
-from winpython._vendor.qtpy.QtGui import (QIcon, QKeyEvent, QKeySequence, QPixmap)
+from winpython._vendor.qtpy.QtWidgets import (
+    QAction,
+    QStyle,
+    QWidget,
+    QApplication,
+    QLabel,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLineEdit,
+    QMenu,
+    QToolButton,
+)
 
-from winpython._vendor.qtpy.QtCore import (Signal, QObject, Qt, QLocale, QTranslator,
-                                 QLibraryInfo, QEvent, Slot)
-from winpython._vendor.qtpy.compat import to_qvariant, from_qvariant
+from winpython._vendor.qtpy.QtGui import (
+    QIcon,
+    QKeyEvent,
+    QKeySequence,
+    QPixmap,
+)
+
+from winpython._vendor.qtpy.QtCore import (
+    Signal,
+    QObject,
+    Qt,
+    QLocale,
+    QTranslator,
+    QLibraryInfo,
+    QEvent,
+    Slot,
+)
+from winpython._vendor.qtpy.compat import (
+    to_qvariant,
+    from_qvariant,
+)
 
 import os
 import re
@@ -28,7 +53,10 @@ import sys
 
 # Local import
 from winpython import config
-from winpython.py3compat import is_text_string, to_text_string
+from winpython.py3compat import (
+    is_text_string,
+    to_text_string,
+)
 
 
 def get_icon(name):
@@ -38,6 +66,7 @@ def get_icon(name):
 
 class MacApplication(QApplication):
     """Subclass to be able to open external files with our Mac app"""
+
     open_external_file = Signal(str)
 
     def __init__(self, *args):
@@ -54,11 +83,13 @@ class MacApplication(QApplication):
 def qapplication(translate=True):
     """Return QApplication instance
     Creates it if it doesn't already exist"""
-    if sys.platform == "darwin" and 'Spyder.app' in __file__:
+    if (
+        sys.platform == "darwin"
+        and 'Spyder.app' in __file__
+    ):
         SpyderApplication = MacApplication
     else:
         SpyderApplication = QApplication
-
     app = SpyderApplication.instance()
     if not app:
         # Set Application name for Gnome 3
@@ -90,9 +121,15 @@ def install_translator(qapp):
     global QT_TRANSLATOR
     if QT_TRANSLATOR is None:
         qt_translator = QTranslator()
-        if qt_translator.load("qt_"+QLocale.system().name(),
-                      QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
-            QT_TRANSLATOR = qt_translator  # Keep reference alive
+        if qt_translator.load(
+            "qt_" + QLocale.system().name(),
+            QLibraryInfo.location(
+                QLibraryInfo.TranslationsPath
+            ),
+        ):
+            QT_TRANSLATOR = (
+                qt_translator
+            )  # Keep reference alive
     if QT_TRANSLATOR is not None:
         qapp.installTranslator(QT_TRANSLATOR)
 
@@ -100,7 +137,9 @@ def install_translator(qapp):
 def keybinding(attr):
     """Return keybinding"""
     ks = getattr(QKeySequence, attr)
-    return from_qvariant(QKeySequence.keyBindings(ks)[0], str)
+    return from_qvariant(
+        QKeySequence.keyBindings(ks)[0], str
+    )
 
 
 def _process_mime_path(path, extlist):
@@ -108,14 +147,19 @@ def _process_mime_path(path, extlist):
         if os.name == 'nt':
             # On Windows platforms, a local path reads: file:///c:/...
             # and a UNC based path reads like: file://server/share
-            if path.startswith(r"file:///"):  # this is a local path
+            if path.startswith(
+                r"file:///"
+            ):  # this is a local path
                 path = path[8:]
             else:  # this is a unc path
                 path = path[5:]
         else:
             path = path[7:]
     if osp.exists(path):
-        if extlist is None or osp.splitext(path)[1] in extlist:
+        if (
+            extlist is None
+            or osp.splitext(path)[1] in extlist
+        ):
             return path
 
 
@@ -127,11 +171,15 @@ def mimedata2url(source, extlist=None):
     pathlist = []
     if source.hasUrls():
         for url in source.urls():
-            path = _process_mime_path(to_text_string(url.toString()), extlist)
+            path = _process_mime_path(
+                to_text_string(url.toString()), extlist
+            )
             if path is not None:
                 pathlist.append(path)
     elif source.hasText():
-        for rawpath in to_text_string(source.text()).splitlines():
+        for rawpath in to_text_string(
+            source.text()
+        ).splitlines():
             path = _process_mime_path(rawpath, extlist)
             if path is not None:
                 pathlist.append(path)
@@ -139,7 +187,12 @@ def mimedata2url(source, extlist=None):
         return pathlist
 
 
-def action2button(action, autoraise=True, text_beside_icon=False, parent=None):
+def action2button(
+    action,
+    autoraise=True,
+    text_beside_icon=False,
+    parent=None,
+):
     """Create a QToolButton directly from a QAction object"""
     if parent is None:
         parent = action.parent()
@@ -147,7 +200,9 @@ def action2button(action, autoraise=True, text_beside_icon=False, parent=None):
     button.setDefaultAction(action)
     button.setAutoRaise(autoraise)
     if text_beside_icon:
-        button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        button.setToolButtonStyle(
+            Qt.ToolButtonTextBesideIcon
+        )
     return button
 
 
@@ -159,9 +214,18 @@ def toggle_actions(actions, enable):
                 action.setEnabled(enable)
 
 
-def create_action(parent, text, shortcut=None, icon=None, tip=None,
-                  toggled=None, triggered=None, data=None, menurole=None,
-                  context=Qt.WindowShortcut):
+def create_action(
+    parent,
+    text,
+    shortcut=None,
+    icon=None,
+    tip=None,
+    toggled=None,
+    triggered=None,
+    data=None,
+    menurole=None,
+    context=Qt.WindowShortcut,
+):
     """Create a QAction"""
     action = QAction(text, parent)
     if triggered is not None:
@@ -200,7 +264,9 @@ def add_actions(target, actions, insert_before=None):
         if previous_action.isSeparator():
             previous_action = None
     for action in actions:
-        if (action is None) and (previous_action is not None):
+        if (action is None) and (
+            previous_action is not None
+        ):
             if insert_before is None:
                 target.addSeparator()
             else:
@@ -222,8 +288,12 @@ def get_std_icon(name, size=None):
     """Get standard platform icon
     Call 'show_std_icons()' for details"""
     if not name.startswith('SP_'):
-        name = 'SP_'+name
-    icon = QWidget().style().standardIcon(getattr(QStyle, name))
+        name = 'SP_' + name
+    icon = (
+        QWidget()
+        .style()
+        .standardIcon(getattr(QStyle, name))
+    )
     if size is None:
         return icon
     else:
