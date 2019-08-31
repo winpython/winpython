@@ -952,6 +952,14 @@ call "%~dp0env_for_icons.bat"
             args=r'Noshell.vbs winpyzo.bat',
         )
 
+        # VSCode launcher
+        self.create_launcher(
+            'VS Code.exe',
+            'code.ico',
+            command='wscript.exe',
+            args=r'Noshell.vbs winvscode.bat',
+        )
+
         self._print_done()
 
     def _create_batch_scripts_initial(self):
@@ -1746,7 +1754,21 @@ cd/D "%WINPYDIR%"
         stdout, stderr = p.communicate()
 
         self._print_done()
+        
+        self.create_batch_script(
+            'winvscode.bat',
+            r"""@echo off
+rem launcher for VScode
+call "%~dp0env_for_icons.bat"
+cd/D "%WINPYWORKDIR%"
+if exist "%WINPYDIR%\..\t\vscode\code.exe" (
+    "%WINPYDIR%\..\t\vscode\code.exe" %*
+) else (
+    "code.exe" %*
+)
 
+""",
+        )
     def _run_complement_batch_scripts(
         self, this_batch="run_complement.bat"
     ):
