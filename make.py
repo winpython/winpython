@@ -1047,10 +1047,11 @@ rem ******************
 set tmp_pyz=%WINPYDIR%\Lib\site-packages\PySide2
 if not exist "%tmp_pyz%" goto pyside2_conf_exist
 set tmp_pyz=%tmp_pyz%\qt.conf
-if  exist "%tmp_pyz%" goto pyside2_conf_exist
-echo [Paths]>>"%tmp_pyz%"
-echo Prefix = .>>"%tmp_pyz%"
-echo Binaries = .>>"%tmp_pyz%"
+if not exist "%tmp_pyz%" (
+    echo [Paths]
+    echo Prefix = .
+    echo Binaries = .
+)>> "%tmp_pyz%"
 :pyside2_conf_exist
 
 rem ******************
@@ -1059,10 +1060,11 @@ rem ******************
 set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt5
 if not exist "%tmp_pyz%" goto pyqt5_conf_exist
 set tmp_pyz=%tmp_pyz%\qt.conf
-if  exist "%tmp_pyz%" goto pyqt5_conf_exist
-echo [Paths]>>"%tmp_pyz%"
-echo Prefix = .>>"%tmp_pyz%"
-echo Binaries = .>>"%tmp_pyz%"
+if not exist "%tmp_pyz%" (
+    echo [Paths]
+    echo Prefix = .
+    echo Binaries = .
+)>> "%tmp_pyz%"
 :pyqt5_conf_exist
 
 
@@ -1072,12 +1074,14 @@ rem ******************
 if not exist "%HOME%\.pyzo" mkdir %HOME%\.pyzo
 if exist "%HOME%\.pyzo\config.ssdf"  goto after_pyzo_conf
 set tmp_pyz="%HOME%\.pyzo\config.ssdf"
-echo shellConfigs2 = list:>>%tmp_pyz%
-echo  dict:>>%tmp_pyz%
-echo    name = 'Python'>>%tmp_pyz%
-echo    exe = '.\\python.exe'>>%tmp_pyz%
-echo    ipython = 'no'>>%tmp_pyz%
-echo    gui = 'none'>>%tmp_pyz%
+(
+    echo shellConfigs2 = list:
+    echo  dict:
+    echo    name = 'Python'
+    echo    exe = '.\\python.exe'
+    echo    ipython = 'no'
+    echo    gui = 'none'
+)>> "%tmp_pyz%"
 
 :after_pyzo_conf
 
@@ -1088,14 +1092,14 @@ rem ******************
 if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
 set winpython_ini=%WINPYDIRBASE%\settings\winpython.ini
 if not exist "%winpython_ini%" (
-    echo [debug]>>"%winpython_ini%"
-    echo state = disabled>>"%winpython_ini%"
-    echo [environment]>>"%winpython_ini%"
-    echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
-    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%>>"%winpython_ini%"
-    echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
-    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
-)
+    echo [debug]
+    echo state = disabled
+    echo [environment]
+    echo ## <?> Uncomment lines to override environment variables
+    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%
+    echo #JUPYTER_DATA_DIR = %%HOME%%
+    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
+)>> "%winpython_ini%"
 
 """,
         )
@@ -1394,14 +1398,16 @@ rem ******************
 set pydistutils_cfg=%WINPYDIRBASE%\settings\pydistutils.cfg
 
 set tmp_blank=
-echo [config]>"%pydistutils_cfg%"
-echo compiler=mingw32>>"%pydistutils_cfg%"
-
-echo [build]>>"%pydistutils_cfg%"
-echo compiler=mingw32>>"%pydistutils_cfg%"
-
-echo [build_ext]>>"%pydistutils_cfg%"
-echo compiler=mingw32>>"%pydistutils_cfg%"
+(
+    echo [config]
+    echo compiler=mingw32
+    echo.
+    echo [build]
+    echo compiler=mingw32
+    echo.
+    echo [build_ext]
+    echo compiler=mingw32
+) > "%pydistutils_cfg%"
 
 echo cython has been set to use mingw32
 echo to remove this, remove file "%pydistutils_cfg%"
@@ -1446,13 +1452,15 @@ pause
             'make_working_directory_be_not_winpython.bat',
             r"""@echo off
 set winpython_ini=%~dp0..\\settings\winpython.ini
-echo [debug]>"%winpython_ini%"
-echo state = disabled>>"%winpython_ini%"
-echo [environment]>>"%winpython_ini%"
-echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
-echo HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings>>"%winpython_ini%"
-echo JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
-echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
+(
+    echo [debug]
+    echo state = disabled
+    echo [environment]
+    echo ## <?> Uncomment lines to override environment variables
+    echo HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
+    echo JUPYTER_DATA_DIR = %%HOME%%
+    echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
+) > "%winpython_ini%"
 """,
         )
 
@@ -1460,13 +1468,15 @@ echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\No
             'make_working_directory_be_winpython.bat',
             r"""@echo off
 set winpython_ini=%~dp0..\\settings\winpython.ini
-echo [debug]>"%winpython_ini%"
-echo state = disabled>>"%winpython_ini%"
-echo [environment]>>"%winpython_ini%"
-echo ## <?> Uncomment lines to override environment variables>>"%winpython_ini%"
-echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings>>"%winpython_ini%"
-echo #JUPYTER_DATA_DIR = %%HOME%%>>"%winpython_ini%"
-echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks>>"%winpython_ini%"
+(
+    echo [debug]
+    echo state = disabled
+    echo [environment]
+    echo ## <?> Uncomment lines to override environment variables
+    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
+    echo #JUPYTER_DATA_DIR = %%HOME%%
+    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
+) > "%winpython_ini%"
 """,
         )
 
