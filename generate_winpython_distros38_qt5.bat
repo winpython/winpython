@@ -12,7 +12,7 @@ set my_flavor=
 
 set my_release=0
 
-set my_release_level=b2b
+set my_release_level=
 
 rem set my_create_installer=False
 set my_create_installer=nsis.zip

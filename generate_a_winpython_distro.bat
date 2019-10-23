@@ -1,5 +1,16 @@
 rem  to launch from a winpython package directory, where 'make.py' is
 @echo on
+
+rem *****************************
+rem 2019-05-10 PATCH for build problem (asking permission to overwrite the file)
+rem 
+rem *****************************
+del -y %userprofile%\.jupyter\jupyter_notebook_config.py
+
+
+rem ******************************
+
+
 rem  this is initialised per the calling .bat
 rem  set my_original_path=%path%
 rem  set my_buildenv=C:\WinPython-64bit-3.4.3.7Qt5
@@ -23,19 +34,23 @@ rem Override other scripts (simpler maintenance)
 set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
 
 rem handle alpha
-if "%my_release_level%"=="" set my_release_level=
+if "%my_release_level%"=="" set my_release_level=b1
+if %my_python_target%==38 set my_release_level=
 
-if %my_python_target%==27 set my_release=2
+rem ---------
+rem newAge 20191022
+rem install with zero package, no installer, then do it from there
+rem change is we must help by giving my_python_target_release
+rem --------
 
-if %my_python_target%==34 set my_release=8
-
-if %my_python_target%==35 set my_release=3
-
-if %my_python_target%==36 set my_release=1
-
-if %my_python_target%==37 set my_release=0
-
-if %my_python_target%==38 set my_release=0
+if %my_python_target%==37 (
+   set my_python_target_release=375
+   set my_release=0
+)
+if %my_python_target%==38 (
+   set my_python_target_release=380
+   set my_release=0
+)
 
 rem **** 2018-10-30 create_installer **
 if "%my_create_installer%"=="" set my_create_installer=True
@@ -121,10 +136,67 @@ set path=%my_original_path%
 echo call %my_buildenv%\scripts\env.bat>>%my_archive_log%
 call %my_buildenv%\scripts\env.bat
 
-rem  build with this 
+echo ----------------------------->>%my_archive_log%
+echo 2.0 Create a build newage1/3 >>%my_archive_log%
+echo ----------------------------->>%my_archive_log%
+
+rem 2019-10-22 new age step1
+rem we don't use requirements 
+rem we don't create installer at first path
+rem we use legacy python build cd /D %~dp0
+
+set my_buildenv_path=%path%
+
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False')">>%my_archive_log%
+
+rem old one
+rem echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='%my_create_installer%')">>%my_archive_log%
+
+
+echo ----------------------------->>%my_archive_log%
+echo 2.0 Create a build newage2/3 >>%my_archive_log%
+echo ----------------------------->>%my_archive_log%
+rem 2019-10-22 new age step2
+rem we use final environment to install requirements
+set path=%my_original_path%
+
+@echo on
+set my_WINPYDIRBASE=%my_root_dir_for_builds%\bd%my_python_target%\bu%my_flavor%\Wpy%my_arch%-%my_python_target_release%%my_release%%my_release_level%
+
+set WINPYDIRBASE=%my_WINPYDIRBASE% 
+call %my_WINPYDIRBASE%\scripts\env.bat
+set
+echo beg of step 2/3
+rem ok no pause 
+
+echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
+pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade >>%my_archive_log%
+echo mid of step 2/3
+rem pause
+
+rem finalize
+@echo on
+call  %my_basedir%\run_complement_newbuild.bat %my_WINPYDIRBASE%
+echo end of step 2/3
+rem pause
+
+echo ----------------------------->>%my_archive_log%
+echo 2.0 Create a build newage3/3 >>%my_archive_log%
+echo ----------------------------->>%my_archive_log%
+
+rem build final changelog and binaries, using create_installer='%my_create_installer%', remove_existing=False , remove : requirements, toolsdirs and docdirs
+
+set path=%my_original_path%
+echo cd /D %~dp0>>%my_archive_log%
 cd /D %~dp0
-echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='%my_create_installer%')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='%my_create_installer%')">>%my_archive_log%
+
+echo call %my_buildenv%\scripts\env.bat>>%my_archive_log%
+call %my_buildenv%\scripts\env.bat
+set
+
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False)">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False)">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%
@@ -132,3 +204,4 @@ echo %date% %time%  >>%my_archive_log%
 echo ===============>>%my_archive_log%
 
 set path=%my_original_path%
+rem pause

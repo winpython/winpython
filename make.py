@@ -1796,6 +1796,10 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     'launch "%s"  for  "%s"'
                     % (filepath, self.winpydir)
                 )
+                self._print(
+                    'launch "%s"  for  "%s" !'
+                    % (filepath, self.winpydir)
+                )    
                 try:
                     retcode = subprocess.call(
                         '"%s"   "%s"'
@@ -1809,9 +1813,19 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                             -retcode,
                             file=sys.stderr,
                         )
+                        self._print(
+                            "Child was terminated by signal ! ",
+                            -retcode,
+                            file=sys.stderr,
+                        )
                 except OSError as e:
                     print(
                         "Execution failed:",
+                        e,
+                        file=sys.stderr,
+                    )
+                    self._print(
+                        "Execution failed !:",
                         e,
                         file=sys.stderr,
                     )
@@ -1922,7 +1936,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     # actions=["install","-r", req, "--no-index",
                     #         "--trusted-host=None"]+ links,
                     #         install_options=None)
-            self._run_complement_batch_scripts()  # run_complement.bat
+            self._run_complement_batch_scripts()
             self.distribution.patch_standard_packages()
         if remove_existing and not self.simulation:
             self._print("Cleaning up distribution")
