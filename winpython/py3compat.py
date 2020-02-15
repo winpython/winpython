@@ -76,7 +76,10 @@ else:
     from sys import maxsize
     import io
     import pickle
-    from collections import MutableMapping
+    try:  # Python 3.8 and more
+        from collections.abc import MutableMapping
+    except ImportError:
+        from collections import MutableMapping
     import _thread
     import reprlib
 # ==============================================================================

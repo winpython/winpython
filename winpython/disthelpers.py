@@ -27,6 +27,7 @@ import atexit
 import imp
 from subprocess import Popen, PIPE
 import warnings
+from distutils.version import LooseVersion, StrictVersion
 
 # ==============================================================================
 # Module, scripts, programs
@@ -143,6 +144,8 @@ def get_msvc_version(python_version):
     elif python_version in ('3.5', '3.6'):
         return '15.0'
     elif python_version in ('3.7', '3.8'):
+        return '15.0'
+    elif StrictVersion(python_version) >= StrictVersion('3.9'):
         return '15.0'
     else:
         raise RuntimeError(
