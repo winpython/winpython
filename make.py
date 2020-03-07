@@ -1013,9 +1013,12 @@ set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 set FINDDIR=%WINDIR%\system32
 echo ";%PATH%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
-if %ERRORLEVEL% NEQ 0 set PATH="""
+if %ERRORLEVEL% NEQ 0 (
+   set "PATH="""
             + path
-            + r"""
+            + r""""
+   cd .
+)         
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
