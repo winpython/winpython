@@ -13,7 +13,7 @@ rem ******************************
 
 rem  this is initialised per the calling .bat
 rem  set my_original_path=%path%
-rem  set my_buildenv=C:\WinPython-64bit-3.4.3.7Qt5
+rem  set my_buildenv=C:\WinPython-64bit-3.6.8.0
 rem  set my_root_dir_for_builds=D:\Winp
 
 rem  set my_python_target=34
@@ -31,11 +31,11 @@ rem set my_basedir=%my_root_dir_for_builds%\build%my_python_target%\%my_arch%
 rem ***********************************************************
 rem Override other scripts (simpler maintenance)
 
-set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
+set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha
-if "%my_release_level%"=="" set my_release_level=b1
-if %my_python_target%==38 set my_release_level=
+if "%my_release_level%"=="" set my_release_level=
+rem if %my_python_target%==38 set my_release_level=b1
 
 rem ---------
 rem newAge 20191022
@@ -44,11 +44,15 @@ rem change is we must help by giving my_python_target_release
 rem --------
 
 if %my_python_target%==37 (
-   set my_python_target_release=375
+   set my_python_target_release=377
    set my_release=0
 )
 if %my_python_target%==38 (
-   set my_python_target_release=380
+   set my_python_target_release=382
+   set my_release=0
+)
+if %my_python_target%==39 (
+   set my_python_target_release=390
    set my_release=0
 )
 
@@ -154,6 +158,9 @@ rem old one
 rem echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='%my_create_installer%')">>%my_archive_log%
 
 
+echo -----------------------------
+echo 2.0 Create a build newage2/3 
+echo -----------------------------
 echo ----------------------------->>%my_archive_log%
 echo 2.0 Create a build newage2/3 >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
@@ -171,6 +178,7 @@ echo beg of step 2/3
 rem ok no pause 
 
 echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
+echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade>>%my_archive_log%
 pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade >>%my_archive_log%
 echo mid of step 2/3
 rem pause
@@ -179,6 +187,7 @@ rem finalize
 @echo on
 call  %my_basedir%\run_complement_newbuild.bat %my_WINPYDIRBASE%
 echo end of step 2/3
+echo end of step 2/3>>%my_archive_log%
 rem pause
 
 echo ----------------------------->>%my_archive_log%

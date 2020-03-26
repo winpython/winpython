@@ -1,6 +1,11 @@
 rem first line check
 echo  keep me in ansi =utf-8 without BOM  (notepad plus plus or win10 screwing up for compatibility)
 
+rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
+rem that is:  pip install --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  -r c:\....\requirements.txt
+rem           ( drag & drop "requirements.txt" file in the dos window a the end of the line, to get full path)
+rem then drag & drop "run_complement_newbuild.bat" file in the dos window and launch it
+
 echo rem labextendion 2019-06-28 test
 @echo off 
 rem %1 is WINPYDIR being prepared
@@ -56,12 +61,14 @@ rem * ===================
 echo jupyterlab manager (if npm there)
 rem * ==================
 @echo off
-rem jupyter lab clean
+rem 2019-11-02 pre-clean
+if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" lab clean
+
 rem jupyter labextension list
-rem jupyter labextension disable bqplot    jupyter-leaflet  jupyter-matplotlib  jupyter-threejs   jupyterlab-datawidgets   jupyterlab_bokeh
 
 rem 2018-07-07 for jupyterlab-0.32.x: https://www.npmjs.com/package/@jupyter-widgets/jupyterlab-manager
-if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyter-widgets/jupyterlab-manager
+rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyter-widgets/jupyterlab-manager js
+if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyter-widgets/jupyterlab-manager
 
 
 rem * ==================
@@ -75,7 +82,9 @@ if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\bqplot" "%
 rem * ==================
 echo finish install of bokeh for jupyterlab (2019-08-10)
 rem * ================= 
-if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\bokeh" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build jupyterlab_bokeh
+rem 2019-11-01 change
+rem if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\bokeh" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build jupyterlab_bokeh
+if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\bokeh" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build @bokeh/jupyter_bokeh
 
 
 rem * ==================
@@ -85,7 +94,7 @@ if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupy
 if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  ipydatawidgets
 rem labextendion 
 rem no need: included per default in jlab-1 
-if not "%WINPYARCH%"=="WIN3x2" if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build       jupyterlab-datawidgets
+if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build       jupyterlab-datawidgets
 
 
 rem * ==================
@@ -103,7 +112,7 @@ echo finish install of pythreejs
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\pythreejs" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  pythreejs
 rem labextendion
-if not "%WINPYARCH%"=="WIN3x2" if exist  "%WINPYDIR%\Lib\site-packages\pythreejs" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-threejs
+if exist  "%WINPYDIR%\Lib\site-packages\pythreejs" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-threejs
 
 
 rem * ==================
@@ -142,7 +151,10 @@ rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\ipympl" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix ipympl
 rem labextendion4
 rem no need: included per default in jlab-1 
-if not "%WINPYARCH%"=="WIN3x2" if exist  "%WINPYDIR%\Lib\site-packages\ipympl" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-matplotlib
+if exist  "%WINPYDIR%\Lib\site-packages\ipympl" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-matplotlib
+
+rem 2019-11-15 patch for ipympl-0.3.3
+rem if exist  "%WINPYDIR%\Lib\site-packages\ipympl-0.3.3.dist-info" copy/Y "C:\WinP\tempo_fixes\ipympl\backend_nbagg.py" "%WINPYDIR%\Lib\site-packages\ipympl\backend_nbagg.py"
 
 
 rem * =================
@@ -164,10 +176,10 @@ if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\
 
 
 rem * ==================
-echo finish install of Qgrid(2019-04-26)
+echo finish install of Qgrid(2020-03-10)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix qgrid
-rem labextendion if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build  qgrid  
+if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build  qgrid2  
 
 rem * ==================
 echo finish install of Jupyterlab-sql
@@ -181,12 +193,26 @@ rem requires jupyter lab build after
 rem * ==================
 echo finish install of Voila (2019-07-21)
 rem * ================= 
-if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" labextension  labextension install @jupyter-voila/jupyterlab-preview
+if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable voila --sys-prefix
+
+if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyter-voila/jupyterlab-preview
 
 rem * ==================
 echo  install of dataregistry (2019-07-28)
 rem * ================= 
-if not "%WINPYARCH%"=="WIN32" if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" labextension  labextension @jupyterlab/dataregistry
+if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" labextension install @jupyterlab/dataregistry-extension
+
+
+rem * ==================
+echo  install of pydeck (2020-02-02)
+rem * ================= 
+if exist  "%WINPYDIR%\Lib\site-packages\pydeck" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix pydeck
+if exist  "%WINPYDIR%\Lib\site-packages\pydeck" "%WINPYDIR%\Scripts\jupyter.exe" labextension  install @deck.gl/jupyter-widget
+
+rem * ==================
+echo  install of labextension install dask-labextension (2020-02-05)
+rem * ================= 
+if exist  "%WINPYDIR%\Lib\site-packages\dask_labextension" "%WINPYDIR%\Scripts\jupyter.exe" labextension install dask-labextension
 
 rem * =================
 echo finish install seaborn iris example
@@ -229,9 +255,6 @@ if exist  "%qt56p%" (
    echo "I DIDN'T patch of %qt56p% !"
    rem pause
 )
-
-
-
 
 
 
