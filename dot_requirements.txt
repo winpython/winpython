@@ -1,0 +1,5 @@
+# the essential
+#sqlite_bro
+#idlex
+wheel
+# end of requirements.txt
