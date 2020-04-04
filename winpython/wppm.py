@@ -28,7 +28,17 @@ from winpython.py3compat import configparser as cp
 from argparse import ArgumentParser
 from winpython import py3compat
 
-
+#  import information reader
+# importlib_metadata before Python 3.8
+try:
+    from importlib import metadata as metadata  # Python-3.8
+    metadata = metadata.metadata
+except:
+    try:
+        from importlib_metadata import metadata   # <Python-3.8
+    except:
+        metadata = None  # nothing available
+    
 # Workaround for installing PyVISA on Windows from source:
 os.environ['HOME'] = os.environ['USERPROFILE']
 
@@ -43,11 +53,11 @@ def get_package_metadata(database, name):
     # machine which is not connected to the internet
     db = cp.ConfigParser()
     db.readfp(open(osp.join(DATA_PATH, database)))
-    metadata = dict(
+    my_metadata = dict(
         description='',
         url='https://pypi.org/project/' + name,
     )
-    for key in metadata:
+    for key in my_metadata:
         name1 = name.lower()
         # wheel replace '-' per '_' in key
         for name2 in (
@@ -58,11 +68,17 @@ def get_package_metadata(database, name):
             normalize(name),
         ):
             try:
-                metadata[key] = db.get(name2, key)
+                my_metadata[key] = db.get(name2, key)
                 break
             except (cp.NoSectionError, cp.NoOptionError):
                 pass
-    return metadata
+    if my_metadata.get('description') == '' and metadata:  # nothing in package.ini
+        try:
+            my_metadata['description']=(
+                    metadata(name)['Summary']+'\n').splitlines()[0]
+        except:
+            pass
+    return my_metadata
 
 
 class BasePackage(object):
