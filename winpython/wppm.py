@@ -47,7 +47,7 @@ def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def get_package_metadata(database, name):
+def get_package_metadata(database, name, gotoWWW=False):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on
     # machine which is not connected to the internet
@@ -76,6 +76,18 @@ def get_package_metadata(database, name):
         try:
             my_metadata['description']=(
                     metadata(name)['Summary']+'\n').splitlines()[0]
+        except:
+            pass
+    if  my_metadata['description'] == '' and gotoWWW:
+        from winpython import utils
+        dir_path = os.path.dirname(sys.executable)
+        this = normalize(name)
+        pip_ask = 'pip search '+ this
+        try:
+            pip_res = (utils.exec_shell_cmd(pip_ask, dir_path)+'\n').splitlines()
+            pip_filter = [l for l in pip_res if this + " (" == l[:len(this)+2]]+['']
+            pip_desc = (pip_filter[0][len(this)+1:]).split(" -", 1)[1] 
+            my_metadata['description'] = '**' + pip_desc
         except:
             pass
     return my_metadata
@@ -131,7 +143,7 @@ class BasePackage(object):
         """Extract package optional infos (description, url)
         from the package database"""
         metadata = get_package_metadata(
-            'packages.ini', self.name
+            'packages.ini', self.name, True
         )
         for key, value in list(metadata.items()):
             setattr(self, key, value)
