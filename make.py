@@ -408,7 +408,7 @@ class WinPythonDistribution(object):
             ]
         # get all packages installed in the changelog, whatever the method
         self.installed_packages = (
-            self.distribution.get_installed_packages()
+            self.distribution.get_installed_packages(update=True)
         )
 
         packages = [
@@ -1660,10 +1660,10 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\designer.exe" %*
-    ) else (
+    ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
     )
 ) else (
     "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
@@ -1679,11 +1679,13 @@ cd/D "%WINPYWORKDIR%"
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\assistant.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" (
+        "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
     )
 ) else (
-    "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
+    "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
 )
 """,
         )

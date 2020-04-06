@@ -46,11 +46,26 @@ os.environ['HOME'] = os.environ['USERPROFILE']
 def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
+def get_official_description(name):
+        from winpython import utils
+        dir_path = os.path.dirname(sys.executable)
+        this = normalize(name)
+        this_len = len(this)
+        pip_ask = 'pip search '+ this
+        try:
+            pip_res = (utils.exec_shell_cmd(pip_ask, dir_path)+'\n').splitlines()
+            pip_filter = [l for l in pip_res if this + " (" ==
+                          normalize(l[:this_len])+l[this_len:this_len+2]]
+            pip_desc = (pip_filter[0][len(this)+1:]).split(" - ", 1)[1] 
+            return pip_desc.replace("://", " ")
+        except:
+            return ''
 
-def get_package_metadata(database, name, gotoWWW=False):
+def get_package_metadata(database, name, gotoWWW=False, update=False):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on
     # machine which is not connected to the internet
+    # we store only  normalized names now (PEP 503)
     db = cp.ConfigParser()
     db.readfp(open(osp.join(DATA_PATH, database)))
     my_metadata = dict(
@@ -72,6 +87,7 @@ def get_package_metadata(database, name, gotoWWW=False):
                 break
             except (cp.NoSectionError, cp.NoOptionError):
                 pass
+    database_desc = my_metadata.get('description')
     if my_metadata.get('description') == '' and metadata:  # nothing in package.ini
         try:
             my_metadata['description']=(
@@ -79,20 +95,19 @@ def get_package_metadata(database, name, gotoWWW=False):
         except:
             pass
     if  my_metadata['description'] == '' and gotoWWW:
-        from winpython import utils
-        dir_path = os.path.dirname(sys.executable)
-        this = normalize(name)
-        pip_ask = 'pip search '+ this
+        the_official = get_official_description(name)
+        if the_official != '':
+            my_metadata['description'] = the_official
+    if update == True and database_desc == '' and my_metadata['description'] !='':
         try:
-            pip_res = (utils.exec_shell_cmd(pip_ask, dir_path)+'\n').splitlines()
-            pip_filter = [l for l in pip_res if this + " (" == l[:len(this)+2]]+['']
-            pip_desc = (pip_filter[0][len(this)+1:]).split(" -", 1)[1] 
-            my_metadata['description'] = '**' + pip_desc
+            db[normalize(name)]={}
+            db[normalize(name)]['description'] = my_metadata['description']
+            with open(osp.join(DATA_PATH, database), 'w') as configfile:
+                db.write(configfile)
         except:
             pass
     return my_metadata
-
-
+    
 class BasePackage(object):
     def __init__(self, fname):
         self.fname = fname
@@ -139,22 +154,22 @@ class BasePackage(object):
             )
         return iscomp
 
-    def extract_optional_infos(self):
+    def extract_optional_infos(self, update=False):
         """Extract package optional infos (description, url)
         from the package database"""
         metadata = get_package_metadata(
-            'packages.ini', self.name, True
+            'packages.ini', self.name, True, update=update
         )
         for key, value in list(metadata.items()):
             setattr(self, key, value)
 
 
 class Package(BasePackage):
-    def __init__(self, fname):
+    def __init__(self, fname, update=False):
         BasePackage.__init__(self, fname)
         self.files = []
         self.extract_infos()
-        self.extract_optional_infos()
+        self.extract_optional_infos(update=update)
 
     def extract_infos(self):
         """Extract package infos (name, version, architecture)
@@ -337,7 +352,7 @@ python "%~dpn0"""
         open(full_dst, 'w').write(contents)
         package.files.append(dst)
 
-    def get_installed_packages(self):
+    def get_installed_packages(self, update=False):
         """Return installed packages"""
 
         # Include package installed via pip (not via WPPM)
@@ -384,7 +399,7 @@ python "%~dpn0"""
                 Package(
                     '%s-%s-py2.py3-none-any.whl'
                     % (i[0].replace('-', '_').lower(), i[1])
-                )
+                , update=update)
                 for i in pip_list
             ]
         except:

@@ -20,6 +20,9 @@ import shutil
 # Local imports
 from winpython import utils
 
+# pep503 defines normalized package names: www.python.org/dev/peps/pep-0503
+def normalize(name):
+    return re.sub(r"[-_.]+", "-", name).lower()
 
 CHANGELOGS_DIR = osp.join(
     osp.dirname(__file__), 'changelogs'
@@ -385,14 +388,20 @@ def test_compare(
 if __name__ == '__main__':
     print(
         compare_package_indexes(
-            '3.6.1.1',
-            '3.6.1.0',
-            basedir='D:\Winpython\basedir36',
-            flavor='Qt5',
-            flavor1='Qt5',
-            architecture=32,
-        )
-    )
+            version2='3.7.4.0',
+            version1='3.7.2.0',
+            basedir=r'C:\WinP\bd37',
+            flavor='Zero',
+            flavor1='Zero',
+            architecture=32
+        ))
+    write_changelog(
+            version2='3.7.4.0',
+            version1='3.7.2.0',
+            basedir=r'C:\WinP\bd37',
+            flavor='Ps2',
+            architecture=64
+            )
     # test_parse_package_index_wiki('2.7.3.3')
     # print(compare_package_indexes('2.7.3.3', '2.7.3.1'))
     # write_changelog('2.7.4.1', '2.7.4.0')
