@@ -51,9 +51,12 @@ def get_official_description(name):
         dir_path = os.path.dirname(sys.executable)
         this = normalize(name)
         this_len = len(this)
-        pip_ask = 'pip search '+ this
+        pip_ask = ['pip', 'search', this, '--retries', '0']
+        if len(this)<2:  # don't ask stupid things
+            return ''
         try:
-            pip_res = (utils.exec_shell_cmd(pip_ask, dir_path)+'\n').splitlines()
+            #  .run work when .popen fails when no internet
+            pip_res = (utils.exec_run_cmd(pip_ask)+'\n').splitlines()
             pip_filter = [l for l in pip_res if this + " (" ==
                           normalize(l[:this_len])+l[this_len:this_len+2]]
             pip_desc = (pip_filter[0][len(this)+1:]).split(" - ", 1)[1] 
