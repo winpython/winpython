@@ -55,7 +55,7 @@ def get_official_description(name):
         if len(this)<2:  # don't ask stupid things
             return ''
         try:
-            #  .run work when .popen fils when no internet
+            #  .run work when .popen fails when no internet
             pip_res = (utils.exec_run_cmd(pip_ask)+'\n').splitlines()
             pip_filter = [l for l in pip_res if this + " (" ==
                           normalize(l[:this_len])+l[this_len:this_len+2]]
