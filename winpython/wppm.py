@@ -56,7 +56,7 @@ def get_official_description(name):
             return ''
         try:
             #  .run work when .popen fils when no internet
-            pip_res = (utils.exec_run_cmd(pip_ask, dir_path)+'\n').splitlines()
+            pip_res = (utils.exec_run_cmd(pip_ask)+'\n').splitlines()
             pip_filter = [l for l in pip_res if this + " (" ==
                           normalize(l[:this_len])+l[this_len:this_len+2]]
             pip_desc = (pip_filter[0][len(this)+1:]).split(" - ", 1)[1] 
