@@ -261,6 +261,7 @@ def get_msvc_dlls(msvc_version, architecture=None):
                 name % ('14' + msvc_minor)
                 for name in (
                     'vcruntime%s.dll',
+                    'vcruntime%s_1.dll',
                     'msvcp%s.dll',
                     'vccorlib%s.dll',
                     'concrt%s.dll',
