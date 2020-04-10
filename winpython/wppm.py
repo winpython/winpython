@@ -44,25 +44,26 @@ os.environ['HOME'] = os.environ['USERPROFILE']
 
 # pep503 defines normalized package names: www.python.org/dev/peps/pep-0503
 def normalize(name):
+    """ return normalized (unique) name of a package"""
     return re.sub(r"[-_.]+", "-", name).lower()
 
 def get_official_description(name):
-        from winpython import utils
-        dir_path = os.path.dirname(sys.executable)
-        this = normalize(name)
-        this_len = len(this)
-        pip_ask = ['pip', 'search', this, '--retries', '0']
-        if len(this)<2:  # don't ask stupid things
-            return ''
-        try:
-            #  .run work when .popen fails when no internet
-            pip_res = (utils.exec_run_cmd(pip_ask)+'\n').splitlines()
-            pip_filter = [l for l in pip_res if this + " (" ==
-                          normalize(l[:this_len])+l[this_len:this_len+2]]
-            pip_desc = (pip_filter[0][len(this)+1:]).split(" - ", 1)[1] 
-            return pip_desc.replace("://", " ")
-        except:
-            return ''
+    """Extract package Summary description from pypi.org"""
+    from winpython import utils
+    this = normalize(name)
+    this_len = len(this)
+    pip_ask = ['pip', 'search', this, '--retries', '0']
+    if len(this)<2:  # don't ask stupid things
+        return ''
+    try:
+        #  .run work when .popen fails when no internet
+        pip_res = (utils.exec_run_cmd(pip_ask)+'\n').splitlines()
+        pip_filter = [l for l in pip_res if this + " (" ==
+                      normalize(l[:this_len])+l[this_len:this_len+2]]
+        pip_desc = (pip_filter[0][len(this)+1:]).split(" - ", 1)[1] 
+        return pip_desc.replace("://", " ")
+    except:
+        return ''
 
 def get_package_metadata(database, name, gotoWWW=False, update=False):
     """Extract infos (description, url) from the local database"""
@@ -76,34 +77,33 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
         url='https://pypi.org/project/' + name,
     )
     for key in my_metadata:
-        name1 = name.lower()
         # wheel replace '-' per '_' in key
-        for name2 in (
-            name1,
-            name1.split('-')[0],
-            name1.replace('-', '_'),
-            '-'.join(name1.split('_')),
-            normalize(name),
-        ):
+        for name2 in (name, normalize(name)):
             try:
                 my_metadata[key] = db.get(name2, key)
                 break
             except (cp.NoSectionError, cp.NoOptionError):
                 pass
-    database_desc = my_metadata.get('description')
-    if my_metadata.get('description') == '' and metadata:  # nothing in package.ini
+    db_desc = my_metadata.get('description')
+
+    if my_metadata.get('description') == '' and metadata:  
+        # nothing in package.ini, we look in our installed packages
         try:
             my_metadata['description']=(
                     metadata(name)['Summary']+'\n').splitlines()[0]
         except:
             pass
+
     if  my_metadata['description'] == '' and gotoWWW:
+        # still nothing, try look on pypi
         the_official = get_official_description(name)
         if the_official != '':
             my_metadata['description'] = the_official
-    if update == True and database_desc == '' and my_metadata['description'] !='':
+
+    if update == True and db_desc == '' and my_metadata['description'] != '':
+        # we add new findings in our packgages.ini list, if it's required
         try:
-            db[normalize(name)]={}
+            db[normalize(name)] = {}
             db[normalize(name)]['description'] = my_metadata['description']
             with open(osp.join(DATA_PATH, database), 'w') as configfile:
                 db.write(configfile)
