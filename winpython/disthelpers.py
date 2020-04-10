@@ -256,12 +256,23 @@ def get_msvc_dlls(msvc_version, architecture=None):
                 'vcomp%s.dll',
             )
         ]
-        if msvc_major == '15':
+        if msvc_major == '15' and architecture == 64:
             namelist = [
                 name % ('14' + msvc_minor)
                 for name in (
                     'vcruntime%s.dll',
                     'vcruntime%s_1.dll',
+                    'msvcp%s.dll',
+                    'vccorlib%s.dll',
+                    'concrt%s.dll',
+                    'vcomp%s.dll',
+                )
+            ]
+        if msvc_major == '15' and architecture != 64:
+            namelist = [
+                name % ('14' + msvc_minor)
+                for name in (
+                    'vcruntime%s.dll',
                     'msvcp%s.dll',
                     'vccorlib%s.dll',
                     'concrt%s.dll',
