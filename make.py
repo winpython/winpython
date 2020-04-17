@@ -1008,7 +1008,6 @@ set WINPYVER="""
 set HOME=%WINPYDIRBASE%\settings
 set USERPROFILE=%HOME%
 rem set WINPYDIRBASE=
-
 set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
@@ -1101,6 +1100,7 @@ if not exist "%winpython_ini%" (
     echo [environment]
     echo ## <?> Uncomment lines to override environment variables
     echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%
+    echo #USERPROFILE = %%HOME%%
     echo #JUPYTER_DATA_DIR = %%HOME%%
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 )>> "%winpython_ini%"
@@ -1144,6 +1144,7 @@ $env:WINPYVER = '"""
             + self.winpyver
             + r"""'
 $env:HOME = "$env:WINPYDIRBASE\settings"
+$env:USERPROFILE = "$env:HOME"
 $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
 $env:WINPYARCH = 'WIN32'
@@ -1238,6 +1239,7 @@ if (-not (Test-Path $env:winpython_ini)) {
     "[environment]" | Add-Content -Path $env:winpython_ini
     "## <?> Uncomment lines to override environment variables" | Add-Content -Path $env:winpython_ini
     "#HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%" | Add-Content -Path $env:winpython_ini
+    "#USERPROFILE = %%HOME%%" | Add-Content -Path $env:winpython_ini
     "#JUPYTER_DATA_DIR = %%HOME%%" | Add-Content -Path $env:winpython_ini
     "#WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks" | Add-Content -Path $env:winpython_ini
 }
@@ -1462,6 +1464,7 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
     echo [environment]
     echo ## <?> Uncomment lines to override environment variables
     echo HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
+    echo USERPROFILE = %%HOME%%
     echo JUPYTER_DATA_DIR = %%HOME%%
     echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 ) > "%winpython_ini%"
@@ -1478,6 +1481,7 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
     echo [environment]
     echo ## <?> Uncomment lines to override environment variables
     echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
+    echo #USERPROFILE = %%HOME%%
     echo #JUPYTER_DATA_DIR = %%HOME%%
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 ) > "%winpython_ini%"
