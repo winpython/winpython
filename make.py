@@ -1006,6 +1006,7 @@ set WINPYVER="""
             + self.winpyver
             + r"""
 set HOME=%WINPYDIRBASE%\settings
+set USERPROFILE=%HOME%
 rem set WINPYDIRBASE=
 
 set JUPYTER_DATA_DIR=%HOME%
