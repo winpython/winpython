@@ -385,6 +385,7 @@ class WinPythonDistribution(object):
             installed_tools += [('Nodejs', nodever)]
             npmver = utils.get_npmjs_version(nodepath)
             installed_tools += [('npmjs', npmver)]
+
         pandocexe = get_tool_path(
             r'\t\pandoc.exe', osp.isfile
         )
@@ -393,6 +394,12 @@ class WinPythonDistribution(object):
                 osp.dirname(pandocexe)
             )
             installed_tools += [('Pandoc', pandocver)]
+
+        vscodeexe = get_tool_path(r'\t\VSCode\Code.exe', osp.isfile)
+        if vscodeexe is not None:
+            installed_tools += [('VSCode',
+                           utils.getFileProperties(vscodeexe)['FileVersion'])]
+
         tools = []
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata(
@@ -1006,7 +1013,8 @@ set WINPYVER="""
             + self.winpyver
             + r"""
 set HOME=%WINPYDIRBASE%\settings
-set USERPROFILE=%HOME%
+rem read https://github.com/winpython/winpython/issues/839
+rem set USERPROFILE=%HOME%
 rem set WINPYDIRBASE=
 set JUPYTER_DATA_DIR=%HOME%
 set WINPYARCH=WIN32
@@ -1093,6 +1101,7 @@ rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
 if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
+if not exist "%WINPYDIRBASE%\settings\Roaming" mkdir "%WINPYDIRBASE%\settings\Roaming" 
 set winpython_ini=%WINPYDIRBASE%\settings\winpython.ini
 if not exist "%winpython_ini%" (
     echo [debug]
@@ -1144,7 +1153,10 @@ $env:WINPYVER = '"""
             + self.winpyver
             + r"""'
 $env:HOME = "$env:WINPYDIRBASE\settings"
-$env:USERPROFILE = "$env:HOME"
+
+# rem read https://github.com/winpython/winpython/issues/839
+# $env:USERPROFILE = "$env:HOME"
+
 $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
 $env:WINPYARCH = 'WIN32'
@@ -1232,6 +1244,7 @@ shellConfigs2 = list:| Add-Content -Path $env:tmp_pyz
 ### WinPython.ini part (removed from nsis)
 #####################
 if (-not (Test-Path "$env:WINPYDIR\..\settings")) { md -Path "$env:WINPYDIR\..\settings" }
+if (-not (Test-Path "$env:WINPYDIR\..\settings\Roaming")) { md -Path "$env:WINPYDIR\..\settings\Roaming" }
 $env:winpython_ini = "$env:WINPYDIR\..\settings\winpython.ini"
 if (-not (Test-Path $env:winpython_ini)) {
     "[debug]" | Add-Content -Path $env:winpython_ini
@@ -1894,6 +1907,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             #  scripts before using an executable launcher, because the latter
             #  is creating the directory automatically)
             os.mkdir(osp.join(self.winpydir, 'settings'))
+            os.mkdir(osp.join(self.winpydir, 'settings', 'Roaming'))
         self._print_done()
 
         if remove_existing and not self.simulation:
