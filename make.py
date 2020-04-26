@@ -1101,7 +1101,8 @@ rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
 if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
-if not exist "%WINPYDIRBASE%\settings\Roaming" mkdir "%WINPYDIRBASE%\settings\Roaming" 
+if not exist "%WINPYDIRBASE%\settings\AppData" mkdir "%WINPYDIRBASE%\settings\AppData" 
+if not exist "%WINPYDIRBASE%\settings\AppData\Roaming" mkdir "%WINPYDIRBASE%\settings\AppData\Roaming" 
 set winpython_ini=%WINPYDIRBASE%\settings\winpython.ini
 if not exist "%winpython_ini%" (
     echo [debug]
@@ -1244,7 +1245,8 @@ shellConfigs2 = list:| Add-Content -Path $env:tmp_pyz
 ### WinPython.ini part (removed from nsis)
 #####################
 if (-not (Test-Path "$env:WINPYDIR\..\settings")) { md -Path "$env:WINPYDIR\..\settings" }
-if (-not (Test-Path "$env:WINPYDIR\..\settings\Roaming")) { md -Path "$env:WINPYDIR\..\settings\Roaming" }
+if (-not (Test-Path "$env:WINPYDIR\..\settings\AppData")) { md -Path "$env:WINPYDIR\..\settings\AppData" }
+if (-not (Test-Path "$env:WINPYDIR\..\settings\AppData\Roaming")) { md -Path "$env:WINPYDIR\..\settings\AppData\Roaming" }
 $env:winpython_ini = "$env:WINPYDIR\..\settings\winpython.ini"
 if (-not (Test-Path $env:winpython_ini)) {
     "[debug]" | Add-Content -Path $env:winpython_ini
@@ -1481,6 +1483,10 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
     echo JUPYTER_DATA_DIR = %%HOME%%
     echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 ) > "%winpython_ini%"
+    call "%~dp0env_for_icons.bat"
+    mkdir %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings
+    mkdir %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings\AppData
+    mkdir %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings\AppData\Roaming
 """,
         )
 
@@ -1502,6 +1508,23 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
         )
 
         self.create_batch_script(
+            'make_working_directory_and_userprofile_be_winpython.bat',
+            r"""@echo off
+set winpython_ini=%~dp0..\\settings\winpython.ini
+(
+    echo [debug]
+    echo state = disabled
+    echo [environment]
+    echo ## <?> Uncomment lines to override environment variables
+    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
+    echo USERPROFILE = %%HOME%%
+    echo #JUPYTER_DATA_DIR = %%HOME%%
+    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
+) > "%winpython_ini%"
+""",
+        )
+
+        self.create_batch_script(
             'cmd.bat',
             r"""@echo off
 call "%~dp0env_for_icons.bat"
@@ -1516,6 +1539,7 @@ rem backward compatibility for  python command-line users
 "%WINPYDIR%\python.exe"  %*
 """,
         )
+        
         self.create_batch_script(
             'winpython.bat',
             r"""@echo off
@@ -1907,7 +1931,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             #  scripts before using an executable launcher, because the latter
             #  is creating the directory automatically)
             os.mkdir(osp.join(self.winpydir, 'settings'))
-            os.mkdir(osp.join(self.winpydir, 'settings', 'Roaming'))
+            os.mkdir(osp.join(self.winpydir, 'settings', 'AppData'))
+            os.mkdir(osp.join(self.winpydir, 'settings', 'AppData', 'Roaming'))
         self._print_done()
 
         if remove_existing and not self.simulation:
