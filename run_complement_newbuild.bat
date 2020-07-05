@@ -19,6 +19,14 @@ call scripts\env.bat
 @echo off
 
 
+rem * ===========================
+rem 2020-05-15 patch jedi-0.17.0
+rem * ===========================
+rem see https://github.com/davidhalter/jedi/commit/f871f5e726f796127d4cfb981726b494f056ebe9
+rem as it fixes https://github.com/davidhalter/jedi/issues/1548 Use the `project` variable before setting the default value.
+rem if exist  "%WINPYDIR%\Lib\site-packages\jedi-0.17.0.dist-info" copy/Y "C:\WinP\tempo_fixes\Jedi-0.17.0\api\__init__.py" "%WINPYDIR%\Lib\site-packages\Jedi-0.17.0\api\__init__.py"
+
+
 rem * ==========================
 rem * When Python has no mingwpy
 rem * ==========================
@@ -45,6 +53,9 @@ rem    if not exist "ipcluster.exe" echo c.NotebookApp.server_extensions.append(
 rem * ===========================
 echo finish install of jupyterlab
 rem * ===========================
+
+rem 2020-04-10 security
+rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\..\n\npm" config set ignore-scripts true
 
 rem other suggestion from https://github.com/nteract/nteract
 rem npm install -g --production windows-build-tools
@@ -295,6 +306,8 @@ if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab" (
 jupyter labextension list
 )
 
+rem jupyter labextension update --all  (will rebuild if needed)
+
 rem 2018-01-15 node-gyp experience
 rem npm config set python "C:\WinPython\bd27\buildZero\winpython-32bit-2.7.x.2\python-2.7.13"
 rem npm config delete python 
@@ -338,6 +351,12 @@ rem * ====================
 echo patch spyder update reflex (2019-05-18 : spyder, not spyderlib !)
 rem * ====================
 %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyder\config\main.py', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': True', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': False' )"
+
+rem * ====================
+echo summary 20202-04-11
+rem * ====================
+pip check
+if exist  "%WINPYDIR%\Lib\site-packages\pipdeptree" pipdeptree
 
 
 @echo on

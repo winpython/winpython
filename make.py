@@ -782,18 +782,6 @@ call "%~dp0env_for_icons.bat"
         )
         self._print_done()
 
-    def _add_msvc_files(self):
-        """Adding Microsoft Visual C++ DLLs"""
-        print("Adding Microsoft Visual C++ DLLs" "")
-        msvc_version = dh.get_msvc_version(
-            self.distribution.version
-        )
-        for fname in dh.get_msvc_dlls(
-            msvc_version,
-            architecture=self.distribution.architecture,
-        ):
-            shutil.copy(fname, self.python_dir)
-
     def _copy_dev_tools(self):
         """Copy dev tools"""
         self._print("Copying tools")
@@ -1945,7 +1933,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
 
         if remove_existing:
             if not self.simulation:
-                self._add_msvc_files()
+                # self._add_msvc_files()  # replaced per msvc_runtime package
                 self._create_batch_scripts_initial()
                 self._create_batch_scripts()
                 # always create all launchers (as long as it is NSIS-based)

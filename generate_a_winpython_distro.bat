@@ -35,7 +35,6 @@ set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha
 if "%my_release_level%"=="" set my_release_level=
-rem if %my_python_target%==38 set my_release_level=b1
 
 rem ---------
 rem newAge 20191022
@@ -45,10 +44,10 @@ rem --------
 
 if %my_python_target%==37 (
    set my_python_target_release=377
-   set my_release=0
+   set my_release=1
 )
 if %my_python_target%==38 (
-   set my_python_target_release=382
+   set my_python_target_release=384
    set my_release=0
 )
 if %my_python_target%==39 (
@@ -172,16 +171,36 @@ set path=%my_original_path%
 set my_WINPYDIRBASE=%my_root_dir_for_builds%\bd%my_python_target%\bu%my_flavor%\Wpy%my_arch%-%my_python_target_release%%my_release%%my_release_level%
 
 set WINPYDIRBASE=%my_WINPYDIRBASE% 
+
+rem D/2020-07-04: poka-yoke
+if not exist %my_WINPYDIRBASE%\scripts\env.bat (
+ echo please check and correct my_python_target_release=%my_python_target_release% 
+ echo in generate_a_winpython_distro.bat
+ echo as %my_WINPYDIRBASE%\scripts\env.bat doesnt exist
+ pause
+ exit
+)     
+rem F/2020-07-04: poka-yoke
+
 call %my_WINPYDIRBASE%\scripts\env.bat
 set
 echo beg of step 2/3
 rem ok no pause 
 
+rem D/2020-07-05: install msvc_runtime before packages that may want to compile
+echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
+echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade>>%my_archive_log%
+pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
+rem F/2020-07-05: install msvc_runtime before packages that may want to compile
+
 echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
 echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade>>%my_archive_log%
+
+echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
+
 pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade >>%my_archive_log%
 echo mid of step 2/3
-rem pause
+
 
 rem finalize
 @echo on
