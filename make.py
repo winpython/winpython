@@ -20,7 +20,6 @@ import shutil
 import sys
 
 # Local imports
-from winpython import disthelpers as dh
 from winpython import wppm, utils
 import diff
 
