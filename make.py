@@ -1067,6 +1067,15 @@ if not exist "%tmp_pyz%" (
 
 
 rem ******************
+rem handle pyqt5_tools if included
+rem ******************
+set tmp_pyz=%WINPYDIR%\Lib\site-packages\pyqt5_tools
+if not exist "%tmp_pyz%" goto end_pyqt5_tools_conf
+set QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
+:end_pyqt5_tools_conf
+
+
+rem ******************
 rem handle Pyzo configuration part
 rem ******************
 if not exist "%HOME%\.pyzo" mkdir %HOME%\.pyzo
@@ -1210,6 +1219,15 @@ if (Test-Path "$env:tmp_pyz") {
       "Prefix = ."| Add-Content -Path $env:tmp_pyz
       "Binaries = ."| Add-Content -Path $env:tmp_pyz
    }
+}
+
+
+#####################
+### handle pyqt5_tools if included
+#####################
+$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\pyqt5_tools"
+if (Test-Path "$env:tmp_pyz") {
+   $env:QT_PLUGIN_PATH = "WINPYDIR\Lib\site-packages\pyqt5_tools\Qt\plugins"
 }
 
 
@@ -1686,8 +1704,11 @@ if exist "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d
             r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
+if "%QT_API%"=="" ( set QT_API=pyqt5 )
 if "%QT_API%"=="pyqt5" (
-    if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
+    if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\designer.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\designer.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
@@ -1705,8 +1726,11 @@ if "%QT_API%"=="pyqt5" (
             r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
+if "%QT_API%"=="" ( set QT_API=pyqt5 )
 if "%QT_API%"=="pyqt5" (
-    if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
+    if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\assistant.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\assistant.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
@@ -1724,8 +1748,11 @@ if "%QT_API%"=="pyqt5" (
             r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR%"
+if "%QT_API%"=="" ( set QT_API=pyqt5 )
 if "%QT_API%"=="pyqt5" (
-    if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" (
+    if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\linguist.exe" (
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\linguist.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
