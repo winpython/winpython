@@ -1,0 +1,459 @@
+# specific to code from remote debugging : PTVSD
+ptvsd
+
+# the essential
+wheel
+pywin32
+
+# Qt4/5 first pass (wheels)
+PyQt5
+PyQtWebEngine
+##Pyside2
+
+# compilers no mingwpy yet in Python3.5)
+#mingwpy
+cython
+pycparser
+cffi
+
+# numeric stones
+numpy
+scipy
+sympy
+Pillow
+matplotlib
+
+
+pandas
+pandas-datareader
+
+# sql - data
+adodbapi
+
+pyodbc
+
+
+SQLAlchemy
+sqlparse
+sqlite_bro
+baresql
+mysql_connector_python
+pg8000
+ipython_sql
+db.py
+xlrd
+XlsxWriter
+pymongo
+redis
+
+# high numeric
+numexpr
+
+h5py
+python-hdf4
+tables
+
+bcolz
+cytoolz
+
+blosc
+
+netCDF4
+xarray
+
+Pulp
+
+scikit_learn
+scikit_image
+
+
+
+# gui
+jupyter
+ipython
+
+spyder
+
+# seaborn wants patsy and statsmodels for lienar modeling
+seaborn
+patsy
+statsmodels
+
+holoviews
+brewer2mpl
+mpld3
+
+# web
+beautifulsoup4
+
+lxml
+html5lib
+requests
+
+
+simplejson
+
+flask
+#blaze
+bokeh
+twitter
+
+# dev complements
+cx_Freeze
+pytest
+# nose
+jedi
+pep8
+pyflakes
+pylint
+
+numpydoc
+
+twine
+
+# other
+networkx
+nltk
+
+PyAudio
+sounddevice
+
+pyserial
+
+reportlab
+
+
+# Pierre Raybaut Stack (PyQt5 only for now)
+guiqwt
+PythonQwt
+
+guidata
+
+# for dask
+bloscpack
+
+
+lmfit
+
+# Qt
+formlayout
+pyqtgraph
+
+
+# yet other
+julia
+oct2py
+scilab2py
+rpy2
+
+
+# remember me why
+certifi
+click
+docopt
+PyOpenGL
+
+
+# python3
+# rope_py3k
+# rope
+
+
+sphinx_rtd_theme
+Sphinx
+greenlet
+rx
+
+backports-abc
+bottleneck
+
+# wheelhouse-uploader apache-libcloud (is heavy)
+
+Markdown
+pystache
+bqplot
+
+pymc
+
+prompt-toolkit
+ptpython
+
+geopy
+
+idlex
+
+wordcloud
+
+mkl-service
+docrepr
+
+#when mingwpy
+# 2018-02-25: bybye theano
+# Theano
+# pymc3
+# lasagne
+# scikit-neuralnetwork
+
+
+widgetsnbextension
+## 2020-09-27 jupyterlab3 issue ipyleaflet
+
+zarr
+
+pycodestyle
+
+altair
+nbconvert
+pypandoc
+
+
+emcee
+astroML
+
+
+# waiting list
+# wpca
+# dead 2020:  pythreejs
+# flexx
+scikit-optimize
+jupyterlab
+
+# removal list:
+# pyhdf 
+# dill (removed 20160612 as it depends on pyreadline)
+pyflux
+husl
+
+nbconvert_reportlab
+#ggplot (replaced per plotnine)
+
+
+snakeviz
+# not enough room nbdime
+
+
+python-Levenshtein
+fuzzywuzzy
+scikit_fuzzy
+imageio
+
+
+
+
+altair-widgets
+xlwings
+
+
+# parallelize (and replace celery)
+joblib
+dask[complete]
+
+# dask 'bag' and 'delayed'
+cloudpickle
+toolz
+partd
+
+#preparing parquet
+python_snappy
+brotli
+jupyterlab_launcher
+vitables
+
+supersmoother
+# requires pyarrow feather_format
+
+pybind11
+
+pygame
+plotnine
+mpldatacursor
+
+mpl_scatter_density
+altair_widgets
+
+jupyter_sphinx
+
+pywinusb
+
+moviepy
+
+
+dask_searchcv
+
+## 2020-09-27 jupyterlab3 issue ipympl
+
+paramnb
+#pb with zict depedency of streamz & distributed
+streamz
+
+# temporarly removed
+#spyder-reports
+#spyder-terminal
+#spyder-notebook
+
+
+#require readline cvxpy
+# Win64 only now:
+# no more: prettytensor
+
+# Tensorflow_world
+###edward
+###Keras
+###keras_vis
+###Tensorflow_cpu
+###tensorflow_probability
+
+##keras-tuner
+
+# pytorch eco-system
+##Torch
+##torchvision
+##botorch
+
+terminado
+Send2Trash
+
+pdvega
+vega_datasets
+
+regex
+
+loky
+pyzo
+
+intake
+ruamel.yaml
+parambokeh
+hvplot
+
+# end of requirements.txt
+
+#waitin 3.7
+clrmagic
+cvxopt
+##cyordereddict
+gmpy2
+
+numba
+pyarrow
+feather_format
+pythonnet
+cvxpy
+mypy
+fastparquet
+datashader
+
+mlxtend
+rise
+ppci
+simpy
+
+
+# too big just doc pyviz
+#ipyvolume
+
+trio
+trio-asyncio
+
+imbalanced-learn
+
+#for rpy2
+tzlocal
+simplegeneric
+astropy
+
+panel
+
+gdal
+geoviews
+
+
+pygbm
+
+hypothesis
+geopandas
+
+
+pyepsg
+rtree
+mercantile
+snuggs
+#(20 Mo) pysal
+rasterio
+
+
+#kalman filter
+quantecon
+
+kiwisolver
+
+# automate notebooks 2019-04-26
+papermill
+pycosat
+
+autopep8
+black
+pyinstaller
+
+# wait spoofing end https://github.com/pbugnion/jupyterlab-sql/issues/89
+#jupyterlab-sql
+
+#z3_solver
+
+##winrt
+
+# swifter uses modin-0.7.4 + pickle5: two problematic dependancies as of 2020-07-27
+#swifter
+
+paramiko
+python_language_server
+pexpect
+
+#swagger flask (still no asyncio choice)
+flask_accepts
+flaskerize
+# flask_RESTplus ... shall be now flask-restx
+quart
+datasette
+hypercorn
+
+#complementing asgi stack
+databases[sqlite]
+
+altair-transform
+altair_data_server
+pydeck
+ibis-framework
+
+folium
+shap
+plotly
+tranquilizer
+#nbdev
+umap-learn
+flask-sqlalchemy
+virtualenv
+pipdeptree
+
+nlopt
+
+flask-session
+python-dotenv
+httpie
+flask-Mail
+asgiref
+lz4
+
+#cgohlke astuce for numba-0.50
+importlib_metadata
+
+# new dl
+# mxnet
+
+jupyter_bokeh
+dask_ml
+dask_labextension
+wasmer
+
+voila
+jupyterlab-widgets
