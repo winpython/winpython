@@ -34,7 +34,7 @@ rem Override other scripts (simpler maintenance)
 set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha
-if "%my_release_level%"=="" set my_release_level=
+if "%my_release_level%"=="" set my_release_level=b2
 
 rem ---------
 rem newAge 20191022
@@ -47,12 +47,12 @@ if %my_python_target%==37 (
    set my_release=1
 )
 if %my_python_target%==38 (
-   set my_python_target_release=384
+   set my_python_target_release=386
    set my_release=0
 )
 if %my_python_target%==39 (
    set my_python_target_release=390
-   set my_release=0
+   set my_release=2
 )
 
 rem **** 2018-10-30 create_installer **
@@ -99,8 +99,10 @@ echo ===============>>%my_archive_log%
 
 if not "%my_preclear_build_directory%"=="Yes" goto no_preclear
 
+
 echo ------------------>>%my_archive_log%
 echo 1.0 Do Pre-clear  >>%my_archive_log%
+echo %date% %time%     >>%my_archive_log%
 echo ------------------>>%my_archive_log%
 
 
@@ -127,6 +129,7 @@ echo %date% %time%>>%my_archive_log%
 
 echo ------------------>>%my_archive_log%
 echo 2.0 Create a build>>%my_archive_log%
+echo %date% %time%     >>%my_archive_log%
 echo ------------------>>%my_archive_log%
 
 
@@ -141,6 +144,7 @@ call %my_buildenv%\scripts\env.bat
 
 echo ----------------------------->>%my_archive_log%
 echo 2.0 Create a build newage1/3 >>%my_archive_log%
+echo %date% %time%                >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
 
 rem 2019-10-22 new age step1
@@ -159,9 +163,11 @@ rem echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_
 
 echo -----------------------------
 echo 2.0 Create a build newage2/3 
+echo %date% %time%                
 echo -----------------------------
 echo ----------------------------->>%my_archive_log%
 echo 2.0 Create a build newage2/3 >>%my_archive_log%
+echo %date% %time%                >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
 rem 2019-10-22 new age step2
 rem we use final environment to install requirements
@@ -193,12 +199,18 @@ echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-link
 pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
 rem F/2020-07-05: install msvc_runtime before packages that may want to compile
 
-echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
-echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade>>%my_archive_log%
+rem D/20200807a : test new resolver= "--use-feature=2020-resolver"
+rem just to go back to normal, do set new_resolver=
+set new_resolver=--use-feature=2020-resolver
+
+echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
+echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
 
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
-pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade >>%my_archive_log%
+pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+
+rem F/20200807a : test new resolver= "--use-feature=2020-resolver"
 echo mid of step 2/3
 
 
@@ -211,6 +223,7 @@ rem pause
 
 echo ----------------------------->>%my_archive_log%
 echo 2.0 Create a build newage3/3 >>%my_archive_log%
+echo %date% %time%                >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
 
 rem build final changelog and binaries, using create_installer='%my_create_installer%', remove_existing=False , remove : requirements, toolsdirs and docdirs

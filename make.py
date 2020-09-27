@@ -1108,6 +1108,8 @@ if not exist "%winpython_ini%" (
     echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%
     echo #USERPROFILE = %%HOME%%
     echo #JUPYTER_DATA_DIR = %%HOME%%
+    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
+    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 )>> "%winpython_ini%"
 
@@ -1261,6 +1263,8 @@ if (-not (Test-Path $env:winpython_ini)) {
     "#HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%" | Add-Content -Path $env:winpython_ini
     "#USERPROFILE = %%HOME%%" | Add-Content -Path $env:winpython_ini
     "#JUPYTER_DATA_DIR = %%HOME%%" | Add-Content -Path $env:winpython_ini
+    "#JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab" | Add-Content -Path $env:winpython_ini
+    "#JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces" | Add-Content -Path $env:winpython_ini
     "#WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks" | Add-Content -Path $env:winpython_ini
 }
 
@@ -1486,6 +1490,8 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
     echo HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
     echo USERPROFILE = %%HOME%%
     echo JUPYTER_DATA_DIR = %%HOME%%
+    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
+    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
     echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 ) > "%winpython_ini%"
     call "%~dp0env_for_icons.bat"
@@ -1507,6 +1513,8 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
     echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
     echo #USERPROFILE = %%HOME%%
     echo #JUPYTER_DATA_DIR = %%HOME%%
+    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
+    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 ) > "%winpython_ini%"
 """,
@@ -1524,6 +1532,8 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
     echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
     echo USERPROFILE = %%HOME%%
     echo #JUPYTER_DATA_DIR = %%HOME%%
+    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
+    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
 ) > "%winpython_ini%"
 """,
