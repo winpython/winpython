@@ -1,6 +1,3 @@
-# specific to code from remote debugging : PTVSD
-ptvsd
-
 # the essential
 wheel
 pywin32
@@ -278,7 +275,6 @@ dask_searchcv
 
 
 paramnb
-#pb with zict depedency of streamz & distributed
 streamz
 
 # temporarly removed
@@ -301,9 +297,9 @@ streamz
 ##keras-tuner
 
 # pytorch eco-system
-##Torch
-##torchvision
-##botorch
+Torch
+torchvision
+botorch
 
 terminado
 Send2Trash
@@ -326,7 +322,7 @@ hvplot
 #waitin 3.7
 clrmagic
 cvxopt
-##cyordereddict
+#cyordereddict (no more in python>3.7)
 gmpy2
 
 numba
@@ -442,8 +438,8 @@ importlib_metadata
 # new dl
 # mxnet
 
-##jupyterlab things 
-jupyterlab
+##jupyterlab things
+jupyterlab==2.2.9
 widgetsnbextension
 
 jupyterlab_launcher
@@ -451,14 +447,12 @@ jupyter_bokeh
 dask_labextension
 pydeck
 
-## Jupyterlab2 
-
 ## jupyterlab3 only
-jupyterlab-widgets
+#jupyterlab-widgets
 
 ## 2020-09-27 jupyterlab2 only
-##ipympl
-##ipyleaflet
+ipympl
+ipyleaflet
 
 # wait spoofing end https://github.com/pbugnion/jupyterlab-sql/issues/89
 # not yet (one man) jupyterlab-sql
