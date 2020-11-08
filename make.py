@@ -1991,7 +1991,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.distribution.patch_standard_packages('pip')
             # not forced update of pip (FIRST) and setuptools here
             for req in ('pip', 'setuptools', 'winpython'):
-                actions = ["install", "--upgrade", req]
+                actions = ["install", "--upgrade", "--pre", req]
                 if self.install_options is not None:
                     actions += self.install_options
                 print("piping %s" % ' '.join(actions))
