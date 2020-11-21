@@ -1990,7 +1990,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             # pre-patch current pip (until default python has pip 8.0.3)
             self.distribution.patch_standard_packages('pip')
             # not forced update of pip (FIRST) and setuptools here
-            for req in ('pip', 'setuptools', 'winpython'):
+            for req in ('pip', 'setuptools', 'wheel', 'winpython'):
                 actions = ["install", "--upgrade", "--pre", req]
                 if self.install_options is not None:
                     actions += self.install_options
