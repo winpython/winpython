@@ -2,6 +2,13 @@ rem  to launch from a winpython package directory, where 'make.py' is
 @echo on
 
 rem *****************************
+rem 2020-12-05 : add a constrints.txt file from a recent pip list
+rem *****************************
+
+if "%my_constraints%"=="" set my_constraints=C:\WinP\constraints.txt
+
+rem *****************************
+rem *****************************
 rem 2019-05-10 PATCH for build problem (asking permission to overwrite the file)
 rem 
 rem *****************************
@@ -44,16 +51,22 @@ rem --------
 
 if %my_python_target%==37 (
    set my_python_target_release=377
-   set my_release=1
+   set my_release=2
 )
 if %my_python_target%==38 (
-   set my_python_target_release=386
+   set my_python_target_release=387
    set my_release=0
 )
 if %my_python_target%==39 (
-   set my_python_target_release=390
-   set my_release=2
+   set my_python_target_release=391
+   set my_release=0
 )
+
+if %my_python_target%==310 (
+   set my_python_target_release=3100
+   set my_release=0
+)
+
 
 rem **** 2018-10-30 create_installer **
 if "%my_create_installer%"=="" set my_create_installer=True
@@ -181,6 +194,10 @@ set WINPYDIRBASE=%my_WINPYDIRBASE%
 rem D/2020-07-04: poka-yoke
 if not exist %my_WINPYDIRBASE%\scripts\env.bat (
  echo please check and correct my_python_target_release=%my_python_target_release% 
+ echo     my_arch=%my_arch%
+ echo     my_python_target_release=%my_python_target_release%
+ echo     my_release=%my_release%
+ echo     my_release_level=%my_release_level%
  echo in generate_a_winpython_distro.bat
  echo as %my_WINPYDIRBASE%\scripts\env.bat doesnt exist
  pause
@@ -201,14 +218,19 @@ rem F/2020-07-05: install msvc_runtime before packages that may want to compile
 
 rem D/20200807a : test new resolver= "--use-feature=2020-resolver"
 rem just to go back to normal, do set new_resolver=
-set new_resolver=--use-feature=2020-resolver
+rem D/20201107 : issues with new resolver infinity looping, waiting pip-20.2.5
+rem (if pip<20.3) set new_resolver=--use-feature=2020-resolver
+rem (if pip>=20.3) set new_resolver=--use-deprecated=legacy-resolver
+rem set new_resolver=--use-deprecated=legacy-resolver
 
-echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
-echo pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+rem 2020-12-05 : add a constraints.txt file from a recent pip list
+
+echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
+echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
 
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
-pip install -r %my_requirements% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
 
 rem F/20200807a : test new resolver= "--use-feature=2020-resolver"
 echo mid of step 2/3

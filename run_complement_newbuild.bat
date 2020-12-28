@@ -10,7 +10,7 @@ if  "%jupyterlab2%"=="" set jupyterlab2=0
 echo jupyterlab2=%jupyterlab2%
 if  %jupyterlab2%==1 then echo "do jupyterlab2 %jupyterlab2% stuff"
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
-rem that is:  pip install --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq --use-feature=2020-resolver -r c:\....\requirements.txt 
+rem that is:  pip install --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
 rem           ( drag & drop "requirements.txt" file in the dos window a the end of the line, to get full path)
 rem then drag & drop "run_complement_newbuild.bat" file in the dos window and launch it
 
