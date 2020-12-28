@@ -192,8 +192,6 @@ docrepr
 # scikit-neuralnetwork
 
 
-widgetsnbextension
-## 2020-09-27 jupyterlab3 issue ipyleaflet
 
 zarr
 
@@ -213,7 +211,6 @@ astroML
 # dead 2020:  pythreejs
 # flexx
 scikit-optimize
-jupyterlab
 
 # removal list:
 # pyhdf 
@@ -253,7 +250,6 @@ partd
 #preparing parquet
 python_snappy
 brotli
-jupyterlab_launcher
 vitables
 
 supersmoother
@@ -277,10 +273,8 @@ moviepy
 
 dask_searchcv
 
-## 2020-09-27 jupyterlab3 issue ipympl
 
 paramnb
-#pb with zict depedency of streamz & distributed
 streamz
 
 # temporarly removed
@@ -328,7 +322,7 @@ hvplot
 #waitin 3.7
 clrmagic
 cvxopt
-##cyordereddict
+#cyordereddict (no more in python>3.7)
 gmpy2
 
 numba
@@ -392,8 +386,6 @@ autopep8
 black
 pyinstaller
 
-# wait spoofing end https://github.com/pbugnion/jupyterlab-sql/issues/89
-#jupyterlab-sql
 
 #z3_solver
 
@@ -419,7 +411,6 @@ databases[sqlite]
 
 altair-transform
 altair_data_server
-pydeck
 ibis-framework
 
 folium
@@ -447,12 +438,38 @@ importlib_metadata
 # new dl
 # mxnet
 
+##jupyterlab things
+jupyterlab
+widgetsnbextension
+
+jupyterlab_launcher
 jupyter_bokeh
-dask_ml
 dask_labextension
+pydeck
+
+## jupyterlab3 only
+jupyterlab-widgets
+
+## 2020-09-27 jupyterlab2 only
+ipympl
+ipyleaflet
+
+# wait spoofing end https://github.com/pbugnion/jupyterlab-sql/issues/89
+# not yet (one man) jupyterlab-sql
+# not yet (one man) mpl-interactions
+# not yet (one man) ipycanvas
+# not yet jupyterlab-git
+
+
+
+dask_ml
 wasmer
 
 voila
-jupyterlab-widgets
 fastapi
 
+coverage
+nbval
+
+onnxruntime
+sklearn-contrib-lightning

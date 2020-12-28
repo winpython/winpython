@@ -470,3 +470,9 @@ wasmer
 
 voila
 fastapi
+
+coverage
+nbval
+
+onnxruntime
+sklearn-contrib-lightning
