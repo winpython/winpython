@@ -366,9 +366,9 @@ python "%~dpn0"""
                 == self.target
             ):
                 #  direct way: we interrogate ourself, using official API
-                import pkg_resources, imp
+                import pkg_resources, importlib
 
-                imp.reload(pkg_resources)
+                importlib.reload(pkg_resources)
                 pip_list = [
                     (i.key, i.version)
                     for i in pkg_resources.working_set
