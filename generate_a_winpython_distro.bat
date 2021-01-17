@@ -40,8 +40,8 @@ rem Override other scripts (simpler maintenance)
 
 set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
-rem handle alpha
-if "%my_release_level%"=="" set my_release_level=
+rem handle alpha set my_release_level=a0
+if "%my_release_level%"=="" set my_release_level=b1
 
 rem ---------
 rem newAge 20191022
@@ -55,11 +55,11 @@ if %my_python_target%==37 (
 )
 if %my_python_target%==38 (
    set my_python_target_release=387
-   set my_release=0
+   set my_release=1
 )
 if %my_python_target%==39 (
    set my_python_target_release=391
-   set my_release=0
+   set my_release=1
 )
 
 if %my_python_target%==310 (
@@ -216,23 +216,20 @@ echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-link
 pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade
 rem F/2020-07-05: install msvc_runtime before packages that may want to compile
 
-rem D/20200807a : test new resolver= "--use-feature=2020-resolver"
-rem just to go back to normal, do set new_resolver=
-rem D/20201107 : issues with new resolver infinity looping, waiting pip-20.2.5
-rem (if pip<20.3) set new_resolver=--use-feature=2020-resolver
-rem (if pip>=20.3) set new_resolver=--use-deprecated=legacy-resolver
-rem set new_resolver=--use-deprecated=legacy-resolver
 
 rem 2020-12-05 : add a constraints.txt file from a recent pip list
 
-echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
-echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+rem 2021-01-09 : temporary log file to trace conflicts on very loong resolver time
+rem if issue, search "ERROR:" in --log C:\WinP\log.txt
+echo ".">C:\WinP\log.txt
 
+echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --log C:\WinP\log.txt --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
+echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --log C:\WinP\log.txt --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+start notepad.exe C:\WinP\log.txt
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
-pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --log C:\WinP\log.txt  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
 
-rem F/20200807a : test new resolver= "--use-feature=2020-resolver"
 echo mid of step 2/3
 
 

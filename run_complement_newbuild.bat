@@ -4,14 +4,17 @@ echo  keep me in ansi =utf-8 without BOM  (notepad plus plus or win10 screwing u
 rem 2020-09-26 Jupyterlab-3 simplification
 rem 2020-09-27 Jupyterlab-3 5S (looking for missing detail) 
 rem 2020-10-25no_more_needed "nbextension enable" no more needed for bqplot, ipyleaflet, ipympl
+rem 2021-01-16: jupyterlab2 stuff removal
 
 rem use this in case we go back to jupyterlab-2
 if  "%jupyterlab2%"=="" set jupyterlab2=0
 echo jupyterlab2=%jupyterlab2%
 if  %jupyterlab2%==1 then echo "do jupyterlab2 %jupyterlab2% stuff"
+
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
-rem that is:  pip install --pre  --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
+rem that is:  pip install --pre  --no-index --trusted-host=None --log C:\WinP\log.txt  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
 rem           ( drag & drop "requirements.txt" file in the dos window a the end of the line, to get full path)
+rem if issue, search "ERROR:" in --log C:\WinP\log.txt
 rem then drag & drop "run_complement_newbuild.bat" file in the dos window and launch it
 
 @echo off 
@@ -48,30 +51,11 @@ if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab" "%WI
 
 @echo on
 rem * ===================
-echo jupyterlab manager (if npm there)
+echo jupyterlab pre-clean meaningless in 3.0
 rem * ==================
 @echo off
 rem pre-clean Whatever jupyterlab version
-if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" lab clean
-
-rem jupyter labextension list
-
-if "%jupyterlab2%"=="1"  if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyter-widgets/jupyterlab-manager
-
-
-rem * ==================
-echo finish install of bqplot
-rem * =================
-rem 2020-10-25no_more_needed if exist  "%WINPYDIR%\Lib\site-packages\bqplot" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix bqplot
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\bqplot" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build bqplot
-
-
-rem * ==================
-echo finish install of bokeh for jupyterlab (2019-08-10)
-rem * ================= 
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\bokeh" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build @bokeh/jupyter_bokeh
+rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" lab clean
 
 
 rem * ==================
@@ -79,24 +63,6 @@ echo finish install of ipydatawidgets (2018-03-10)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe" nbextension install --py --sys-prefix  ipydatawidgets
 if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  ipydatawidgets
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build       jupyterlab-datawidgets
-
-
-rem * ==================
-echo finish install of ipyleaflet
-rem * ================= 
-rem 2020-10-25no_more_needed if exist  "%WINPYDIR%\Lib\site-packages\ipyleaflet" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix  ipyleaflet
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\ipyleaflet" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-leaflet
-
-
-rem * ==================
-echo finish install of pythreejs
-rem * ================= 
-rem 2020-10-25no_more_needed if exist  "%WINPYDIR%\Lib\site-packages\pythreejs" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  pythreejs
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\pythreejs" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-threejs
 
 
 rem * ==================
@@ -107,19 +73,10 @@ if exist  "%WINPYDIR%\Lib\site-packages\ipyvolume" "%WINPYDIR%\Scripts\jupyter.e
 
 
 rem * ==================
-echo finish install of ipyvolume / ipywebrtc
-rem * =================
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\ipywebrtc" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-webrtc
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\ipywebrtc" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build ipyvolume
-
-
-rem * ==================
 echo finish install of pdvega
 rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\vega3" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix vega3
 
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyterlab/vega3-extension
 
 rem * ==================
 echo finish install of rise
@@ -129,37 +86,9 @@ if exist  "%WINPYDIR%\Lib\site-packages\rise" "%WINPYDIR%\Scripts\jupyter.exe" n
 
 
 rem * ==================
-echo finish install of ipympl (2017-10-29)
-rem * ================= 
-rem 2020-10-25no_more_needed if exist  "%WINPYDIR%\Lib\site-packages\ipympl" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix ipympl
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\ipympl" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build jupyter-matplotlib
-
-rem * =================
-echo finish install of holoviews jupyterlab 2018-02-27 
-rem * =================
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\holoviews" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @pyviz/jupyterlab_pyviz 
-
-rem * ==================
 echo finish install of nteract_on_jupyter (2018-12-27)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
-
-
-rem * ==================
-echo finish install of Qgrid(2020-03-10)
-rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix qgrid
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\qgrid" "%WINPYDIR%\Scripts\jupyter.exe"  labextension install --no-build  qgrid2  
-
-rem * ==================
-echo finish install of Jupyterlab-sql
-rem * ==================
-
-rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab_sql" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable jupyterlab_sql --py --sys-prefix
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab_sql" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyterlab-sql 
 
 
 rem * ==================
@@ -167,35 +96,28 @@ echo finish install of Voila (2019-07-21)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable voila --sys-prefix
 
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build @jupyter-voila/jupyterlab-preview
-
-rem * ==================
-echo  install of dataregistry (2019-07-28)(no more 2020-07-27)
-rem * ================= 
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" labextension install @jupyterlab/dataregistry-extension
-
 
 rem * ==================
 echo  install of pydeck (2020-02-02)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\pydeck" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix pydeck
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\pydeck" "%WINPYDIR%\Scripts\jupyter.exe" labextension  install --no-build @deck.gl/jupyter-widget
+
 
 rem * ==================
 echo  install of labextension install dask-labextension (2020-02-05)
 rem * ================= 
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\dask_labextension" "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build dask-labextension
-if exist  "%WINPYDIR%\Lib\site-packages\dask_labextension" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable dask_labextension
+rem no more if exist  "%WINPYDIR%\Lib\site-packages\dask_labextension" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable dask_labextension 
+
+
+rem * ==================
+echo finish install of ipygany (2020-12-29)
+rem * ================= 
+if exist  "%WINPYDIR%\Lib\site-packages\ipygany" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix ipygany
 
 rem * =================
 echo finish install seaborn iris example
 rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\seaborn" "%WINPYDIR%\python.exe" -c "import seaborn as sns;sns.set();sns.load_dataset('iris')"
-
-rem * =================
-echo finish install PyQtdoc
-rem * =================
-if exist  "%WINPYDIR%\Scripts\PyQtdoc_win_post_install.bat" "%WINPYDIR%\Scripts\PyQtdoc_win_post_install.bat" "-install"
 
 
 rem * =================
@@ -221,27 +143,15 @@ rem * =================
 rem echo tornado Python-3.8.0  fix 2019-06-28  https://github.com/tornadoweb/tornado/issues/2656#issuecomment-491400255
 rem * ==================
 
+rem KEEP as example for next time needed
+
 set qt56p=%WINPYDIR%\Lib\site-packages\tornado-6.0.3.dist-info
 if exist  "%qt56p%" (
-   %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\tornado\platform\asyncio.py', 'import asyncio', 'import asyncio;asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # python-3.8.0' )"
-   echo "DID I patch   %qt56p% ??"
-   rem pause
+  %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\tornado\platform\asyncio.py', 'import asyncio', 'import asyncio;asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # python-3.8.0' )"
+  rem echo "DID I patch   %qt56p% ??"
 ) else (
-   echo "I DIDN'T patch of %qt56p% !"
-   rem pause
+  rem echo "I DIDN'T patch of %qt56p% !"
 )
-
-
-
-rem * ===================
-echo 2018-03-25 Jupyterlab simplified wrap-up (https://github.com/jupyter/notebook/pull/3116#issuecomment-355672998)
-rem * ===================
-rem reduce time by building only once
-rem at each extension do:
-rem   "%WINPYDIR%\Scripts\jupyter.exe" labextension install --no-build 
-rem at the end:
-rem jupyter lab build
-rem )
 
 echo JUPYTERLAB_DIR=%JUPYTERLAB_DIR%  default is ~/.jupyter/lab
 echo JUPYTERLAB_SETTINGS_DIR=%JUPYTERLAB_SETTINGS_DIR% , default is ~/.jupyter/lab/user-settings/
@@ -250,27 +160,15 @@ echo JUPYTERLAB_WORKSPACES_DIR=%JUPYTERLAB_WORKSPACES_DIR% , default is ~/.jupyt
 %WINPYDIR%\Scripts\jupyter.exe" lab path
 
 
-
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab" (
-"%WINPYDIR%\Scripts\jupyter.exe" lab build
-jupyter labextension list
+rem jupyter labextension update --all  (will rebuild if needed)
+rem 2020-12-31 tweaks
+rem see https://jupyter.readthedocs.io/en/latest/use/jupyter-directories.html
+if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab" (
+"%WINPYDIR%\Scripts\jupyter.exe"jupyter labextension list
+"%WINPYDIR%\Scripts\jupyter.exe"jupyter  --paths  
 )
 
-rem jupyter labextension update --all  (will rebuild if needed)
-
-
-
-
-rem * ===================
-echo remove enum34 from Tensorfow (2017-12-22)
-rem * ===================
-if exist  "%WINPYDIR%\Lib\site-packages\enum" "%WINPYDIR%\scripts\pip.exe" uninstall -y enum34
-
-
-rem * ===================
-echo remove typing from altair (2018-11-01)
-rem * ===================
-if exist  "%WINPYDIR%\Lib\site-packages\typing.py" "%WINPYDIR%\scripts\pip.exe" uninstall -y typing
+if exist  "%WINPYDIR%\Lib\site-packages\notebook" "%WINPYDIR%\Scripts\jupyter.exe" nbextension list
 
 
 rem * ===================
@@ -310,21 +208,6 @@ if exist  "%WINPYDIR%\Lib\site-packages\pipdeptree" pipdeptree
 @echo on
 goto the_end
 
-rem ====================
-rem installation via requirements.txt, requirements2.txt and requirements3.txt files
-rem ====================
 
-rem pip install cvxpy --no-index --find-links=C:\WinPython\packages.srcreq --trusted-host=None
-
-set link_srcreq=--find-links=%origin%packages.srcreq
-
-set my_req=%origin%requirements.txt
-if exist %my_req% pip install -r %my_req% --no-index %link_srcreq% --trusted-host=None
-
-set my_req=%origin%requirements2.txt
-if exist %my_req% pip install -r %my_req% --no-index %link_srcreq% --trusted-host=None
-
-set my_req=%origin%requirements3.txt
-if exist %my_req% pip install -r %my_req% --no-index %link_srcreq% --trusted-host=None
 
 :the_end
