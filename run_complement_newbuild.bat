@@ -4,12 +4,8 @@ echo  keep me in ansi =utf-8 without BOM  (notepad plus plus or win10 screwing u
 rem 2020-09-26 Jupyterlab-3 simplification
 rem 2020-09-27 Jupyterlab-3 5S (looking for missing detail) 
 rem 2020-10-25no_more_needed "nbextension enable" no more needed for bqplot, ipyleaflet, ipympl
-rem 2021-01-16: jupyterlab2 stuff removal
+rem 2021-01-30: jupyterlab2 final stuff removal
 
-rem use this in case we go back to jupyterlab-2
-if  "%jupyterlab2%"=="" set jupyterlab2=0
-echo jupyterlab2=%jupyterlab2%
-if  %jupyterlab2%==1 then echo "do jupyterlab2 %jupyterlab2% stuff"
 
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
 rem that is:  pip install --pre  --no-index --trusted-host=None --log C:\WinP\log.txt  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
@@ -47,7 +43,6 @@ rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\..\n\npm" c
 rem other suggestion from https://github.com/nteract/nteract
 rem npm install -g --production windows-build-tools
 
-if "%jupyterlab2%"=="1" if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable --py  jupyterlab --sys-prefix 
 
 @echo on
 rem * ===================
