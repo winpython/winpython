@@ -1,6 +1,6 @@
 import os
 
-from . import PYSIDE, PYSIDE2, PYQT4, PYQT5
+from . import PYSIDE, PYSIDE6, PYSIDE2, PYQT4, PYQT5
 from .QtWidgets import QComboBox
 
 
@@ -81,6 +81,9 @@ else:
     if PYSIDE:
         from PySide.QtCore import QMetaObject
         from PySide.QtUiTools import QUiLoader
+    elif PYSIDE6:
+        from PySide6.QtCore import QMetaObject
+        from PySide6.QtUiTools import QUiLoader
     elif PYSIDE2:
         from PySide2.QtCore import QMetaObject
         from PySide2.QtUiTools import QUiLoader

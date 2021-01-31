@@ -10,7 +10,7 @@
 Provides QtWebEngineWidgets classes and functions.
 """
 
-from . import PYQT5,PYSIDE2, PYQT4, PYSIDE, PythonQtError
+from . import PYQT5,PYSIDE2, PYSIDE6, PYQT4, PYSIDE, PythonQtError
 
 
 # To test if we are using WebEngine or WebKit
@@ -28,17 +28,9 @@ if PYQT5:
         from PyQt5.QtWebKit import QWebSettings as QWebEngineSettings
         WEBENGINE = False
 elif PYSIDE2:
-    try:
-        from PySide2.QtWebEngineWidgets import QWebEnginePage
-        from PySide2.QtWebEngineWidgets import QWebEngineView
-        # Current PySide2 wheels seem to be missing this.
-        # from PySide2.QtWebEngineWidgets import QWebEngineSettings
-    except ImportError:
-        from PySide2.QtWebKitWidgets import QWebPage as QWebEnginePage
-        from PySide2.QtWebKitWidgets import QWebView as QWebEngineView
-        # Current PySide2 wheels seem to be missing this.
-        # from PySide2.QtWebKit import QWebSettings as QWebEngineSettings
-        WEBENGINE = False
+    from PySide2.QtWebEngineWidgets import QWebEnginePage
+    from PySide2.QtWebEngineWidgets import QWebEngineView
+    from PySide2.QtWebEngineWidgets import QWebEngineSettings
 elif PYQT4:
     from PyQt4.QtWebKit import QWebPage as QWebEnginePage
     from PyQt4.QtWebKit import QWebView as QWebEngineView

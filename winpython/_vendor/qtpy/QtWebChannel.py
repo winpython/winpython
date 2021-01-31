@@ -5,22 +5,14 @@
 # Licensed under the terms of the MIT License
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
-"""Provides QtSql classes and functions."""
+"""Provides QtWebChannel classes and functions."""
 
 # Local imports
-from . import PYQT5, PYSIDE6, PYSIDE2, PYQT4, PYSIDE, PythonQtError
+from . import PYSIDE2, PYQT5, PythonQtError
 
 if PYQT5:
-    from PyQt5.QtSql import *
-elif PYSIDE6:
-    from PySide6.QtSql import *
+    from PyQt5.QtWebChannel import *
 elif PYSIDE2:
-    from PySide2.QtSql import *
-elif PYQT4:
-    from PyQt4.QtSql import *
-elif PYSIDE:
-    from PySide.QtSql import *
+    from PySide2.QtWebChannel import *
 else:
     raise PythonQtError('No Qt bindings could be found')
-
-del PYQT4, PYQT5, PYSIDE, PYSIDE2

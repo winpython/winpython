@@ -22,14 +22,8 @@ if PYQT5:
     from PyQt5.QtWidgets import *
 elif PYSIDE6:
     from PySide6.QtWidgets import *
-    from PySide6.QtGui import QAction , QActionGroup  # to add stonebig
-    from PySide6.QtCore import QCoreApplication  # to add stonebig
-    QApplication.flush=QCoreApplication.sendPostedEvents  # to add stonebig
-    QTextEdit.setTabStopWidth=QTextEdit.setTabStopDistance
-    QTextEdit.tabStopWidth=QTextEdit.tabStopDistance
-    QPlainTextEdit.setTabStopWidth=QPlainTextEdit.setTabStopDistance
-    QPlainTextEdit.tabStopWidth=QPlainTextEdit.tabStopDistance
-    #Z = 1/ 0
+    from PySide6.QtGui import QAction
+
 elif PYSIDE2:
     from PySide2.QtWidgets import *
 elif PYQT4:

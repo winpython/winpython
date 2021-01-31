@@ -8,10 +8,12 @@
 """Provides QtSvg classes and functions."""
 
 # Local imports
-from . import PYQT4, PYSIDE2, PYQT5, PYSIDE, PythonQtError
+from . import PYQT4, PYSIDE6, PYSIDE2, PYQT5, PYSIDE, PythonQtError
 
 if PYQT5:
     from PyQt5.QtSvg import *
+elif PYSIDE6:
+    from PySide6.QtSvg import *
 elif PYSIDE2:
     from PySide2.QtSvg import *
 elif PYQT4:

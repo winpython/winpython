@@ -8,10 +8,14 @@
 """Provides QtOpenGL classes and functions."""
 
 # Local imports
-from . import PYQT4, PYQT5, PYSIDE, PythonQtError
+from . import PYQT4, PYQT5, PYSIDE, PYSIDE2, PythonQtError
 
 if PYQT5:
     from PyQt5.QtOpenGL import *
+elif PYSIDE6:
+    from PySide6.QtOpenGL import *
+elif PYSIDE2:
+    from PySide2.QtOpenGL import *
 elif PYQT4:
     from PyQt4.QtOpenGL import *
 elif PYSIDE:
@@ -19,4 +23,4 @@ elif PYSIDE:
 else:
     raise PythonQtError('No Qt bindings could be found')
 
-del PYQT4, PYQT5, PYSIDE
+del PYQT4, PYQT5, PYSIDE, PYSIDE2
