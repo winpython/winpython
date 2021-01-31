@@ -10,24 +10,41 @@
 Provides QtCore classes and functions.
 """
 
-from . import PYQT5, PYSIDE2, PYQT4, PYSIDE, PythonQtError
+from . import PYQT5, PYSIDE2, PYSIDE6, PYQT4, PYSIDE, PythonQtError
 
 
 if PYQT5:
     from PyQt5.QtCore import *
     from PyQt5.QtCore import pyqtSignal as Signal
+    from PyQt5.QtCore import pyqtBoundSignal as SignalInstance
     from PyQt5.QtCore import pyqtSlot as Slot
     from PyQt5.QtCore import pyqtProperty as Property
     from PyQt5.QtCore import QT_VERSION_STR as __version__
 
+    # For issue #153
+    from PyQt5.QtCore import QDateTime
+    QDateTime.toPython = QDateTime.toPyDateTime
+
     # Those are imported from `import *`
-    del pyqtSignal, pyqtSlot, pyqtProperty, QT_VERSION_STR
+    del pyqtSignal, pyqtBoundSignal, pyqtSlot, pyqtProperty, QT_VERSION_STR
+
+elif PYSIDE6:
+   from PySide6.QtCore import *
+   import PySide6.QtCore
+   __version__ = PySide6.QtCore.__version__
+   Qt.BackgroundColorRole=Qt.BackgroundRole  # suggested addition stonebig
+   Qt.TextColorRole=Qt.ForegroundRole  # suggested addition stonebig
+   Qt.MidButton = Qt.MiddleButton  # suggested addition stonebig
 elif PYSIDE2:
     from PySide2.QtCore import *
+
     try:  # may be limited to PySide-5.11a1 only 
         from PySide2.QtGui import QStringListModel
     except:
         pass
+
+    import PySide2.QtCore
+    __version__ = PySide2.QtCore.__version__
 elif PYQT4:
     from PyQt4.QtCore import *
     # Those are things we inherited from Spyder that fix crazy crashes under
@@ -35,6 +52,7 @@ elif PYQT4:
     from PyQt4.QtCore import QCoreApplication
     from PyQt4.QtCore import Qt
     from PyQt4.QtCore import pyqtSignal as Signal
+    from PyQt4.Qtcore import pyqtBoundSignal as SignalInstance
     from PyQt4.QtCore import pyqtSlot as Slot
     from PyQt4.QtCore import pyqtProperty as Property
     from PyQt4.QtGui import (QItemSelection, QItemSelectionModel,
@@ -65,7 +83,7 @@ elif PYQT4:
         writableLocation = _QDesktopServices.storageLocation
 
     # Those are imported from `import *`
-    del pyqtSignal, pyqtSlot, pyqtProperty, QT_VERSION_STR, qInstallMsgHandler
+    del pyqtSignal, pyqtBoundSignal, pyqtSlot, pyqtProperty, QT_VERSION_STR, qInstallMsgHandler
 elif PYSIDE:
     from PySide.QtCore import *
     from PySide.QtGui import (QItemSelection, QItemSelectionModel,
