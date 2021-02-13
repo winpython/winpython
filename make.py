@@ -1326,6 +1326,13 @@ exit
             r"""@echo off
 call "%~dp0env.bat"
 set WINPYWORKDIR=%~dp0..\Notebooks
+
+set WINPYWORKDIR1=%~dp1
+if "%WINPYWORKDIR1%"=="" (
+   if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1=%CD%
+)
+if "%WINPYWORKDIR1%"=="" set WINPYWORKDIR1=%WINPYWORKDIR%
+
 FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
 %winpythontoexec%set winpythontoexec=
 
@@ -1549,14 +1556,14 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
         self.create_batch_script(
             'cmd.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat"  %*
 cmd.exe /k""",
         )
 
         self.create_batch_script(
             'python.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat"  %*
 rem backward compatibility for  python command-line users
 "%WINPYDIR%\python.exe"  %*
 """,
@@ -1565,8 +1572,8 @@ rem backward compatibility for  python command-line users
         self.create_batch_script(
             'winpython.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat"  %*
+cd/D "%WINPYWORKDIR1%"
 rem backward compatibility for non-ptpython users
 if exist "%WINPYDIR%\scripts\ptpython.exe" (
     "%WINPYDIR%\scripts\ptpython.exe" %*
@@ -1579,7 +1586,7 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
         self.create_batch_script(
             'idlex.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat"  %*
 rem backward compatibility for non-IDLEX users
 if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
@@ -1592,7 +1599,7 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
         self.create_batch_script(
             'idle.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat"  %*
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 
 """,
@@ -1600,8 +1607,9 @@ call "%~dp0env_for_icons.bat"
         self.create_batch_script(
             'winidlex.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+
+call "%~dp0env_for_icons.bat"  %*
+cd/D "%WINPYWORKDIR1%"
 rem backward compatibility for non-IDLEX users
 if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
@@ -1613,8 +1621,8 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
         self.create_batch_script(
             'winidle.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat"  %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 """,
         )
@@ -1622,33 +1630,32 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script(
             'spyder.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+rem cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
-   "%WINPYDIR%\scripts\spyder3.exe" %*
+   "%WINPYDIR%\scripts\spyder3.exe" %* -w "%WINPYWORKDIR1%"
 ) else (
-   "%WINPYDIR%\scripts\spyder.exe" %*
-)   
+   "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
+)  
 """,
         )
         self.create_batch_script(
             'winspyder.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+rem cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
-   "%WINPYDIR%\scripts\spyder3.exe" %*
+   "%WINPYDIR%\scripts\spyder3.exe" %* -w "%WINPYWORKDIR1%"
 ) else (
-   "%WINPYDIR%\scripts\spyder.exe" %*
-) 
+   "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
 """,
         )
 
         self.create_batch_script(
             'spyder_reset.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
     "%WINPYDIR%\scripts\spyder3.exe" --reset %*
 ) else (
@@ -1660,8 +1667,8 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
         self.create_batch_script(
             'ipython_notebook.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
 """,
         )
@@ -1669,8 +1676,8 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script(
             'winipython_notebook.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
 """,
         )
@@ -1678,8 +1685,8 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script(
             'winjupyter_lab.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-lab.exe" %*
 """,
         )
@@ -1687,8 +1694,8 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script(
             'qtconsole.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
 """,
         )
@@ -1696,8 +1703,8 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script(
             'winqtconsole.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
 """,
         )
@@ -1705,8 +1712,8 @@ cd/D "%WINPYWORKDIR%"
         self.create_batch_script(
             'qtdemo.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
 )  
@@ -1719,8 +1726,8 @@ if exist "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d
         self.create_batch_script(
             'qtdesigner.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 if "%QT_API%"=="" ( set QT_API=pyqt5 )
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Scripts\designer.exe" (
@@ -1743,8 +1750,8 @@ if "%QT_API%"=="pyqt5" (
         self.create_batch_script(
             'qtassistant.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 if "%QT_API%"=="" ( set QT_API=pyqt5 )
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Scripts\assistant.exe" (
@@ -1767,8 +1774,8 @@ if "%QT_API%"=="pyqt5" (
         self.create_batch_script(
             'qtlinguist.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 if "%QT_API%"=="" ( set QT_API=pyqt5 )
 if "%QT_API%"=="pyqt5" (
     if exist "%WINPYDIR%\Scripts\linguist.exe" (
@@ -1805,8 +1812,8 @@ call "%~dp0register_python.bat" --all""",
         self.create_batch_script(
             'wpcp.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\python.exe" -m winpython.controlpanel %*
 """,
         )
@@ -1829,7 +1836,7 @@ pause
         self.create_batch_script(
             'winpyzo.bat',
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat"  %*
 cd/D "%WINPYDIR%"
 "%WINPYDIR%\scripts\pyzo.exe" %*
 """,
@@ -1853,8 +1860,8 @@ cd/D "%WINPYDIR%"
             'winvscode.bat',
             r"""@echo off
 rem launcher for VScode
-call "%~dp0env_for_icons.bat"
-rem cd/D "%WINPYWORKDIR%"
+call "%~dp0env_for_icons.bat" %*
+rem cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\..\t\vscode\code.exe" (
     "%WINPYDIR%\..\t\vscode\code.exe" %*
 ) else (
