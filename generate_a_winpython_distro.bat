@@ -41,7 +41,7 @@ rem Override other scripts (simpler maintenance)
 set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha set my_release_level=a0
-if "%my_release_level%"=="" set my_release_level=b1
+if "%my_release_level%"=="" set my_release_level=b3
 
 rem ---------
 rem newAge 20191022
@@ -125,6 +125,13 @@ set build_det=\%my_flavor%
 if "%my_flavor%"=="" set build_det=
 
 dir %build_det%
+
+rem 2021-02-13 workaround to hard to remove json files
+echo ren bu%my_flavor% bu%my_flavor%_old
+ren bu%my_flavor% bu%my_flavor%_old
+start rmdir /S /Q bu%my_flavor%_old
+
+
 echo rmdir /S /Q bu%my_flavor%
 rem  pause
 rmdir /S /Q bu%my_flavor%
@@ -219,16 +226,12 @@ rem F/2020-07-05: install msvc_runtime before packages that may want to compile
 
 rem 2020-12-05 : add a constraints.txt file from a recent pip list
 
-rem 2021-01-09 : temporary log file to trace conflicts on very loong resolver time
-rem if issue, search "ERROR:" in --log C:\WinP\log.txt
-echo ".">C:\WinP\log.txt
 
-echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --log C:\WinP\log.txt --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
-echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --log C:\WinP\log.txt --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
-start notepad.exe C:\WinP\log.txt
+echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%
+echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
-pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --log C:\WinP\log.txt  --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
+pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq  --upgrade %new_resolver%>>%my_archive_log%
 
 echo mid of step 2/3
 
@@ -263,5 +266,7 @@ echo END OF creation>>%my_archive_log%
 echo %date% %time%  >>%my_archive_log%
 echo ===============>>%my_archive_log%
 
+rem show logs
+start notepad.exe %my_archive_log%
 set path=%my_original_path%
 rem pause

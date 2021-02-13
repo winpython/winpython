@@ -8,9 +8,8 @@ rem 2021-01-30: jupyterlab2 final stuff removal
 
 
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
-rem that is:  pip install --pre  --no-index --trusted-host=None --log C:\WinP\log.txt  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
+rem that is:  pip install --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
 rem           ( drag & drop "requirements.txt" file in the dos window a the end of the line, to get full path)
-rem if issue, search "ERROR:" in --log C:\WinP\log.txt
 rem then drag & drop "run_complement_newbuild.bat" file in the dos window and launch it
 
 @echo off 
