@@ -1327,13 +1327,27 @@ exit
 call "%~dp0env.bat"
 set WINPYWORKDIR=%~dp0..\Notebooks
 
-set WINPYWORKDIR1=%~dp1
-if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
+rem default is as before: Winpython ..\Notebooks
+set WINPYWORKDIR1=%WINPYWORKDIR%
 
-if "%WINPYWORKDIR1%"=="" (
-   if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1=%CD%
+rem if we have a file or directory in %1 parameter, we use that directory 
+if not "%~1"=="" (
+   if exist "%~1" (
+      if exist "%~1\" (
+         rem echo it is a directory %~1
+	     set WINPYWORKDIR1=%~1
+	  ) else (
+	  rem echo  it is a file %~1, so we take the directory %~dp1
+	  set WINPYWORKDIR1=%~dp1
+	  )
+   )
+) else (
+rem if it it launched from another directory , we keep it that one echo %CD%
+if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1=%CD%
 )
-if "%WINPYWORKDIR1%"=="" set WINPYWORKDIR1=%WINPYWORKDIR%
+
+rem remove some potential last \
+if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
 
 FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
 %winpythontoexec%set winpythontoexec=
@@ -1559,6 +1573,7 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
             'cmd.bat',
             r"""@echo off
 call "%~dp0env_for_icons.bat"  %*
+if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 cmd.exe /k""",
         )
 
@@ -1567,6 +1582,7 @@ cmd.exe /k""",
             r"""@echo off
 call "%~dp0env_for_icons.bat"  %*
 rem backward compatibility for  python command-line users
+if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 "%WINPYDIR%\python.exe"  %*
 """,
         )
