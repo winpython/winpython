@@ -1328,6 +1328,8 @@ call "%~dp0env.bat"
 set WINPYWORKDIR=%~dp0..\Notebooks
 
 set WINPYWORKDIR1=%~dp1
+if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
+
 if "%WINPYWORKDIR1%"=="" (
    if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1=%CD%
 )
@@ -1648,6 +1650,7 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
    "%WINPYDIR%\scripts\spyder3.exe" %* -w "%WINPYWORKDIR1%"
 ) else (
    "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
+)  
 """,
         )
 
