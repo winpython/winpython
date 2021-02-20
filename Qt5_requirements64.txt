@@ -8,8 +8,7 @@ PyQtWebEngine
 pyqt5_tools
 ##Pyside2
 
-# compilers no mingwpy yet in Python3.5)
-#mingwpy
+# compilers
 cython
 pycparser
 cffi
@@ -39,7 +38,7 @@ mysql_connector_python
 pg8000
 ipython_sql
 db.py
-xlrd
+#xlrd no moe supported per pandas-1.2.0
 XlsxWriter
 pymongo
 redis
@@ -151,11 +150,6 @@ docopt
 PyOpenGL
 
 
-# python3
-# rope_py3k
-# rope
-
-
 sphinx_rtd_theme
 Sphinx
 greenlet
@@ -184,14 +178,6 @@ wordcloud
 mkl-service
 docrepr
 
-#when mingwpy
-# 2018-02-25: bybye theano
-# Theano
-# pymc3
-# lasagne
-# scikit-neuralnetwork
-
-
 
 zarr
 
@@ -207,20 +193,15 @@ astroML
 
 
 # waiting list
-# wpca
-# dead 2020:  pythreejs
 # flexx
 scikit-optimize
 
 # removal list:
-# pyhdf 
-# dill (removed 20160612 as it depends on pyreadline)
+
 pyflux
 husl
 
 nbconvert_reportlab
-#ggplot (replaced per plotnine)
-
 
 snakeviz
 # not enough room nbdime
@@ -283,10 +264,6 @@ streamz
 #spyder-notebook
 
 
-#require readline cvxpy
-# Win64 only now:
-# no more: prettytensor
-
 # Tensorflow_world
 ###edward
 ###Keras
@@ -299,6 +276,7 @@ streamz
 # pytorch eco-system
 Torch
 torchvision
+torchaudio		  
 botorch
 
 terminado
@@ -317,12 +295,8 @@ ruamel.yaml
 parambokeh
 hvplot
 
-# end of requirements.txt
-
-#waitin 3.7
 clrmagic
 cvxopt
-#cyordereddict (no more in python>3.7)
 gmpy2
 
 numba
@@ -457,13 +431,15 @@ ipyleaflet
 # wait spoofing end https://github.com/pbugnion/jupyterlab-sql/issues/89
 # not yet (one man) jupyterlab-sql
 # not yet (one man) mpl-interactions
-# not yet (one man) ipycanvas
+ipycanvas
 # not yet jupyterlab-git
 
 
 
 dask_ml
 wasmer
+wasmer_compiler_cranelift
+wasmer_compiler_singlepass
 
 voila
 fastapi
@@ -473,3 +449,9 @@ nbval
 
 onnxruntime
 sklearn-contrib-lightning
+openpyxl
+zstandard
+jupyterlab_lsp
+jupyter_lsp
+pynndescent
+great_expectations
