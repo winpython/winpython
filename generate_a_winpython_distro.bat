@@ -41,7 +41,7 @@ rem Override other scripts (simpler maintenance)
 set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha set my_release_level=a0
-if "%my_release_level%"=="" set my_release_level=b3
+if "%my_release_level%"=="" set my_release_level=
 
 rem ---------
 rem newAge 20191022
@@ -54,12 +54,12 @@ if %my_python_target%==37 (
    set my_release=2
 )
 if %my_python_target%==38 (
-   set my_python_target_release=387
-   set my_release=1
+   set my_python_target_release=388
+   set my_release=0
 )
 if %my_python_target%==39 (
-   set my_python_target_release=391
-   set my_release=1
+   set my_python_target_release=392
+   set my_release=0
 )
 
 if %my_python_target%==310 (
