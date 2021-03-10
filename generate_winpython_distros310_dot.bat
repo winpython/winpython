@@ -12,7 +12,7 @@ set my_flavor=dot
 
 set my_release=0
 
-set my_release_level=a3
+set my_release_level=a6b
 
 rem set my_create_installer=False
 set my_create_installer=nsis.zip

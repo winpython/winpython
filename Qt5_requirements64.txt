@@ -276,7 +276,7 @@ streamz
 # pytorch eco-system
 Torch
 torchvision
-torchaudio		  
+torchaudio
 botorch
 
 terminado
@@ -446,7 +446,6 @@ fastapi
 
 coverage
 nbval
-
 onnxruntime
 sklearn-contrib-lightning
 openpyxl

@@ -448,7 +448,6 @@ fastapi
 
 coverage
 nbval
-
 onnxruntime
 sklearn-contrib-lightning
 openpyxl
