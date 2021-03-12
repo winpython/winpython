@@ -1011,6 +1011,8 @@ rem read https://github.com/winpython/winpython/issues/839
 rem set USERPROFILE=%HOME%
 rem set WINPYDIRBASE=
 set JUPYTER_DATA_DIR=%HOME%
+set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
+set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
 set WINPYARCH=WIN32
 if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 set FINDDIR=%WINDIR%\system32
