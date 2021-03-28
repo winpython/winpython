@@ -5,10 +5,13 @@ rem 2020-09-26 Jupyterlab-3 simplification
 rem 2020-09-27 Jupyterlab-3 5S (looking for missing detail) 
 rem 2020-10-25no_more_needed "nbextension enable" no more needed for bqplot, ipyleaflet, ipympl
 rem 2021-01-30: jupyterlab2 final stuff removal
+rem 2021-03-13: notebook classic stuff removal
 
 
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
-rem that is:  pip install --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   c:\....\requirements.txt 
+rem that is:  pip install --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   C:\WinP\bd39\requirements_test.txt Qt5_requirements64.txt Cod_requirements64.txt
+rem python -m pip freeze>C:\WinP\bd39\req_test150.txt between intermediate steps
+rem 
 rem           ( drag & drop "requirements.txt" file in the dos window a the end of the line, to get full path)
 rem then drag & drop "run_complement_newbuild.bat" file in the dos window and launch it
 
@@ -30,55 +33,12 @@ if not exist "%WINPYDIR%\Lib\site-packages\mingwpy" set pydistutils_cfg=%WINPYDI
 if not exist "%WINPYDIR%\Lib\site-packages\mingwpy" echo [config]>%pydistutils_cfg%
 
 
-
-@echo off
-rem * ===========================
-echo finish install of jupyterlab
-rem * ===========================
-
-rem 2020-04-10 security
-rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\..\n\npm" config set ignore-scripts true
-
-rem other suggestion from https://github.com/nteract/nteract
-rem npm install -g --production windows-build-tools
-
-
-@echo on
-rem * ===================
-echo jupyterlab pre-clean meaningless in 3.0
 rem * ==================
-@echo off
-rem pre-clean Whatever jupyterlab version
-rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" lab clean
-
-
-rem * ==================
-echo finish install of ipydatawidgets (2018-03-10)
-rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe" nbextension install --py --sys-prefix  ipydatawidgets
-if exist  "%WINPYDIR%\Lib\site-packages\ipydatawidgets" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  ipydatawidgets
-
-
-rem * ==================
-echo finish install of ipyvolume / ipywebrtc
+echo finish install of bqplot (for VSCode 2021-03-13)
 rem * =================
-if exist  "%WINPYDIR%\Lib\site-packages\ipywebrtc" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  ipywebrtc
-if exist  "%WINPYDIR%\Lib\site-packages\ipyvolume" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py  --sys-prefix  ipyvolume
+if exist  "%WINPYDIR%\Lib\site-packages\bqplot" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix bqplot
 
-
-rem * ==================
-echo finish install of pdvega
-rem * =================
-if exist  "%WINPYDIR%\Lib\site-packages\vega3" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix vega3
-
-
-rem * ==================
-echo finish install of rise
-rem * =================
-if exist  "%WINPYDIR%\Lib\site-packages\rise" "%WINPYDIR%\Scripts\jupyter.exe" nbextension install rise --py --sys-prefix
-if exist  "%WINPYDIR%\Lib\site-packages\rise" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix rise 
-
-
+						 
 rem * ==================
 echo finish install of nteract_on_jupyter (2018-12-27)
 rem * ================= 
@@ -90,23 +50,6 @@ echo finish install of Voila (2019-07-21)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable voila --sys-prefix
 
-
-rem * ==================
-echo  install of pydeck (2020-02-02)
-rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\pydeck" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix pydeck
-
-
-rem * ==================
-echo  install of labextension install dask-labextension (2020-02-05)
-rem * ================= 
-rem no more if exist  "%WINPYDIR%\Lib\site-packages\dask_labextension" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable dask_labextension 
-
-
-rem * ==================
-echo finish install of ipygany (2020-12-29)
-rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\ipygany" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix ipygany
 
 rem * =================
 echo finish install seaborn iris example
@@ -169,15 +112,8 @@ rem * ===================
 echo clear jupyterlab staging (2018-03-09)
 rem * ===================
 if exist "%WINPYDIR%\share\jupyter\lab\staging" rmdir /S /Q "%WINPYDIR%\share\jupyter\lab\staging"
+rem if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab"  "%WINPYDIR%\Scripts\jupyter.exe" lab clean
 
-
-rem * ===================
-echo clear Pyside2 QML (2018-04-29 : it's too big)
-rem * ===================
-rem 20181222
-rem if exist  "%WINPYDIR%\Lib\site-packages\PySide2\qml"  rmdir /S /Q "%WINPYDIR%\Lib\site-packages\PySide2\qml"
-
-@echo on
 
 echo 2019-10-22 Spyder tweaks moved at the end as suspicion of problem creating (on Python-3.8)
 rem * ============================
@@ -201,7 +137,6 @@ if exist  "%WINPYDIR%\Lib\site-packages\pipdeptree" pipdeptree
 
 @echo on
 goto the_end
-
 
 
 :the_end
