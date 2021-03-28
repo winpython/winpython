@@ -3,6 +3,7 @@ rem  to launch from a winpython package directory, where 'make.py' is
 
 rem *****************************
 rem 2020-12-05 : add a constrints.txt file from a recent pip list
+rem 2021-03-20 : track successes packages combination are archived for future contraint update
 rem *****************************
 
 if "%my_constraints%"=="" set my_constraints=C:\WinP\constraints.txt
@@ -41,7 +42,7 @@ rem Override other scripts (simpler maintenance)
 set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha set my_release_level=a0
-if "%my_release_level%"=="" set my_release_level=
+if "%my_release_level%"=="" set my_release_level=b1
 
 rem ---------
 rem newAge 20191022
@@ -55,11 +56,11 @@ if %my_python_target%==37 (
 )
 if %my_python_target%==38 (
    set my_python_target_release=388
-   set my_release=0
+   set my_release=1
 )
 if %my_python_target%==39 (
    set my_python_target_release=392
-   set my_release=0
+   set my_release=1
 )
 
 if %my_python_target%==310 (
@@ -243,6 +244,18 @@ echo end of step 2/3
 echo end of step 2/3>>%my_archive_log%
 rem pause
 
+rem *****************************
+rem 2021-03-20 : track successes packages combination are archived for future contraint update
+rem *****************************
+echo ----------------------------->>%my_archive_log%
+echo 1.99 archive success
+echo %date% %time%                >>%my_archive_log%
+echo ----------------------------->>%my_archive_log%
+echo python -m pip freeze>%my_archive_log%.packages_versions.txt>>%my_archive_log%
+
+python -m pip freeze>%my_archive_log%.packages_versions.txt
+
+
 echo ----------------------------->>%my_archive_log%
 echo 2.0 Create a build newage3/3 >>%my_archive_log%
 echo %date% %time%                >>%my_archive_log%
@@ -268,5 +281,9 @@ echo ===============>>%my_archive_log%
 
 rem show logs
 start notepad.exe %my_archive_log%
+
+rem 2021-03-20 : track successes packages combination are archived for future contraint update
+start notepad.exe %my_archive_log%.packages_versions.txt
+
 set path=%my_original_path%
 rem pause
