@@ -936,7 +936,8 @@ call "%~dp0env_for_icons.bat"
             'Jupyter Notebook.exe',
             'jupyter.ico',
             command='$SYSDIR\cmd.exe',
-            args=r'/k winjupyter_nbclassic.bat',
+            args=r'/k winipython_notebook.bat',  # like VSCode + Rise way
+            # args=r'/k winjupyter_nbclassic.bat',  # Jupyterlab in classic look
         )
 
         self.create_launcher(
