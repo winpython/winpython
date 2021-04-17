@@ -26,9 +26,9 @@ cd /d %new_winpydir%
 call scripts\env.bat
 @echo off
 
-rem * ==========================
-rem * When Python has no mingwpy
-rem * ==========================
+rem  * ==========================
+echo * When Python has no mingwpy
+rem  * ==========================
 if not exist "%WINPYDIR%\Lib\site-packages\mingwpy" set pydistutils_cfg=%WINPYDIR%\..\settings\pydistutils.cfg
 if not exist "%WINPYDIR%\Lib\site-packages\mingwpy" echo [config]>%pydistutils_cfg%
 
@@ -57,27 +57,20 @@ rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\seaborn" "%WINPYDIR%\python.exe" -c "import seaborn as sns;sns.set();sns.load_dataset('iris')"
 
 
-rem * =================
-echo opengl PyQt5 patch 2018-01-06
-rem * ==================
-set qt56p=%WINPYDIR%\Lib\site-packages\PyQt5\Qt\bin
-set qt56dest=%WINPYDIR%\Lib\site-packages\PyQt5\Qt\bin\opengl32sw.dll
-if exist  "%qt56p%" if not exist "%qt56dest%" ( 
-if "%WINPYARCH%"=="WIN32" copy "C:\WinPython\bd35\patch_qt570\opengl32sw-32\opengl32sw.dll" "%WINPYDIR%\Lib\site-packages\PyQt5\Qt\bin\opengl32sw.dll"
-)
-if not "%WINPYARCH%"=="WIN32" copy "C:\WinPython\bd35\patch_qt570\opengl32sw-64\opengl32sw.dll" "%WINPYDIR%\Lib\site-packages\PyQt5\Qt\bin\opengl32sw.dll"
-)
-
 rem  ** Active patchs**
 rem * ===========================
-rem 2021-04-17 patch jupyter_lsp-1.1.4
+echo 2021-04-17 patch jupyter_lsp-1.1.4
 rem see https://github.com/krassowski/jupyterlab-lsp/pull/580/files
 rem * ===========================
+
+rem in DOS, the variable must be set befor the parenthesis block....
+set this_source='%WINPYDIR%\Lib\site-packages\jupyter_lsp\virtual_documents_shadow.py'
 if exist  "%WINPYDIR%\Lib\site-packages\jupyter_lsp-1.1.4.dist-info" (
-   set this_source='%WINPYDIR%\Lib\site-packages\jupyter_lsp\virtual_documents_shadow.py'
+   echo "**%this_source%**"
    %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
    %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
 ) 
+
 
 rem  ** Example of live file replacement (not active)**
 rem * ===========================
