@@ -9,7 +9,7 @@ WinPython Package Manager
 
 Created on Fri Aug 03 14:32:26 2012
 """
-
+# pypy3 to patch from 'python' to 'pypy3': 379 493 497 627 692 696 743 767 785
 from __future__ import print_function
 
 import os
@@ -376,7 +376,7 @@ python "%~dpn0"""
             else:
                 #  indirect way: we interrogate something else
                 cmdx = [
-                    osp.join(self.target, 'python.exe'),
+                    utils.get_python_executable(self.target), # PyPy !
                     '-c',
                     "import pip;from pip._internal.utils.misc import  get_installed_distributions as pip_get_installed_distributions ;print('+!+'.join(['%s@+@%s@+@' % (i.key,i.version)  for i in pip_get_installed_distributions()]))",
                 ]
@@ -490,11 +490,13 @@ python "%~dpn0"""
                 '/D',
                 self.target,
                 r'&&',
-                osp.join(self.target, 'python.exe'),
+                utils.get_python_executable(self.target), 
+                # Before PyPy: osp.join(self.target, 'python.exe')
             ]
             complement += ['-m', 'pip']
         else:
-            executing = osp.join(self.target, 'python.exe')
+            executing = utils.get_python_executable(self.target)
+            # Before PyPy: osp.join(self.target, 'python.exe')
             complement = ['-m', 'pip']
         try:
             fname = utils.do_script(
@@ -525,6 +527,10 @@ python "%~dpn0"""
             origin = self.target + (
                 r"\Lib\site-packages\pywin32_system32"
             )
+            if 'pypy3' in sys.executable:
+                origin = self.target + (
+                r"\site-packages\pywin32_system32"
+                )
             destin = self.target
             if osp.isdir(origin):
                 for name in os.listdir(origin):
@@ -548,29 +554,34 @@ python "%~dpn0"""
             sheb_fix = " executable = get_executable()"
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
             sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
+            if 'pypy3' in sys.executable:
+               the_place=r"\site-packages\pip\_vendor\distlib\scripts.py"
+            else:
+               the_place=r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"
+            print(the_place)
             if to_movable:
                 utils.patch_sourcefile(
                     self.target
-                    + r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                    + the_place,
                     sheb_fix,
                     sheb_mov1,
                 )
                 utils.patch_sourcefile(
                     self.target
-                    + r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                    + the_place,
                     sheb_mov2,
                     sheb_mov1,
                 )
             else:
                 utils.patch_sourcefile(
                     self.target
-                    + r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                    + the_place,
                     sheb_mov1,
                     sheb_fix,
                 )
                 utils.patch_sourcefile(
                     self.target
-                    + r"\Lib\site-packages\pip\_vendor\distlib\scripts.py",
+                    + the_place,
                     sheb_mov2,
                     sheb_fix,
                 )
@@ -686,6 +697,11 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 tmp_string = r'''@echo off
 if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
+
+            # PyPy adaption: python.exe or pypy3.exe
+            my_exec = osp.basename(utils.get_python_executable(self.target))
+            tmp_string = tmp_string.replace('python.exe', my_exec)
+
             self.create_file(
                 package,
                 'pyuic%s.bat' % package.name[-1],
@@ -730,9 +746,10 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         if not package.name == 'pip':
             # trick to get true target (if not current)
             this_executable_path = self.target
+            this_exec = utils.get_python_executable(self.target)  # PyPy !
             subprocess.call(
                 [
-                    this_executable_path + r'\python.exe',
+                    this_exec,
                     '-m',
                     'pip',
                     'uninstall',
@@ -755,9 +772,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         try:
             fname = utils.direct_pip_install(
                 package.fname,
-                python_exe=osp.join(
-                    self.target, 'python.exe'
-                ),
+                python_exe=utils.get_python_executable(self.target),  # PyPy !
                 architecture=self.architecture,
                 verbose=self.verbose,
                 install_options=install_options,
@@ -773,9 +788,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         try:
             fname = utils.do_script(
                 script,
-                python_exe=osp.join(
-                    self.target, 'python.exe'
-                ),
+                python_exe=utils.get_python_executable(self.target), # PyPy3 !
                 architecture=self.architecture,
                 verbose=self.verbose,
                 install_options=install_options,

@@ -28,6 +28,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-__version__ = '4.1.20210417'
+__version__ = '4.2.20210422'
 __license__ = __doc__
 __project_url__ = 'http://winpython.github.io/'
