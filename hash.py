@@ -34,28 +34,25 @@ if __name__ == '__main__':
         + " | SHA-256"
         + " " * (64 - 7)
         + " | Binary"
-        + " " * (31 - 5)
+        + " " * (33 - 5)
         + "| Size"
         + " " * (20 - 6)
-    )
+        #+ " | SHA3-256"
+        #+ " " * (64 - 7)
+   )
     line = "|".join(
         ["-" * len(i) for i in header.split("|")]
     )
 
     print(header)
     print(line)
-    print(
-        "%s | %s | %s | %s | %s"
-        % (
-            give_hash(file, hashlib.md5),
-            give_hash(file, hashlib.sha1),
-            give_hash(file, hashlib.sha256),
-            '{0:31s}'.format(os.path.basename(file)),
-            (
-                '{0:12,}'.format(
-                    os.path.getsize(file)
-                ).replace(",", " ")
-                + ' Bytes'
-            ),
-        )
-    )
+
+    print(""+
+        f"{give_hash(file, hashlib.md5)} | " +
+        f"{give_hash(file, hashlib.sha1)} | " +
+        f"{give_hash(file, hashlib.sha256)} | " +
+        f"{os.path.basename(file):33} |"+
+		f"{os.path.getsize(file):13,}".replace(",", " ") +  ' Bytes' ) #+ f"{give_hash(file, hashlib.sha3_256)}")
+        
+         
+
