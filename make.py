@@ -354,7 +354,6 @@ class WinPythonDistribution(object):
         #    .groups()[0]
         #    .split('.')
         #)
-        self.python_version = 'winUNKNOWN' #  '.'.join(vlst[:2])
         self.python_fullversion = 'winUNKNOWN' # '.'.join(vlst[:3])
 
     @property
@@ -2034,22 +2033,20 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.python_fname,
             self.python_name,
             self.distname,
-            self.python_version,
-            self.python_fullversion,
-        )
-        # Create the WinPython base directory
-        self._print(
-            "Creating WinPython %s base directory"
-            % self.python_version
+            self.python_fullversion,  # PyPy to delete or move
         )
         if my_winpydir is None:
             self.winpydir = osp.join(
-                self.target, self.distname
+                self.target, self.distname  # PyPy to delete
             )
         else:
             self.winpydir = osp.join(
                 self.target, my_winpydir
-            )
+            )        # Create/re-create the WinPython base directory
+        self._print(
+            "Creating WinPython %s base directory"
+            % my_winpydir
+        )
         if (
             osp.isdir(self.winpydir)
             and remove_existing
@@ -2072,11 +2069,16 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
 
         if remove_existing and not self.simulation:
             self._extract_python()  # unzip Python interpreter
+
         self.distribution = wppm.Distribution(
             self.python_dir,
             verbose=self.verbose,
             indent=True,
         )
+
+        # PyPy: get Fullversion from the executable
+        self.python_fullversion = utils.get_python_long_version(
+                self.distribution.target)
 
         if remove_existing:
             if not self.simulation:
