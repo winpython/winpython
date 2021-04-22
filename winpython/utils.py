@@ -369,6 +369,11 @@ def python_query(cmd, path):
     the_exe = get_python_executable(path)
     return exec_shell_cmd('%s -c "%s"' % (the_exe, cmd), path).splitlines()[0]
 
+def python_execmodule(cmd, path):
+    """Execute Python command using the Python interpreter located in *path*"""
+    the_exe = get_python_executable(path)
+    exec_shell_cmd('%s -m %s' % (the_exe, cmd), path)
+
 
 def get_python_infos(path):
     """Return (version, architecture) for the Python distribution located in
@@ -385,6 +390,7 @@ def get_python_infos(path):
     )
     if re.match(r'([0-9]*)\.([0-9]*)', ver) is None:
         ver = None
+  
     return ver, arch
 
 

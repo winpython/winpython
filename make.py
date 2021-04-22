@@ -321,7 +321,7 @@ class WinPythonDistribution(object):
             docsdirs = []
         self._docsdirs = docsdirs
         self.verbose = verbose
-        self.winpydir = None
+        self.winpydir = None  # new WinPython BaseDirectory
         self.distribution = None
         self.installed_packages = []
         self.simulation = simulation
@@ -331,20 +331,31 @@ class WinPythonDistribution(object):
         self.install_options = install_options
         self.flavor = flavor
 
-        self.python_fname = self.get_package_fname(
+        # python_fname = the .zip of the python interpreter PyPy !
+        # impot re
+        # re.match(r'(pypy3*-v|python-)([0-9\.rcba]*)((\.|\-)(amd64|win64)?\.zip')
+        try:  # PyPy
+            self.python_fname = self.get_package_fname(
+             r'(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip'
+             )
+        except:  # normal Python
+            self.python_fname = self.get_package_fname(
             r'python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)'
-        )
+             )
+
+        # osp.join(self.winpydir, self.python_name) = Directory of Python exec
+        # self.pythondir =osp.join(self.winpydir, self.python_name) 
         self.python_name = osp.basename(self.python_fname)[
             :-4
         ]
-        self.distname = 'win%s' % self.python_name
-        vlst = (
-            re.match(r'winpython-([0-9\.]*)', self.distname)
-            .groups()[0]
-            .split('.')
-        )
-        self.python_version = '.'.join(vlst[:2])
-        self.python_fullversion = '.'.join(vlst[:3])
+        self.distname = 'winUNKNOWN' #win%s' % self.python_name #  PyPy ?  
+        #vlst = (
+        #    re.match(r'winpython-([0-9\.]*)', self.distname)
+        #    .groups()[0]
+        #    .split('.')
+        #)
+        self.python_version = 'winUNKNOWN' #  '.'.join(vlst[:2])
+        self.python_fullversion = 'winUNKNOWN' # '.'.join(vlst[:3])
 
     @property
     def package_index_wiki(self):
@@ -471,7 +482,7 @@ Name | Version | Description
     @property
     def python_dir(self):
         """Return Python dirname (full path) of the target distribution"""
-        return osp.join(self.winpydir, self.python_name)
+        return osp.join(self.winpydir, self.python_name)  # python.exe path
 
     @property
     def winpy_arch(self):
@@ -561,13 +572,21 @@ Name | Version | Description
                 % pattern
             )
 
-    def create_batch_script(self, name, contents):
+    def create_batch_script(self, name, contents,
+                            do_changes=None):
         """Create batch script %WINPYDIR%/name"""
         scriptdir = osp.join(self.winpydir, 'scripts')
         if not osp.isdir(scriptdir):
             os.mkdir(scriptdir)
+        print ('dochanges for %s %', name, do_changes)
+        # live patch pypy3
+        contents_final = contents
+        if do_changes != None:
+           for i in do_changes:
+               contents_final = contents_final.replace(i[0], i[1])
+        
         fd = open(osp.join(scriptdir, name), 'w')
-        fd.write(contents)
+        fd.write(contents_final)
         fd.close()
 
     def create_launcher(
@@ -985,6 +1004,14 @@ call "%~dp0env_for_icons.bat"
             + convps(self.postpath)
         )
 
+        # PyPy3
+        shorty =self.distribution.short_exe
+        changes=(
+               (r'DIR%\python.exe' , r'DIR%' + "\\" + shorty),  
+               (r'DIR%\PYTHON.EXE' , r'DIR%' + "\\" + shorty),  
+                )
+        if shorty == 'pypy3.exe':
+            changes += ((r'\Lib\idlelib' , r'\lib-python\3\idlelib'),)
         self.create_batch_script(
             'env.bat',
             r"""@echo off
@@ -1003,7 +1030,6 @@ set WINPYDIR=%WINPYDIRBASE%"""
             + r"""
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 set PYTHON=%WINPYDIR%\python.exe
-
 set WINPYVER="""
             + self.winpyver
             + r"""
@@ -1124,6 +1150,7 @@ if not exist "%winpython_ini%" (
 )>> "%winpython_ini%"
 
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1303,6 +1330,7 @@ $host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
 
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1313,6 +1341,7 @@ call "%~dp0env_for_icons.bat"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 exit
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1322,6 +1351,7 @@ rem no safe bet (for comparisons)
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 exit
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1369,6 +1399,7 @@ if not exist "%WINPYDIRBASE%\settings\pydistutils.cfg" goto no_cython
 if not exist "%HOME%\pydistutils.cfg" xcopy   "%WINPYDIRBASE%\settings\pydistutils.cfg" "%HOME%" 
 :no_cython 
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1440,6 +1471,17 @@ end function
     def _create_batch_scripts(self):
         """Create batch scripts"""
         self._print("Creating batch scripts")
+
+        # PyPy3
+        shorty =self.distribution.short_exe
+        changes=(
+               (r'DIR%\python.exe' , r'DIR%' + "\\" + shorty),  
+               (r'DIR%\PYTHON.EXE' , r'DIR%' + "\\" + shorty),  
+                )
+        if shorty == 'pypy3.exe':
+            changes += ((r'\Lib\idlelib' , r'\lib-python\3\idlelib'),)
+
+        
         self.create_batch_script(
             'readme.txt',
             r"""These batch files are required to run WinPython icons.
@@ -1498,6 +1540,7 @@ echo patch pip and current launchers for move
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
 pause
         """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1509,6 +1552,7 @@ echo patch pip and current launchers for non-move
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
 pause
         """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1588,6 +1632,7 @@ rem backward compatibility for  python command-line users
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 "%WINPYDIR%\python.exe"  %*
 """,
+            do_changes=changes,
         )
         
         self.create_batch_script(
@@ -1602,6 +1647,7 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
     "%WINPYDIR%\python.exe"  %*
 )
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1615,6 +1661,7 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 )
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1624,6 +1671,7 @@ call "%~dp0env_for_icons.bat"  %*
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 
 """,
+            do_changes=changes,
         )
         self.create_batch_script(
             'winidlex.bat',
@@ -1638,6 +1686,7 @@ if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 )
 """,
+            do_changes=changes,
         )
         self.create_batch_script(
             'winidle.bat',
@@ -1646,6 +1695,7 @@ call "%~dp0env_for_icons.bat"  %*
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1753,6 +1803,7 @@ if exist "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d
     "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py"
 )
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -1854,6 +1905,7 @@ call "%~dp0env_for_icons.bat" %*
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\python.exe" -m winpython.controlpanel %*
 """,
+            do_changes=changes,
         )
 
         # self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
@@ -1869,6 +1921,7 @@ pause
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 pause
 """,
+            do_changes=changes,
         )
 
         self.create_batch_script(
@@ -2018,7 +2071,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_done()
 
         if remove_existing and not self.simulation:
-            self._extract_python()
+            self._extract_python()  # unzip Python interpreter
         self.distribution = wppm.Distribution(
             self.python_dir,
             verbose=self.verbose,
@@ -2033,6 +2086,11 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 # always create all launchers (as long as it is NSIS-based)
                 self._create_launchers()
             # pre-patch current pip (until default python has pip 8.0.3)
+            
+            # PyPY must ensure pip
+            # "pypy3.exe -m ensurepip"
+            utils.python_execmodule('ensurepip', self.distribution.target)
+            
             self.distribution.patch_standard_packages('pip')
             # not forced update of pip (FIRST) and setuptools here
             for req in ('pip', 'setuptools', 'wheel', 'winpython'):
@@ -2180,7 +2238,8 @@ def make_all(
     ), "The *basedir* directory must be specified"
     assert architecture in (32, 64)
     utils.print_box(
-        "Making WinPython %dbits" % architecture
+        "Making WinPython %dbits at %s" % (architecture, 
+         osp.join(basedir, 'bu' + flavor))
     )
 
     # Create Build director, where Winpython will be constructed
