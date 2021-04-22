@@ -273,6 +273,8 @@ class Distribution(object):
         self.version, self.architecture = utils.get_python_infos(
             target
         )
+        # name of the exe (python.exe or pypy3;exe)
+        self.short_exe = osp.basename(utils.get_python_executable(self.target))
 
     def clean_up(self):
         """Remove directories which couldn't be removed when building"""
@@ -634,6 +636,11 @@ python "%~dpn0"""
         scriptpy = osp.join(
             self.target, 'Scripts'
         )  # std Scripts of python
+
+        # PyPy has no initial Scipts directory
+        if not osp.isdir(scriptpy):
+            os.mkdir(scriptpy)
+
         if not list(names) == names:
             my_list = [
                 f
