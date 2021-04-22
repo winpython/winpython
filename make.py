@@ -2219,6 +2219,7 @@ def make_all(
     source_dirs=None,
     toolsdirs=None,
     docsdirs=None,
+    python_target_release=None, # 37101 for 3.7.10 
 ):
     """Make WinPython distribution, for a given base directory and
     architecture:
@@ -2298,7 +2299,20 @@ def make_all(
     )
     while not my_x.isdigit() and len(my_x) > 0:
         my_x = my_x[:-1]
-    my_winpydir = (
+    
+    # simplify for PyPy
+    if not python_target_release == None :
+        my_winpydir = (
+        'WPy'
+        + ('%s' % architecture)
+        + '-'
+        + python_target_release
+        + ''
+        + ('%s' % build_number)
+    ) + release_level
+    # + flavor
+    else:
+        my_winpydir = (
         'WPy'
         + ('%s' % architecture)
         + '-'

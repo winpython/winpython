@@ -521,18 +521,20 @@ python "%~dpn0"""
         """patch Winpython packages in need"""
         import filecmp
 
+        # Adpating to PyPy
+        if 'pypy3' in osp.basename(utils.get_python_executable(self.target)):
+            site_package_place="\\site-packages\\" 
+        else:
+            site_package_place="\\Lib\\site-packages\\"
+
+
         # 'pywin32' minimal post-install (pywin32_postinstall.py do too much)
         if (
             package_name.lower() == "pywin32"
             or package_name == ''
         ):
-            origin = self.target + (
-                r"\Lib\site-packages\pywin32_system32"
-            )
-            if 'pypy3' in sys.executable:
-                origin = self.target + (
-                r"\site-packages\pywin32_system32"
-                )
+            origin = self.target + site_package_place + "pywin32_system32"
+
             destin = self.target
             if osp.isdir(origin):
                 for name in os.listdir(origin):
@@ -556,10 +558,9 @@ python "%~dpn0"""
             sheb_fix = " executable = get_executable()"
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
             sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
-            if 'pypy3' in sys.executable:
-               the_place=r"\site-packages\pip\_vendor\distlib\scripts.py"
-            else:
-               the_place=r"\Lib\site-packages\pip\_vendor\distlib\scripts.py"
+
+            # Adpating to PyPy
+            the_place=site_package_place + r"pip\_vendor\distlib\scripts.py"
             print(the_place)
             if to_movable:
                 utils.patch_sourcefile(
@@ -591,7 +592,7 @@ python "%~dpn0"""
             # will be in standard pip 8.0.3
             utils.patch_sourcefile(
                 self.target
-                + (r"\Lib\site-packages\pip\wheel.py"),
+                + (site_package_place +r"pip\wheel.py"),
                 " writer.writerow((f, h, l))",
                 " writer.writerow((normpath(f, lib_dir), h, l))",
             )
@@ -606,7 +607,7 @@ python "%~dpn0"""
             utils.patch_sourcefile(
                 self.target
                 + (
-                    r"\Lib\site-packages\spyderlib\config\main.py"
+                    site_package_place+r"spyderlib\config\main.py"
                 ),
                 "'check_updates_on_startup': True,",
                 "'check_updates_on_startup': False,",
@@ -614,7 +615,7 @@ python "%~dpn0"""
             utils.patch_sourcefile(
                 self.target
                 + (
-                    r"\Lib\site-packages\spyder\config\main.py"
+                    site_package_place+r"spyder\config\main.py"
                 ),
                 "'check_updates_on_startup': True,",
                 "'check_updates_on_startup': False,",
