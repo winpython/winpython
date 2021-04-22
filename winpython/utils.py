@@ -28,6 +28,23 @@ import locale
 # Local imports
 from winpython.py3compat import winreg
 
+def get_python_executable(path = None):
+    """return the python executable"""
+    my_path = sys.executable if path == None else path  # default = current one
+    my_path = path if osp.isdir(path) else osp.dirname(path)
+    exec_py = os.path.join(path, 'python.exe')
+    exec_pypy = os.path.join(path, 'pypy3.exe')  # PyPy !
+    python_executable = exec_pypy if osp.isfile(exec_pypy) else exec_py
+    return python_executable
+
+def get_site_packages_path(path = None):
+    """return the python site-packages"""
+    my_path = sys.executable if path == None else path  # default = current one
+    my_path = path if osp.isdir(path) else osp.dirname(path)
+    site_py = os.path.join(path, 'Lib', 'site-packages')
+    site_pypy = os.path.join(path, 'site-packages')  # PyPy !!
+    site_packages_path = site_pypy if osp.isfile(site_pypy) else site_py
+    return site_packages_path
 
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`.
@@ -264,9 +281,9 @@ def print_box(text):
 def is_python_distribution(path):
     """Return True if path is a Python distribution"""
     # XXX: This test could be improved but it seems to be sufficient
-    return osp.isfile(
-        osp.join(path, 'python.exe')
-    ) and osp.isdir(osp.join(path, 'Lib', 'site-packages'))
+    has_exec = osp.isfile(get_python_executable(path))
+    has_site = osp.isdir(get_site_packages_path(path))    
+    return has_exec and has_site
 
 
 # =============================================================================
@@ -349,9 +366,8 @@ def get_pandoc_version(path):
 
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
-    return exec_shell_cmd(
-        'python -c "%s"' % cmd, path
-    ).splitlines()[0]
+    the_exe = get_python_executable(path)
+    return exec_shell_cmd('%s -c "%s"' % (the_exe, cmd), path).splitlines()[0]
 
 
 def get_python_infos(path):
@@ -417,6 +433,11 @@ def patch_shebang_line(
         shebang_line = re.compile(
             b"(#!.*pythonw?\.exe)"
         )  # Python3+
+        if 'pypy3' in sys.executable:
+            shebang_line = re.compile(
+            b"(#!.*pypy3w?\.exe)"
+        )  # Pypy3+
+            
         target_dir = target_dir.encode('utf-8')
     with open(fname, 'rb') as fh:
         initial_content = fh.read()
@@ -461,11 +482,15 @@ def patch_shebang_line_py(
         return
     if to_movable:
         exec_path = '#!.\python.exe'
+        if 'pypy3' in sys.executable:  # PyPy !
+            exec_path = '#!.\pypy3.exe'
     else:
         exec_path = '#!' + sys.executable
     for line in fileinput.input(fname, inplace=True):
         if re.match('^#\!.*python\.exe$', line) is not None:
             print(exec_path)
+        elif re.match('^#\!.*pypy3\.exe$', line) is not None:# PyPy !
+            print(exec_path)          
         else:
             print(line, end='')
 
