@@ -4,9 +4,17 @@ rem  to launch from a winpython package directory, where 'make.py' is
 rem *****************************
 rem 2020-12-05 : add a constrints.txt file from a recent pip list
 rem 2021-03-20 : track successes packages combination are archived for future contraint update
+rem 2021-04-22 : patch PyPy3 (as we don't try to copy PyPy3.exe to Python.exe) 
+rem 2021-04-22b: Patch PyPy3, give '%my_python_target_release%' to make (otherwise known only after unzip)
 rem *****************************
 
 if "%my_constraints%"=="" set my_constraints=C:\WinP\constraints.txt
+
+rem *****************************
+rem  2021-04-22 : path PyPy3 (as we don't try to copy PyPy3.exe to Python.exe) 
+rem *****************************
+rem just replace python.exe (of the target distribution) per %target_python_exe%
+if "%target_python_exe%"=="" set target_python_exe=python.exe
 
 rem *****************************
 rem *****************************
@@ -51,16 +59,16 @@ rem change is we must help by giving my_python_target_release
 rem --------
 
 if %my_python_target%==37 (
-   set my_python_target_release=377
-   set my_release=2
+   set my_python_target_release=3710
+   set my_release=0
 )
 if %my_python_target%==38 (
    set my_python_target_release=389
-   set my_release=0
+   set my_release=1
 )
 if %my_python_target%==39 (
    set my_python_target_release=394
-   set my_release=0
+   set my_release=1
 )
 
 if %my_python_target%==310 (
@@ -175,8 +183,8 @@ rem we use legacy python build cd /D %~dp0
 
 set my_buildenv_path=%path%
 
-echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False')">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
 
 rem old one
 rem echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', requirements=r'%my_requirements%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='%my_create_installer%')">>%my_archive_log%
@@ -251,9 +259,9 @@ echo ----------------------------->>%my_archive_log%
 echo 1.99 archive success
 echo %date% %time%                >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
-echo python -m pip freeze>%my_archive_log%.packages_versions.txt>>%my_archive_log%
+echo %target_python_exe% -m pip freeze>%my_archive_log%.packages_versions.txt>>%my_archive_log%
 
-python -m pip freeze>%my_archive_log%.packages_versions.txt
+%target_python_exe% -m pip freeze>%my_archive_log%.packages_versions.txt
 
 
 echo ----------------------------->>%my_archive_log%
@@ -271,8 +279,8 @@ echo call %my_buildenv%\scripts\env.bat>>%my_archive_log%
 call %my_buildenv%\scripts\env.bat
 set
 
-echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False)">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False)">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False, python_target_release='%my_python_target_release%')">>%my_archive_log%
+python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False, python_target_release='%my_python_target_release%')">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
 echo END OF creation>>%my_archive_log%
