@@ -37,8 +37,8 @@ if __name__ == '__main__':
         + " " * (33 - 5)
         + "| Size"
         + " " * (20 - 6)
-        #+ " | SHA3-256"
-        #+ " " * (64 - 7)
+        + " | SHA3-256"
+        + " " * (64 - 7)
    )
     line = "|".join(
         ["-" * len(i) for i in header.split("|")]
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         f"{give_hash(file, hashlib.sha1)} | " +
         f"{give_hash(file, hashlib.sha256)} | " +
         f"{os.path.basename(file):33} |"+
-		f"{os.path.getsize(file):13,}".replace(",", " ") +  ' Bytes' ) #+ f"{give_hash(file, hashlib.sha3_256)}")
+		f"{os.path.getsize(file):13,}".replace(",", " ") +  ' Bytes'   + f" | {give_hash(file, hashlib.sha3_256)}")
         
          
 

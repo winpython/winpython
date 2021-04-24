@@ -2079,6 +2079,15 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         # PyPy: get Fullversion from the executable
         self.python_fullversion = utils.get_python_long_version(
                 self.distribution.target)
+        
+        # PyPY: Assert that WinPython version and real python version do match
+        self._print(f"Python version{self.python_fullversion.replace('.','')}"+
+                      f"\nDistro Name {self.distribution.target}")
+        assert self.python_fullversion.replace('.','') in \
+            self.distribution.target, \
+            "Distro Directory doesn't match the Python version it ships" + \
+            f"\nPython version: {self.python_fullversion.replace('.','')}"+ \
+            f"\nDistro Name: {self.distribution.target}" 
 
         if remove_existing:
             if not self.simulation:
