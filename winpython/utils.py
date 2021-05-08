@@ -24,6 +24,7 @@ import atexit
 import sys
 import stat
 import locale
+import io
 
 # Local imports
 from winpython.py3compat import winreg
@@ -31,7 +32,7 @@ from winpython.py3compat import winreg
 def get_python_executable(path = None):
     """return the python executable"""
     my_path = sys.executable if path == None else path  # default = current one
-    my_path = path if osp.isdir(path) else osp.dirname(path)
+    my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
     exec_py = os.path.join(path, 'python.exe')
     exec_pypy = os.path.join(path, 'pypy3.exe')  # PyPy !
     python_executable = exec_pypy if osp.isfile(exec_pypy) else exec_py
@@ -40,7 +41,7 @@ def get_python_executable(path = None):
 def get_site_packages_path(path = None):
     """return the python site-packages"""
     my_path = sys.executable if path == None else path  # default = current one
-    my_path = path if osp.isdir(path) else osp.dirname(path)
+    my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
     site_py = os.path.join(path, 'Lib', 'site-packages')
     site_pypy = os.path.join(path, 'site-packages')  # PyPy !!
     site_packages_path = site_pypy if osp.isfile(site_pypy) else site_py
@@ -502,6 +503,25 @@ def patch_shebang_line_py(
 
 
 # =============================================================================
+# Guess encoding (shall rather be utf-8 per default)
+# =============================================================================
+def guess_encoding(csv_file):
+    """guess the encoding of the given file"""
+    # UTF_8_BOM = "\xEF\xBB\xBF"
+    # Python behavior on UTF-16 not great on write, so we drop it
+    with io.open(csv_file, "rb") as f:
+        data = f.read(5)
+    if data.startswith(b"\xEF\xBB\xBF"):  # UTF-8 with a "BOM" (normally no BOM in utf-8)
+        return ["utf-8-sig"]
+    else:  # in Windows, guessing utf-8 doesn't work, so we have to try
+        try:
+            with io.open(csv_file, encoding="utf-8") as f:
+                preview = f.read(222222)
+                return ["utf-8"]
+        except:
+            return [locale.getdefaultlocale()[1], "utf-8"]
+            
+# =============================================================================
 # Patch sourcefile (instead of forking packages)
 # =============================================================================
 def patch_sourcefile(
@@ -511,7 +531,8 @@ def patch_sourcefile(
     import io
 
     if osp.isfile(fname) and not in_text == out_text:
-        with io.open(fname, 'r') as fh:
+        the_encoding = guess_encoding(fname)[0]
+        with io.open(fname, 'r', encoding=the_encoding) as fh:
             content = fh.read()
         new_content = content.replace(in_text, out_text)
         if not new_content == content:
@@ -524,7 +545,7 @@ def patch_sourcefile(
                     "to",
                     out_text,
                 )
-            with io.open(fname, 'wt') as fh:
+            with io.open(fname, 'wt', encoding=the_encoding) as fh:
                 fh.write(new_content)
 
 
@@ -543,7 +564,8 @@ def patch_sourcelines(
     import os.path as osp
 
     if osp.isfile(fname):
-        with io.open(fname, 'r') as fh:
+        the_encoding = guess_encoding(fname)[0]
+        with io.open(fname, 'r', encoding=the_encoding) as fh:
             contents = fh.readlines()
             content = "".join(contents)
             for l in range(len(contents)):
@@ -575,7 +597,7 @@ def patch_sourcelines(
         if not new_content == content:
             # if not silent_mode:
             #    print("patching ", fname, "from", content, "to", new_content)
-            with io.open(fname, 'wt') as fh:
+            with io.open(fname, 'wt', encoding=the_encoding) as fh:
                 try:
                     fh.write(new_content)
                 except:
