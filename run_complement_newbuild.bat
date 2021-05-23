@@ -6,6 +6,7 @@ rem 2020-09-27 Jupyterlab-3 5S (looking for missing detail)
 rem 2020-10-25no_more_needed "nbextension enable" no more needed for bqplot, ipyleaflet, ipympl
 rem 2021-01-30: jupyterlab2 final stuff removal
 rem 2021-03-13: notebook classic stuff removal
+rem 2021-05-23: use "%PYTHON%" for the executable instead of "%WINPYDIR%\python.exe"
 
 
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
@@ -16,11 +17,12 @@ rem           ( drag & drop "requirements.txt" file in the dos window a the end 
 rem then drag & drop "run_complement_newbuild.bat" file in the dos window and launch it
 
 @echo off 
-rem %1 is WINPYDIR being prepared
+rem %1 is WINPYDIRBASE being prepared, (names winpydir of python build batch) (like "...bd37\buPyPy\WPy64-37100b2")
 rem this .bat is placed at root (buildir34, buildir34\FlavorJulia, ...)
 set origin=%~dp0
 set new_winpydir=%1
 
+echo new_winpydir= ********%new_winpydir%***********************************************************
 cd /d %new_winpydir%
 
 call scripts\env.bat
@@ -54,7 +56,7 @@ if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" 
 rem * =================
 echo finish install seaborn iris example
 rem * =================
-if exist  "%WINPYDIR%\Lib\site-packages\seaborn" "%WINPYDIR%\python.exe" -c "import seaborn as sns;sns.set();sns.load_dataset('iris')"
+if exist  "%WINPYDIR%\Lib\site-packages\seaborn" "%PYTHON%" -c "import seaborn as sns;sns.set();sns.load_dataset('iris')"
 
 
 rem  ** Active patchs**
@@ -67,8 +69,8 @@ rem in DOS, the variable must be set befor the parenthesis block....
 set this_source='%WINPYDIR%\Lib\site-packages\jupyter_lsp\virtual_documents_shadow.py'
 if exist  "%WINPYDIR%\Lib\site-packages\jupyter_lsp-1.1.4.dist-info" (
    echo "**%this_source%**"
-   %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
-   %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
+   "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
+   "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
 ) 
 
 
@@ -88,7 +90,7 @@ rem KEEP as example for next time needed
 
 set qt56p=%WINPYDIR%\Lib\site-packages\tornado-6.0.3.dist-info
 if exist  "%qt56p%" (
-  %WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\tornado\platform\asyncio.py', 'import asyncio', 'import asyncio;asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # python-3.8.0' )"
+  "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\tornado\platform\asyncio.py', 'import asyncio', 'import asyncio;asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # python-3.8.0' )"
   rem echo "DID I patch   %qt56p% ??"
 ) else (
   rem echo "I DIDN'T patch of %qt56p% !"
@@ -130,7 +132,7 @@ if  exist "%WINPYDIR%\..\settings\.spyder-py3\temp.py" del  "%WINPYDIR%\..\setti
 rem * ====================
 echo patch spyder update reflex (2019-05-18 : spyder, not spyderlib !)
 rem * ====================
-%WINPYDIR%\python.exe -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyder\config\main.py', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': True', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': False' )"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyder\config\main.py', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': True', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': False' )"
 
 rem * ====================
 echo summary 20202-04-11
