@@ -3,13 +3,15 @@
 #python -m pip freeze>C:\WinP\bd39\constraints_new.txt.txt on previous ok install
 # replace == per >=
 #pip install--pre--no-index--trusted-host=None-cC:\WinP\constraints.txt--find-links=C:\WinP\packages.srcreq httpie
+
+# 2021-04-10 contraining this creates infinute searching flake8>=3.9.0 autopep8>=1.5.6 pyflakes>=2.3.1 pycodestyle>=2.7.0
+
 adodbapi>=2.6.1.3
 affine>=2.3.0
 aiofiles>=0.6.0
 
-
-aiohttp>=3.7.3
 # aiohttp>=3.7.4.post0
+aiohttp>=3.7.3
 
 aiosqlite>=0.17.0
 alabaster>=0.7.12
@@ -26,10 +28,14 @@ aniso8601>=7.0.0
 ansiwrap>=0.8.4
 anyio>=2.2.0
 appdirs>=1.4.4
+
+# python 3.8 vs 3.9
 argon2-cffi>=20.1.0
+
+arrow>=1.0.3
 asciitree>=0.3.3
 asgi-csrf>=0.6.1
-asgiref>=3.3.1
+asgiref>=3.3.4
 
 # asteval>=0.9.23
 asteval>=0.9.22
@@ -38,27 +44,31 @@ asteval>=0.9.22
 astroid>=2.5
 
 astroML>=1.0.1
-astropy>=4.2
+astropy>=4.2.1
 async-generator>=1.10
 async-timeout>=3.0.1
 atomicwrites>=1.4.0
 attrs>=20.3.0
+
+# why autopep8>=1.5.5
 autopep8>=1.5.5
+
 Babel>=2.9.0
 backcall>=0.2.0
 backports-abc>=0.5
 baresql>=0.7.6
 bcrypt>=3.1.7
 beautifulsoup4>=4.9.3
+binaryornot>=0.4.4
 black>=20.8b1
 bleach>=3.3.0
 blinker>=1.4
 blosc>=1.10.2
 bloscpack>=0.16.0
-bokeh>=2.3.0
+bokeh>=2.3.1
 botorch>=0.3.2
-BBottleneck>=1.3.2
-bqplot>=0.12.23
+Bottleneck>=1.3.2
+bqplot>=0.12.25
 branca>=0.4.2
 brewer2mpl>=1.4.1
 Brotli>=1.0.9
@@ -67,7 +77,10 @@ Cartopy>=0.18.0
 certifi>=2020.12.5
 cffi>=1.14.5
 cftime>=1.4.1
+
+# something I forgot
 chardet>=3.0.2
+
 click>=7.1.2
 click-default-group>=1.2.2
 click-plugins>=1.1.1
@@ -80,15 +93,16 @@ clrmagic>=0.0.1a2
 colorama>=0.4.3
 
 colorcet>=2.0.6
+cookiecutter>=1.7.2				   
 coverage>=5.5
 cryptography>=3.4.6
 cvxopt>=1.2.6
-cvxpy>=1.1.11
+cvxpy>=1.1.12
 cx-Freeze>=6.5.3
 cycler>=0.10.0
 Cython>=0.29.22
 cytoolz>=0.11.0
-dask>=2021.3.0
+dask>=2021.4.0
 dask-glm>=0.2.0
 dask-labextension>=5.0.1
 dask-ml>=1.8.0
@@ -104,10 +118,14 @@ Deprecated>=1.2.12
 descartes>=1.1.0
 diff-match-patch>=20200713
 distlib>=0.3.1
-distributed>=2021.3.0
+distributed>=2021.4.0
 docopt>=0.6.2
 docrepr>=0.1.1
+
+# sphinx-3.5.4 doesn't like docutils-0.17
+#docutils>=0.17
 docutils>=0.16
+
 ecos>=2.0.7.post1
 emcee>=3.0.2
 entrypoints>=0.3
@@ -118,18 +136,23 @@ fasteners>=0.16
 fastparquet>=0.5.0
 feather-format>=0.4.1
 filelock>=3.0.12
-Fiona>=1.8.18
+Fiona>=1.8.19
+
+# why flake-3.8.4 before
 flake8>=3.8.4
+
 Flask>=1.1.2
 flask-accepts>=0.17.7
 Flask-Mail>=0.9.1
 flask-restx>=0.2.0
 Flask-Session>=0.3.2
-Flask-SQLAlchemy>=2.4.4
+Flask-SQLAlchemy>=2.5.1
 flaskerize>=0.14.0
+flit>=3.1.0
+flit-core>=3.1.0
 folium>=0.12.1
 formlayout>=2.0.0a0
-fs>=2.4.12
+fs>=2.4.13
 fsspec>=0.8.7
 future>=0.18.2
 fuzzywuzzy>=0.18.0
@@ -139,9 +162,13 @@ geopandas>=0.9.0
 geopy>=2.1.0
 geoviews>=1.9.1
 gmpy2>=2.0.8
-great-expectations>=0.13.12
 gpytorch>=1.2.1
-greenlet>=1.0.0
+great-expectations>=0.13.12
+
+# pypy ship its own
+# greenlet>=1.0.0
+greenlet>=0.4.13
+
 guidata>=1.7.9
 guiqwt>=3.0.6
 h11>=0.12.0
@@ -149,18 +176,18 @@ h2>=4.0.0
 h5py>=2.10.0
 HeapDict>=1.0.1
 helpdev>=0.7.1
-holoviews>=1.14.2
+holoviews>=1.14.3
 hpack>=4.0.0
 html5lib>=1.1
 httpcore>=0.12.3
 httpie>=2.4.0
-httpx>=0.17.0
+httpx>=0.17.1
 hupper>=1.10.2
 husl>=4.0.3
 hvplot>=0.7.1
 Hypercorn>=0.11.2
 hyperframe>=6.0.0
-hypothesis>=6.6.0
+hypothesis>=6.8.3
 ibis-framework>=1.4.0
 idlex>=1.18
 
@@ -171,23 +198,25 @@ imageio>=2.9.0
 imageio-ffmpeg>=0.4.2
 imagesize>=1.2.0
 imbalanced-learn>=0.8.0
-importlib-metadata>=3.7.3
+importlib-metadata>=3.10.0
+inflection>=0.5.1				 
 iniconfig>=1.1.1
 intake>=0.6.1
 intervaltree>=3.0.2
 ipycanvas>=0.8.2
-ipykernel>=5.5.0
+ipykernel>=5.5.3
 ipyleaflet>=0.13.6
-ipympl>=0.6.3
-ipython>=7.21.0
+ipympl>=0.7.0
+ipython>=7.22.0
 ipython-genutils>=0.2.0
 ipython-sql>=0.4.1b1
 ipywidgets>=7.6.3
-isort>=5.7.0
+isort>=5.8.0
 itsdangerous>=1.1.0
 janus>=0.6.1
 jedi>=0.17.2
 Jinja2>=2.11.3
+jinja2-time>=0.2.0
 joblib>=1.0.1
 json5>=0.9.5
 jsonpatch>=1.32
@@ -198,40 +227,43 @@ jsonschema>=3.1.1
 
 julia>=0.5.6
 jupyter>=1.0.0
-jupyter-bokeh>=2.0.4
+jupyter-bokeh>=3.0.0
 jupyter-client>=6.1.12
-jupyter-console>=6.3.0
+jupyter-console>=6.4.0
+
+# test pypy 4.7.11
 jupyter-core>=4.7.1
+
 jupyter-lsp>=1.1.4
 jupyter-packaging>=0.7.12
-jupyter-server>=1.4.1
+jupyter-server>=1.6.0
 jupyter-server-proxy>=3.0.2
 jupyter-sphinx>=0.3.2
-jupyterlab>=3.0.12
+jupyterlab>=3.0.13
 jupyterlab-launcher>=0.13.1
-jupyterlab-lsp>=3.4.1
+jupyterlab-lsp>=3.5.0
 jupyterlab-pygments>=0.1.2
-jupyterlab-server>=2.3.0
+jupyterlab-server>=2.4.0
 jupyterlab-widgets>=1.0.0
-keyring>=23.0.0
+keyring>=23.0.1
 kiwisolver>=1.3.1
-lazy-object-proxy>=1.5.2
+lazy-object-proxy>=1.6.0
 llvmlite>=0.36.0
 lmfit>=1.0.2
 locket>=0.2.1
 loky>=2.9.0
-lxml>=4.6.2
+lxml>=4.6.3
 lz4>=3.1.3
 Markdown>=3.3.4
 MarkupSafe>=1.1.1
 marshmallow>=3.10.0
-matplotlib>=3.3.4
+matplotlib>=3.4.1
 mccabe>=0.6.1
 mercantile>=1.1.6
 mergedeep>=1.3.4
 metakernel>=0.27.5
 mistune>=0.8.4
-mizani>=0.7.2
+mizani>=0.7.3
 mkl-service>=2.3.0
 mlxtend>=0.18.0
 monotonic>=1.5
@@ -248,47 +280,47 @@ munch>=2.5.0
 mypy>=0.812
 mypy-extensions>=0.4.3
 mysql-connector-python>=8.0.21
-nbclassic>=0.2.6
+nbclassic>=0.2.7
 nbclient>=0.5.3
 
 # dagit constraint *****************
 nbconvert>=5.6.1
 
 nbconvert-reportlab>=0.2
-nbformat>=5.1.2
+nbformat>=5.1.3
 nbval>=0.9.6
 nest-asyncio>=1.5.1
 netCDF4>=1.5.6
-networkx>=2.5
+networkx>=2.5.1
 NLopt>=2.7.0
-nltk>=3.5
-notebook>=6.2.0
-numba>=0.53.0
+nltk>=3.6.1
+notebook>=6.3.0
+numba>=0.53.1
 numcodecs>=0.7.3
 numdifftools>=0.9.39
 numexpr>=2.7.3
-numpy>=1.20.1+mkl
+numpy>=1.20.2+mkl
 numpydoc>=1.1.0
 oct2py>=5.2.0
 octave-kernel>=0.32.0
 onnxruntime>=1.7.0
 openpyxl>=3.0.7
 orjson>=3.4.6
-osqp>=0.6.1
+osqp>=0.6.2.post0
 outcome>=1.1.0
 packaging>=20.9
 palettable>=3.3.0
 pandas>=1.2.3
 pandas-datareader>=0.9.0
 pandocfilters>=1.4.3
-panel>=0.11.1
+panel>=0.11.2
 papermill>=2.3.3
 param>=1.10.1
 parambokeh>=0.2.3
 paramiko>=2.7.2
 paramnb>=2.0.4
 parso>=0.7.0
-partd>=1.1.0
+partd>=1.2.0
 pathspec>=0.8.0
 pathtools>=0.1.2
 patsy>=0.5.1
@@ -299,8 +331,8 @@ pep8>=1.7.1
 pexpect>=4.8.0
 pg8000>=1.16.5
 pickleshare>=0.7.5
-Pillow>=8.1.2
-Pint>=0.16.1
+Pillow>=8.2.0
+Pint>=0.17
 
 #not pip
 #pip>=21.0.1
@@ -308,7 +340,7 @@ Pint>=0.16.1
 pipdeptree>=2.0.0
 pkginfo>=1.7.0
 plotly>=4.14.3
-plotnine>=0.7.1
+plotnine>=0.8.0
 pluggy>=0.13.1
 ply>=3.11
 portpicker>=1.3.1
@@ -317,13 +349,16 @@ prettytable>=2.1.0
 priority>=1.3.0
 proglog>=0.1.9
 prometheus-client>=0.9.0
-prompt-toolkit>=3.0.17
+prompt-toolkit>=3.0.18
 
 # dbt *********************************
 protobuf>=3.15.0
 
 psutil>=5.8.0
+
+#pypy need 3.0.16 ptpython>=3.0.17
 ptpython>=3.0.16
+
 ptvsd>=4.3.2
 ptyprocess>=0.7.0
 PuLP>=2.3
@@ -333,16 +368,22 @@ pyarrow>=3.0.0
 PyAudio>=0.2.11
 pybars3>=0.9.7
 pybind11>=2.6.2
+
+# why pycodestyle>=2.6.0
 pycodestyle>=2.6.0
+
 pycosat>=0.6.3
 pycparser>=2.20
 pyct>=0.4.8
 pydantic>=1.8.1
 pydeck>=0.6.1
-pydocstyle>=5.1.1
+pydocstyle>=6.0.0
 pyepsg>=0.4.0
 pyerfa>=1.7.2
+
+# why pyflakes>=2.2.0
 pyflakes>=2.2.0
+
 pyflux>=0.4.17
 pygame>=2.0.1
 pygbm>=0.1.0
@@ -350,7 +391,7 @@ Pygments>=2.8.1
 pyhdf>=0.10.2
 pyinstaller>=4.2
 pyinstaller-hooks-contrib>=2021.1
-pylint>=2.7.2
+pylint>=2.7.4
 pyls-black>=0.4.6
 pyls-spyder>=0.3.2
 pymc>=2.3.8
@@ -367,9 +408,12 @@ pyparsing>=2.4.7
 #pyproj>=3.0.0.post1
 pyproj>=2.6.0
 
-PyQt5>=5.15.1
-PyQt5-sip>=12.8.1
-pyqt5-tools>=5.15.1.1.7.5
+# 2021-04-14: experiment
+# PyQt5-sip>=12.8.1;python_version>='3.9'
+PyQt5>=5.12.0
+# PyQt5>=5.15.1;python_version>='3.9'
+pyqt5-tools>=5.12.0
+#pyqt5-tools>=5.15.1.1.7.5;python_version>='3.9'
 pyqtgraph>=0.11.1
 PyQtWebEngine>=5.15.1
 pyrsistent>=0.17.3
@@ -377,7 +421,7 @@ pyserial>=3.5
 pyshp>=2.1.3
 PySocks>=1.7.1
 pystache>=0.5.4
-pytest>=6.2.2
+pytest>=6.2.3
 python-baseconv>=1.2.2
 python-dateutil>=2.8.1
 python-dotenv>=0.15.0
@@ -385,9 +429,10 @@ python-hdf4>=0.10.0+dummy
 python-jsonrpc-server>=0.4.0
 python-language-server>=0.36.2
 python-Levenshtein>=0.12.2
+python-slugify>=4.0.1					 
 python-snappy>=0.6.0
 pythonnet>=2.5.2
-PythonQwt>=0.8.3
+PythonQwt>=0.9.0
 pytz>=2021.1
 pyviz-comms>=2.0.1
 PyWavelets>=1.1.1
@@ -398,17 +443,21 @@ pywinusb>=0.4.2
 PyYAML>=5.4.1
 pyzmq>=22.0.3
 pyzo>=4.11.2
-QDarkStyle>=2.8.1
+QDarkStyle>=3.0.2
+qdldl>=0.1.5.post0
+qpsolvers>=1.6.1
+qstylizer>=0.1.10				  
 QtAwesome>=1.0.2
 qtconsole>=5.0.3
 QtPy>=1.10.0.dev0
+quadprog>=0.1.8			   
 quantecon>=0.4.8
 Quart>=0.14.1
-rasterio>=1.2.1
+rasterio>=1.2.3
 readme-renderer>=29.0
 redis>=3.5.3
-regex>=2021.3.17
-reportlab>=3.5.65
+regex>=2021.4.4
+reportlab>=3.5.66
 
 
 # dbt ***************************************************
@@ -421,7 +470,7 @@ rise>=5.7.1
 rope>=0.18.0
 rpy2>=3.4.0.dev0
 Rtree>=0.9.7
-ruamel.yaml>=0.16.12
+ruamel.yaml>=0.17.4
 #ruamel.yaml.clib>=0.2.2
 
 # dagster
@@ -434,7 +483,7 @@ scikit-image>=0.18.1
 scikit-learn>=0.24.1
 scikit-optimize>=0.8.1
 scilab2py>=0.6.2
-scipy>=1.6.1
+scipy>=1.6.2
 scramp>=1.2.0
 scs>=2.1.2
 seaborn>=0.11.1
@@ -458,8 +507,8 @@ snowballstemmer>=2.1.0
 snuggs>=1.4.7
 sortedcontainers>=2.3.0
 sounddevice>=0.4.1
-soupsieve>=2.2
-Sphinx>=3.5.2
+soupsieve>=2.2.1
+Sphinx>=3.5.3
 sphinx-rtd-theme>=0.5.1
 sphinxcontrib-applehelp>=1.0.2
 sphinxcontrib-devhelp>=1.0.2
@@ -467,9 +516,9 @@ sphinxcontrib-htmlhelp>=1.0.3
 sphinxcontrib-jsmath>=1.0.1
 sphinxcontrib-qthelp>=1.0.3
 sphinxcontrib-serializinghtml>=1.1.4
-spyder>=4.2.4
-spyder-kernels>=1.10.2
-SQLAlchemy>=1.4.1
+spyder>=5.0.0
+spyder-kernels>=2.0.1
+SQLAlchemy>=1.4.7
 sqlite-bro>=0.9.1
 
 # dbt **********************************
@@ -480,23 +529,26 @@ starlette>=0.13.6
 statsmodels>=0.12.2
 streamz>=0.6.2
 supersmoother>=0.4
-sympy>=1.7.1
+sympy>=1.8
 tables>=3.6.1
 tblib>=1.7.0
 tenacity>=7.0.0
 termcolor>=1.1.0
 terminado>=0.9.3
 testpath>=0.4.4
+text-unidecode>=1.3
 textdistance>=4.2.1
 textwrap3>=0.9.2
 threadpoolctl>=2.1.0
 three-merge>=0.1.1
 thrift>=0.13.0
-tifffile>=2021.3.5
+tifffile>=2021.4.8
+tinycss>=0.4
 toml>=0.10.2
 toolz>=0.11.1
 
-torch>=1.7.1+cpu
+torch>=1.8.1+cpu
+torchaudio>=0.8.1
 torchvision>=0.8.2+cpu
 
 tornado>=6.1
@@ -506,7 +558,7 @@ traittypes>=0.2.1
 tranquilizer>=0.5.0+1.gff8dd5f
 trio>=0.18.0
 trio-asyncio>=0.12.0
-twine>=3.3.0
+twine>=3.4.1
 twitter>=1.18.0
 typed-ast>=1.4.2
 typing-extensions>=3.7.4.3
@@ -528,7 +580,7 @@ urllib3>=1.25.11
 uvicorn>=0.13.4
 vega>=3.4.0
 vega-datasets>=0.9.0
-virtualenv>=20.4.2
+virtualenv>=20.4.3
 ViTables>=3.0.2
 voila>=0.2.7
 wasmer>=1.0.0
@@ -556,11 +608,11 @@ wrapt>=1.12.1
 wsproto>=1.0.0
 xarray>=0.17.0
 		   
-XlsxWriter>=1.3.7
+XlsxWriter>=1.3.8
 xlwings>=0.22.2
 yapf>=0.31.0
 yarl>=1.6.3
-zarr>=2.6.1
+zarr>=2.7.0
 zict>=2.0.0
 zipp>=3.4.1
 zstandard>=0.15.2
