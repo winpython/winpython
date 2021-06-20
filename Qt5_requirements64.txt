@@ -204,8 +204,8 @@ husl
 nbconvert_reportlab
 
 snakeviz
-# not enough room nbdime
-
+nbdime
+jupyterlab-git
 
 python-Levenshtein
 fuzzywuzzy
@@ -280,6 +280,10 @@ torchaudio
 botorch
 
 terminado
+
+# pywinpty added due link removed from terminado for PyPy3
+pywinpty
+
 Send2Trash
 
 pdvega
@@ -442,6 +446,8 @@ wasmer_compiler_cranelift
 wasmer_compiler_singlepass
 
 voila
+voila_gridstack
+
 fastapi
 
 coverage
@@ -454,3 +460,18 @@ jupyterlab_lsp
 jupyter_lsp
 pynndescent
 great_expectations
+
+flit
+qpsolvers
+
+csvs_to_sqlite
+datasette_graphql
+sqlite_utils
+
+maturin
+python_picard
+dask_image
+
+#orjson for ipycanvas speed-up
+orjson
+
