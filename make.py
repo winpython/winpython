@@ -1375,7 +1375,7 @@ if not "%~1"=="" (
    )
 ) else (
 rem if it it launched from another directory , we keep it that one echo %CD%
-if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1=%CD%
+if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1="%CD%"
 )
 
 rem remove some potential last \
