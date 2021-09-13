@@ -35,7 +35,9 @@ def get_python_executable(path = None):
     my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
     exec_py = os.path.join(path, 'python.exe')
     exec_pypy = os.path.join(path, 'pypy3.exe')  # PyPy !
-    python_executable = exec_pypy if osp.isfile(exec_pypy) else exec_py
+    # PyPy >=7.3.6 3.8 aligns to python.exe and Lib\site-packages
+    #python_executable = exec_pypy if osp.isfile(exec_pypy) else exec_py
+    python_executable = exec_py if osp.isfile(exec_py) else exec_pypy
     return python_executable
 
 def get_site_packages_path(path = None):
@@ -368,6 +370,8 @@ def get_pandoc_version(path):
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
     the_exe = get_python_executable(path)
+    # debug2021-09-12
+    print('%s -c "%s"' % (the_exe, cmd), ' * ',  path)
     return exec_shell_cmd('%s -c "%s"' % (the_exe, cmd), path).splitlines()[0]
 
 def python_execmodule(cmd, path):
