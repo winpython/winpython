@@ -33,8 +33,8 @@ def get_python_executable(path = None):
     """return the python executable"""
     my_path = sys.executable if path == None else path  # default = current one
     my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
-    exec_py = os.path.join(path, 'python.exe')
-    exec_pypy = os.path.join(path, 'pypy3.exe')  # PyPy !
+    exec_py = os.path.join(my_path, 'python.exe')
+    exec_pypy = os.path.join(my_path, 'pypy3.exe')  # PyPy !
     # PyPy >=7.3.6 3.8 aligns to python.exe and Lib\site-packages
     #python_executable = exec_pypy if osp.isfile(exec_pypy) else exec_py
     python_executable = exec_py if osp.isfile(exec_py) else exec_pypy
@@ -44,8 +44,8 @@ def get_site_packages_path(path = None):
     """return the python site-packages"""
     my_path = sys.executable if path == None else path  # default = current one
     my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
-    site_py = os.path.join(path, 'Lib', 'site-packages')
-    site_pypy = os.path.join(path, 'site-packages')  # PyPy !!
+    site_py = os.path.join(my_path, 'Lib', 'site-packages')
+    site_pypy = os.path.join(my_path, 'site-packages')  # PyPy !!
     site_packages_path = site_pypy if osp.isfile(site_pypy) else site_py
     return site_packages_path
 

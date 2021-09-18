@@ -1009,7 +1009,8 @@ call "%~dp0env_for_icons.bat"
                (r'DIR%\python.exe' , r'DIR%' + "\\" + shorty),  
                (r'DIR%\PYTHON.EXE' , r'DIR%' + "\\" + shorty),  
                 )
-        if shorty == 'pypy3.exe':
+        if osp.isdir(osp.join(self.distribution.target,
+                               r'lib-python\3\idlelib')):
             changes += ((r'\Lib\idlelib' , r'\lib-python\3\idlelib'),)
         self.create_batch_script(
             'env.bat',
@@ -1477,7 +1478,8 @@ end function
                (r'DIR%\python.exe' , r'DIR%' + "\\" + shorty),  
                (r'DIR%\PYTHON.EXE' , r'DIR%' + "\\" + shorty),  
                 )
-        if shorty == 'pypy3.exe':
+        if osp.isdir(osp.join(self.distribution.target,
+                               r'lib-python\3\idlelib')):
             changes += ((r'\Lib\idlelib' , r'\lib-python\3\idlelib'),)
 
         
