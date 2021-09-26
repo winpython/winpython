@@ -380,7 +380,7 @@ python "%~dpn0"""
                 cmdx = [
                     utils.get_python_executable(self.target), # PyPy !
                     '-c',
-                    "import pip;from pip._internal.utils.misc import  get_installed_distributions as pip_get_installed_distributions ;print('+!+'.join(['%s@+@%s@+@' % (i.key,i.version)  for i in pip_get_installed_distributions()]))",
+                    "import pkg_resources, importlib;importlib.reload(pkg_resources);print('+!+'.join(['%s@+@%s@+@' % (i.key, i.version) for i in pkg_resources.working_set]))",
                 ]
                 p = subprocess.Popen(
                     cmdx,
