@@ -1824,11 +1824,13 @@ if "%QT_API%"=="pyqt5" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
-    ) else (
+    ) else if exist "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" (
         "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PySide6\designer.exe" %*
     )
 ) else (
-    "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
+    "%WINPYDIR%\Lib\site-packages\PySide6\designer.exe" %*
 )
 """,
         )
@@ -1850,11 +1852,13 @@ if "%QT_API%"=="pyqt5" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
-    ) else (
+    ) else if exist "%WINPYDIR%\Lib\site-packages\PySide2\assistant.exe" (
         "%WINPYDIR%\Lib\site-packages\PySide2\assistant.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PySide6\assistant.exe" %*
     )
 ) else (
-    "%WINPYDIR%\Lib\site-packages\PySide2\assistant.exe" %*
+    "%WINPYDIR%\Lib\site-packages\PySide6\assistant.exe" %*
 )
 """,
         )
@@ -1876,12 +1880,17 @@ if "%QT_API%"=="pyqt5" (
         "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" %*
     ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" (
         "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
-    ) else (
+    ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" (
         cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
         "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
+        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
+    ) else if exist "%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" (
+        "%%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" %*
+    ) else (
+        "%WINPYDIR%\Lib\site-packages\PySide6\linguist.exe" %*
     )
 ) else (
-    "%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" %*
+    "%WINPYDIR%\Lib\site-packages\PySide6\linguist.exe" %*
 )
 
 """,
