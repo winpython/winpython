@@ -1020,7 +1020,7 @@ set WINPYDIRBASE=%~dp0..
 rem get a normalize path
 set WINPYDIRBASETMP=%~dp0..
 pushd %WINPYDIRBASETMP%
-set WINPYDIRBASE=%CD%
+set WINPYDIRBASE=%__CD__%
 set WINPYDIRBASETMP=
 popd
 
@@ -1375,8 +1375,8 @@ if not "%~1"=="" (
 	  )
    )
 ) else (
-rem if it it launched from another directory , we keep it that one echo %CD%
-if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1="%CD%"
+rem if it it launched from another directory , we keep it that one echo %__CD__%
+if not "%__CD__%\"=="%~dp0" set  WINPYWORKDIR1="__%CD%__"
 )
 
 rem remove some potential last \
