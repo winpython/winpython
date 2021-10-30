@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright © 2019- The Spyder Development Team
 #
@@ -8,15 +7,27 @@
 """Provides QtChart classes and functions."""
 
 # Local imports
-from . import PYQT5, PYSIDE2, PythonQtError
+from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, PythonQtError
 
 if PYQT5:
     try:
-        from PyQt5 import QtChart as QtCharts
+        from PyQt5.QtChart import *
     except ImportError:
         raise PythonQtError('The QtChart module was not found. '
                             'It needs to be installed separately for PyQt5.')
+elif PYQT6:
+    try:
+        from PyQt6.QtCharts import *
+    except ImportError:
+        raise PythonQtError('The QtCharts module was not found. '
+                            'It needs to be installed separately for PyQt6.')
+elif PYSIDE6:
+    from PySide6.QtCharts import *
 elif PYSIDE2:
-    from PySide2.QtCharts import *
+    # https://bugreports.qt.io/projects/PYSIDE/issues/PYSIDE-1026
+    import PySide2.QtCharts as __temp
+    import inspect
+    for __name in inspect.getmembers(__temp.QtCharts):
+        globals()[__name[0]] = __name[1]
 else:
     raise PythonQtError('No Qt bindings could be found')

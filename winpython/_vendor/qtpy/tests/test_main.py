@@ -7,17 +7,6 @@ try:
 except Exception:
     pass
 
-
-def assert_pyside():
-    """
-    Make sure that we are using PySide
-    """
-    import PySide
-    assert QtCore.QEvent is PySide.QtCore.QEvent
-    assert QtGui.QPainter is PySide.QtGui.QPainter
-    assert QtWidgets.QWidget is PySide.QtGui.QWidget
-    assert QtWebEngineWidgets.QWebEnginePage is PySide.QtWebKit.QWebPage
-
 def assert_pyside2():
     """
     Make sure that we are using PySide
@@ -36,18 +25,8 @@ def assert_pyside6():
     assert QtCore.QEvent is PySide6.QtCore.QEvent
     assert QtGui.QPainter is PySide6.QtGui.QPainter
     assert QtWidgets.QWidget is PySide6.QtWidgets.QWidget
-    #assert QtWebEngineWidgets.QWebEnginePage is PySide6.QtWebEngineWidgets.QWebEnginePage
-
-def assert_pyqt4():
-    """
-    Make sure that we are using PyQt4
-    """
-    import PyQt4
-    assert QtCore.QEvent is PyQt4.QtCore.QEvent
-    assert QtGui.QPainter is PyQt4.QtGui.QPainter
-    assert QtWidgets.QWidget is PyQt4.QtGui.QWidget
-    assert QtWebEngineWidgets.QWebEnginePage is PyQt4.QtWebKit.QWebPage
-
+    # Only valid for qt>=6.2
+    # assert QtWebEngineWidgets.QWebEnginePage is PySide6.QtWebEngineCore.QWebEnginePage
 
 def assert_pyqt5():
     """
@@ -62,6 +41,15 @@ def assert_pyqt5():
     else:
         assert QtWebEngineWidgets.QWebEnginePage is PyQt5.QtWebKitWidgets.QWebPage
 
+def assert_pyqt6():
+    """
+    Make sure that we are using PyQt6
+    """
+    import PyQt6
+    assert QtCore.QEvent is PyQt6.QtCore.QEvent
+    assert QtGui.QPainter is PyQt6.QtGui.QPainter
+    assert QtWidgets.QWidget is PyQt6.QtWidgets.QWidget
+
 
 def test_qt_api():
     """
@@ -70,12 +58,10 @@ def test_qt_api():
 
     QT_API = os.environ.get('QT_API', '').lower()
 
-    if QT_API == 'pyside':
-        assert_pyside()
-    elif QT_API in ('pyqt', 'pyqt4'):
-        assert_pyqt4()
-    elif QT_API == 'pyqt5':
+    if QT_API == 'pyqt5':
         assert_pyqt5()
+    elif QT_API == 'pyqt6':
+        assert_pyqt6()
     elif QT_API == 'pyside2':
         assert_pyside2()
     elif QT_API == 'pyside6':
@@ -84,16 +70,16 @@ def test_qt_api():
         # If the tests are run locally, USE_QT_API and QT_API may not be
         # defined, but we still want to make sure qtpy is behaving sensibly.
         # We should then be loading, in order of decreasing preference, PyQt5,
-        # PyQt4, and PySide.
+        # PyQt6, and PySide2.
         try:
             import PyQt5
         except ImportError:
             try:
-                import PyQt4
+                import PyQt6
             except ImportError:
-                import PySide
-                assert_pyside()
+                import PySide2
+                assert_pyside2()
             else:
-                assert_pyqt4()
+                assert_pyqt6()
         else:
             assert_pyqt5()

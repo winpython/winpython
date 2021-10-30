@@ -1,11 +1,9 @@
-from __future__ import absolute_import
-
 import pytest
-from qtpy import PYSIDE6
+from qtpy import PYSIDE6, PYQT6
 
-@pytest.mark.skipif(PYSIDE6, reason="Only available in Qt<6 bindings")
+@pytest.mark.skipif(PYSIDE6 or PYQT6, reason="Only available in Qt<6,>=6.2 bindings")
 def test_qtwebenginewidgets():
-    """Test the qtpy.QtWebSockets namespace"""
+    """Test the qtpy.QtWebEngineWidget namespace"""
 
     QtWebEngineWidgets = pytest.importorskip("qtpy.QtWebEngineWidgets")
 

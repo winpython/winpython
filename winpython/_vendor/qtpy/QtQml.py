@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright © 2009- The Spyder Development Team
 #
@@ -8,10 +7,12 @@
 """Provides QtQml classes and functions."""
 
 # Local imports
-from . import PYQT5, PYSIDE2, PYSIDE6, PythonQtError
+from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, PythonQtError
 
 if PYQT5:
     from PyQt5.QtQml import *
+elif PYQT6:
+    from PyQt6.QtQml import *
 elif PYSIDE6:
     from PySide6.QtQml import *
 elif PYSIDE2:

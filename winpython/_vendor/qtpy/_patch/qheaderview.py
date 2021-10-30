@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright © The Spyder Development Team
 #
