@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-
 import pytest
-from qtpy import PYSIDE2, PYSIDE6, PYSIDE
+from qtpy import PYSIDE2, PYSIDE6, PYQT6
 
-@pytest.mark.skipif(PYSIDE6, reason="not available with qt 6.0")
+@pytest.mark.skipif((PYSIDE6 or PYQT6), reason="not available with qt 6.0")
 def test_qtxmlpatterns():
     """Test the qtpy.QtXmlPatterns namespace"""
     from qtpy import QtXmlPatterns
@@ -11,7 +9,7 @@ def test_qtxmlpatterns():
     assert QtXmlPatterns.QAbstractUriResolver is not None
     assert QtXmlPatterns.QAbstractXmlNodeModel is not None
     assert QtXmlPatterns.QAbstractXmlReceiver is not None
-    if not PYSIDE2 and not PYSIDE:
+    if not PYSIDE2:
         assert QtXmlPatterns.QSimpleXmlNodeModel is not None
     assert QtXmlPatterns.QSourceLocation is not None
     assert QtXmlPatterns.QXmlFormatter is not None

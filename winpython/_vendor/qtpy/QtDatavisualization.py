@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright © 2009- The Spyder Development Team
 #
@@ -8,10 +7,14 @@
 """Provides QtDataVisualization classes and functions."""
 
 # Local imports
-from . import PYQT5, PYSIDE2, PythonQtError
+from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, PythonQtError
 
-if PYQT5:
+if PYQT6:
+    from PyQt6.QtDataVisualization import *
+elif PYQT5:
     from PyQt5.QtDataVisualization import *
+elif PYSIDE6:
+    from PySide6.QtDataVisualization import *
 elif PYSIDE2:
     # https://bugreports.qt.io/projects/PYSIDE/issues/PYSIDE-1026
     import PySide2.QtDataVisualization as __temp

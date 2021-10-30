@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-
 import pytest
-from qtpy import PYQT5, PYSIDE2
+from qtpy import PYQT6
 
-@pytest.mark.skipif(not (PYQT5 or PYSIDE2), reason="Only available in Qt5 bindings")
+@pytest.mark.skipif(PYQT6, reason="Not complete in PyQt6")
 def test_qt3dcore():
     """Test the qtpy.Qt3DCore namespace"""
     Qt3DCore = pytest.importorskip("qtpy.Qt3DCore")

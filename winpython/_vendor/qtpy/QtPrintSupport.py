@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright © 2009- The Spyder Development Team
 #
@@ -9,22 +8,19 @@
 Provides QtPrintSupport classes and functions.
 """
 
-from . import PYQT5, PYQT4, PYSIDE6, PYSIDE2, PYSIDE, PythonQtError
+from . import PYQT5, PYQT6, PYSIDE6, PYSIDE2, PythonQtError
 
 
 if PYQT5:
     from PyQt5.QtPrintSupport import *
+elif PYQT6:
+    from PyQt6.QtPrintSupport import *
+    QPageSetupDialog.exec_ = QPageSetupDialog.exec
+    QPrintDialog.exec_ = QPrintDialog.exec
+    QPrintPreviewWidget.print_ = QPrintPreviewWidget.print
 elif PYSIDE6:
     from PySide6.QtPrintSupport import *
 elif PYSIDE2:
     from PySide2.QtPrintSupport import *
-elif PYQT4:
-    from PyQt4.QtGui import (QAbstractPrintDialog, QPageSetupDialog,
-                             QPrintDialog, QPrintEngine, QPrintPreviewDialog,
-                             QPrintPreviewWidget, QPrinter, QPrinterInfo)
-elif PYSIDE:
-    from PySide.QtGui import (QAbstractPrintDialog, QPageSetupDialog,
-                              QPrintDialog, QPrintEngine, QPrintPreviewDialog,
-                              QPrintPreviewWidget, QPrinter, QPrinterInfo)
 else:
     raise PythonQtError('No Qt bindings could be found')

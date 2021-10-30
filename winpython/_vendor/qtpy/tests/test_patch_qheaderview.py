@@ -1,16 +1,12 @@
-from __future__ import absolute_import
-
 import sys
 
 import pytest
-from qtpy import PYSIDE, PYSIDE2, PYQT4
+
+from qtpy import PYQT6, PYSIDE2, PYSIDE6, QT_VERSION
 from qtpy.QtWidgets import QApplication
 from qtpy.QtWidgets import QHeaderView
 from qtpy.QtCore import Qt
 from qtpy.QtCore import QAbstractListModel
-
-
-PY3 = sys.version[0] == "3"
 
 
 def get_qapp(icon_path=None):
@@ -20,7 +16,12 @@ def get_qapp(icon_path=None):
     return qapp
 
 
-@pytest.mark.skipif(PY3 or PYSIDE2, reason="It fails on Python 3 and PySide2")
+@pytest.mark.skipif(
+    QT_VERSION.startswith('5.15') or PYSIDE6 or PYQT6 or
+    ((PYSIDE2) and sys.version_info.major == 3 and sys.version_info.minor >= 8
+     and (sys.platform == 'darwin' or sys.platform.startswith('linux'))
+    ),
+    reason="Segfaults with Qt 5.15; and PySide2/Python 3.8+ on Mac and Linux")
 def test_patched_qheaderview():
     """
     This will test whether QHeaderView has the new methods introduced in Qt5.
@@ -37,6 +38,7 @@ def test_patched_qheaderview():
     # setup a model and add it to a headerview
     qapp = get_qapp()
     headerview = QHeaderView(Qt.Horizontal)
+    # Fails here on PySide 2 and Python 3.8 due a bug: https://bugreports.qt.io/browse/PYSIDE-1140
     class Model(QAbstractListModel):
         pass
     model = Model()
@@ -46,7 +48,7 @@ def test_patched_qheaderview():
     # test it
     assert isinstance(headerview.sectionsClickable(), bool)
     assert isinstance(headerview.sectionsMovable(), bool)
-    if PYSIDE:
+    if PYSIDE2:
         assert isinstance(headerview.sectionResizeMode(0),
                           QHeaderView.ResizeMode)
     else:
@@ -79,20 +81,5 @@ def test_patched_qheaderview():
     assert headerview.sectionResizeMode(0) == QHeaderView.Stretch
     headerview.setSectionResizeMode(0, QHeaderView.ResizeToContents)
     assert headerview.sectionResizeMode(0) == QHeaderView.ResizeToContents
-
-    # test that the old methods in Qt4 raise exceptions
-    if PYQT4 or PYSIDE:
-        with pytest.warns(UserWarning):
-            headerview.isClickable()
-        with pytest.warns(UserWarning):
-            headerview.isMovable()
-        with pytest.warns(UserWarning):
-            headerview.resizeMode(0)
-        with pytest.warns(UserWarning):
-            headerview.setClickable(True)
-        with pytest.warns(UserWarning):
-            headerview.setMovable(True)
-        with pytest.warns(UserWarning):
-            headerview.setResizeMode(0, QHeaderView.Interactive)
 
 

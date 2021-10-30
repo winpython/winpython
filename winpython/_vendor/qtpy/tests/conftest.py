@@ -2,9 +2,7 @@ import os
 
 
 def pytest_configure(config):
-    """
-    This function gets run by py.test at the very start
-    """
+    """Configure the test environment."""
 
     if 'USE_QT_API' in os.environ:
         os.environ['QT_API'] = os.environ['USE_QT_API'].lower()
@@ -15,17 +13,14 @@ def pytest_configure(config):
 
 
 def pytest_report_header(config):
-    """
-    This function is used by py.test to insert a customized header into the
-    test report.
-    """
+    """Insert a customized header into the test report."""
 
     versions = os.linesep
-    versions += 'PyQt4: '
+    versions += 'PyQt6: '
 
     try:
-        from PyQt4 import Qt
-        versions += "PyQt: {0} - Qt: {1}".format(Qt.PYQT_VERSION_STR, Qt.QT_VERSION_STR)
+        from PyQt6 import Qt
+        versions += f"PyQt: {Qt.PYQT_VERSION_STR} - Qt: {Qt.QT_VERSION_STR}"
     except ImportError:
         versions += 'not installed'
     except AttributeError:
@@ -36,19 +31,7 @@ def pytest_report_header(config):
 
     try:
         from PyQt5 import Qt
-        versions += "PyQt: {0} - Qt: {1}".format(Qt.PYQT_VERSION_STR, Qt.QT_VERSION_STR)
-    except ImportError:
-        versions += 'not installed'
-    except AttributeError:
-        versions += 'unknown version'
-
-    versions += os.linesep
-    versions += 'PySide: '
-
-    try:
-        import PySide
-        from PySide import QtCore
-        versions += "PySide: {0} - Qt: {1}".format(PySide.__version__, QtCore.__version__)
+        versions += f"PyQt: {Qt.PYQT_VERSION_STR} - Qt: {Qt.QT_VERSION_STR}"
     except ImportError:
         versions += 'not installed'
     except AttributeError:
@@ -60,12 +43,24 @@ def pytest_report_header(config):
     try:
         import PySide2
         from PySide2 import QtCore
-        versions += "PySide: {0} - Qt: {1}".format(PySide2.__version__, QtCore.__version__)
+        versions += f"PySide: {PySide2.__version__} - Qt: {QtCore.__version__}"
     except ImportError:
         versions += 'not installed'
     except AttributeError:
         versions += 'unknown version'
 
     versions += os.linesep
-    
+    versions += 'PySide6: '
+
+    try:
+        import PySide6
+        from PySide6 import QtCore
+        versions += f"PySide: {PySide6.__version__} - Qt: {QtCore.__version__}"
+    except ImportError:
+        versions += 'not installed'
+    except AttributeError:
+        versions += 'unknown version'
+
+    versions += os.linesep
+
     return versions

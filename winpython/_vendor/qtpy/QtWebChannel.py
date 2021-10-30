@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright © 2009- The Spyder Development Team
 #
@@ -8,10 +7,14 @@
 """Provides QtWebChannel classes and functions."""
 
 # Local imports
-from . import PYSIDE2, PYQT5, PythonQtError
+from . import PYSIDE2, PYSIDE6, PYQT5, PYQT6, PythonQtError
 
 if PYQT5:
     from PyQt5.QtWebChannel import *
+elif PYQT6:
+    from PyQt6.QtWebChannel import *
+elif PYSIDE6:
+    from PySide6.QtWebChannel import *
 elif PYSIDE2:
     from PySide2.QtWebChannel import *
 else:

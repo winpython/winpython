@@ -1,7 +1,5 @@
-from __future__ import absolute_import
-
 import pytest
-from qtpy import PYQT5, PYSIDE2, QtCore
+from qtpy import PYQT5, PYQT6, PYSIDE2, QtCore
 
 """Test QtCore."""
 
@@ -18,6 +16,8 @@ def test_DateTime_toPython():
     assert QtCore.QDateTime.toPython is not None
 
 
+@pytest.mark.skipif(PYSIDE2 or PYQT6,
+                    reason="Doesn't seem to be present on PySide2 and PyQt6")
 def test_QtCore_SignalInstance():
     class ClassWithSignal(QtCore.QObject):
         signal = QtCore.Signal()
