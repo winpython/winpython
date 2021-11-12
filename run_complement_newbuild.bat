@@ -7,6 +7,7 @@ rem 2020-10-25no_more_needed "nbextension enable" no more needed for bqplot, ipy
 rem 2021-01-30: jupyterlab2 final stuff removal
 rem 2021-03-13: notebook classic stuff removal
 rem 2021-05-23: use "%PYTHON%" for the executable instead of "%WINPYDIR%\python.exe"
+rem 2021-11-12: patch numba restrictor
 
 
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
@@ -72,6 +73,28 @@ if exist  "%WINPYDIR%\Lib\site-packages\jupyter_lsp-1.1.4.dist-info" (
    "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
    "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
 ) 
+
+rem * ===========================
+rem 2021-11-12: patch numba-0.54.1 restrictor
+rem * ===========================
+set qt56p=%WINPYDIR%\Lib\site-packages\numba
+if exist  "%qt56p%" (
+  "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\numba\__init__.py', 'numpy_version > (1, 20):', 'numpy_version > (1, 21):  # stonebig relax patch' )"
+  echo "DID I patch numba%??"
+) else (
+  echo "I DIDN'T patch of numba !"
+)
+
+rem * ===========================
+rem 2020-05-15 patch statsmodels-0.12.2 for PyPi
+rem * ===========================
+if exist  "%WINPYDIR%\site-packages\statsmodels-0.12.2.dist-info" (
+   echo "coucou PyPy"
+   copy/Y "C:\WinP\tempo_fixes\statsmodels\tools\docstring.py" "%WINPYDIR%\site-packages\statsmodels\tools\docstring.py"
+   copy/Y "C:\WinP\tempo_fixes\statsmodels\tsa\forecasting\stl.py" "%WINPYDIR%\site-packages\statsmodels\tsa\forecasting\stl.py"
+   copy/Y "C:\WinP\tempo_fixes\statsmodels\tsa\vector_ar\api.py" "%WINPYDIR%\site-packages\statsmodels\tsa\vector_ar\api.py"
+
+)
 
 
 rem  ** Example of live file replacement (not active)**
