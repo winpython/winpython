@@ -1021,6 +1021,7 @@ rem get a normalize path
 set WINPYDIRBASETMP=%~dp0..
 pushd %WINPYDIRBASETMP%
 set WINPYDIRBASE=%__CD__%
+if "%WINPYDIRBASE:~-1%"=="\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
 set WINPYDIRBASETMP=
 popd
 
@@ -1358,7 +1359,7 @@ exit
             'env_for_icons.bat',
             r"""@echo off
 call "%~dp0env.bat"
-set WINPYWORKDIR=%~dp0..\Notebooks
+set WINPYWORKDIR=%WINPYDIRBASE%\Notebooks
 
 rem default is as before: Winpython ..\Notebooks
 set WINPYWORKDIR1=%WINPYWORKDIR%
