@@ -1378,7 +1378,8 @@ if not "%~1"=="" (
 rem if it it launched from another directory , we keep it that one echo %__CD__%
 if not "%__CD__%\"=="%~dp0" set  WINPYWORKDIR1="%__CD__%"
 )
-
+rem remove potential doublequote
+set WINPYWORKDIR1=%WINPYWORKDIR1:"=%
 rem remove some potential last \
 if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
 
