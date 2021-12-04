@@ -507,17 +507,17 @@ Name | Version | Description
             "DLLs",
             "Scripts",
             r"..\t",
-            r"..\t\mingw32\bin",
+            #r"..\t\mingw32\bin",
         ]
-        if (
-            self.distribution.architecture == 32
-            and osp.isdir(self.winpydir + self.MINGW32_PATH)
-        ):
-            path += [r".." + self.MINGW32_PATH]
-        if self.distribution.architecture == 32:
-            path += [r".." + self.R_PATH + r"\i386"]
-        if self.distribution.architecture == 64:
-            path += [r".." + self.R_PATH + r"\x64"]
+        #if (
+        #    self.distribution.architecture == 32
+        #    and osp.isdir(self.winpydir + self.MINGW32_PATH)
+        #):
+        #    path += [r".." + self.MINGW32_PATH]
+        #if self.distribution.architecture == 32:
+        #    path += [r".." + self.R_PATH + r"\i386"]
+        #if self.distribution.architecture == 64:
+        #    path += [r".." + self.R_PATH + r"\x64"]
         path += [r".." + self.JULIA_PATH]
 
         path += [r".." + self.NODEJS_PATH]
@@ -1020,7 +1020,7 @@ set WINPYDIRBASE=%~dp0..
 rem get a normalize path
 set WINPYDIRBASETMP=%~dp0..
 pushd %WINPYDIRBASETMP%
-set WINPYDIRBASE=%__CD__%
+set WINPYDIRBASE=%CD%
 set WINPYDIRBASETMP=
 popd
 
@@ -1375,8 +1375,8 @@ if not "%~1"=="" (
 	  )
    )
 ) else (
-rem if it it launched from another directory , we keep it that one echo %__CD__%
-if not "%__CD__%\"=="%~dp0" set  WINPYWORKDIR1="%__CD__%"
+rem if it it launched from another directory , we keep it that one echo %CD%
+if not "%CD%\"=="%~dp0" set  WINPYWORKDIR1="%CD%"
 )
 
 rem remove some potential last \
