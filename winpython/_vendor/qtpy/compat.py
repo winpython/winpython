@@ -5,8 +5,6 @@
 """
 Compatibility functions
 """
-
-from collections.abc import Callable
 import sys
 
 from .QtWidgets import QFileDialog

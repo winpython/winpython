@@ -152,9 +152,11 @@ else:
                     # customWidgets is empty.
                     try:
                         widget = self.customWidgets[class_name](parent)
-                    except KeyError:
-                        raise Exception('No custom widget ' + class_name + ' '
-                                        'found in customWidgets')
+                    except KeyError as error:
+                        raise Exception(
+                            f'No custom widget {class_name} '
+                            'found in customWidgets'
+                            ) from error
 
                 if self.baseinstance:
                     # set an attribute for the new child widget on the base
@@ -254,7 +256,7 @@ else:
         widget_class = ui.find('widget').get('class')
         form_class = ui.find('class').text
 
-        with open(uifile) as fd:
+        with open(uifile, encoding="utf-8") as fd:
             code_stream = StringIO()
             frame = {}
 
