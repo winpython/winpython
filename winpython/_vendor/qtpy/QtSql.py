@@ -18,6 +18,10 @@ elif PYQT6:
     QSqlResult.exec_ = QSqlResult.exec
 elif PYSIDE6:
     from PySide6.QtSql import *
+    # Map DeprecationWarning methods
+    QSqlDatabase.exec_ = QSqlDatabase.exec
+    QSqlQuery.exec_ = QSqlQuery.exec
+    QSqlResult.exec_ = QSqlResult.exec
 elif PYSIDE2:
     from PySide2.QtSql import *
 else:

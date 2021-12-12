@@ -20,6 +20,9 @@ elif PYQT6:
     QPrintPreviewWidget.print_ = QPrintPreviewWidget.print
 elif PYSIDE6:
     from PySide6.QtPrintSupport import *
+    # Map DeprecationWarning methods
+    QPageSetupDialog.exec_ = QPageSetupDialog.exec
+    QPrintDialog.exec_ = QPrintDialog.exec
 elif PYSIDE2:
     from PySide2.QtPrintSupport import *
 else:
