@@ -46,12 +46,15 @@ rem * ==================
 echo finish install of nteract_on_jupyter (2018-12-27)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
+if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" server extension enable nteract_on_jupyter
 
 
 rem * ==================
 echo finish install of Voila (2019-07-21)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable voila --sys-prefix
+if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" server extension enable voila --sys-prefix
+
 
 
 rem * =================
