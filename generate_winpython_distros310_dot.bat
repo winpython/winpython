@@ -10,9 +10,9 @@ set my_pyver=3.10
 
 set my_flavor=dot
 
-set my_release=0
+set my_release=
 
-set my_release_level=b3
+set my_release_level=
 
 rem set my_create_installer=False
 set my_create_installer=nsis.zip

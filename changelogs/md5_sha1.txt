@@ -1,3 +1,16 @@
+### WinPython 2021-05 release (January 25th, 2022)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | SHA3-256                                                         
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|------------------------------------------------------------------
+f89ffddb6baafd0cda00639cb27be51f | 7e7b86b05a8ba04b5eee1d8c7be580350fd6af18 | 3e7668eb8206b5e63ce52aef2f81c3513e51614acc9b8b7447e7c7af183f56cb | Winpython64-3.11.0.0dota4.exe     |   27 320 030 Bytes | 09d2caa336aa0b19230b1ce60eb16570d67b299a51de08a401f334b90752958d
+b129f1cce35343fd96f824fc19a25f23 | 4c0c25c08f738341879143e37ce15bb162be23d3 | aeb1a08b0e0d80f1c3088fae1069f3a913da00dffe3be7b25800257c137ac51b | Winpython64-3.10.2.0dot.exe       |   26 265 889 Bytes | 394b0687284e41239356407d572eca23d76e97014c2f78371d17396fa8f4f7f7
+875470e76953b37ddfe1f0c8f2489ad9 | 2a8c0431c86998c3f7339ef50d8d270abe7824a8 | d762e9c74016947d50451fd14033927c861bbc1801ad02a86f727f1503ebe59a | Winpython32-3.10.2.0dot.exe       |   25 034 027 Bytes | 3b45eeb727bb1dfed5ed732c8f7646e7246ff6e75c06ded62ace85b2e7af115a
+27c7f5ba309c75d4156472f94df5f999 | e96cabce38ddc6178575127281f4f2ab5cdee0ad | c7d41083435940906998f07f4d2abfad27108b7854653d4e41c0e329e32c55b0 | Winpython64-3.9.10.0dot.exe       |   26 475 751 Bytes | 78d302debbc4488d992f5594bd469b2a86ff9bf8bbbf09f25658e1f32f2bc1cf
+03150fc86fd56d8d067721100fd2a097 | 1c72ea2134ca71edf346cff60f64db81fbc4d94b | 497f9b4d1d3bebc3606c94911673b843dda3f0b226876b7240982e3e874bb52f | Winpython32-3.9.10.0dot.exe       |   25 358 253 Bytes | 91ba91f6999331d2bd902cdf29141bffd18d31dc159d943cbcf6b46dc57ca3bd
+54c3befe8eca7c62ae453fa497228ce2 | f2c867670e877bd7d22077d1761cfcb4a00f8d22 | 09d197889b86062e9090fdc716bd16f5f604290cec3c68a0444eb7cd18f24f93 | Winpython64-3.9.10.0.exe          |  857 520 123 Bytes | 82c08f19ef5fc7232c5bae5deef042d2b09f61835cd713a61bc97e8b109e2b6e
+ea78ad02b6ac45e9025c9340836fc3d6 | 7db8d4d2e2c04fb4b41731d6287a3b2a02edec6b | 26f057ccbad8b9dd5b42a18ba2dc8d3a8c2a8a9cbd6d199239e956d361540790 | Winpython64-3.10.2.0.exe          |  710 798 132 Bytes | 2e9270f58bbc55044301b94a47a900181b3830ba6bc074a2d2a45c6bd822a34d
+
+
 ### WinPython 2021-04 release (November 11th, 2021)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | SHA3-256                                                         

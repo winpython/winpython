@@ -95,6 +95,7 @@ bokeh
 twitter
 
 # dev complements
+# cx_Freeze  out of fathion
 cx_Freeze
 pytest
 # nose
@@ -126,7 +127,7 @@ PythonQwt
 guidata
 
 # for dask
-bloscpack
+##bloscpack dead
 
 
 lmfit
@@ -370,10 +371,11 @@ pyinstaller
 winrt
 
 # swifter uses modin-0.7.4 + pickle5: two problematic dependancies as of 2020-07-27
-#swifter
+swifter
 
 paramiko
-python_language_server
+#python_language_server no more
+python_lsp_server
 pexpect
 
 #swagger flask (still no asyncio choice)
@@ -389,12 +391,12 @@ databases[sqlite]
 
 altair-transform
 altair_data_server
-ibis-framework
+## ibis-framework no big life
 
 folium
 shap
 plotly
-tranquilizer
+## tranquilizer  no more needed
 #nbdev
 umap-learn
 flask-sqlalchemy
@@ -446,7 +448,7 @@ wasmer_compiler_cranelift
 wasmer_compiler_singlepass
 
 voila
-voila_gridstack
+## voila_gridstack no more 2022-01-16
 
 fastapi
 
@@ -456,6 +458,7 @@ onnxruntime
 sklearn-contrib-lightning
 openpyxl
 zstandard
+pyzstd
 jupyterlab_lsp
 jupyter_lsp
 pynndescent
@@ -474,4 +477,8 @@ dask_image
 
 #orjson for ipycanvas speed-up
 orjson
-
+fastai
+streamlit
+dash
+jupyter_packaging
+alembic

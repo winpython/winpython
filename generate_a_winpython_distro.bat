@@ -51,6 +51,7 @@ set my_buildenv=C:\WinPython-64bit-3.6.8.0
 
 rem handle alpha set my_release_level=a0
 if "%my_release_level%"=="" set my_release_level=
+rem b5
 
 rem ---------
 rem newAge 20191022
@@ -59,22 +60,29 @@ rem change is we must help by giving my_python_target_release
 rem --------
 
 if %my_python_target%==37 (
-   set my_python_target_release=3710
-   set my_release=0
+   set my_python_target_release=3712
+   set my_release=1
 )
 if %my_python_target%==38 (
-   set my_python_target_release=3810
-   set my_release=0
+   set my_python_target_release=3812
+   set my_release=1
 )
 if %my_python_target%==39 (
-   set my_python_target_release=395
+   set my_python_target_release=3910
    set my_release=0
 )
 
 if %my_python_target%==310 (
-   set my_python_target_release=3100
+   set my_python_target_release=3102
    set my_release=0
 )
+
+
+if %my_python_target%==311 (
+   set my_python_target_release=3110
+   set my_release=0
+)
+
 
 
 rem **** 2018-10-30 create_installer **
