@@ -371,8 +371,8 @@ def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
     the_exe = get_python_executable(path)
     # debug2021-09-12
-    print('%s -c "%s"' % (the_exe, cmd), ' * ',  path)
-    return exec_shell_cmd('%s -c "%s"' % (the_exe, cmd), path).splitlines()[0]
+    print('"%s" -c "%s"' % (the_exe, cmd), ' * ',  path)
+    return exec_shell_cmd('"%s" -c "%s"' % (the_exe, cmd), path).splitlines()[0]
 
 def python_execmodule(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
