@@ -13,7 +13,7 @@ Overview
 --------
 
 WinPython is a portable distribution of the Python programming 
-language for Windows (http://winpython.github.io).
+language for Windows (https://winpython.github.io).
 		
 This is the `winpython` Python package, not the distribution itself.
 It includes two main features:
@@ -59,11 +59,10 @@ manually any previous version of WinPython by removing the associated
 directory ('winpython' in your site-packages directory).
 
 From the Python package index, you may simply install WinPython *and* 
-upgrade an existing installation using `pip`::
-    http://pypi.python.org/pypi
+upgrade an existing installation using `pip`: https://pypi.org
 
 But the easiest way to install the last stable release of WinPython is 
-by using an executable installer: http://winpython.github.io/
+by using an executable installer: https://winpython.github.io/
             
 More informations
 -----------------
@@ -72,4 +71,4 @@ More informations
 
 * Development, bug reports and feature requests: https://github.com/winpython/winpython
 
-* Discussions: http://groups.google.com/group/winpython
+* Discussions: https://groups.google.com/group/winpython
