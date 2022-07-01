@@ -878,6 +878,13 @@ call "%~dp0env_for_icons.bat"
         )
 
         self.create_launcher(
+            'WinPython Terminal.exe',
+            'terminal.ico',
+            command='$SYSDIR\cmd.exe',
+            args=r'/k WinPython_Terminal.bat',
+        )
+
+        self.create_launcher(
             'WinPython Interpreter.exe',
             'python.ico',
             command='$SYSDIR\cmd.exe',
@@ -1626,6 +1633,15 @@ call "%~dp0env_for_icons.bat"  %*
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 cmd.exe /k""",
         )
+
+        self.create_batch_script(
+            'WinPython_Terminal.bat',
+            r"""@echo off
+call "%~dp0env_for_icons.bat"  %*
+if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
+%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe""",
+        )
+
 
         self.create_batch_script(
             'python.bat',
