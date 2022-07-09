@@ -115,7 +115,7 @@ class PackagesModel(QAbstractTableModel):
         package = self.packages[index.row()]
         column = index.column()
         if role == Qt.CheckStateRole and column == CHECK:
-            return to_qvariant(package in self.checked)
+            return int(package in self.checked)
         elif role == Qt.DisplayRole:
             if column == NAME:
                 return to_qvariant(package.name)
