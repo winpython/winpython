@@ -91,8 +91,8 @@ def get_iscc_exe():
                 if osp.isfile(exe):
                     return exe
     else:
-        raise RuntimeError(
-            "Inno Setup 5 is not installed on this computer."
+        #raise RuntimeError(
+        print(    "Inno Setup 5 is not installed on this computer."
         )
 
 
