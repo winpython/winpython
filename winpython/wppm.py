@@ -622,7 +622,7 @@ python "%~dpn0"""
             )
         # workaround bad installers
         if package_name.lower() == "numba":
-            self.create_pybat(['numba', 'pycc'])
+            self.create_pybat(['numba'])
         else:
             self.create_pybat(package_name.lower())
 
