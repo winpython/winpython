@@ -167,8 +167,8 @@ class pipdata:
             lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
             print("\n".join(lines).replace('"', ""))
         else:
-            for one_pp in sorted(distro):
-                down(self, one_pp, extra, depth, indent, version_req)
+            for one_pp in sorted(self.distro):
+                self.down(one_pp, extra, depth, indent, version_req)
 
     def up(self, pp, extra="", depth=99, indent=5, version_req=""):
         """print the upward needs for the package"""
