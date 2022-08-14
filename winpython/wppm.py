@@ -28,6 +28,8 @@ from winpython.py3compat import configparser as cp
 from argparse import ArgumentParser
 from winpython import py3compat
 
+from winpython import piptree 
+
 #  import information reader
 # importlib_metadata before Python 3.8
 try:
@@ -367,37 +369,19 @@ python "%~dpn0"""
                 os.path.dirname(sys.executable)
                 == self.target
             ):
-                #  direct way: we interrogate ourself, using official API
-                import pkg_resources, importlib
-
-                importlib.reload(pkg_resources)
-                pip_list = [
-                    (i.key, i.version)
-                    for i in pkg_resources.working_set
-                ]
+                #  win pip 22.2, we can use pip inspect API
+                pip = piptree.pipdata()
+                pip_list = pip.pip_list()
             else:
-                #  indirect way: we interrogate something else
+                #  indirect way: we use pip list (for now)
                 cmdx = [
                     utils.get_python_executable(self.target), # PyPy !
-                    '-c',
-                    "import pkg_resources, importlib;importlib.reload(pkg_resources);print('+!+'.join(['%s@+@%s@+@' % (i.key, i.version) for i in pkg_resources.working_set]))",
+                    '-m',
+                    "pip", "list",
                 ]
-                p = subprocess.Popen(
-                    cmdx,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    cwd=self.target,
-                )
-                stdout, stderr = p.communicate()
-                start_at = (
-                    2 if sys.version_info >= (3, 0) else 0
-                )
-                pip_list = [
-                    line.split("@+@")[:2]
-                    for line in ("%s" % stdout)[
-                        start_at:
-                    ].split("+!+")
-                ]
+                pip_list_raw = utils.exec_run_cmd(cmdx).splitlines()
+                # pip list gives 2 lines of titles to ignore
+                pip_list = [ l.split()  for l in pip_list_raw[2:] ]
             # there are only Packages installed with pip now
             # create pip package list
             wppm = [
@@ -844,7 +828,7 @@ def main(test=False):
     else:
 
         parser = ArgumentParser(
-            description="WinPython Package Manager: install, "
+            description="WinPython Package Manager: view, install, "
             "uninstall or upgrade Python packages on a Windows "
             "Python distribution like WinPython."
         )
@@ -852,7 +836,7 @@ def main(test=False):
             'fname',
             metavar='package',
             type=str if py3compat.PY3 else unicode,
-            help='path to a Python package',
+            help='path to a Python package, or package name',
         )
         parser.add_argument(
             '-t',
@@ -880,13 +864,49 @@ def main(test=False):
             default=False,
             help='uninstall package',
         )
+        parser.add_argument(
+            '-r',
+            '--reverse-tree',
+            dest='pipup',
+            action='store_const',
+            const=True,
+            default=False,
+            help='show reverse dependancies of the package',
+        )
+        parser.add_argument(
+            '-p',
+            '--package-tree',
+            dest='pipdown',
+            action='store_const',
+            const=True,
+            default=False,
+            help='show  dependancies of the package',
+        )    
+        parser.add_argument(
+            '-l',
+            '--levels_of_depth',
+            dest='levels_of_depth', 
+            type=int, default=2,
+            help='show  l levels_of_depth',
+        )
+        
         args = parser.parse_args()
 
         if args.install and args.uninstall:
             raise RuntimeError(
                 "Incompatible arguments: --install and --uninstall"
             )
-        if not args.install and not args.uninstall:
+        if args.pipdown:
+           pip = piptree.pipdata()
+           pack, extra, *other =(args.fname +"[").replace(']','[').split("[")
+           pip.down(pack, extra, args.levels_of_depth)
+           sys.exit()
+        elif args.pipup:
+           pip = piptree.pipdata()
+           pack, extra, *other =(args.fname +"[").replace(']','[').split("[")
+           pip.up(pack, extra, args.levels_of_depth)
+           sys.exit()
+        elif not args.install and not args.uninstall:
             args.install = True
         if not osp.isfile(args.fname) and args.install:
             raise IOError("File not found: %s" % args.fname)
