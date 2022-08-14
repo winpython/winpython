@@ -1136,12 +1136,6 @@ set tmp_pyz="%HOME%\.pyzo\config.ssdf"
 
 :after_pyzo_conf
 
-rem ******************
-rem handle dying pipdeptree if included
-rem ******************
-set tmp_pyz=%WINPYDIR%\Lib\site-packages\pipdeptree.py
-if exist "%tmp_pyz%" set _PIP_USE_IMPORTLIB_METADATA=0
-
 
 rem ******************
 rem WinPython.ini part (removed from nsis)
@@ -1297,15 +1291,6 @@ shellConfigs2 = list:| Add-Content -Path $env:tmp_pyz
    exe = '.\\python.exe'| Add-Content -Path $env:tmp_pyz
    ipython = 'no'| Add-Content -Path $env:tmp_pyz
    gui = 'none'| Add-Content -Path $env:tmp_pyz
-}
-
-
-#####################
-###  handle dying pipdeptree if included
-#####################
-$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\pipdeptree.py"
-if (Test-Path "$env:tmp_pyz") {
-   $env:_PIP_USE_IMPORTLIB_METADATA=0
 }
 
 
