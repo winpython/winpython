@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json, sys, re, platform, os
+import re
 from winpython import utils
 from collections import OrderedDict
 from pip._vendor.packaging.markers import Marker
@@ -53,7 +54,13 @@ class pipdata:
             if "requires_dist" in meta:
                 for i in meta["requires_dist"]:
                     det = (i + ";").split(";")
-                    req_nameextra = normalize((det[0] + " ").split(" ")[0])
+                    
+                    # req_nameextra is "python-jose[cryptography]"
+                    #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
+                    # req_nameextra is "google-cloud-storage" 
+                    #   from "google-cloud-storage (<2.0.0,>=1.26.0)
+                    req_nameextra = re.split(' |;|==|!|>|<', det[0]+ ";")[0]
+                    req_nameextra = normalize(req_nameextra)
                     req_key = normalize((req_nameextra + "[").split("[")[0])
                     req_key_extra = req_nameextra[len(req_key) + 1 :].split("]")[0]
                     req_version = det[0][len(req_nameextra) :].translate(replacements)
