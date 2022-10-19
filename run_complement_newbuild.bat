@@ -8,8 +8,8 @@ rem 2021-01-30: jupyterlab2 final stuff removal
 rem 2021-03-13: notebook classic stuff removal
 rem 2021-05-23: use "%PYTHON%" for the executable instead of "%WINPYDIR%\python.exe"
 rem 2021-11-12: patch numba restrictor
-
-
+rem 2022-10-19 patch cpython bug https://github.com/winpython/winpython/issues/1121
+ 
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
 rem that is:  pip install --pre  --no-index --trusted-host=None --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r   C:\WinP\bd39\requirements_test.txt Qt5_requirements64.txt Cod_requirements64.txt
 rem python -m pip freeze>C:\WinP\bd39\req_test150.txt between intermediate steps
@@ -46,14 +46,13 @@ rem * ==================
 echo finish install of nteract_on_jupyter (2018-12-27)
 rem * ================= 
 if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
-if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" server extension enable nteract_on_jupyter
 
 
 rem * ==================
-echo finish install of Voila (2019-07-21)
+echo finish install of nteract_on_jupyter (2018-12-27)
 rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable voila --sys-prefix
-if exist  "%WINPYDIR%\Lib\site-packages\voila" "%WINPYDIR%\Scripts\jupyter.exe" server extension enable voila --sys-prefix
+if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
+if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" server extension enable nteract_on_jupyter
 
 
 
@@ -76,6 +75,18 @@ if exist  "%WINPYDIR%\Lib\site-packages\jupyter_lsp-1.1.4.dist-info" (
    "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
    "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
 ) 
+
+
+rem * ===========================
+rem 2022-10-19 patch cpython bug https://github.com/winpython/winpython/issues/1121
+rem * ===========================
+set qt56p=%WINPYDIR%\Lib\idlelib\macosx.py
+if exist  "%qt56p%" (
+  "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\idlelib\macosx.py', 'from test.support ', '#stonebig  patch cpython/pull/98313/files:  from test.support' )"
+  echo "DID I patch numba%??"
+) else (
+  echo "I DIDN'T patch of numba !"
+)
 
 rem * ===========================
 rem 2021-11-12: patch numba-0.54.1 restrictor
