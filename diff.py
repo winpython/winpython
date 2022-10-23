@@ -255,6 +255,7 @@ def compare_package_indexes(
             " distribution since version %s."
             % (architecture, version1 + flavor1),
             "",
+            "<details>",
             "",
         ]
     )
@@ -288,7 +289,7 @@ def compare_package_indexes(
             + '\r\n\r\n'
             + py_text
         )
-    text += '* * *\r\n'
+    text += '\r\n</details>\r\n* * *\r\n'
     return text
 
 
