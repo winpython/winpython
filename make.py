@@ -445,6 +445,8 @@ class WinPythonDistribution(object):
 
 The following packages are included in WinPython-%sbit v%s%s.
 
+<details>
+
 ### Tools
 
 Name | Version | Description
@@ -465,7 +467,7 @@ Name | Version | Description
             self.python_fullversion,
             python_desc,
             '\n'.join(packages),
-        )
+        ) + '\n\n</details>\n'
 
     # @property makes self.winpyver becomes a call to self.winpyver()
     @property

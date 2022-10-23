@@ -143,6 +143,8 @@ class PackageIndex(object):
                 elif line in (
                     self.HEADER_LINE1,
                     self.HEADER_LINE2,
+                    '<details>',
+                    '</details>'
                 ):
                     continue
                 if tools_flag or python_flag:
