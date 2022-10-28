@@ -15,6 +15,7 @@ from __future__ import print_function
 import sys
 import os
 import os.path as osp
+from pathlib import Path
 import subprocess
 
 
@@ -42,7 +43,8 @@ def _get_shortcut_data(target, current=True):
     wpgroup = utils.create_winpython_start_menu_folder(
         current=current
     )
-    wpdir = osp.join(target, os.pardir)
+    # wpdir = osp.join(target, os.pardir)
+    wpdir = str(Path(target).parent) 
     data = []
     for name in os.listdir(wpdir):
         bname, ext = osp.splitext(name)
