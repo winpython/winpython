@@ -1921,16 +1921,30 @@ if "%QT_API%"=="pyqt5" (
 
         self.create_python_batch(
             'register_python.bat',
-            'register_python',
+            r'"%WINPYDIR%\Lib\site-packages\winpython\register_python.py"',
             workdir=r'"%WINPYDIR%\Scripts"',
         )
+
+        self.create_python_batch(
+            'unregister_python.bat',
+            r'"%WINPYDIR%\Lib\site-packages\winpython\unregister_python.py"',
+            workdir=r'"%WINPYDIR%\Scripts"',
+        )
+
         self.create_batch_script(
             'register_python_for_all.bat',
             r"""@echo off
 call "%~dp0env.bat"
 call "%~dp0register_python.bat" --all""",
         )
-
+          
+        self.create_batch_script(
+            'unregister_python_for_all.bat',
+            r"""@echo off
+call "%~dp0env.bat"
+call "%~dp0unregister_python.bat" --all""",
+        )
+        
         self.create_batch_script(
             'wpcp.bat',
             r"""@echo off
