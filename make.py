@@ -14,6 +14,7 @@ from __future__ import print_function
 
 import os
 import os.path as osp
+from pathlib import Path
 import re
 import subprocess
 import shutil
@@ -41,7 +42,8 @@ def get_drives():
 
 def get_nsis_exe():
     """Return NSIS executable"""
-    localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    # localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    localdir = str(Path(sys.prefix).parent.parent)
     for drive in get_drives():
         for dirname in (
             r'C:\Program Files',
@@ -71,7 +73,8 @@ NSIS_EXE = get_nsis_exe()  # NSIS Compiler
 
 def get_iscc_exe():
     """Return ISCC executable"""
-    localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    # localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    localdir = str(Path(sys.prefix).parent.parent)
     for drive in get_drives():
         for dirname in (
             r'C:\Program Files',
@@ -101,7 +104,8 @@ ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
 
 def get_7zip_exe():
     """Return 7zip executable"""
-    localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    # localdir = osp.join(sys.prefix, os.pardir, os.pardir)
+    localdir = str(Path(sys.prefix).parent.parent)
     for drive in get_drives():
         for dirname in (
             r'C:\Program Files',
@@ -2198,16 +2202,20 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.python_fullversion,
             self.build_number,
         )
-        fname = osp.join(
-            self.winpydir,
-            os.pardir,
-            'WinPython%s-%sbit-%s.md'
-            % (
-                self.flavor,
-                self.distribution.architecture,
-                self.winpyver2,
-            ),
-        )
+        #fname = osp.join(
+        #    self.winpydir,
+        #    os.pardir,
+        #    'WinPython%s-%sbit-%s.md'
+        #    % (
+        #        self.flavor,
+        #        self.distribution.architecture,
+        #        self.winpyver2,
+        #    ),
+        #)
+        fname = str(Path(self.winpydir).parent / (
+                f'WinPython{self.flavor}-' +
+                f'-{self.distribution.architecture}bit-'+
+                f'{self.winpyver2}.md'))   
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
         shutil.copyfile(
