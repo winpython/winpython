@@ -659,7 +659,7 @@ Name | Version | Description
 """
                 % workdir
             )
-        if script_name:
+        if script_name != "":
             script_name = ' ' + script_name
         self.create_batch_script(
             name,
