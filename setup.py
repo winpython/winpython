@@ -83,13 +83,13 @@ including a package manager, WPPM."""
         )
     },
     # requires=["PyQt4 (>=4.5)"],
-    scripts=[
-        osp.join('scripts', fname)
-        for fname in (
-            'register_python',
-            'register_python.bat',
-        )
-    ],
+    #scripts=[
+    #    osp.join('scripts', fname)
+    #    for fname in (
+    #        'register_python',
+    #        'register_python.bat',
+    #    )
+    #],
     # use setuptools functionalities
     entry_points={
         'console_scripts': [
