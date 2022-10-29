@@ -2214,7 +2214,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         #)
         fname = str(Path(self.winpydir).parent / (
                 f'WinPython{self.flavor}-' +
-                f'-{self.distribution.architecture}bit-'+
+                f'{self.distribution.architecture}bit-'+
                 f'{self.winpyver2}.md'))   
         open(fname, 'w').write(self.package_index_wiki)
         # Copy to winpython/changelogs
