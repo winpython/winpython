@@ -14,6 +14,7 @@ from __future__ import print_function
 
 import os
 import os.path as osp
+from pathlib import Path
 import shutil
 import re
 import sys
@@ -793,13 +794,14 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 
 def main(test=False):
     if test:
-        sbdir = osp.join(
-            osp.dirname(__file__),
-            os.pardir,
-            os.pardir,
-            os.pardir,
-            'sandbox',
-        )
+        #sbdir = osp.join(
+        #    osp.dirname(__file__),
+        #    os.pardir,
+        #    os.pardir,
+        #    os.pardir,
+        #    'sandbox',
+        #)
+        sbdir = str(Path(__file__).parents[0].parent.parent.parent / 'sandbox')
         tmpdir = osp.join(sbdir, 'tobedeleted')
 
         # fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
