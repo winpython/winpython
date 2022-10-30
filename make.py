@@ -25,9 +25,10 @@ from winpython import wppm, utils
 import diff
 
 
-CHANGELOGS_DIR = osp.join(
-    osp.dirname(__file__), 'changelogs'
-)
+# CHANGELOGS_DIR = osp.join(
+#     osp.dirname(__file__), 'changelogs'
+# )
+CHANGELOGS_DIR = str(Path(__file__).parent / 'changelogs')
 assert osp.isdir(CHANGELOGS_DIR)
 
 
@@ -541,11 +542,13 @@ Name | Version | Description
     @property
     def toolsdirs(self):
         """Return tools directory list"""
+        # formerly was joining prepared tool dir + the one of building env.. 
         return [
-            osp.join(
-                osp.dirname(osp.abspath(__file__)), 't'
-            )
+        #    osp.join(
+        #        osp.dirname(osp.abspath(__file__)), 't'
+        #    )
         ] + self._toolsdirs
+        
 
     @property
     def docsdirs(self):
@@ -807,13 +810,13 @@ call "%~dp0env_for_icons.bat"
 
     def _copy_dev_tools(self):
         """Copy dev tools"""
-        self._print("Copying tools")
+        self._print(f"Copying tools from {self.toolsdirs} to {self.winpydir}/t")
         toolsdir = osp.join(self.winpydir, 't')
         os.mkdir(toolsdir)
         for (
             dirname
         ) in (
-            self.toolsdirs
+            [ok_dir for ok_dir in self.toolsdirs if osp.isdir(ok_dir)]
         ):  # the ones in the make.py script environment
             for name in os.listdir(dirname):
                 path = osp.join(dirname, name)
@@ -840,8 +843,8 @@ call "%~dp0env_for_icons.bat"
 
     def _copy_dev_docs(self):
         """Copy dev docs"""
-        self._print("Copying Noteebook docs")
         docsdir = osp.join(self.winpydir, 'notebooks')
+        self._print(f"Copying Noteebook docs from {self.docsdirs} to {docsdir}")
         if not osp.isdir(docsdir):
             os.mkdir(docsdir)
         docsdir = osp.join(
@@ -2168,6 +2171,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 )
             # no more directory base package install: use requirements.txt
             # 2019-05-03 removed self._install_all_other_packages()
+            print('self.simulation zz', self.simulation)
             if not self.simulation:
                 self._copy_dev_tools()
                 self._copy_dev_docs()
@@ -2328,8 +2332,10 @@ def make_all(
     toolsdirs = transform_in_list(toolsdirs, 'toolsdirs=')
 
     # Optional pre-defined toolsdirs
+    print('docsdirs input', docsdirs)
     docsdirs = transform_in_list(docsdirs, 'docsdirs=')
-
+    print('docsdirs output', docsdirs)
+    
     # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
     install_options = transform_in_list(
         install_options, 'install_options'
