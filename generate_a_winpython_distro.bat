@@ -30,7 +30,7 @@ rem ******************************
 rem  this is initialised per the calling .bat
 rem  set my_original_path=%path%
 rem  set my_buildenv=C:\WinPython-64bit-3.6.8.0
-rem  set my_root_dir_for_builds=D:\Winp
+rem  set my_root_dir_for_builds=D:\WinP
 
 rem  set my_python_target=34
 rem  set my_pyver=3.4
@@ -73,14 +73,14 @@ if %my_python_target%==39 (
 )
 
 if %my_python_target%==310 (
-   set my_python_target_release=3102
+   set my_python_target_release=3108
    set my_release=0
 )
 
 
 if %my_python_target%==311 (
    set my_python_target_release=3110
-   set my_release=0
+   set my_release=1
 )
 
 
@@ -118,11 +118,11 @@ set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%%my_flavor%_%
 
 
 echo ===============
-echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit *** 
+echo preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit *** 
 echo %date% %time%
 echo ===============
 echo ===============>>%my_archive_log%
-echo preparing winpython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
+echo preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
 echo %date% %time%>>%my_archive_log%
 echo ===============>>%my_archive_log%
 
@@ -146,11 +146,13 @@ dir %build_det%
 rem 2021-02-13 workaround to hard to remove json files
 echo ren bu%my_flavor% bu%my_flavor%_old
 ren bu%my_flavor% bu%my_flavor%_old
+
+rem pause
 start rmdir /S /Q bu%my_flavor%_old
 
 
 echo rmdir /S /Q bu%my_flavor%
-rem  pause
+rem pause
 rmdir /S /Q bu%my_flavor%
 rmdir /S /Q bu%my_flavor%
 rmdir /S /Q bu%my_flavor%
@@ -192,6 +194,8 @@ rem we use legacy python build cd /D %~dp0
 set my_buildenv_path=%path%
 
 echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False', python_target_release='%my_python_target_release%')"
+rem pause
 python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', docsdirs=r'%my_docsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
 
 rem old one
@@ -288,6 +292,8 @@ call %my_buildenv%\scripts\env.bat
 set
 
 echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False, python_target_release='%my_python_target_release%')">>%my_archive_log%
+echo python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False, python_target_release='%my_python_target_release%')"
+rem pause
 python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False, python_target_release='%my_python_target_release%')">>%my_archive_log%
 
 echo ===============>>%my_archive_log%
