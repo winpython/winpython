@@ -12,7 +12,7 @@ Created on Wed Aug 29 12:23:19 2012
 
 import sys
 import os.path as osp
-
+from pathlib import Path
 
 def get_module_path(modname):
     """Return module *modname* base path"""
@@ -33,18 +33,21 @@ def get_module_data_path(
         return datapath
     else:
         datapath = get_module_path(modname)
-        parentdir = osp.join(datapath, osp.pardir)
+        # parentdir = osp.join(datapath, osp.pardir)
+        parentdir = str(Path(datapath).parent)
         if osp.isfile(parentdir):
             # Parent directory is not a directory but the 'library.zip' file:
             # this is either a py2exe or a cx_Freeze distribution
             datapath = osp.abspath(
-                osp.join(
-                    osp.join(parentdir, osp.pardir), modname
-                )
+                # osp.join(
+                #     osp.join(parentdir, osp.pardir), modname
+                # )
+                str(Path(parentdir).parent / modname)
             )
         if relpath is not None:
             datapath = osp.abspath(
-                osp.join(datapath, relpath)
+                # osp.join(datapath, relpath)
+                str(Path(datapath) / relpath)
             )
         return datapath
 

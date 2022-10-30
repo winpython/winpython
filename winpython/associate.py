@@ -44,16 +44,18 @@ def _get_shortcut_data(target, current=True):
         current=current
     )
     # wpdir = osp.join(target, os.pardir)
-    wpdir = str(Path(target).parent) 
+    wpdir = str(Path(target).parent)
     data = []
     for name in os.listdir(wpdir):
         bname, ext = osp.splitext(name)
         if ext == '.exe':
             data.append(
                 (
-                    osp.join(wpdir, name),
+                    # osp.join(wpdir, name),
+                    str(Path(wpdir) / name),
                     bname,
-                    osp.join(wpgroup, bname),
+                    # osp.join(wpgroup, bname),
+                    str(Path(wpgroup) / bname),
                 )
             )
     return data
@@ -114,10 +116,13 @@ def register(target, current=True):
     )
 
     # Verbs
-    python = osp.abspath(osp.join(target, 'python.exe'))
-    pythonw = osp.abspath(osp.join(target, 'pythonw.exe'))
+    # python = osp.abspath(osp.join(target, 'python.exe'))
+    python = osp.abspath(str(Path(target) / 'python.exe'))
+    # pythonw = osp.abspath(osp.join(target, 'pythonw.exe'))
+    pythonw = osp.abspath(str(Path(target) / 'pythonw.exe'))
     spyder = osp.abspath(
-        osp.join(target, os.pardir, 'Spyder.exe')
+        # osp.join(target, os.pardir, 'Spyder.exe')
+        str(Path(target).parent / 'Spyder.exe')
     )
     if not osp.isfile(spyder):
         spyder = '%s" "%s\Scripts\spyder' % (
@@ -189,7 +194,8 @@ def register(target, current=True):
             handler,
         )
     # Icons
-    dlls = osp.join(target, 'DLLs')
+    # dlls = osp.join(target, 'DLLs')
+    dlls = str(Path(target) / 'DLLs')
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_I % ""),
         "",
@@ -285,26 +291,6 @@ def register(target, current=True):
         target, current=current
     ):
         utils.create_shortcut(path, desc, fname)
-    # Register the Python ActiveX Scripting client (requires pywin32)
-    axscript = osp.join(
-        target,
-        'Lib',
-        'site-packages',
-        'win32comext',
-        'axscript',
-        'client',
-        'pyscript.py',
-    )
-    if osp.isfile(axscript):
-        subprocess.call(
-            '"%s" "%s"' % (python, axscript), cwd=target
-        )
-    else:
-        print(
-            'Unable to register ActiveX: please install pywin32',
-            file=sys.stderr,
-        )
-
 
 def unregister(target, current=True):
     """Unregister a Python distribution in Windows registry"""

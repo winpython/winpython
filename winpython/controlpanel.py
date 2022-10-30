@@ -11,6 +11,7 @@ Created on Mon Aug 13 11:40:01 2012
 """
 
 import os.path as osp
+from pathlib import Path
 import os
 import sys
 import platform
@@ -775,19 +776,15 @@ class PMWindow(QMainWindow):
         answer = QMessageBox.warning(
             self,
             "Register distribution",
+            "(experimental)",
             "This will associate file extensions, icons and "
             "Windows explorer's context menu entries ('Edit with IDLE', ...) "
             "with selected Python distribution in Windows registry. "
             "<br>Shortcuts for all WinPython launchers will be installed "
             "in <i>WinPython</i> Start menu group (replacing existing "
             "shortcuts)."
-            "<br>If <i>pywin32</i> is installed (it should be on any "
-            "WinPython distribution), the Python ActiveX Scripting client "
-            "will also be registered."
-            "<br><br><u>Warning</u>: the only way to undo this change is to "
-            "register another Python distribution to Windows registry."
-            "<br><br><u>Note</u>: these actions are exactly the same as those "
-            "performed when installing Python with the official installer "
+            "<br><br><u>Note</u>: these actions are similar to those performed"
+            "when installing old Pythons with the official installer before 'py' "
             "for Windows.<br><br>Do you want to continue?",
             QMessageBox.Yes | QMessageBox.No,
         )
@@ -799,14 +796,12 @@ class PMWindow(QMainWindow):
         answer = QMessageBox.warning(
             self,
             "Unregister distribution",
+            "(experimental)",
             "This will remove file extensions associations, icons and "
             "Windows explorer's context menu entries ('Edit with IDLE', ...) "
             "with selected Python distribution in Windows registry. "
             "<br>Shortcuts for all WinPython launchers will be removed "
             "from <i>WinPython</i> Start menu group."
-            "<br>If <i>pywin32</i> is installed (it should be on any "
-            "WinPython distribution), the Python ActiveX Scripting client "
-            "will also be unregistered."
             "<br><br>Do you want to continue?",
             QMessageBox.Yes | QMessageBox.No,
         )
@@ -815,11 +810,13 @@ class PMWindow(QMainWindow):
 
     @property
     def command_prompt_path(self):
-        return osp.join(
-            self.distribution.target,
-            osp.pardir,
-            "WinPython Command Prompt.exe",
-        )
+        # return osp.join(
+        #     self.distribution.target,
+        #     osp.pardir,
+        #     "WinPython Command Prompt.exe",
+        # )
+        return str(Path(self.distribution.target).parent /
+                   "WinPython Command Prompt.exe")
 
     def distribution_changed(self, path):
         """Distribution path has just changed"""

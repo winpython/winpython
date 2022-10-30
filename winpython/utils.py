@@ -14,6 +14,7 @@ from __future__ import print_function
 
 import os
 import os.path as osp
+from pathlib import Path
 import subprocess
 import re
 import tarfile
@@ -70,7 +71,8 @@ def is_program_installed(basename):
     """Return program absolute path if installed in PATH
     Otherwise, return None"""
     for path in os.environ["PATH"].split(os.pathsep):
-        abspath = osp.join(path, basename)
+        # abspath = osp.join(path, basename)
+        abspath = str(Path(path) / basename)
         if osp.isfile(abspath):
             return abspath
 
@@ -214,7 +216,9 @@ def get_winpython_start_menu_folder(current=True):
             folder = get_special_folder_path(
                 "CSIDL_PROGRAMS"
             )
-    return osp.join(folder, 'WinPython')
+    # return osp.join(folder, 'WinPython')
+    return str(Path(folder) / 'WinPython')
+
 
 
 def create_winpython_start_menu_folder(current=True):
@@ -743,7 +747,8 @@ def build_wininst(
         p.communicate()
         p.stdout.close()
         p.stderr.close()
-    distdir = osp.join(root, 'dist')
+    # distdir = osp.join(root, 'dist')
+    distdir = str(Path(root) / 'dist')
     if not osp.isdir(distdir):
         raise RuntimeError(
             "Build failed: see package README file for further"
@@ -773,11 +778,13 @@ def build_wininst(
             "Build failed: not a pure Python package? %s"
             % distdir
         )
-    src_fname = osp.join(distdir, distname)
+    # src_fname = osp.join(distdir, distname)
+    src_fname = str(Path(distdir) / distname)
     if copy_to is None:
         return src_fname
     else:
-        dst_fname = osp.join(copy_to, distname)
+        # dst_fname = osp.join(copy_to, distname)
+        dst_fname = str(Path(copy_to) / distname)
         shutil.move(src_fname, dst_fname)
         if verbose:
             print(
@@ -896,12 +903,14 @@ if __name__ == '__main__':
     print(
         (
             extract_archive(
-                osp.join(
-                    r'D:\WinP\bd37',
-                    'packages.win-amd64',
-                    'python-3.7.3.amd64.zip',
-                ),
+                #osp.join(
+                #    r'D:\WinP\bd37',
+                #    'packages.win-amd64',
+                #    'python-3.7.3.amd64.zip',
+                #),
+                str(Path(r'D:\WinP\bd37') / 'packages.win-amd64' /
+                    'python-3.7.3.amd64.zip'),        
                 tmpdir,
-            )
+            )    
         )
     )
