@@ -26,7 +26,8 @@ from winpython.config import DATA_PATH
 from winpython.py3compat import configparser as cp
 
 # from former wppm separate script launcher
-from argparse import ArgumentParser
+import textwrap
+from argparse import ArgumentParser, HelpFormatter, RawTextHelpFormatter
 from winpython import py3compat
 
 from winpython import piptree 
@@ -113,6 +114,7 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
         except:
             pass
     return my_metadata
+
     
 class BasePackage(object):
     def __init__(self, fname):
@@ -828,16 +830,45 @@ def main(test=False):
         # dist.install(pack)
         # dist.uninstall(pack)
     else:
+        bold = "\033[1m"
+        unbold = "\033[0m"
+        registerWinPythonHelp = f'''Register distribution
+({bold}experimental{unbold})
+This will associate file extensions, icons and
+Windows explorer's context menu entries ('Edit with IDLE', ...)
+with selected Python distribution in Windows registry.
+
+Shortcuts for all WinPython launchers will be installed
+in {unbold}WinPython{unbold} Start menu group (replacing existing
+shortcuts).
+
+{bold}Note{unbold}: these actions are similar to those performed 
+when installing old Pythons with the official installer before 'py'
+.
+'''
+
+        unregisterWinPythonHelp = '''Unregister distribution
+({bold}experimental{unbold})
+This will remove file extensions associations, icons and
+Windows explorer's context menu entries ('Edit with IDLE', ...)
+with selected Python distribution in Windows registry.
+
+Shortcuts for all WinPython launchers will be removed
+from {bold}WinPython{unbold} Start menu group."
+.'''
 
         parser = ArgumentParser(
             description="WinPython Package Manager: view, install, "
             "uninstall or upgrade Python packages on a Windows "
-            "Python distribution like WinPython."
+            "Python distribution like WinPython.",
+            formatter_class=RawTextHelpFormatter
         )
         parser.add_argument(
             'fname',
             metavar='package',
-            type=str if py3compat.PY3 else unicode,
+            nargs='?',
+            default='',
+            type=str,
             help='path to a Python package, or package name',
         )
         parser.add_argument(
@@ -891,10 +922,30 @@ def main(test=False):
             type=int, default=2,
             help='show  l levels_of_depth',
         )
+        parser.add_argument(
+            '--register',
+            dest='registerWinPython', 
+            action='store_const',
+            const=True,
+            default=False,
+            help=registerWinPythonHelp,
+        )
+        parser.add_argument(
+            '--unregister',
+            dest='unregisterWinPython', 
+            action='store_const',
+            const=True,
+            default=False,
+            help=unregisterWinPythonHelp,
+        )
         
         args = parser.parse_args()
 
         if args.install and args.uninstall:
+            raise RuntimeError(
+                "Incompatible arguments: --install and --uninstall"
+            )
+        if args.registerWinPython and args.unregisterWinPython:
             raise RuntimeError(
                 "Incompatible arguments: --install and --uninstall"
             )
@@ -908,10 +959,40 @@ def main(test=False):
            pack, extra, *other =(args.fname +"[").replace(']','[').split("[")
            pip.up(pack, extra, args.levels_of_depth)
            sys.exit()
+        if args.registerWinPython:
+            print(registerWinPythonHelp)
+            if utils.is_python_distribution(args.target):
+                dist = Distribution(args.target)
+            else:
+                raise WindowsError("Invalid Python distribution {args.target}")
+            print(f'registering {args.target}')
+            print('continue ? Y/N')
+            theAnswer=input()
+            if theAnswer=='Y':
+                from winpython import associate
+                associate.register(dist.target)
+                sys.exit()
+        if args.unregisterWinPython:
+            print(unregisterWinPythonHelp)
+            if utils.is_python_distribution(args.target):
+                dist = Distribution(args.target)
+            else:
+                raise WindowsError("Invalid Python distribution {args.target}")
+            print(f'unregistering {args.target}')
+            print('continue ? Y/N')
+            theAnswer=input()
+            if theAnswer=='Y':
+                from winpython import associate
+                associate.unregister(dist.target)
+                sys.exit()        
         elif not args.install and not args.uninstall:
             args.install = True
         if not osp.isfile(args.fname) and args.install:
-            raise IOError("File not found: %s" % args.fname)
+            if args.fname=="":
+                parser.print_help()
+                sys.exit()
+            else:
+                raise IOError("File not found: %s" % args.fname)
         if utils.is_python_distribution(args.target):
             dist = Distribution(args.target)
             try:
