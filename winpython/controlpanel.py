@@ -776,16 +776,16 @@ class PMWindow(QMainWindow):
         answer = QMessageBox.warning(
             self,
             "Register distribution",
-            "(experimental)",
+            "(experimental)\n"
             "This will associate file extensions, icons and "
             "Windows explorer's context menu entries ('Edit with IDLE', ...) "
             "with selected Python distribution in Windows registry. "
-            "<br>Shortcuts for all WinPython launchers will be installed "
-            "in <i>WinPython</i> Start menu group (replacing existing "
+            "\n\nShortcuts for all WinPython launchers will be installed "
+            "in WinPython Start menu group (replacing existing "
             "shortcuts)."
-            "<br><br><u>Note</u>: these actions are similar to those performed"
+            "\n\nNote: these actions are similar to those performed"
             "when installing old Pythons with the official installer before 'py' "
-            "for Windows.<br><br>Do you want to continue?",
+            "for Windows.\n\nDo you want to continue? ",
             QMessageBox.Yes | QMessageBox.No,
         )
         if answer == QMessageBox.Yes:
@@ -796,13 +796,13 @@ class PMWindow(QMainWindow):
         answer = QMessageBox.warning(
             self,
             "Unregister distribution",
-            "(experimental)",
+            "(experimental)\n"
             "This will remove file extensions associations, icons and "
             "Windows explorer's context menu entries ('Edit with IDLE', ...) "
             "with selected Python distribution in Windows registry. "
-            "<br>Shortcuts for all WinPython launchers will be removed "
-            "from <i>WinPython</i> Start menu group."
-            "<br><br>Do you want to continue?",
+            "\n\nShortcuts for all WinPython launchers will be removed "
+            "from WinPython Start menu group."
+            "\n\nDo you want to continue? ",
             QMessageBox.Yes | QMessageBox.No,
         )
         if answer == QMessageBox.Yes:
