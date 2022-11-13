@@ -10,7 +10,7 @@ WinPython Package Manager GUI
 Created on Mon Aug 13 11:40:01 2012
 """
 
-import os.path as osp
+#  import os.path as osp
 from pathlib import Path
 import os
 import sys
@@ -69,7 +69,7 @@ from winpython.qthelpers import (
 # Local imports
 from winpython import __version__, __project_url__
 from winpython import wppm, associate, utils
-from winpython.py3compat import getcwd, to_text_string
+# from winpython.py3compat import getcwd, to_text_string
 
 
 COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = list(
@@ -249,7 +249,8 @@ class PackagesTable(QTableView):
         notcompatible = []
         dist = self.distribution
         for fname in fnames:
-            bname = osp.basename(fname)
+            # bname = osp.basename(fname)
+            bname = Path(fname).name
             try:
                 package = wppm.Package(fname)
                 if package.is_compatible_with(dist):
@@ -355,7 +356,7 @@ class PackagesTable(QTableView):
         fnames = [
             path
             for path in mimedata2url(source)
-            if osp.isfile(path)
+            if Path(path).is_file()  # if osp.isfile(path)
         ]
         self.add_packages(fnames)
         event.acceptProposedAction()
@@ -405,9 +406,11 @@ class DistributionSelector(QWidget):
 
     def select_directory(self):
         """Select directory"""
-        basedir = to_text_string(self.line_edit.text())
-        if not osp.isdir(basedir):
-            basedir = getcwd()
+        #  basedir = to_text_string(self.line_edit.text())
+        basedir = str(self.line_edit.text())
+        # if not osp.isdir(basedir):
+        if not Path(basedir).is_dir():
+            basedir = str(Path.cwd())  # getcwd()
         while True:
             directory = getexistingdirectory(
                 self, self.TITLE, basedir
@@ -423,7 +426,9 @@ class DistributionSelector(QWidget):
                 )
                 basedir = directory
                 continue
-            directory = osp.abspath(osp.normpath(directory))
+            # directory = osp.abspath(osp.normpath(directory))
+            # directory = str(Path(osp.normpath(directory)).resolve())
+            directory = str(Path(directory).resolve(strict=False))
             self.set_distribution(directory)
             # PyQt4 old SIGNAL: self.emit(SIGNAL('selected_distribution(QString)'), directory)
             self.selected_distribution.emit(directory)
@@ -667,7 +672,8 @@ class PMWindow(QMainWindow):
             ),
         )
         open_console_action.setEnabled(
-            osp.exists(self.command_prompt_path)
+            #  osp.exists(self.command_prompt_path)
+            Path(self.command_prompt_path).exists()
         )
         add_actions(
             option_menu,
@@ -822,7 +828,8 @@ class PMWindow(QMainWindow):
         """Distribution path has just changed"""
         for package in self.table.model.packages:
             self.table.remove_package(package)
-        dist = wppm.Distribution(to_text_string(path))
+        # dist = wppm.Distribution(to_text_string(path))
+        dist = wppm.Distribution(str(path))
         self.table.refresh_distribution(dist)
         self.untable.refresh_distribution(dist)
         self.distribution = dist
@@ -843,7 +850,8 @@ class PMWindow(QMainWindow):
             filters='*.exe *.zip *.tar.gz *.whl',
         )
         if fnames:
-            self.basedir = osp.dirname(fnames[0])
+            # self.basedir = osp.dirname(fnames[0])
+            self.basedir = str(Path(fnames[0]).parent)
             self.table.add_packages(fnames)
 
     def get_packages_to_be_installed(self):
@@ -911,7 +919,7 @@ class PMWindow(QMainWindow):
                     table.remove_package(package)
                     error = thread.error
                 except Exception as error:
-                    error = to_text_string(error)
+                    error = str(error)  # to_text_string(error)
                 if error is not None:
                     pstr = (
                         package.name + ' ' + package.version

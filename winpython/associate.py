@@ -14,13 +14,14 @@ from __future__ import print_function
 
 import sys
 import os
-import os.path as osp
+# import os.path as osp
 from pathlib import Path
-import subprocess
+#  import subprocess
 
 
 # Local imports
-from winpython.py3compat import winreg
+# from winpython.py3compat import winreg
+import winreg
 from winpython import utils
 
 KEY_C = r"Software\Classes\%s"
@@ -47,7 +48,8 @@ def _get_shortcut_data(target, current=True):
     wpdir = str(Path(target).parent)
     data = []
     for name in os.listdir(wpdir):
-        bname, ext = osp.splitext(name)
+        # bname, ext = osp.splitext(name)
+        bname, ext = Path(name).stem, Path(name).suffix
         if ext == '.exe':
             data.append(
                 (
@@ -117,18 +119,24 @@ def register(target, current=True):
 
     # Verbs
     # python = osp.abspath(osp.join(target, 'python.exe'))
-    python = osp.abspath(str(Path(target) / 'python.exe'))
+    # python = osp.abspath(str(Path(target) / 'python.exe'))
+    python = str((Path(target) / 'python.exe').resolve())
     # pythonw = osp.abspath(osp.join(target, 'pythonw.exe'))
-    pythonw = osp.abspath(str(Path(target) / 'pythonw.exe'))
-    spyder = osp.abspath(
-        # osp.join(target, os.pardir, 'Spyder.exe')
-        str(Path(target).parent / 'Spyder.exe')
-    )
-    if not osp.isfile(spyder):
-        spyder = '%s" "%s\Scripts\spyder' % (
-            pythonw,
-            target,
-        )
+    #pythonw = osp.abspath(str(Path(target) / 'pythonw.exe'))
+    pythonw = str((Path(target) / 'pythonw.exe').resolve())
+    #spyder = osp.abspath(
+    #    # osp.join(target, os.pardir, 'Spyder.exe')
+    #    str(Path(target).parent / 'Spyder.exe')
+    #)
+    spyder = str((Path(target).parent / 'Spyder.exe').resolve())
+
+    # if not osp.isfile(spyder):
+    if not Path(spyder).is_file():
+        #spyder = '%s" "%s\Scripts\spyder' % (
+        #    pythonw,
+        #    target,
+        #)
+        spyder = f'{pythonw}" "{target}\Scripts\spyder'
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C2 % ("", "open")),
         "",
@@ -366,7 +374,8 @@ def unregister(target, current=True):
     for path, desc, fname in _get_shortcut_data(
         target, current=current
     ):
-        if osp.exists(fname):
+        # if osp.exists(fname):
+        if Path(fname).exists():
             os.remove(fname)
 
 
