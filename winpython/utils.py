@@ -13,7 +13,7 @@ Created on Tue Aug 14 14:08:40 2012
 from __future__ import print_function
 
 import os
-import os.path as osp
+# import os.path as osp
 from pathlib import Path
 import subprocess
 import re
@@ -33,21 +33,29 @@ from winpython.py3compat import winreg
 def get_python_executable(path = None):
     """return the python executable"""
     my_path = sys.executable if path == None else path  # default = current one
-    my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
-    exec_py = os.path.join(my_path, 'python.exe')
-    exec_pypy = os.path.join(my_path, 'pypy3.exe')  # PyPy !
+    # my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
+    my_path = my_path if Path(my_path).is_dir() else str(Path(my_path).parent)
+    #exec_py = os.path.join(my_path, 'python.exe')
+    exec_py = str(Path(my_path) / 'python.exe')
+    # exec_pypy = os.path.join(my_path, 'pypy3.exe')  # PyPy !
+    exec_pypy = str(Path(my_path) / 'pypy3.exe')  # PyPy !
     # PyPy >=7.3.6 3.8 aligns to python.exe and Lib\site-packages
     #python_executable = exec_pypy if osp.isfile(exec_pypy) else exec_py
-    python_executable = exec_py if osp.isfile(exec_py) else exec_pypy
+    #python_executable = exec_py if osp.isfile(exec_py) else exec_pypy
+    python_executable = exec_py if Path(exec_py).is_file() else exec_pypy
     return python_executable
 
 def get_site_packages_path(path = None):
     """return the python site-packages"""
     my_path = sys.executable if path == None else path  # default = current one
-    my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
-    site_py = os.path.join(my_path, 'Lib', 'site-packages')
-    site_pypy = os.path.join(my_path, 'site-packages')  # PyPy !!
-    site_packages_path = site_pypy if osp.isfile(site_pypy) else site_py
+    # my_path = my_path if osp.isdir(my_path) else osp.dirname(my_path)
+    my_path = my_path if Path(my_path).is_dir() else str(Path(my_path).parent)
+    # site_py = os.path.join(my_path, 'Lib', 'site-packages')
+    site_py = str(Path(my_path) / 'Lib' / 'site-packages')
+    # site_pypy = os.path.join(my_path, 'site-packages')  # PyPy !!
+    site_pypy = str(Path(my_path) / 'site-packages')  # PyPy !!
+    # site_packages_path = site_pypy if osp.isfile(site_pypy) else site_py
+    site_packages_path = site_pypy if Path(site_pypy).is_file() else site_py
     return site_packages_path
 
 def onerror(function, path, excinfo):
@@ -73,7 +81,8 @@ def is_program_installed(basename):
     for path in os.environ["PATH"].split(os.pathsep):
         # abspath = osp.join(path, basename)
         abspath = str(Path(path) / basename)
-        if osp.isfile(abspath):
+        # if osp.isfile(abspath):
+        if Path(abspath).is_file():
             return abspath
 
 
@@ -224,7 +233,8 @@ def get_winpython_start_menu_folder(current=True):
 def create_winpython_start_menu_folder(current=True):
     """Create WinPython Start menu folder -- remove it if it already exists"""
     path = get_winpython_start_menu_folder(current=current)
-    if osp.isdir(path):
+    # if osp.isdir(path):
+    if Path(path).is_dir():
         try:
             shutil.rmtree(path, onerror=onerror)
         except WindowsError:
@@ -288,8 +298,10 @@ def print_box(text):
 def is_python_distribution(path):
     """Return True if path is a Python distribution"""
     # XXX: This test could be improved but it seems to be sufficient
-    has_exec = osp.isfile(get_python_executable(path))
-    has_site = osp.isdir(get_site_packages_path(path))    
+    # has_exec = osp.isfile(get_python_executable(path))
+    has_exec = Path(get_python_executable(path)).is_file()
+    # has_site = osp.isdir(get_site_packages_path(path))    
+    has_site = Path(get_site_packages_path(path)).is_dir()    
     return has_exec and has_site
 
 
@@ -538,7 +550,8 @@ def patch_sourcefile(
     """Replace a string in a source file"""
     import io
 
-    if osp.isfile(fname) and not in_text == out_text:
+    # if osp.isfile(fname) and not in_text == out_text:
+    if Path(fname).is_file() and not in_text == out_text:
         the_encoding = guess_encoding(fname)[0]
         with io.open(fname, 'r', encoding=the_encoding) as fh:
             content = fh.read()
@@ -569,9 +582,10 @@ def patch_sourcelines(
 ):
     """Replace the middle of lines between in_line_start and endline """
     import io
-    import os.path as osp
+    # import os.path as osp
 
-    if osp.isfile(fname):
+    # if osp.isfile(fname):
+    if Path(fname).is_file():
         the_encoding = guess_encoding(fname)[0]
         with io.open(fname, 'r', encoding=the_encoding) as fh:
             contents = fh.readlines()
@@ -641,16 +655,19 @@ def extract_exe(fname, targetdir=None, verbose=False):
     assert is_program_installed(extract), (
         "Required program '%s' was not found" % extract
     )
-    bname = osp.basename(fname)
+    #bname = osp.basename(fname)
+    bname = Path(fname).name
     args = ['x', '-o%s' % targetdir, '-aos', bname]
     if verbose:
         retcode = subprocess.call(
-            [extract] + args, cwd=osp.dirname(fname)
+            # [extract] + args, cwd=osp.dirname(fname)
+            [extract] + args, cwd=str(Path(fname).parent)
         )
     else:
         p = subprocess.Popen(
             [extract] + args,
-            cwd=osp.dirname(fname),
+            #cwd=osp.dirname(fname),
+            cwd=str(Path(fname).parent),
             stdout=subprocess.PIPE,
         )
         p.communicate()
@@ -675,7 +692,8 @@ def extract_archive(fname, targetdir=None, verbose=False):
             os.mkdir(targetdir)
         except:
             pass
-    if osp.splitext(fname)[1] in ('.zip', '.exe'):
+    #if osp.splitext(fname)[1] in ('.zip', '.exe'):
+    if Path(fname).suffix in ('.zip', '.exe'):
         obj = zipfile.ZipFile(fname, mode="r")
     elif fname.endswith('.tar.gz'):
         obj = tarfile.open(fname, mode='r:gz')
@@ -707,8 +725,10 @@ WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package"""
     if fname[-4:] == '.whl':
-        return osp.basename(fname).split("-")[:2]
-    match = re.match(SOURCE_PATTERN, osp.basename(fname))
+        #return osp.basename(fname).split("-")[:2]
+        return Path(fname).name.split("-")[:2]
+    # match = re.match(SOURCE_PATTERN, osp.basename(fname))
+    match = re.match(SOURCE_PATTERN, Path(fname).name)
     if match is not None:
         return match.groups()[:2]
 
@@ -726,7 +746,8 @@ def build_wininst(
     Return wininst installer full path."""
     if python_exe is None:
         python_exe = sys.executable
-    assert osp.isfile(python_exe)
+    #assert osp.isfile(python_exe)
+    assert Path(python_exe).is_file()
     cmd = [python_exe, 'setup.py', 'build']
     if architecture is not None:
         archstr = (
@@ -749,7 +770,8 @@ def build_wininst(
         p.stderr.close()
     # distdir = osp.join(root, 'dist')
     distdir = str(Path(root) / 'dist')
-    if not osp.isdir(distdir):
+    # if not osp.isdir(distdir):
+    if not Path(distdir).is_dir():
         raise RuntimeError(
             "Build failed: see package README file for further"
             " details regarding installation requirements.\n\n"
@@ -806,12 +828,15 @@ def direct_pip_install(
     install_options=None,
 ):
     """Direct install via pip !"""
-    copy_to = osp.dirname(fname)
+    # copy_to = osp.dirname(fname)
+    copy_to = str(Path(fname).parent)
 
     if python_exe is None:
         python_exe = sys.executable
-    assert osp.isfile(python_exe)
-    myroot = os.path.dirname(python_exe)
+    # assert osp.isfile(python_exe)
+    assert Path(python_exe).is_file()
+    # myroot = os.path.dirname(python_exe)
+    myroot = str(Path(python_exe).parent)
 
     cmd = [python_exe, '-m', 'pip', 'install']
     if install_options:
@@ -898,7 +923,8 @@ if __name__ == '__main__':
     # print dname+':', '\n', get_python_infos(dname)
 
     tmpdir = r'D:\Tests\winpython_tests'
-    if not osp.isdir(tmpdir):
+    # if not osp.isdir(tmpdir):
+    if not Path(tmpdir).is_dir():
         os.mkdir(tmpdir)
     print(
         (
