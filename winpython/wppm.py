@@ -13,7 +13,7 @@ Created on Fri Aug 03 14:32:26 2012
 from __future__ import print_function
 
 import os
-import os.path as osp
+# import os.path as osp
 from pathlib import Path
 import shutil
 import re
@@ -28,7 +28,7 @@ from winpython.py3compat import configparser as cp
 # from former wppm separate script launcher
 import textwrap
 from argparse import ArgumentParser, HelpFormatter, RawTextHelpFormatter
-from winpython import py3compat
+# from winpython import py3compat
 
 from winpython import piptree 
 
@@ -75,7 +75,8 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
     # machine which is not connected to the internet
     # we store only  normalized names now (PEP 503)
     db = cp.ConfigParser()
-    db.readfp(open(osp.join(DATA_PATH, database)))
+    # db.readfp(open(osp.join(DATA_PATH, database)))
+    db.readfp(open(str(Path(DATA_PATH) / database)))
     my_metadata = dict(
         description='',
         url='https://pypi.org/project/' + name,
@@ -109,7 +110,8 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
         try:
             db[normalize(name)] = {}
             db[normalize(name)]['description'] = my_metadata['description']
-            with open(osp.join(DATA_PATH, database), 'w') as configfile:
+            # with open(osp.join(DATA_PATH, database), 'w') as configfile:
+            with open(str(Path(DATA_PATH) / database), 'w') as configfile:
                 db.write(configfile)
         except:
             pass
@@ -139,7 +141,8 @@ class BasePackage(object):
             pytext,
             self.description,
             self.url,
-            osp.basename(self.fname),
+            # osp.basename(self.fname),
+            Path(self.fname).name,
         )
         return text
 
@@ -182,7 +185,7 @@ class Package(BasePackage):
     def extract_infos(self):
         """Extract package infos (name, version, architecture)
         from filename (installer basename)"""
-        bname = osp.basename(self.fname)
+        bname = Path(self.fname).name  # osp.basename(self.fname)
         if bname.endswith(('32.whl', '64.whl')):
             # {name}[-{bloat}]-{version}-{python tag}-{abi tag}-{platform tag}.whl
             # ['sounddevice','0.3.5','py2.py3.cp34.cp35','none','win32']
@@ -230,9 +233,9 @@ class WininstPackage(BasePackage):
         self.name = match.groups()[0]
         self.logname = '%s-wininst.log' % self.name
         fd = open(
-            osp.join(
-                self.distribution.target, self.logname
-            ),
+            # osp.join(
+            #    self.distribution.target, self.logname
+            str(Path(self.distribution.target) / self.logname),
             'U',
         )
         searchtxt = 'DisplayName='
@@ -279,7 +282,8 @@ class Distribution(object):
             target
         )
         # name of the exe (python.exe or pypy3;exe)
-        self.short_exe = osp.basename(utils.get_python_executable(self.target))
+        # self.short_exe = osp.basename(utils.get_python_executable(self.target))
+        self.short_exe = Path(utils.get_python_executable(self.target)).name
 
     def clean_up(self):
         """Remove directories which couldn't be removed when building"""
@@ -309,40 +313,53 @@ class Distribution(object):
         create_bat_files=False,
     ):
         """Add copy task"""
-        srcdir = osp.join(targetdir, srcdir)
-        if not osp.isdir(srcdir):
+        # srcdir = osp.join(targetdir, srcdir)
+        srcdir = str(Path(targetdir) / srcdir)
+        # if not osp.isdir(srcdir):
+        if not Path(srcdir).is_dir():
             return
         offset = len(srcdir) + len(os.pathsep)
         for dirpath, dirnames, filenames in os.walk(srcdir):
             for dname in dirnames:
-                t_dname = osp.join(dirpath, dname)[offset:]
-                src = osp.join(srcdir, t_dname)
-                dst = osp.join(dstdir, t_dname)
+                # t_dname = osp.join(dirpath, dname)[offset:]
+                t_dname = str(Path(dirpath) / dname)[offset:]
+                # src = osp.join(srcdir, t_dname)
+                src = str(Path(srcdir) / t_dname)
+                # dst = osp.join(dstdir, t_dname)
+                dst = str(Path(dstdir) / t_dname)
                 if self.verbose:
                     print("mkdir: %s" % dst)
-                full_dst = osp.join(self.target, dst)
-                if not osp.exists(full_dst):
+                # full_dst = osp.join(self.target, dst)
+                full_dst = str(Path(self.target) / dst)
+                # if not osp.exists(full_dst):
+                if not Path(full_dst).exists():
                     os.mkdir(full_dst)
                 package.files.append(dst)
             for fname in filenames:
-                t_fname = osp.join(dirpath, fname)[offset:]
-                src = osp.join(srcdir, t_fname)
+                # t_fname = osp.join(dirpath, fname)[offset:]
+                t_fname = str(Path(dirpath) / fname)[offset:]
+                # src = osp.join(srcdir, t_fname)
+                src = str(Path(srcdir) / t_fname)
                 if dirpath.endswith('_system32'):
                     # Files that should be copied in %WINDIR%\system32
                     dst = fname
                 else:
-                    dst = osp.join(dstdir, t_fname)
+                    # dst = osp.join(dstdir, t_fname)
+                    dst = str(Path(dstdir) / t_fname)
                 if self.verbose:
                     print("file:  %s" % dst)
-                full_dst = osp.join(self.target, dst)
+                # full_dst = osp.join(self.target, dst)
+                full_dst = str(Path(self.target) / dst)
                 shutil.move(src, full_dst)
                 package.files.append(dst)
-                name, ext = osp.splitext(dst)
+                #name, ext = osp.splitext(dst)
+                name, ext = Path(dst).stem, Path(dst).suffix
                 if create_bat_files and ext in ('', '.py'):
                     dst = name + '.bat'
                     if self.verbose:
                         print("file:  %s" % dst)
-                    full_dst = osp.join(self.target, dst)
+                    # full_dst = osp.join(self.target, dst)
+                    full_dst = str(Path(self.target) / dst)
                     fd = open(full_dst, 'w')
                     fd.write(
                         """@echo off
@@ -355,10 +372,12 @@ python "%~dpn0"""
 
     def create_file(self, package, name, dstdir, contents):
         """Generate data file -- path is relative to distribution root dir"""
-        dst = osp.join(dstdir, name)
+        # dst = osp.join(dstdir, name)
+        dst = str(Path(dstdir) / name)
         if self.verbose:
             print("create:  %s" % dst)
-        full_dst = osp.join(self.target, dst)
+        # full_dst = osp.join(self.target, dst)
+        full_dst = str(Path(self.target) / dst)
         open(full_dst, 'w').write(contents)
         package.files.append(dst)
 
@@ -369,7 +388,8 @@ python "%~dpn0"""
         wppm = []
         try:
             if (
-                os.path.dirname(sys.executable)
+                #os.path.dirname(sys.executable)
+                str(Path(sys.executable).parent)
                 == self.target
             ):
                 #  win pip 22.2, we can use pip inspect API
@@ -469,10 +489,13 @@ python "%~dpn0"""
         my_actions = actions
         if my_actions is None:
             my_actions = []
-        executing = osp.join(
-            self.target, '..', 'scripts', 'env.bat'
+        # executing = osp.join(
+        #    self.target, '..', 'scripts', 'env.bat'
+        executing = str(Path(
+            self.target).parent / 'scripts' / 'env.bat'
         )
-        if osp.isfile(executing):
+        #if osp.isfile(executing):
+        if Path(executing).is_file():
             complement = [
                 r'&&',
                 'cd',
@@ -509,7 +532,8 @@ python "%~dpn0"""
         import filecmp
 
         # Adpating to PyPy
-        if 'pypy3' in osp.basename(utils.get_python_executable(self.target)):
+        # if 'pypy3' in osp.basename(utils.get_python_executable(self.target)):
+        if 'pypy3' in Path(utils.get_python_executable(self.target)).name:
             site_package_place="\\site-packages\\" 
         else:
             site_package_place="\\Lib\\site-packages\\"
@@ -523,14 +547,17 @@ python "%~dpn0"""
             origin = self.target + site_package_place + "pywin32_system32"
 
             destin = self.target
-            if osp.isdir(origin):
+            # if osp.isdir(origin):
+            if Path(origin).is_dir():
                 for name in os.listdir(origin):
                     here, there = (
-                        osp.join(origin, name),
-                        osp.join(destin, name),
+                        # osp.join(origin, name),
+                        str(Path(origin) / name),
+                        # osp.join(destin, name),
+                        str(Path(destin) / name),
                     )
-                    if not os.path.exists(
-                        there
+                    # if not os.path.exists(there
+                    if not Path(there).exists(
                     ) or not filecmp.cmp(here, there):
                         shutil.copyfile(here, there)
         # 'pip' to do movable launchers (around line 100) !!!!
@@ -621,12 +648,14 @@ python "%~dpn0"""
     ):
         """Create launcher batch script when missing"""
 
-        scriptpy = osp.join(
-            self.target, 'Scripts'
+        # scriptpy = osp.join(
+        #    self.target, 'Scripts'
+        scriptpy = str(Path(self.target) / 'Scripts'
         )  # std Scripts of python
 
         # PyPy has no initial Scipts directory
-        if not osp.isdir(scriptpy):
+        # if not osp.isdir(scriptpy):
+        if not Path(scriptpy).is_dir():
             os.mkdir(scriptpy)
 
         if not list(names) == names:
@@ -638,16 +667,20 @@ python "%~dpn0"""
         else:
             my_list = names
         for name in my_list:
-            if osp.isdir(scriptpy) and osp.isfile(
-                osp.join(scriptpy, name)
-            ):
-                if not osp.isfile(
-                    osp.join(scriptpy, name + '.exe')
-                ) and not osp.isfile(
-                    osp.join(scriptpy, name + '.bat')
+            # if osp.isdir(scriptpy) and osp.isfile(
+            #    osp.join(scriptpy, name)):
+            if Path(scriptpy).is_dir() and (Path(
+                scriptpy) / name).is_dir():
+                #if not osp.isfile(
+                #    osp.join(scriptpy, name + '.exe')
+                #) and not osp.isfile(
+                #    osp.join(scriptpy, name + '.bat')
+                if not (Path(scriptpy) / (name + '.exe')).is_file(
+                ) and not (Path(scriptpy) / (name + '.bat')).is_file(
                 ):
                     fd = open(
-                        osp.join(scriptpy, name + '.bat'),
+                        # osp.join(scriptpy, name + '.bat'),
+                        str(Path(scriptpy) / (name + '.bat')),
                         'w',
                     )
                     fd.write(contents)
@@ -668,8 +701,10 @@ Binaries = ."""
             self.create_file(
                 package,
                 name,
-                osp.join(
-                    'Lib', 'site-packages', package.name
+                #osp.join(
+                #    'Lib', 'site-packages', package.name
+                str(Path(
+                    'Lib') / 'site-packages' / package.name
                 ),
                 contents,
             )
@@ -694,7 +729,8 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9'''
 
             # PyPy adaption: python.exe or pypy3.exe
-            my_exec = osp.basename(utils.get_python_executable(self.target))
+            #my_exec = osp.basename(utils.get_python_executable(self.target))
+            my_exec = Path(utils.get_python_executable(self.target)).name
             tmp_string = tmp_string.replace('python.exe', my_exec)
 
             self.create_file(
@@ -706,14 +742,17 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 ),
             )
             # Adding missing __init__.py files (fixes Issue 8)
-            uic_path = osp.join(
-                'Lib', 'site-packages', package.name, 'uic'
+            # uic_path = osp.join(
+            #    'Lib', 'site-packages', package.name, 'uic'
+            uic_path = str(Path(
+                'Lib') / 'site-packages' / package.name / 'uic'
             )
             for dirname in ('Loader', 'port_v2', 'port_v3'):
                 self.create_file(
                     package,
                     '__init__.py',
-                    osp.join(uic_path, dirname),
+                    # osp.join(uic_path, dirname),
+                    str(Path(uic_path) / dirname),
                     '',
                 )
 
@@ -804,24 +843,36 @@ def main(test=False):
         #    'sandbox',
         #)
         sbdir = str(Path(__file__).parents[0].parent.parent.parent / 'sandbox')
-        tmpdir = osp.join(sbdir, 'tobedeleted')
+        #tmpdir = osp.join(sbdir, 'tobedeleted')
+        tmpdir = str(Path(sbdir) / 'tobedeleted')
 
         # fname = osp.join(tmpdir, 'scipy-0.10.1.win-amd64-py2.7.exe')
-        fname = osp.join(
-            sbdir, 'VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe'
+        #fname = osp.join(
+        #    sbdir, 'VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe'
+        fname = str(Path(
+            sbdir) / 'VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe'
         )
         print(Package(fname))
         sys.exit()
-        target = osp.join(
-            utils.BASE_DIR,
-            'build',
-            'winpython-2.7.3',
-            'python-2.7.3',
+        #target = osp.join(
+        #    utils.BASE_DIR,
+        #    'build',
+        #    'winpython-2.7.3',
+        #    'python-2.7.3',
+        target = str(Path(
+            utils.BASE_DIR) /
+            'build' /
+            'winpython-2.7.3' /
+            'python-2.7.3'
         )
-        fname = osp.join(
-            utils.BASE_DIR,
-            'packages.src',
-            'docutils-0.9.1.tar.gz',
+        #fname = osp.join(
+        #    utils.BASE_DIR,
+        #    'packages.src',
+        #    'docutils-0.9.1.tar.gz',
+        fname = str(Path(
+            utils.BASE_DIR) /
+            'packages.src' /
+            'docutils-0.9.1.tar.gz'
         )
 
         dist = Distribution(target, verbose=True)
@@ -987,7 +1038,8 @@ from {bold}WinPython{unbold} Start menu group."
                 sys.exit()        
         elif not args.install and not args.uninstall:
             args.install = True
-        if not osp.isfile(args.fname) and args.install:
+        #if not osp.isfile(args.fname) and args.install:
+        if not Path(args.fname).is_file() and args.install:
             if args.fname=="":
                 parser.print_help()
                 sys.exit()
