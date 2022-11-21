@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import sys
 import os
-import os.path as osp
+# import os.path as osp
 from pathlib import Path
 import shutil
 import traceback
@@ -36,7 +36,8 @@ from distutils.version import LooseVersion, StrictVersion
 def get_module_path(modname):
     """Return module *modname* base path"""
     module = sys.modules.get(modname, __import__(modname))
-    return osp.abspath(osp.dirname(module.__file__))
+    # return osp.abspath(osp.dirname(module.__file__))
+    return str(Path(module.__file__).parent.resolve())
 
 
 # ==============================================================================
@@ -67,12 +68,15 @@ def prepend_module_to_path(module_path):
     1) In your application to import local frozen copies of internal libraries
     2) In your py2exe distributed package to add a text file containing the returned string
     """
-    if not osp.isdir(module_path):
+    #if not osp.isdir(module_path):
+    if not Path(module_path).is_dir():
         # Assuming py2exe distribution
         return
-    sys.path.insert(0, osp.abspath(module_path))
+    #sys.path.insert(0, osp.abspath(module_path))
+    sys.path.insert(0, str(Path(module_path).resolve()))
     changeset = get_changeset(module_path)
-    name = osp.basename(module_path)
+    # name = osp.basename(module_path)
+    name = Path(module_path).name
     prefix = "Prepending module to sys.path"
     message = prefix + (
         "%s [revision %s]" % (name, changeset)
@@ -95,7 +99,8 @@ def prepend_module_to_path(module_path):
 
 def prepend_modules_to_path(module_base_path):
     """Prepend to sys.path all modules located in *module_base_path*"""
-    if not osp.isdir(module_base_path):
+    # if not osp.isdir(module_base_path):
+    if not Path(module_base_path).is_dir():
         # Assuming py2exe distribution
         return
     fnames = [
@@ -106,7 +111,8 @@ def prepend_modules_to_path(module_base_path):
     messages = [
         prepend_module_to_path(dirname)
         for dirname in fnames
-        if osp.isdir(dirname)
+        # if osp.isdir(dirname)
+        if Path(dirname).is_dir()
     ]
     return os.linesep.join(messages)
 
@@ -118,10 +124,12 @@ def _remove_later(fname):
     """Try to remove file later (at exit)"""
 
     def try_to_remove(fname):
-        if osp.exists(fname):
+        # if osp.exists(fname):
+        if Path(fname).exists():
             os.remove(fname)
 
-    atexit.register(try_to_remove, osp.abspath(fname))
+    # atexit.register(try_to_remove, osp.abspath(fname))
+    atexit.register(try_to_remove, str(Path(fname).resolve()))
 
 
 def to_include_files(data_files):
@@ -142,7 +150,7 @@ def to_include_files(data_files):
             #dest_fname = osp.join(
             #    dest_dir, osp.basename(source_fname))
             dest_fname = str(Path(dest_dir) / 
-                osp.basename(source_fname))
+                Path(source_fname).name)
             include_files.append((source_fname, dest_fname))
     return include_files
 
@@ -276,7 +284,8 @@ class Distribution(object):
             else version
         )
         self.description = description
-        assert osp.isfile(script)
+        # assert osp.isfile(script)
+        assert Path(script).is_file()
         self.script = script
         self.target_name = target_name
         self.target_dir = target_dir
@@ -339,7 +348,8 @@ class Distribution(object):
 
         import PyQt4
 
-        pyqt_path = osp.dirname(PyQt4.__file__)
+        # pyqt_path = osp.dirname(PyQt4.__file__)
+        pyqt_path = str(Path(PyQt4.__file__).parent)
 
         # Configuring PyQt4
         conf = os.linesep.join(
@@ -351,7 +361,8 @@ class Distribution(object):
         if self.msvc:
             vc90man = "Microsoft.VC90.CRT.manifest"
             pyqt_tmp = 'pyqt_tmp'
-            if osp.isdir(pyqt_tmp):
+            # if osp.isdir(pyqt_tmp):
+            if Path(pyqt_tmp).is_dir():
                 shutil.rmtree(pyqt_tmp)
             os.mkdir(pyqt_tmp)
             # vc90man_pyqt = osp.join(pyqt_tmp, vc90man)
@@ -373,12 +384,14 @@ class Distribution(object):
                 # osp.join(dirpath, f)
                 str(Path(dirpath) / f)     
                 for f in filenames
-                if osp.splitext(f)[1] in ('.dll', '.py')
+                # if osp.splitext(f)[1] in ('.dll', '.py')
+                if Path(f).suffix in ('.dll', '.py')
             ]
             if self.msvc and [
                 f
                 for f in filelist
-                if osp.splitext(f)[1] == '.dll'
+                # if osp.splitext(f)[1] == '.dll'
+                if Path(f).suffix == '.dll'
             ]:
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
@@ -397,9 +410,10 @@ class Distribution(object):
         # Including french translation
         # fr_trans = osp.join(
         #     pyqt_path, "translations", "qt_fr.qm"
+        # )
         fr_trans = str(Path(pyqt_path) / "translations" / "qt_fr.qm")  
-        )
-        if osp.exists(fr_trans):
+        # if osp.exists(fr_trans):
+        if Path(fr_trans).exists():
             self.data_files.append(
                 ('translations', (fr_trans,))
             )
@@ -429,7 +443,8 @@ class Distribution(object):
 
         import PySide
 
-        pyside_path = osp.dirname(PySide.__file__)
+        # pyside_path = osp.dirname(PySide.__file__)
+        pyside_path = str(Path(PySide.__file__).parent)
 
         # Configuring PySide
         conf = os.linesep.join(
@@ -460,12 +475,14 @@ class Distribution(object):
                 # osp.join(dirpath, f)
                 str(Path(dirpath) / f)  
                 for f in filenames
-                if osp.splitext(f)[1] in ('.dll', '.py')
+                # if osp.splitext(f)[1] in ('.dll', '.py')
+                if Path(f).suffix in ('.dll', '.py')
             ]
             if self.msvc and [
                 f
                 for f in filelist
-                if osp.splitext(f)[1] == '.dll'
+                # if osp.splitext(f)[1] == '.dll'
+                if Path(f).suffix == '.dll'
             ]:
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
@@ -485,7 +502,8 @@ class Distribution(object):
             # osp.join(pyside_path, fname)
             str(Path(pyside_path) / fname) 
             for fname in os.listdir(pyside_path)
-            if osp.splitext(fname)[1] == '.dll'
+            #if osp.splitext(fname)[1] == '.dll'
+            if Path(fname).suffix == '.dll'
         ]
         self.data_files.append(('', dlls))
 
@@ -495,7 +513,8 @@ class Distribution(object):
         # fr_trans = osp.join(
         #    pyside_path, "translations", "qt_fr.qm")
         fr_trans = str(Path(pyside_path) / "translations" / "qt_fr.qm")     
-        if osp.exists(fr_trans):
+        #if osp.exists(fr_trans):
+        if Path(fr_trans).exists():
             self.data_files.append(
                 ('translations', (fr_trans,))
             )
@@ -613,12 +632,15 @@ class Distribution(object):
                     import sphinx.ext
 
                     for fname in os.listdir(
-                        osp.dirname(sphinx.ext.__file__)
+                        #osp.dirname(sphinx.ext.__file__)
+                        str(Path(sphinx.ext.__file__).parent)
                     ):
-                        if osp.splitext(fname)[1] == '.py':
+                        #if osp.splitext(fname)[1] == '.py':
+                        if Path(fname).suffix == '.py':
                             modname = (
                                 'sphinx.ext.%s'
-                                % osp.splitext(fname)[0]
+                                # % osp.splitext(fname)[0]
+                                % Path(fname).stem
                             )
                             self.includes.append(modname)
             elif module_name == 'pygments':
@@ -699,10 +721,12 @@ class Distribution(object):
         *extensions*: list of file extensions, e.g. ('.png', '.svg')
         """
         module_dir = get_module_path(module_name)
-        nstrip = len(module_dir) + len(osp.sep)
+        # nstrip = len(module_dir) + len(osp.sep)
+        nstrip = len(module_dir) + len(os.sep)
         # data_dir = osp.join(module_dir, data_dir_name)
         data_dir = str(Path(module_dir) / data_dir_name)
-        if not osp.isdir(data_dir):
+        # if not osp.isdir(data_dir):
+        if not Path(data_dir).is_dir():
             raise IOError(
                 "Directory not found: %s" % data_dir
             )
@@ -710,7 +734,8 @@ class Distribution(object):
             data_dir
         ):
             dirname = dirpath[nstrip:]
-            if osp.basename(dirpath) in exclude_dirs:
+            #if osp.basename(dirpath) in exclude_dirs:
+            if Path(dirpath).name in exclude_dirs:
                 continue
             if not copy_to_root:
                 # dirname = osp.join(module_name, dirname)
@@ -719,7 +744,8 @@ class Distribution(object):
                 # osp.join(dirpath, f)
                 str(Path(dirpath) / f)
                 for f in filenames
-                if osp.splitext(f)[1].lower() in extensions
+                # if osp.splitext(f)[1].lower() in extensions
+                if Path(f).suffix.lower() in extensions
             ]
             self.data_files.append((dirname, pathlist))
             if verbose:
@@ -767,15 +793,21 @@ class Distribution(object):
         #)
         translation_file = str(Path(module_dir) / "locale" / "fr" / 
                                "LC_MESSAGES" / f"{module_name}.mo" ) 
-        if osp.isfile(translation_file):
+        # if osp.isfile(translation_file):
+        if Path(translation_file).is_file():
             self.data_files.append(
                 (
-                    osp.join(
-                        module_name,
-                        "locale",
-                        "fr",
-                        "LC_MESSAGES",
-                    ),
+                    #osp.join(
+                    #    module_name,
+                    #    "locale",
+                    #    "fr",
+                    #    "LC_MESSAGES",
+                    #),
+                    str(Path(
+                        module_name) /
+                        "locale" /
+                        "fr" /
+                        "LC_MESSAGES"),
                     (translation_file,),
                 )
             )
@@ -783,7 +815,8 @@ class Distribution(object):
                 "Adding module '%s' translation file: %s"
                 % (
                     module_name,
-                    osp.basename(translation_file),
+                    #osp.basename(translation_file),
+                    Path(translation_file).name,
                 )
             )
 
@@ -821,7 +854,8 @@ class Distribution(object):
     def __cleanup(self):
         """Remove old build and dist directories"""
         remove_dir("build")
-        if osp.isdir("dist"):
+        # if osp.isdir("dist"):
+        if Path("dist").is_dir():
             remove_dir("dist")
         remove_dir(self.target_dir)
 
@@ -877,7 +911,8 @@ class Distribution(object):
             icon_resources=[(0, self.icon)],
             bitmap_resources=[],
             other_resources=[],
-            dest_base=osp.splitext(self.target_name)[0],
+            # dest_base=osp.splitext(self.target_name)[0],
+            dest_base=Path(self.target_name).stem,
             version=self.version,
             company_name=company_name,
             copyright=copyright,
