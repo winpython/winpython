@@ -48,7 +48,7 @@ from winpython._vendor.qtpy.compat import (
 
 import os
 import re
-import os.path as osp
+# import os.path as osp
 from pathlib import Path
 import sys
 
@@ -157,10 +157,12 @@ def _process_mime_path(path, extlist):
                 path = path[5:]
         else:
             path = path[7:]
-    if osp.exists(path):
+    # if osp.exists(path):
+    if Path(path).exists():
         if (
             extlist is None
-            or osp.splitext(path)[1] in extlist
+            #or osp.splitext(path)[1] in extlist
+            or Path(path).suffix in extlist
         ):
             return path
 
