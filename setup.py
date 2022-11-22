@@ -16,8 +16,8 @@ import setuptools
 
 from distutils.core import setup
 import os
-import os.path as osp
-
+# import os.path as osp
+from pathlib import Path
 
 def get_package_data(name, extlist):
     """Return data files for package *name* with extensions in *extlist*"""
@@ -28,10 +28,12 @@ def get_package_data(name, extlist):
         for fname in filenames:
             if (
                 not fname.startswith('.')
-                and osp.splitext(fname)[1] in extlist
+                # and osp.splitext(fname)[1] in extlist
+                and Path(fname).suffix in extlist
             ):
                 flist.append(
-                    osp.join(dirpath, fname)[offset:]
+                    # osp.join(dirpath, fname)[offset:]
+                    str(Path(dirpath) / fname)[offset:]
                 )
     return flist
 
@@ -40,7 +42,9 @@ def get_subpackages(name):
     """Return subpackages of package *name*"""
     splist = []
     for dirpath, _dirnames, _filenames in os.walk(name):
-        if osp.isfile(osp.join(dirpath, '__init__.py')):
+        # if osp.isfile(osp.join(dirpath, '__init__.py')):
+        # if osp.isfile(str(Path(dirpath) / '__init__.py')):
+        if (Path(dirpath) / '__init__.py').is_file():
             splist.append(".".join(dirpath.split(os.sep)))
     return splist
 
