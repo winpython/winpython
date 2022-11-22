@@ -29,7 +29,8 @@ import diff
 #     osp.dirname(__file__), 'changelogs'
 # )
 CHANGELOGS_DIR = str(Path(__file__).parent / 'changelogs')
-assert osp.isdir(CHANGELOGS_DIR)
+# assert osp.isdir(CHANGELOGS_DIR)
+assert Path(CHANGELOGS_DIR).is_dir()
 
 
 def get_drives():
@@ -51,8 +52,10 @@ def get_nsis_exe():
             r'C:\Program Files (x86)',
             drive + r'PortableApps\NSISPortableANSI',
             drive + r'PortableApps\NSISPortable',
-            osp.join(localdir, 'NSISPortableANSI'),
-            osp.join(localdir, 'NSISPortable'),
+            # osp.join(localdir, 'NSISPortableANSI'),
+            str(Path(localdir) / 'NSISPortableANSI'),
+            # osp.join(localdir, 'NSISPortable'),
+            str(Path(localdir) / 'NSISPortable'),
         ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(
@@ -61,7 +64,8 @@ def get_nsis_exe():
                     'NSIS',
                     'makensis.exe',
                 )
-                if osp.isfile(exe):
+                # if osp.isfile(exe):
+                if Path(exe).is_file():
                     return exe
     else:
         raise RuntimeError(
@@ -83,7 +87,8 @@ def get_iscc_exe():
             # drive+r'PortableApps\NSISPortableANSI',
             # drive+r'PortableApps\NSISPortable',
             # osp.join(localdir, 'NSISPortableANSI'),
-            osp.join(localdir, 'Inno Setup 5'),
+            # osp.join(localdir, 'Inno Setup 5'),
+            str(Path(localdir) / 'Inno Setup 5'),
         ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(
@@ -92,7 +97,8 @@ def get_iscc_exe():
                     'Inno Setup 5',
                     'iscc.exe',
                 )
-                if osp.isfile(exe):
+                # if osp.isfile(exe):
+                if Path(exe).is_file():
                     return exe
     else:
         #raise RuntimeError(
@@ -111,14 +117,16 @@ def get_7zip_exe():
         for dirname in (
             r'C:\Program Files',
             r'C:\Program Files (x86)',
-            osp.join(localdir, '7-Zip'),
+            # osp.join(localdir, '7-Zip'),
+            str(Path(localdir) / '7-Zip'),
         ):
             for subdirname in ('.', 'App'):
                 exe = osp.join(
                     dirname, subdirname, '7-Zip', '7z.exe'
                 )
                 # include = osp.join(dirname, subdirname, '7-Zip', 'include')
-                if osp.isfile(exe):
+                # if osp.isfile(exe):
+                if Path(exe).is_file():
                     return exe
     else:
         raise RuntimeError(
@@ -215,7 +223,8 @@ def build_nsis(srcname, dstname, data):
     data = [
         (
             '!addincludedir',
-            osp.join(portable_dir, 'include'),
+            # osp.join(portable_dir, 'include'),
+            str(Path(portable_dir) / 'include'),
         )
     ] + list(data)
     replace_in_nsis_file(dstname, data)
@@ -350,7 +359,8 @@ class WinPythonDistribution(object):
 
         # osp.join(self.winpydir, self.python_name) = Directory of Python exec
         # self.pythondir =osp.join(self.winpydir, self.python_name) 
-        self.python_name = osp.basename(self.python_fname)[
+        # self.python_name = osp.basename(self.python_fname)[
+        self.python_name = Path(self.python_fname).name[
             :-4
         ]
         self.distname = 'winUNKNOWN' #win%s' % self.python_name #  PyPy ?  
@@ -488,7 +498,8 @@ Name | Version | Description
     @property
     def python_dir(self):
         """Return Python dirname (full path) of the target distribution"""
-        return osp.join(self.winpydir, self.python_name)  # python.exe path
+        # return osp.join(self.winpydir, self.python_name)  # python.exe path
+        return str(Path(self.winpydir) / self.python_name)  # python.exe path
 
     @property
     def winpy_arch(self):
@@ -583,8 +594,10 @@ Name | Version | Description
     def create_batch_script(self, name, contents,
                             do_changes=None):
         """Create batch script %WINPYDIR%/name"""
-        scriptdir = osp.join(self.winpydir, 'scripts')
-        if not osp.isdir(scriptdir):
+        # scriptdir = osp.join(self.winpydir, 'scripts')
+        scriptdir = str(Path(self.winpydir) / 'scripts')
+        # if not osp.isdir(scriptdir):
+        if not Path(scriptdir).is_dir():
             os.mkdir(scriptdir)
         print ('dochanges for %s %', name, do_changes)
         # live patch pypy3
@@ -593,7 +606,8 @@ Name | Version | Description
            for i in do_changes:
                contents_final = contents_final.replace(i[0], i[1])
         
-        fd = open(osp.join(scriptdir, name), 'w')
+        # fd = open(osp.join(scriptdir, name), 'w')
+        fd = open(str(Path(scriptdir) / name), 'w')
         fd.write(contents_final)
         fd.close()
 
@@ -611,8 +625,10 @@ Name | Version | Description
         portable_dir = osp.join(
             osp.dirname(osp.abspath(__file__)), 'portable'
         )
-        icon_fname = osp.join(portable_dir, 'icons', icon)
-        assert osp.isfile(icon_fname)
+        # icon_fname = osp.join(portable_dir, 'icons', icon)
+        icon_fname = str(Path(portable_dir) / 'icons' / icon)
+        # assert osp.isfile(icon_fname)
+        assert Path(icon_fname).is_file()
 
         # Customizing NSIS script
         if command is None:
@@ -686,7 +702,8 @@ call "%~dp0env_for_icons.bat"
         portable_dir = osp.join(
             osp.dirname(osp.abspath(__file__)), 'portable'
         )
-        fname = osp.join(portable_dir, 'installer-tmp.nsi')
+        # fname = osp.join(portable_dir, 'installer-tmp.nsi')
+        fname = str(Path(portable_dir) / 'installer-tmp.nsi')
         data = (
             ('DISTDIR', self.winpydir),
             ('ARCH', self.winpy_arch),
@@ -811,7 +828,8 @@ call "%~dp0env_for_icons.bat"
     def _copy_dev_tools(self):
         """Copy dev tools"""
         self._print(f"Copying tools from {self.toolsdirs} to {self.winpydir}/t")
-        toolsdir = osp.join(self.winpydir, 't')
+        # toolsdir = osp.join(self.winpydir, 't')
+        toolsdir = str(Path(self.winpydir) / 't')
         os.mkdir(toolsdir)
         for (
             dirname
@@ -819,22 +837,27 @@ call "%~dp0env_for_icons.bat"
             [ok_dir for ok_dir in self.toolsdirs if osp.isdir(ok_dir)]
         ):  # the ones in the make.py script environment
             for name in os.listdir(dirname):
-                path = osp.join(dirname, name)
+                # path = osp.join(dirname, name)
+                path = str(Path(dirname) / name)
                 copy = (
                     shutil.copytree
-                    if osp.isdir(path)
+                    # if osp.isdir(path)
+                    if Path(path).is_dir()
                     else shutil.copyfile
                 )
                 if self.verbose:
                     print(
                         path
                         + ' --> '
-                        + osp.join(toolsdir, name)
+                        # + osp.join(toolsdir, name)
+                        + str(Path(toolsdir) / name)
                     )
-                copy(path, osp.join(toolsdir, name))
+                # copy(path, osp.join(toolsdir, name))
+                copy(path, str(Path(toolsdir) / name))
         self._print_done()
         # move node higher
-        nodejs_current = osp.join(toolsdir, 'n')
+        # nodejs_current = osp.join(toolsdir, 'n')
+        nodejs_current = str(Path(toolsdir) / 'n')
         nodejs_target = self.winpydir + self.NODEJS_PATH
         if nodejs_current != nodejs_target and osp.isdir(
             nodejs_current
@@ -843,21 +866,26 @@ call "%~dp0env_for_icons.bat"
 
     def _copy_dev_docs(self):
         """Copy dev docs"""
-        docsdir = osp.join(self.winpydir, 'notebooks')
+        # docsdir = osp.join(self.winpydir, 'notebooks')
+        docsdir = str(Path(self.winpydir) / 'notebooks')
         self._print(f"Copying Noteebook docs from {self.docsdirs} to {docsdir}")
-        if not osp.isdir(docsdir):
+        # if not osp.isdir(docsdir):
+        if not Path(docsdir).is_dir():
             os.mkdir(docsdir)
         docsdir = osp.join(
             self.winpydir, 'notebooks', 'docs'
         )
-        if not osp.isdir(docsdir):
+        # if not osp.isdir(docsdir):
+        if not Path(docsdir).is_dir():
             os.mkdir(docsdir)
         for dirname in self.docsdirs:
             for name in os.listdir(dirname):
-                path = osp.join(dirname, name)
+                # path = osp.join(dirname, name)
+                path = str(Path(dirname) / name)
                 copy = (
                     shutil.copytree
-                    if osp.isdir(path)
+                    # if osp.isdir(path)
+                    if Path(path).is_dir()
                     else shutil.copyfile
                 )
                 copy(path, osp.join(docsdir, name))
@@ -865,7 +893,8 @@ call "%~dp0env_for_icons.bat"
                     print(
                         path
                         + ' --> '
-                        + osp.join(docsdir, name)
+                        # + osp.join(docsdir, name)
+                        + str(Path(docsdir) / name)
                     )
         self._print_done()
 
