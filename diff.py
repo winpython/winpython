@@ -13,7 +13,8 @@ Created on Tue Jan 29 11:56:54 2013
 from __future__ import print_function, with_statement
 
 import os
-import os.path as osp
+# import os.path as osp
+from pathlib import Path
 import re
 import shutil
 
@@ -24,10 +25,12 @@ from winpython import utils
 def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
-CHANGELOGS_DIR = osp.join(
-    osp.dirname(__file__), 'changelogs'
-)
-assert osp.isdir(CHANGELOGS_DIR)
+# CHANGELOGS_DIR = osp.join(
+#     osp.dirname(__file__), 'changelogs'
+# )
+CHANGELOGS_DIR = str(Path(__file__).parent / 'changelogs')
+# assert osp.isdir(CHANGELOGS_DIR)
+assert Path(CHANGELOGS_DIR).is_dir()
 
 
 class Package(object):
@@ -109,15 +112,18 @@ class PackageIndex(object):
 
     def from_file(self, basedir):
         # fname = osp.join(basedir, 'build%s' % self.flavor,
-        fname = osp.join(
-            CHANGELOGS_DIR,
-            'WinPython%s-%sbit-%s.md'
-            % (
-                self.flavor,
-                self.architecture,
-                self.version,
-            ),
-        )
+        #fname = osp.join(
+        #    CHANGELOGS_DIR,
+        #    'WinPython%s-%sbit-%s.md'
+        #    % (
+        #        self.flavor,
+        #        self.architecture,
+        #        self.version,
+        #    ),
+        #)
+        fname = str(Path(CHANGELOGS_DIR) /
+            f'WinPython{self.flavor}-{self.architecture}bit-{self.version}.md')
+
         with open(
             fname, 'r'
         ) as fdesc:  # python3 doesn't like 'rb'
@@ -208,7 +214,8 @@ def find_closer_version(
     version1, basedir=None, flavor='', architecture=64
 ):
     """Find version which is the closest to `version`"""
-    builddir = osp.join(basedir, 'bu%s' % flavor)
+    # builddir = osp.join(basedir, 'bu%s' % flavor)
+    builddir = str(Path(basedir) / f'bu{flavor}')
     func = lambda name: re.match(
         r'WinPython%s-%sbit-([0-9\.]*)\.(txt|md)'
         % (flavor, architecture),
@@ -304,8 +311,10 @@ def _copy_all_changelogs(
             name,
         ):
             shutil.copyfile(
-                osp.join(CHANGELOGS_DIR, name),
-                osp.join(basedir, 'bu%s' % flavor, name),
+                # osp.join(CHANGELOGS_DIR, name),
+                str(Path(CHANGELOGS_DIR) / name),
+                # osp.join(basedir, 'bu%s' % flavor, name),
+                str(Path(basedir) / f'bu{flavor}' / name),
             )
 
 
@@ -338,19 +347,25 @@ def write_changelog(
         flavor=flavor,
         architecture=architecture,
     )
-    fname = osp.join(
-        basedir,
-        'bu%s' % flavor,
-        'WinPython%s-%sbit-%s_History.md'
-        % (flavor, architecture, version2),
-    )
+    #fname = osp.join(
+    #    basedir,
+    #    'bu%s' % flavor,
+    #    'WinPython%s-%sbit-%s_History.md'
+    #    % (flavor, architecture, version2),
+    #)
+    fname = str(Path(basedir) /
+        f'bu{flavor}' /
+        f'WinPython{flavor}-{architecture}bit-{version2}_History.md')
+
+
     with open(
         fname, 'w', encoding='utf-8-sig'
     ) as fdesc:  # python 3 need
         fdesc.write(text)
     # Copy to winpython/changelogs
     shutil.copyfile(
-        fname, osp.join(CHANGELOGS_DIR, osp.basename(fname))
+        #fname, osp.join(CHANGELOGS_DIR, osp.basename(fname))
+        fname, str(Path(CHANGELOGS_DIR) / Path(fname).name)
     )
 
 
