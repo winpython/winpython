@@ -14,7 +14,8 @@ from __future__ import print_function
 
 import sys
 import os
-import os.path as osp
+# import os.path as osp
+from pathlib import Path
 import re
 
 # Local imports
@@ -25,9 +26,12 @@ def test_python_packages(pyver):
     """Check if all Python packages are supported by WinPython"""
     basedir = utils.get_basedir(pyver)
     for suffix in ('src', 'win32', 'win-amd64'):
-        dirname = osp.join(basedir, 'packages.%s' % suffix)
+        # dirname = osp.join(basedir, 'packages.%s' % suffix)
+        dirname = str(Path(basedir) / f'packages.{suffix}')
         for name in os.listdir(dirname):
-            if osp.isfile(osp.join(dirname, name)) \
+            # if osp.isfile(osp.join(dirname, name)) \
+            # if osp.isfile(str(Path(dirname) / name)) \
+            if (Path(dirname) / name).is_file() \
                and not re.match(r'python-([0-9\.]*)(\.amd64)?\.msi', name):
                 try:
                     print(wppm.Package(name))
