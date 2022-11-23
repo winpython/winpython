@@ -58,12 +58,13 @@ def get_nsis_exe():
             str(Path(localdir) / 'NSISPortable'),
         ):
             for subdirname in ('.', 'App'):
-                exe = osp.join(
-                    dirname,
-                    subdirname,
-                    'NSIS',
-                    'makensis.exe',
-                )
+                #exe = osp.join(
+                #    dirname,
+                #    subdirname,
+                #    'NSIS',
+                #    'makensis.exe',
+                #)
+                exe = str(Path(dirname) / subdirname / 'NSIS' / 'makensis.exe')
                 # if osp.isfile(exe):
                 if Path(exe).is_file():
                     return exe
@@ -91,12 +92,13 @@ def get_iscc_exe():
             str(Path(localdir) / 'Inno Setup 5'),
         ):
             for subdirname in ('.', 'App'):
-                exe = osp.join(
-                    dirname,
-                    subdirname,
-                    'Inno Setup 5',
-                    'iscc.exe',
-                )
+                #exe = osp.join(
+                #    dirname,
+                #    subdirname,
+                #    'Inno Setup 5',
+                #    'iscc.exe',
+                #)
+                exe = str(Path(dirname) / subdirname / 'Inno Setup 5' / 'iscc.exe')
                 # if osp.isfile(exe):
                 if Path(exe).is_file():
                     return exe
@@ -121,9 +123,10 @@ def get_7zip_exe():
             str(Path(localdir) / '7-Zip'),
         ):
             for subdirname in ('.', 'App'):
-                exe = osp.join(
-                    dirname, subdirname, '7-Zip', '7z.exe'
-                )
+                #exe = osp.join(
+                #    dirname, subdirname, '7-Zip', '7z.exe'
+                #)
+                exe = str(Path(dirname) / subdirname / '7-Zip' / '7z.exe')
                 # include = osp.join(dirname, subdirname, '7-Zip', 'include')
                 # if osp.isfile(exe):
                 if Path(exe).is_file():
@@ -216,10 +219,12 @@ def replace_in_7zip_file(fname, data):
 
 def build_nsis(srcname, dstname, data):
     """Build NSIS script"""
-    portable_dir = osp.join(
-        osp.dirname(osp.abspath(__file__)), 'portable'
-    )
-    shutil.copy(osp.join(portable_dir, srcname), dstname)
+    #portable_dir = osp.join(
+    #    osp.dirname(osp.abspath(__file__)), 'portable'
+    #)
+    portable_dir = str(Path(__file__).resolve().parent / 'portable')
+    # shutil.copy(osp.join(portable_dir, srcname), dstname)
+    shutil.copy(str(Path(portable_dir) / srcname), dstname)
     data = [
         (
             '!addincludedir',
@@ -247,10 +252,12 @@ def build_nsis(srcname, dstname, data):
 
 def build_iss(srcname, dstname, data):
     """Build Inno Setup Script"""
-    portable_dir = osp.join(
-        osp.dirname(osp.abspath(__file__)), 'portable'
-    )
-    shutil.copy(osp.join(portable_dir, srcname), dstname)
+    #portable_dir = osp.join(
+    #    osp.dirname(osp.abspath(__file__)), 'portable'
+    #)
+    portable_dir = str(Path(__file__).resolve().parent / 'portable')
+    # shutil.copy(osp.join(portable_dir, srcname), dstname)
+    shutil.copy(str(Path(portable_dir) / srcname), dstname)
     data = [('PORTABLE_DIR', portable_dir)] + list(data)
     replace_in_iss_file(dstname, data)
     try:
@@ -272,10 +279,12 @@ def build_iss(srcname, dstname, data):
 
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
-    portable_dir = osp.join(
-        osp.dirname(osp.abspath(__file__)), 'portable'
-    )
-    shutil.copy(osp.join(portable_dir, srcname), dstname)
+    #portable_dir = osp.join(
+    #    osp.dirname(osp.abspath(__file__)), 'portable'
+    #)
+    portable_dir = str(Path(__file__).resolve().parent / 'portable')
+    #shutil.copy(osp.join(portable_dir, srcname), dstname)
+    shutil.copy(str(Path(portable_dir) / srcname), dstname)
     data = [
         ('PORTABLE_DIR', portable_dir),
         ('SEVENZIP_EXE', SEVENZIP_EXE),
@@ -415,7 +424,8 @@ class WinPythonDistribution(object):
         )
         if pandocexe is not None:
             pandocver = utils.get_pandoc_version(
-                osp.dirname(pandocexe)
+                #osp.dirname(pandocexe)
+                str(Path(pandocexe).parent)
             )
             installed_tools += [('Pandoc', pandocver)]
 
@@ -564,16 +574,18 @@ Name | Version | Description
     @property
     def docsdirs(self):
         """Return docs directory list"""
-        if osp.isdir(
-            osp.join(
-                osp.dirname(osp.abspath(__file__)), 'docs'
-            )
-        ):
+        #if osp.isdir(
+        #    osp.join(
+        #        osp.dirname(osp.abspath(__file__)), 'docs'
+        #    )
+        #):
+        if (Path(__file__).resolve().parent / 'docs').is_dir():
             return [
-                osp.join(
-                    osp.dirname(osp.abspath(__file__)),
-                    'docs',
-                )
+                #osp.join(
+                #    osp.dirname(osp.abspath(__file__)),
+                #    'docs',
+                #)
+                str(Path(__file__).resolve().parent / 'docs')
             ] + self._docsdirs
         else:
             return self._docsdirs
@@ -584,7 +596,8 @@ Name | Version | Description
         for fname in os.listdir(path):
             match = re.match(pattern, fname)
             if match is not None or pattern == fname:
-                return osp.abspath(osp.join(path, fname))
+                # return osp.abspath(osp.join(path, fname))
+                return str((Path(path) / fname).resolve())
         else:
             raise RuntimeError(
                 'Could not find required package matching %s'
@@ -622,9 +635,10 @@ Name | Version | Description
     ):
         """Create exe launcher with NSIS"""
         assert name.endswith('.exe')
-        portable_dir = osp.join(
-            osp.dirname(osp.abspath(__file__)), 'portable'
-        )
+        #portable_dir = osp.join(
+        #    osp.dirname(osp.abspath(__file__)), 'portable'
+        #)
+        portable_dir = str(Path(__file__).resolve().parent / 'portable')
         # icon_fname = osp.join(portable_dir, 'icons', icon)
         icon_fname = str(Path(portable_dir) / 'icons' / icon)
         # assert osp.isfile(icon_fname)
@@ -640,9 +654,10 @@ Name | Version | Description
             args = ''
         if workdir is None:
             workdir = ''
-        fname = osp.join(
-            self.winpydir, osp.splitext(name)[0] + '.nsi'
-        )
+        #fname = osp.join(
+        #    self.winpydir, osp.splitext(name)[0] + '.nsi'
+        #)
+        fname = str(Path(self.winpydir) / (Path(name).stem + '.nsi'))
 
         data = [
             ('WINPYDIR', '$EXEDIR\%s' % self.python_name),
@@ -699,9 +714,10 @@ call "%~dp0env_for_icons.bat"
     def create_installer(self):
         """Create installer with NSIS"""
         self._print("Creating WinPython installer")
-        portable_dir = osp.join(
-            osp.dirname(osp.abspath(__file__)), 'portable'
-        )
+        #portable_dir = osp.join(
+        #    osp.dirname(osp.abspath(__file__)), 'portable'
+        #)
+        portable_dir = str(Path(__file__).resolve().parent /  'portable')
         # fname = osp.join(portable_dir, 'installer-tmp.nsi')
         fname = str(Path(portable_dir) / 'installer-tmp.nsi')
         data = (
@@ -734,12 +750,14 @@ call "%~dp0env_for_icons.bat"
     def create_installer_inno(self):
         """Create installer with INNO"""
         self._print("Creating WinPython installer INNO")
-        portable_dir = osp.join(
-            osp.dirname(osp.abspath(__file__)), 'portable'
-        )
-        fname = osp.join(
-            portable_dir, 'installer_INNO-tmp.iss'
-        )
+        #portable_dir = osp.join(
+        #    osp.dirname(osp.abspath(__file__)), 'portable'
+        #)
+        portable_dir = str(Path(__file__).resolve().parent /  'portable')
+        #fname = osp.join(
+        #    portable_dir, 'installer_INNO-tmp.iss'
+        #)
+        fname = str(Path(portable_dir) / 'installer_INNO-tmp.iss')
         data = (
             ('DISTDIR', self.winpydir),
             ('ARCH', self.winpy_arch),
@@ -770,12 +788,14 @@ call "%~dp0env_for_icons.bat"
     def create_installer_7zip(self, installer_option=''):
         """Create installer with 7-ZIP"""
         self._print("Creating WinPython installer 7-ZIP")
-        portable_dir = osp.join(
-            osp.dirname(osp.abspath(__file__)), 'portable'
-        )
-        fname = osp.join(
-            portable_dir, 'installer_7zip-tmp.bat'
-        )
+        #portable_dir = osp.join(
+        #    osp.dirname(osp.abspath(__file__)), 'portable'
+        #)
+        portable_dir = str(Path(__file__).parent / 'portable')
+        #fname = osp.join(
+        #    portable_dir, 'installer_7zip-tmp.bat'
+        #)
+        fname = str(Path(portable_dir) / 'installer_7zip-tmp.bat')
         data = (
             ('DISTDIR', self.winpydir),
             ('ARCH', self.winpy_arch),
@@ -834,7 +854,8 @@ call "%~dp0env_for_icons.bat"
         for (
             dirname
         ) in (
-            [ok_dir for ok_dir in self.toolsdirs if osp.isdir(ok_dir)]
+            #[ok_dir for ok_dir in self.toolsdirs if osp.isdir(ok_dir)]
+            [ok_dir for ok_dir in self.toolsdirs if Path(ok_dir).is_dir()]
         ):  # the ones in the make.py script environment
             for name in os.listdir(dirname):
                 # path = osp.join(dirname, name)
@@ -859,9 +880,10 @@ call "%~dp0env_for_icons.bat"
         # nodejs_current = osp.join(toolsdir, 'n')
         nodejs_current = str(Path(toolsdir) / 'n')
         nodejs_target = self.winpydir + self.NODEJS_PATH
-        if nodejs_current != nodejs_target and osp.isdir(
-            nodejs_current
-        ):
+        #if nodejs_current != nodejs_target and osp.isdir(
+        #    nodejs_current
+        #):
+        if nodejs_current != nodejs_target and Path(nodejs_current).is_dir():
             shutil.move(nodejs_current, nodejs_target)
 
     def _copy_dev_docs(self):
@@ -872,9 +894,10 @@ call "%~dp0env_for_icons.bat"
         # if not osp.isdir(docsdir):
         if not Path(docsdir).is_dir():
             os.mkdir(docsdir)
-        docsdir = osp.join(
-            self.winpydir, 'notebooks', 'docs'
-        )
+        #docsdir = osp.join(
+        #    self.winpydir, 'notebooks', 'docs'
+        #)
+        docsdir = str(Path(self.winpydir) / 'notebooks' / 'docs')
         # if not osp.isdir(docsdir):
         if not Path(docsdir).is_dir():
             os.mkdir(docsdir)
@@ -888,7 +911,8 @@ call "%~dp0env_for_icons.bat"
                     if Path(path).is_dir()
                     else shutil.copyfile
                 )
-                copy(path, osp.join(docsdir, name))
+                #copy(path,  osp.join(docsdir, name))
+                copy(path, str(Path(docsdir) / name))
                 if self.verbose:
                     print(
                         path
@@ -1054,8 +1078,9 @@ call "%~dp0env_for_icons.bat"
                (r'DIR%\python.exe' , r'DIR%' + "\\" + shorty),  
                (r'DIR%\PYTHON.EXE' , r'DIR%' + "\\" + shorty),  
                 )
-        if osp.isdir(osp.join(self.distribution.target,
-                               r'lib-python\3\idlelib')):
+        #if osp.isdir(osp.join(self.distribution.target,
+        #                       r'lib-python\3\idlelib')):
+        if (Path(self.distribution.target) / r'lib-python\3\idlelib').is_dir():
             changes += ((r'\Lib\idlelib' , r'\lib-python\3\idlelib'),)
         self.create_batch_script(
             'env.bat',
@@ -1526,10 +1551,10 @@ end function
                (r'DIR%\python.exe' , r'DIR%' + "\\" + shorty),  
                (r'DIR%\PYTHON.EXE' , r'DIR%' + "\\" + shorty),  
                 )
-        if osp.isdir(osp.join(self.distribution.target,
-                               r'lib-python\3\idlelib')):
+        #if osp.isdir(osp.join(self.distribution.target,
+        #                       r'lib-python\3\idlelib')):
+        if (Path(self.distribution.target) / r'lib-python\3\idlelib').is_dir():
             changes += ((r'\Lib\idlelib' , r'\lib-python\3\idlelib'),)
-
         
         self.create_batch_script(
             'readme.txt',
@@ -2018,11 +2043,13 @@ cd/D "%WINPYDIR%"
 
         # pre-run mingw batch
         print('now pre-running extra mingw')
-        filepath = osp.join(
-            self.winpydir,
-            'scripts',
-            'make_cython_use_mingw.bat',
-        )
+        #filepath = osp.join(
+        #    self.winpydir,
+        #    'scripts',
+        #    'make_cython_use_mingw.bat',
+        #)
+        filepath = str(Path(self.winpydir) / 'scripts' / 
+            'make_cython_use_mingw.bat')
         p = subprocess.Popen(
             filepath, shell=True, stdout=subprocess.PIPE
         )
@@ -2053,10 +2080,13 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         """ tools\..\run_complement.bat for final complements"""
         print('now %s in tooldirs\..' % this_batch)
         for post_complement in list(
-            set([osp.dirname(s) for s in self._toolsdirs])
+            #set([osp.dirname(s) for s in self._toolsdirs])
+            set([str(Path(s).parent) for s in self._toolsdirs])
         ):
-            filepath = osp.join(post_complement, this_batch)
-            if osp.isfile(filepath):
+            #filepath = osp.join(post_complement, this_batch)
+            filepath = str(Path(post_complement) / this_batch)
+            #if osp.isfile(filepath):
+            if Path(filepath).is_file():
                 print(
                     'launch "%s"  for  "%s"'
                     % (filepath, self.winpydir)
@@ -2120,35 +2150,42 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.python_fullversion,  # PyPy to delete or move
         )
         if my_winpydir is None:
-            self.winpydir = osp.join(
-                self.target, self.distname  # PyPy to delete
-            )
+            #self.winpydir = osp.join(
+            #    self.target, self.distname  # PyPy to delete
+            #)
+            self.winpydir = str(Path(self.target) / self.distname)  # PyPy to delete
         else:
-            self.winpydir = osp.join(
-                self.target, my_winpydir
-            )        # Create/re-create the WinPython base directory
+            #self.winpydir = osp.join(
+            #    self.target, my_winpydir
+            #)        # Create/re-create the WinPython base directory
+            self.winpydir = str(Path(self.target) / my_winpydir)  # Create/re-create the WinPython base directory
         self._print(
             "Creating WinPython %s base directory"
             % my_winpydir
         )
         if (
-            osp.isdir(self.winpydir)
+            # osp.isdir(self.winpydir)
+            Path(self.winpydir).is_dir()
             and remove_existing
             and not self.simulation
         ):
             shutil.rmtree(
                 self.winpydir, onerror=utils.onerror
             )
-        if not osp.isdir(self.winpydir):
+        # if not osp.isdir(self.winpydir):
+        if not Path(self.winpydir).is_dir():
             os.mkdir(self.winpydir)
         if remove_existing and not self.simulation:
             # Create settings directory
             # (only necessary if user is starting an application with a batch
             #  scripts before using an executable launcher, because the latter
             #  is creating the directory automatically)
-            os.mkdir(osp.join(self.winpydir, 'settings'))
-            os.mkdir(osp.join(self.winpydir, 'settings', 'AppData'))
-            os.mkdir(osp.join(self.winpydir, 'settings', 'AppData', 'Roaming'))
+            # os.mkdir(osp.join(self.winpydir, 'settings'))
+            os.mkdir(str(Path(self.winpydir) / 'settings'))
+            # os.mkdir(osp.join(self.winpydir, 'settings', 'AppData'))
+            os.mkdir(str(Path(self.winpydir) / 'settings' / 'AppData'))
+            # os.mkdir(osp.join(self.winpydir, 'settings', 'AppData', 'Roaming'))
+            os.mkdir(str(Path(self.winpydir) / 'settings' / 'AppData' / 'Roaming'))
         self._print_done()
 
         if remove_existing and not self.simulation:
@@ -2253,7 +2290,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         # Copy to winpython/changelogs
         shutil.copyfile(
             fname,
-            osp.join(CHANGELOGS_DIR, osp.basename(fname)),
+            #osp.join(CHANGELOGS_DIR, osp.basename(fname)),
+            str(Path(CHANGELOGS_DIR) / Path(fname).name),
         )
         self._print_done()
 
@@ -2279,9 +2317,11 @@ def rebuild_winpython(
         if name.startswith('winpython-') and name.endswith(
             ('.exe', '.whl')
         ):
-            os.remove(osp.join(packdir, name))
+            # os.remove(osp.join(packdir, name))
+            os.remove(str(Path(packdir) / name))
     utils.build_wininst(
-        osp.dirname(osp.abspath(__file__)),
+        # osp.dirname(osp.abspath(__file__)),
+        str(Path(__file__).resolve().parent),
         copy_to=packdir,
         architecture=architecture,
         verbose=verbose,
@@ -2339,13 +2379,16 @@ def make_all(
     ), "The *basedir* directory must be specified"
     assert architecture in (32, 64)
     utils.print_box(
-        "Making WinPython %dbits at %s" % (architecture, 
-         osp.join(basedir, 'bu' + flavor))
-    )
+         # "Making WinPython %dbits at %s" % (architecture, 
+         # osp.join(basedir, 'bu' + flavor))
+        "Making WinPython %dbits at %s" % (architecture,
+                                    str(Path(basedir) / ('bu' + flavor))))
 
     # Create Build director, where Winpython will be constructed
-    builddir = osp.join(basedir, 'bu' + flavor)
-    if not osp.isdir(builddir):
+    # builddir = osp.join(basedir, 'bu' + flavor)
+    builddir = str(Path(basedir) / ('bu' + flavor) )
+    # if not osp.isdir(builddir):
+    if not Path(builddir).is_dir():
         os.mkdir(builddir)
     # use source_dirs as the directory to re-build Winpython wheel
     wheeldir = source_dirs
