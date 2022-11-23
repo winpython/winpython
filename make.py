@@ -13,7 +13,7 @@ Created on Sun Aug 12 11:17:50 2012
 from __future__ import print_function
 
 import os
-import os.path as osp
+# import os.path as osp
 from pathlib import Path
 import re
 import subprocess
@@ -385,43 +385,53 @@ class WinPythonDistribution(object):
         """Return Package Index page in Wiki format"""
         installed_tools = []
 
-        def get_tool_path(relpath, checkfunc):
+        def get_tool_path_file(relpath):
             if self.simulation:
                 for dirname in self.toolsdirs:
                     path = dirname + relpath.replace(
                         r'\t', ''
                     )
-                    if checkfunc(path):
+                    if Path(path).is_file():
                         return path
             else:
                 path = self.winpydir + relpath
-                if checkfunc(path):
+                if Path(path).is_file():
                     return path
 
-        if get_tool_path(r'\t\SciTE.exe', osp.isfile):
+        def get_tool_path_dir(relpath):
+            if self.simulation:
+                for dirname in self.toolsdirs:
+                    path = dirname + relpath.replace(
+                        r'\t', ''
+                    )
+                    if Path(path).is_dir():
+                        return path
+            else:
+                path = self.winpydir + relpath
+                if Path(path).is_dir():
+                    return path
+
+        if get_tool_path_file(r'\t\SciTE.exe'):
             installed_tools += [('SciTE', '3.3.7')]
-        rpath = get_tool_path(self.R_PATH, osp.isdir)
+
+        rpath = get_tool_path_dir(self.R_PATH)
         if rpath is not None:
             rver = utils.get_r_version(rpath)
             installed_tools += [('R', rver)]
-        juliapath = get_tool_path(
-            self.JULIA_PATH, osp.isdir
-        )
+
+        juliapath = get_tool_path_dir(self.JULIA_PATH)
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
             installed_tools += [('Julia', juliaver)]
-        nodepath = get_tool_path(
-            self.NODEJS_PATH, osp.isdir
-        )
+            
+        nodepath = get_tool_path_dir(self.NODEJS_PATH)
         if nodepath is not None:
             nodever = utils.get_nodejs_version(nodepath)
             installed_tools += [('Nodejs', nodever)]
             npmver = utils.get_npmjs_version(nodepath)
             installed_tools += [('npmjs', npmver)]
 
-        pandocexe = get_tool_path(
-            r'\t\pandoc.exe', osp.isfile
-        )
+        pandocexe = get_tool_path_file(r'\t\pandoc.exe')
         if pandocexe is not None:
             pandocver = utils.get_pandoc_version(
                 #osp.dirname(pandocexe)
@@ -429,7 +439,7 @@ class WinPythonDistribution(object):
             )
             installed_tools += [('Pandoc', pandocver)]
 
-        vscodeexe = get_tool_path(r'\t\VSCode\Code.exe', osp.isfile)
+        vscodeexe = get_tool_path_file(r'\t\VSCode\Code.exe')
         if vscodeexe is not None:
             installed_tools += [('VSCode',
                            utils.getFileProperties(vscodeexe)['FileVersion'])]
