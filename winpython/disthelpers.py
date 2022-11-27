@@ -104,7 +104,6 @@ def prepend_modules_to_path(module_base_path):
     messages = [
         prepend_module_to_path(dirname)
         for dirname in fnames
-        # if osp.isdir(dirname)
         if Path(dirname).is_dir()
     ]
     return os.linesep.join(messages)
