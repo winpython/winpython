@@ -48,7 +48,6 @@ from winpython._vendor.qtpy.compat import (
 
 import os
 import re
-# import os.path as osp
 from pathlib import Path
 import sys
 
@@ -62,7 +61,6 @@ from winpython.py3compat import (
 
 def get_icon(name):
     """Return QIcon from icon name"""
-    # return QIcon(osp.join(config.IMAGE_PATH, name))
     return QIcon(str(Path(config.IMAGE_PATH) / name))
 
 
@@ -157,11 +155,9 @@ def _process_mime_path(path, extlist):
                 path = path[5:]
         else:
             path = path[7:]
-    # if osp.exists(path):
     if Path(path).exists():
         if (
             extlist is None
-            #or osp.splitext(path)[1] in extlist
             or Path(path).suffix in extlist
         ):
             return path
