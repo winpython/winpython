@@ -14,7 +14,6 @@ from __future__ import print_function
 
 import sys
 import os
-# import os.path as osp
 from pathlib import Path
 #  import subprocess
 
@@ -44,19 +43,15 @@ def _get_shortcut_data(target, current=True):
     wpgroup = utils.create_winpython_start_menu_folder(
         current=current
     )
-    # wpdir = osp.join(target, os.pardir)
     wpdir = str(Path(target).parent)
     data = []
     for name in os.listdir(wpdir):
-        # bname, ext = osp.splitext(name)
         bname, ext = Path(name).stem, Path(name).suffix
         if ext == '.exe':
             data.append(
                 (
-                    # osp.join(wpdir, name),
                     str(Path(wpdir) / name),
                     bname,
-                    # osp.join(wpgroup, bname),
                     str(Path(wpgroup) / bname),
                 )
             )
@@ -118,24 +113,11 @@ def register(target, current=True):
     )
 
     # Verbs
-    # python = osp.abspath(osp.join(target, 'python.exe'))
-    # python = osp.abspath(str(Path(target) / 'python.exe'))
     python = str((Path(target) / 'python.exe').resolve())
-    # pythonw = osp.abspath(osp.join(target, 'pythonw.exe'))
-    #pythonw = osp.abspath(str(Path(target) / 'pythonw.exe'))
     pythonw = str((Path(target) / 'pythonw.exe').resolve())
-    #spyder = osp.abspath(
-    #    # osp.join(target, os.pardir, 'Spyder.exe')
-    #    str(Path(target).parent / 'Spyder.exe')
-    #)
     spyder = str((Path(target).parent / 'Spyder.exe').resolve())
 
-    # if not osp.isfile(spyder):
     if not Path(spyder).is_file():
-        #spyder = '%s" "%s\Scripts\spyder' % (
-        #    pythonw,
-        #    target,
-        #)
         spyder = f'{pythonw}" "{target}\Scripts\spyder'
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C2 % ("", "open")),
@@ -202,7 +184,6 @@ def register(target, current=True):
             handler,
         )
     # Icons
-    # dlls = osp.join(target, 'DLLs')
     dlls = str(Path(target) / 'DLLs')
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_I % ""),
@@ -374,7 +355,6 @@ def unregister(target, current=True):
     for path, desc, fname in _get_shortcut_data(
         target, current=current
     ):
-        # if osp.exists(fname):
         if Path(fname).exists():
             os.remove(fname)
 
