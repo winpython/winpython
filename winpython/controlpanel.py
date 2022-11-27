@@ -10,7 +10,6 @@ WinPython Package Manager GUI
 Created on Mon Aug 13 11:40:01 2012
 """
 
-#  import os.path as osp
 from pathlib import Path
 import os
 import sys
@@ -249,7 +248,6 @@ class PackagesTable(QTableView):
         notcompatible = []
         dist = self.distribution
         for fname in fnames:
-            # bname = osp.basename(fname)
             bname = Path(fname).name
             try:
                 package = wppm.Package(fname)
@@ -356,7 +354,7 @@ class PackagesTable(QTableView):
         fnames = [
             path
             for path in mimedata2url(source)
-            if Path(path).is_file()  # if osp.isfile(path)
+            if Path(path).is_file()
         ]
         self.add_packages(fnames)
         event.acceptProposedAction()
@@ -408,7 +406,6 @@ class DistributionSelector(QWidget):
         """Select directory"""
         #  basedir = to_text_string(self.line_edit.text())
         basedir = str(self.line_edit.text())
-        # if not osp.isdir(basedir):
         if not Path(basedir).is_dir():
             basedir = str(Path.cwd())  # getcwd()
         while True:
@@ -426,8 +423,6 @@ class DistributionSelector(QWidget):
                 )
                 basedir = directory
                 continue
-            # directory = osp.abspath(osp.normpath(directory))
-            # directory = str(Path(osp.normpath(directory)).resolve())
             directory = str(Path(directory).resolve(strict=False))
             self.set_distribution(directory)
             # PyQt4 old SIGNAL: self.emit(SIGNAL('selected_distribution(QString)'), directory)
@@ -672,7 +667,6 @@ class PMWindow(QMainWindow):
             ),
         )
         open_console_action.setEnabled(
-            #  osp.exists(self.command_prompt_path)
             Path(self.command_prompt_path).exists()
         )
         add_actions(
@@ -816,11 +810,6 @@ class PMWindow(QMainWindow):
 
     @property
     def command_prompt_path(self):
-        # return osp.join(
-        #     self.distribution.target,
-        #     osp.pardir,
-        #     "WinPython Command Prompt.exe",
-        # )
         return str(Path(self.distribution.target).parent /
                    "WinPython Command Prompt.exe")
 
@@ -850,7 +839,6 @@ class PMWindow(QMainWindow):
             filters='*.exe *.zip *.tar.gz *.whl',
         )
         if fnames:
-            # self.basedir = osp.dirname(fnames[0])
             self.basedir = str(Path(fnames[0]).parent)
             self.table.add_packages(fnames)
 
