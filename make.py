@@ -126,7 +126,7 @@ def replace_in_nsis_file(fname, data):
             if line.startswith(start + ' '):
                 lines[idx] = (
                     line[: len(start) + 1]
-                    + ('"%s"' % text)
+                    + f'"{text}"'
                     + '\n'
                 )
     fd = open(fname, 'w')
@@ -151,7 +151,7 @@ def replace_in_iss_file(fname, data):
             if line.startswith(start + ' '):
                 lines[idx] = (
                     line[: len(start) + 1]
-                    + ('"%s"' % text)
+                    + f'"{text}"'
                     + '\n'
                 )
     fd = open(fname, 'w')
@@ -176,7 +176,7 @@ def replace_in_7zip_file(fname, data):
             if line.startswith(start + '='):
                 lines[idx] = (
                     line[: len(start) + 1]
-                    + ('%s' % text)
+                    + f'{text}'
                     + '\n'
                 )
     fd = open(fname, 'w')
@@ -198,7 +198,7 @@ def build_nsis(srcname, dstname, data):
     replace_in_nsis_file(dstname, data)
     try:
         retcode = subprocess.call(
-            '"%s" -V2 "%s"' % (NSIS_EXE, dstname),
+            f'"{NSIS_EXE}" -V2 "{dstname}"',
             shell=True,
             stdout=sys.stderr,
         )
@@ -221,7 +221,7 @@ def build_iss(srcname, dstname, data):
     replace_in_iss_file(dstname, data)
     try:
         retcode = subprocess.call(
-            '"%s"  "%s"' % (ISCC_EXE, dstname),
+            f'"{ISCC_EXE}"  "{dstname}"',
             shell=True,
             stdout=sys.stderr,
         )
@@ -247,9 +247,9 @@ def build_7zip(srcname, dstname, data):
     replace_in_7zip_file(dstname, data)
     try:
         # insted of a 7zip command line, we launch a script that does it
-        # retcode = subprocess.call('"%s"  "%s"' % (SEVENZIP_EXE, dstname),
+        # retcode = subprocess.call(f'"{SEVENZIP_EXE}"  "{dstname}"'),
         retcode = subprocess.call(
-            '"%s"  ' % (dstname),
+            f'"{dstname}"  ',
             shell=True,
             stdout=sys.stderr,
         )
@@ -326,7 +326,7 @@ class WinPythonDistribution(object):
         self.python_name = Path(self.python_fname).name[
             :-4
         ]
-        self.distname = 'winUNKNOWN' #win%s' % self.python_name #  PyPy ?  
+        self.distname = 'winUNKNOWN'  # f'win{self.python_name}' #  PyPy ?  
         #vlst = (
         #    re.match(r'winpython-([0-9\.]*)', self.distname)
         #    .groups()[0]
@@ -406,32 +406,25 @@ class WinPythonDistribution(object):
                 metadata['url'],
                 metadata['description'],
             )
-            tools += [
-                '[%s](%s) | %s | %s'
-                % (name, url, ver, desc)
-            ]
+            tools += [f'[{name}]({url}) | {ver} | {desc}']
         # get all packages installed in the changelog, whatever the method
         self.installed_packages = (
             self.distribution.get_installed_packages(update=True)
         )
 
         packages = [
-            '[%s](%s) | %s | %s'
-            % (
-                pack.name,
-                pack.url,
-                pack.version,
-                pack.description,
-            )
+            f'[{pack.name}]({pack.url}) | {pack.version} | {pack.description}'
             for pack in sorted(
                 self.installed_packages,
                 key=lambda p: p.name.lower(),
             )
         ]
         python_desc = 'Python programming language with standard library'
-        return """## WinPython %s 
+        tools_f = '\n'.join(tools)
+        packages_f = '\n'.join(packages)
+        return f"""## WinPython {self.winpyver2 + self.flavor} 
 
-The following packages are included in WinPython-%sbit v%s%s.
+The following packages are included in WinPython-{self.winpy_arch}bit v{self.winpyver2+self.flavor} {self.release_level}.
 
 <details>
 
@@ -439,34 +432,20 @@ The following packages are included in WinPython-%sbit v%s%s.
 
 Name | Version | Description
 -----|---------|------------
-%s
+{tools_f}
 
 ### Python packages
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | %s | %s
-%s""" % (
-            self.winpyver2 + self.flavor,
-            self.winpy_arch,
-            self.winpyver2 + self.flavor,
-            (' %s' % self.release_level),
-            '\n'.join(tools),
-            self.python_fullversion,
-            python_desc,
-            '\n'.join(packages),
-        ) + '\n\n</details>\n'
+[Python](http://www.python.org/) | {self.python_fullversion} | {python_desc}
+{packages_f}""" + '\n\n</details>\n'
 
     # @property makes self.winpyver becomes a call to self.winpyver()
     @property
     def winpyver(self):
         """Return WinPython version (with flavor and release level!)"""
-        return '%s.%d%s%s' % (
-            self.python_fullversion,
-            self.build_number,
-            self.flavor,
-            self.release_level,
-        )
+        return f'{self.python_fullversion}.{self.build_number}{self.flavor}{self.release_level}'
 
     @property
     def python_dir(self):
@@ -476,7 +455,7 @@ Name | Version | Description
     @property
     def winpy_arch(self):
         """Return WinPython architecture"""
-        return '%d' % self.distribution.architecture
+        return f'{self.distribution.architecture}'
 
     @property
     def py_arch(self):
@@ -552,8 +531,7 @@ Name | Version | Description
                 return str((Path(path) / fname).resolve())
         else:
             raise RuntimeError(
-                'Could not find required package matching %s'
-                % pattern
+                f'Could not find required package matching {pattern}'
             )
 
     def create_batch_script(self, name, contents,
@@ -601,7 +579,7 @@ Name | Version | Description
         fname = str(Path(self.winpydir) / (Path(name).stem + '.nsi'))
 
         data = [
-            ('WINPYDIR', '$EXEDIR\%s' % self.python_name),
+            ('WINPYDIR', f'$EXEDIR\{self.python_name}'),
             ('WINPYVER', self.winpyver),
             ('COMMAND', command),
             ('PARAMETERS', args),
@@ -662,22 +640,12 @@ call "%~dp0env_for_icons.bat"
             ('ARCH', self.winpy_arch),
             (
                 'VERSION',
-                '%s.%d%s'
-                % (
-                    self.python_fullversion,
-                    self.build_number,
-                    self.flavor,
-                ),
+                f'{self.python_fullversion}.{self.build_number}{self.flavor}',
             ),
             (
                 'VERSION_INSTALL',
-                '%s%d'
-                % (
-                    self.python_fullversion.replace(
-                        '.', ''
-                    ),
-                    self.build_number,
-                ),
+                f'{self.python_fullversion.replace(".", "")}'+
+                f'{self.build_number}',
             ),
             ('RELEASELEVEL', self.release_level),
         )
@@ -694,22 +662,12 @@ call "%~dp0env_for_icons.bat"
             ('ARCH', self.winpy_arch),
             (
                 'VERSION',
-                '%s.%d%s'
-                % (
-                    self.python_fullversion,
-                    self.build_number,
-                    self.flavor,
-                ),
+                f'{self.python_fullversion}.{self.build_number}{self.flavor}',
             ),
             (
                 'VERSION_INSTALL',
-                '%s%d'
-                % (
-                    self.python_fullversion.replace(
-                        '.', ''
-                    ),
-                    self.build_number,
-                ),
+                f'{self.python_fullversion.replace(".", "")}'+
+                f'{self.build_number}',
             ),
             ('RELEASELEVEL', self.release_level),
         )
@@ -726,22 +684,12 @@ call "%~dp0env_for_icons.bat"
             ('ARCH', self.winpy_arch),
             (
                 'VERSION',
-                '%s.%d%s'
-                % (
-                    self.python_fullversion,
-                    self.build_number,
-                    self.flavor,
-                ),
+                f'{self.python_fullversion}.{self.build_number}{self.flavor}',
             ),
             (
                 'VERSION_INSTALL',
-                '%s%d'
-                % (
-                    self.python_fullversion.replace(
-                        '.', ''
-                    ),
-                    self.build_number,
-                ),
+                f'{self.python_fullversion.replace(".", "")}'+
+                f'{self.build_number}',
             ),
             ('RELEASELEVEL', self.release_level),
         )
@@ -1974,24 +1922,17 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self, this_batch="run_complement.bat"
     ):
         """ tools\..\run_complement.bat for final complements"""
-        print('now %s in tooldirs\..' % this_batch)
+        print(f'now {this_batch} in tooldirs\..')
         for post_complement in list(
             set([str(Path(s).parent) for s in self._toolsdirs])
         ):
             filepath = str(Path(post_complement) / this_batch)
             if Path(filepath).is_file():
-                print(
-                    'launch "%s"  for  "%s"'
-                    % (filepath, self.winpydir)
-                )
-                self._print(
-                    'launch "%s"  for  "%s" !'
-                    % (filepath, self.winpydir)
-                )    
+                print(f'launch "{filepath}"  for  "{self.winpydir}"')
+                self._print(f'launch "{filepath}"  for  "{self.winpydir}" !')
                 try:
                     retcode = subprocess.call(
-                        '"%s"   "%s"'
-                        % (filepath, self.winpydir),
+                        f'"{filepath}"   "{self.winpydir}"',
                         shell=True,
                         stdout=sys.stderr,
                     )
@@ -2046,10 +1987,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.winpydir = str(Path(self.target) / self.distname)  # PyPy to delete
         else:
             self.winpydir = str(Path(self.target) / my_winpydir)  # Create/re-create the WinPython base directory
-        self._print(
-            "Creating WinPython %s base directory"
-            % my_winpydir
-        )
+        self._print(f"Creating WinPython {my_winpydir} base directory")
         if (
             Path(self.winpydir).is_dir()
             and remove_existing
@@ -2111,8 +2049,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 actions = ["install", "--upgrade", "--pre", req]
                 if self.install_options is not None:
                     actions += self.install_options
-                print("piping %s" % ' '.join(actions))
-                self._print("piping %s" % ' '.join(actions))
+                print(f"piping {' '.join(actions)}")
+                self._print(f"piping {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(
                     req
@@ -2132,10 +2070,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     actions = ["install", "-r", req]
                     if self.install_options is not None:
                         actions += self.install_options
-                    print("piping %s" % ' '.join(actions))
-                    self._print(
-                        "piping %s" % ' '.join(actions)
-                    )
+                    print(f"piping {' '.join(actions)}")
+                    self._print(f"piping {' '.join(actions)}")
                     self.distribution.do_pip_action(actions)
                     # actions=["install","-r", req, "--no-index",
                     #         "--trusted-host=None"]+ links,
@@ -2150,10 +2086,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print("Writing package index")
         # winpyver2 = need the version without build part
         # but with self.distribution.architecture
-        self.winpyver2 = '%s.%s' % (
-            self.python_fullversion,
-            self.build_number,
-        )
+        self.winpyver2 = f'{self.python_fullversion}.{self.build_number}'
         fname = str(Path(self.winpydir).parent / (
                 f'WinPython{self.flavor}-' +
                 f'{self.distribution.architecture}bit-'+
@@ -2248,8 +2181,8 @@ def make_all(
     ), "The *basedir* directory must be specified"
     assert architecture in (32, 64)
     utils.print_box(
-        "Making WinPython %dbits at %s" % (architecture,
-                                    str(Path(basedir) / ('bu' + flavor))))
+        f"Making WinPython {architecture}bits"+
+        f" at {Path(basedir) / ('bu' + flavor)}")
 
     # Create Build director, where Winpython will be constructed
     builddir = str(Path(basedir) / ('bu' + flavor) )
@@ -2273,7 +2206,7 @@ def make_all(
     docsdirs = transform_in_list(docsdirs, 'docsdirs=')
     print('docsdirs output', docsdirs)
     
-    # install_options = ['--no-index', '--pre', '--find-links=%s' % wheeldir]
+    # install_options = ['--no-index', '--pre', f'--find-links={wheeldir)']
     install_options = transform_in_list(
         install_options, 'install_options'
     )
@@ -2281,7 +2214,7 @@ def make_all(
     find_links = transform_in_list(find_links, 'find_links')
 
     find_list = [
-        '--find-links=%s' % l
+        f'--find-links={l}'
         for l in find_links + [wheeldir]
     ]
     dist = WinPythonDistribution(
@@ -2312,23 +2245,23 @@ def make_all(
     if not python_target_release == None :
         my_winpydir = (
         'WPy'
-        + ('%s' % architecture)
+        + f'{architecture}'
         + '-'
         + python_target_release
         + ''
-        + ('%s' % build_number)
+        + f'{build_number}'
     ) + release_level
     # + flavor
     else:
         my_winpydir = (
         'WPy'
-        + ('%s' % architecture)
+        + f'{architecture}'
         + '-'
         + pyver.replace('.', '')
         + ''
         + my_x
         + ''
-        + ('%s' % build_number)
+        + f'{build_number}'
     ) + release_level
     # + flavor
 
