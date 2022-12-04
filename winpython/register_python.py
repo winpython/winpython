@@ -23,4 +23,4 @@ print(args.target)
 if utils.is_python_distribution(args.target):
     associate.register(args.target, current=not args.all)
 else:
-    raise WindowsError("Invalid Python distribution %s" % args.target)
+    raise WindowsError(f"Invalid Python distribution {args.target}")
