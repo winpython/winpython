@@ -126,20 +126,15 @@ class BasePackage(object):
         self.url = None
 
     def __str__(self):
-        text = "%s %s" % (self.name, self.version)
+        text = f"{self.name} {self.version}"
         pytext = ""
         if self.pyversion is not None:
-            pytext = " for Python %s" % self.pyversion
+            pytext = f" for Python {self.pyversion}"
         if self.architecture is not None:
             if not pytext:
                 pytext = " for Python"
-            pytext += " %dbits" % self.architecture
-        text += "%s\n%s\nWebsite: %s\n[%s]" % (
-            pytext,
-            self.description,
-            self.url,
-            Path(self.fname).name,
-        )
+            pytext += f" {self.architecture}bits"
+        text += f"{pytext}\n{self.description}\nWebsite: {self.url}\n[{Path(self.fname).name}]" 
         return text
 
     def is_compatible_with(self, distribution):
@@ -205,7 +200,7 @@ class Package(BasePackage):
                 self.name, self.version = infos
                 return
         raise NotImplementedError(
-            "Not supported package type %s" % bname
+            f"Not supported package type {bname}"
         )
 
 
@@ -227,7 +222,7 @@ class WininstPackage(BasePackage):
         if match is None:
             return
         self.name = match.groups()[0]
-        self.logname = '%s-wininst.log' % self.name
+        self.logname = f'{self.name}-wininst.log'
         fd = open(
             str(Path(self.distribution.target) / self.logname),
             'U',
@@ -285,8 +280,7 @@ class Distribution(object):
                 shutil.rmtree(path, onerror=utils.onerror)
             except WindowsError:
                 print(
-                    "Directory %s could not be removed"
-                    % path,
+                    f"Directory {path} could not be removed",
                     file=sys.stderr,
                 )
 
@@ -316,7 +310,7 @@ class Distribution(object):
                 src = str(Path(srcdir) / t_dname)
                 dst = str(Path(dstdir) / t_dname)
                 if self.verbose:
-                    print("mkdir: %s" % dst)
+                    print(f"mkdir: {dst}")
                 full_dst = str(Path(self.target) / dst)
                 if not Path(full_dst).exists():
                     os.mkdir(full_dst)
@@ -330,7 +324,7 @@ class Distribution(object):
                 else:
                     dst = str(Path(dstdir) / t_fname)
                 if self.verbose:
-                    print("file:  %s" % dst)
+                    print(f"file:  {dst}")
                 full_dst = str(Path(self.target) / dst)
                 shutil.move(src, full_dst)
                 package.files.append(dst)
@@ -338,7 +332,7 @@ class Distribution(object):
                 if create_bat_files and ext in ('', '.py'):
                     dst = name + '.bat'
                     if self.verbose:
-                        print("file:  %s" % dst)
+                        print(f"file:  {dst}")
                     full_dst = str(Path(self.target) / dst)
                     fd = open(full_dst, 'w')
                     fd.write(
@@ -354,7 +348,7 @@ python "%~dpn0"""
         """Generate data file -- path is relative to distribution root dir"""
         dst = str(Path(dstdir) / name)
         if self.verbose:
-            print("create:  %s" % dst)
+            print(f"create:  {dst}")
         full_dst = str(Path(self.target) / dst)
         open(full_dst, 'w').write(contents)
         package.files.append(dst)
@@ -386,8 +380,7 @@ python "%~dpn0"""
             # create pip package list
             wppm = [
                 Package(
-                    '%s-%s-py2.py3-none-any.whl'
-                    % (i[0].replace('-', '_').lower(), i[1])
+                    f"{i[0].replace('-', '_').lower()}-{i[1]}-py2.py3-none-any.whl"
                 , update=update)
                 for i in pip_list
             ]
@@ -671,7 +664,7 @@ Binaries = ."""
                 '.',
                 contents.replace(
                     '.',
-                    './Lib/site-packages/%s' % package.name,
+                    f'./Lib/site-packages/{package.name}',
                 ),
             )
             # pyuic script
@@ -691,7 +684,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 
             self.create_file(
                 package,
-                'pyuic%s.bat' % package.name[-1],
+                f'pyuic{package.name[-1]}.bat',
                 'Scripts',
                 tmp_string.replace(
                     'package.name', package.name
@@ -754,7 +747,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         """Install a package directly !"""
         self._print(
             package,
-            "Installing %s" % package.fname.split(".")[-1],
+            f"Installing {package.fname.split('.')[-1]}",
         )
         try:
             fname = utils.direct_pip_install(
@@ -861,7 +854,7 @@ from {bold}WinPython{unbold} Start menu group."
             dest='target',
             default=sys.prefix,
             help='path to target Python distribution '
-            '(default: "%s")' % sys.prefix,
+            f'(default: "{sys.prefix}")',
         )
         parser.add_argument(
             '-i',
@@ -948,7 +941,7 @@ from {bold}WinPython{unbold} Start menu group."
             if utils.is_python_distribution(args.target):
                 dist = Distribution(args.target)
             else:
-                raise WindowsError("Invalid Python distribution {args.target}")
+                raise WindowsError(f"Invalid Python distribution {args.target}")
             print(f'registering {args.target}')
             print('continue ? Y/N')
             theAnswer=input()
@@ -961,7 +954,7 @@ from {bold}WinPython{unbold} Start menu group."
             if utils.is_python_distribution(args.target):
                 dist = Distribution(args.target)
             else:
-                raise WindowsError("Invalid Python distribution {args.target}")
+                raise WindowsError(f"Invalid Python distribution {args.target}")
             print(f'unregistering {args.target}')
             print('continue ? Y/N')
             theAnswer=input()
@@ -976,7 +969,7 @@ from {bold}WinPython{unbold} Start menu group."
                 parser.print_help()
                 sys.exit()
             else:
-                raise IOError("File not found: %s" % args.fname)
+                raise IOError(f"File not found: {args.fname}")
         if utils.is_python_distribution(args.target):
             dist = Distribution(args.target)
             try:
@@ -993,11 +986,7 @@ from {bold}WinPython{unbold} Start menu group."
                     else:
                         raise RuntimeError(
                             "Package is not compatible with Python "
-                            "%s %dbit"
-                            % (
-                                dist.version,
-                                dist.architecture,
-                            )
+                            f"{dist.version} {dist.architecture}bit"
                         )
             except NotImplementedError:
                 raise RuntimeError(
@@ -1005,8 +994,7 @@ from {bold}WinPython{unbold} Start menu group."
                 )
         else:
             raise WindowsError(
-                "Invalid Python distribution %s"
-                % args.target
+                f"Invalid Python distribution {args.target}"
             )
 
 
