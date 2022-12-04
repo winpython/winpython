@@ -167,7 +167,7 @@ def diff_package_dicts(dict1_in, dict2_in):
             )
     if upgraded_list:
         text += (
-            f"Upgraded packages:\r\n\r\n{''.join(upgraded_list}\r\n"
+            "Upgraded packages:\r\n\r\n"+f"{''.join(upgraded_list)}"+"\r\n"
         )
     # Removed packages
     removed = sorted(set1 - set2)
