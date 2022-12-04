@@ -74,7 +74,7 @@ def prepend_module_to_path(module_path):
     name = Path(module_path).name
     prefix = "Prepending module to sys.path"
     message = prefix + (
-        "%s [revision %s]" % (name, changeset)
+        f"{name} [revision {changeset}]"
     ).rjust(80 - len(prefix), ".")
     print(message, file=sys.stderr)
     if name in sys.modules:
@@ -84,9 +84,9 @@ def prepend_module_to_path(module_path):
             if modname.startswith(name + '.'):
                 sys.modules.pop(modname)
                 nbsp += 1
-        warning = '(removed %s from sys.modules' % name
+        warning = f'(removed {name} from sys.modules'
         if nbsp:
-            warning += ' and %d subpackages' % nbsp
+            warning += f' and {nbsp} subpackages'
         warning += ')'
         print(warning.rjust(80), file=sys.stderr)
     return message
@@ -157,7 +157,7 @@ def strip_version(version):
 def remove_dir(dirname):
     """Remove directory *dirname* and all its contents
     Print details about the operation (progress, success/failure)"""
-    print("Removing directory '%s'..." % dirname, end=' ')
+    print(f"Removing directory '{dirname}'...", end=' ')
     try:
         shutil.rmtree(dirname, ignore_errors=True)
         print("OK")
@@ -530,7 +530,7 @@ class Distribution(object):
     def add_modules(self, *module_names):
         """Include module *module_name*"""
         for module_name in module_names:
-            print("Configuring module '%s'" % module_name)
+            print(f"Configuring module '{module_name}'")
             if module_name == 'PyQt4':
                 self.add_pyqt4()
             elif module_name == 'PySide':
@@ -552,7 +552,7 @@ class Distribution(object):
                 ]:
                     if hasattr(h5py, attr):
                         self.includes.append(
-                            'h5py.%s' % attr
+                            f'h5py.{attr}'
                         )
                 if (
                     self.bin_path_excludes is not None
@@ -598,8 +598,7 @@ class Distribution(object):
                     ):
                         if Path(fname).suffix == '.py':
                             modname = (
-                                'sphinx.ext.%s'
-                                % Path(fname).stem
+                                f'sphinx.ext.{Path(fname).stem}'
                             )
                             self.includes.append(modname)
             elif module_name == 'pygments':
@@ -661,8 +660,7 @@ class Distribution(object):
                     )
                 except IOError:
                     raise RuntimeError(
-                        "Module not supported: %s"
-                        % module_name
+                        f"Module not supported: {module_name}"
                     )
 
     def add_module_data_dir(
@@ -684,7 +682,7 @@ class Distribution(object):
         data_dir = str(Path(module_dir) / data_dir_name)
         if not Path(data_dir).is_dir():
             raise IOError(
-                "Directory not found: %s" % data_dir
+                f"Directory not found: {data_dir}"
             )
         for dirpath, _dirnames, filenames in os.walk(
             data_dir
@@ -719,12 +717,7 @@ class Distribution(object):
         *extensions*: list of file extensions, e.g. ('.png', '.svg')
         """
         print(
-            "Adding module '%s' data files in %s (%s)"
-            % (
-                module_name,
-                ", ".join(data_dir_names),
-                ", ".join(extensions),
-            )
+            f"Adding module '{module_name}' data files in {', '.join(data_dir_names)} ({', '.join(extensions)})"
         )
         module_dir = get_module_path(module_name)
         for data_dir_name in data_dir_names:
@@ -750,11 +743,7 @@ class Distribution(object):
                 )
             )
             print(
-                "Adding module '%s' translation file: %s"
-                % (
-                    module_name,
-                    Path(translation_file).name,
-                )
+                f"Adding module '{module_name}' translation file: {Path(translation_file).name}"
             )
 
     def build(
@@ -785,7 +774,7 @@ class Distribution(object):
             )
         else:
             raise RuntimeError(
-                "Unsupported library %s" % library
+                f"Unsupported library {library}"
             )
 
     def __cleanup(self):
@@ -803,7 +792,7 @@ class Distribution(object):
             * 'move': move target directory to a ZIP archive
         """
         name = self.target_dir
-        os.system('zip "%s.zip" -r "%s"' % (name, name))
+        os.system(f'zip "{name}.zip" -r "{name}"')
         if option == 'move':
             shutil.rmtree(name)
 
