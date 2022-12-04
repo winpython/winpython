@@ -687,7 +687,7 @@ class PMWindow(QMainWindow):
         # Help menu
         about_action = create_action(
             self,
-            "About %s..." % self.NAME,
+            f"About {self.NAME}...",
             icon=get_std_icon('MessageBoxInformation'),
             triggered=self.about,
         )
@@ -706,7 +706,7 @@ class PMWindow(QMainWindow):
         status = self.statusBar()
         status.setObjectName("StatusBar")
         status.showMessage(
-            "Welcome to %s!" % self.NAME, 5000
+            f"Welcome to {self.NAME}!", 5000
         )
 
         # Button layouts
@@ -823,8 +823,7 @@ class PMWindow(QMainWindow):
         self.untable.refresh_distribution(dist)
         self.distribution = dist
         self.selector.label.setText(
-            'Python %s %dbit:'
-            % (dist.version, dist.architecture)
+            f'Python {dist.version} {dist.architecture}bit:'
         )
 
     def add_packages(self):
@@ -887,8 +886,7 @@ class PMWindow(QMainWindow):
         for index, package in enumerate(packages):
             progress.setValue(index)
             progress.setLabelText(
-                "%s %s %s..."
-                % (text, package.name, package.version)
+                f"{text} {package.name} {package.version}..."
             )
             QApplication.processEvents()
             if progress.wasCanceled():
@@ -915,9 +913,9 @@ class PMWindow(QMainWindow):
                     QMessageBox.critical(
                         self,
                         "Error",
-                        "<b>Unable to %s <i>%s</i></b>"
-                        "<br><br>Error message:<br>%s"
-                        % (action, pstr, error),
+                        f"<b>Unable to {action} <i>{<pstr}/i></b>"
+                        f"<br><br>Error message:<br>{error}"
+                        ,
                     )
         progress.setValue(progress.maximum())
         status.clearMessage()
@@ -930,12 +928,12 @@ class PMWindow(QMainWindow):
 
     def report_issue(self):
 
-        issue_template = """\
-Python distribution:   %s
-Control panel version: %s
+        issue_template = f"""\
+Python distribution:   {python_distribution_infos()}
+Control panel version: {__version__}
 
-Python Version:  %s
-Qt Version:      %s, %s %s
+Python Version:  {platform.python_version()}
+Qt Version:      {winpython._vendor.qtpy.QtCore.__version__}, {winpython.qt.API_NAME} {winpython._vendor.qtpy.__version__}
 
 What steps will reproduce the problem?
 1.
@@ -946,16 +944,9 @@ What is the expected output? What do you see instead?
 
 
 Please provide any additional information below.
-""" % (
-            python_distribution_infos(),
-            __version__,
-            platform.python_version(),
-            winpython._vendor.qtpy.QtCore.__version__,
-            winpython.qt.API_NAME,
-            winpython._vendor.qtpy.__version__,
-        )
+"""
 
-        url = QUrl("%s/issues/entry" % __project_url__)
+        url = QUrl(f"{__project_url__}/issues/entry")
         url.addQueryItem("comment", issue_template)
         QDesktopServices.openUrl(url)
 
@@ -963,27 +954,18 @@ Please provide any additional information below.
         """About this program"""
         QMessageBox.about(
             self,
-            "About %s" % self.NAME,
-            """<b>%s %s</b>
+            f"About {self.NAME}",
+            f"""<b>{self.NAME} {__version__}</b>
             <br>Package Manager and Advanced Tasks
             <p>Copyright &copy; 2012 Pierre Raybaut
             <br>Licensed under the terms of the MIT License
             <p>Created, developed and maintained by Pierre Raybaut
-            <p><a href="%s">WinPython at Github.io</a>: downloads, bug reports,
+            <p><a href="{__project_url__}">WinPython at Github.io</a>: downloads, bug reports,
             discussions, etc.</p>
             <p>This program is executed by:<br>
-            <b>%s</b><br>
-            Python %s, Qt %s, %s qtpy %s"""
-            % (
-                self.NAME,
-                __version__,
-                __project_url__,
-                python_distribution_infos(),
-                platform.python_version(),
-                winpython._vendor.qtpy.QtCore.__version__,
-                winpython._vendor.qtpy.API_NAME,
-                winpython._vendor.qtpy.__version__,
-            ),
+            <b>{python_distribution_infos()}</b><br>
+            Python {platform.python_version()}, Qt {winpython._vendor.qtpy.QtCore.__version__}, {winpython._vendor.qtpy.API_NAME} qtpy {winpython._vendor.qtpy.__version__}"""
+            ,
         )
 
 
