@@ -41,11 +41,8 @@ class Package(object):
         self.url = None
 
     def __str__(self):
-        text = "%s %s" % (self.name, self.version)
-        text += "\r\n%s\r\nWebsite: %s" % (
-            self.description,
-            self.url,
-        )
+        text = f"{self.name} {self.version}"
+        text += f"\r\n{self.description}\r\nWebsite: {self.url}"
         return text
 
     def from_text(self, text):
@@ -59,12 +56,7 @@ class Package(object):
             ).groups()
 
     def to_wiki(self):
-        return "  * [%s](%s) %s (%s)\r\n" % (
-            self.name,
-            self.url,
-            self.version,
-            self.description,
-        )
+        return f"  * [{self.name}]({self.url}) {self.version} ({self.description})\r\n"
 
     def upgrade_wiki(self, other):
         # wheel replace '-' per '_' in package name
@@ -72,13 +64,7 @@ class Package(object):
             self.name.replace('-', '_').lower()
             == other.name.replace('-', '_').lower()
         )
-        return "  * [%s](%s) %s → %s (%s)\r\n" % (
-            self.name,
-            self.url,
-            other.version,
-            self.version,
-            self.description,
-        )
+        return f"  * [{self.name}]({self.url}) {other.version} → {self.version} ({self.description})\r\n"
 
 
 class PackageIndex(object):
@@ -181,8 +167,7 @@ def diff_package_dicts(dict1_in, dict2_in):
             )
     if upgraded_list:
         text += (
-            "Upgraded packages:\r\n\r\n%s\r\n"
-            % "".join(upgraded_list)
+            f"Upgraded packages:\r\n\r\n{''.join(upgraded_list}\r\n"
         )
     # Removed packages
     removed = sorted(set1 - set2)
@@ -213,9 +198,9 @@ def find_closer_version(
     try:
         index = versions.index(version1)
     except ValueError:
-        raise ValueError("Unknown version %s" % version1)
+        raise ValueError(f"Unknown version {version1}")
     if index == 0:
-        print("No version prior to %s" % version1)
+        print(f"No version prior to {version1}")
         index += 1  # we don't want to fail on this
     return versions[index - 1]
 
@@ -239,12 +224,10 @@ def compare_package_indexes(
     flavor1 = flavor1 if flavor1 is not None else flavor
     text = '\r\n'.join(
         [
-            "## History of changes for WinPython-%sbit %s"
-            % (architecture, version2 + flavor),
+            f"## History of changes for WinPython-{architecture}bit {version2 + flavor}",
             "",
-            "The following changes were made to WinPython-%sbit"
-            " distribution since version %s."
-            % (architecture, version1 + flavor1),
+            f"The following changes were made to WinPython-{architecture}bit"
+            f" distribution since version {version1 + flavor1}.",
             "",
             "<details>",
             "",
@@ -354,7 +337,7 @@ def test_parse_package_index_wiki(
         flavor=flavor,
         architecture=architecture,
     )
-    utils.print_box("WinPython %s:" % pi.version)
+    utils.print_box(f"WinPython {pi.version}:")
     utils.print_box("Tools:")
     for package in pi.other_packages.values():
         print(package)
