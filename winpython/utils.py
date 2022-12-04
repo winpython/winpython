@@ -194,7 +194,7 @@ def get_special_folder_path(path_name):
                 0, csidl, False
             )
     raise ValueError(
-        "%s is an unknown path ID" % (path_name,)
+        f"{path_name} is an unknown path ID"
     )
 
 
@@ -225,7 +225,7 @@ def create_winpython_start_menu_folder(current=True):
             shutil.rmtree(path, onerror=onerror)
         except WindowsError:
             print(
-                "Directory %s could not be removed" % path,
+                f"Directory {path} could not be removed",
                 file=sys.stderr,
             )
     else:
@@ -371,13 +371,13 @@ def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
     the_exe = get_python_executable(path)
     # debug2021-09-12
-    print('"%s" -c "%s"' % (the_exe, cmd), ' * ',  path)
-    return exec_shell_cmd('"%s" -c "%s"' % (the_exe, cmd), path).splitlines()[0]
+    print(f'"{the_exe}" -c "{cmd}"', ' * ',  path)
+    return exec_shell_cmd(f'"{the_exe}" -c "{cmd}"', path).splitlines()[0]
 
 def python_execmodule(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
     the_exe = get_python_executable(path)
-    exec_shell_cmd('%s -m %s' % (the_exe, cmd), path)
+    exec_shell_cmd(f'{the_exe} -m {cmd}', path)
 
 
 def get_python_infos(path):
@@ -389,8 +389,8 @@ def get_python_infos(path):
     )
     arch = {'True': 64, 'False': 32}.get(is_64, None)
     ver = python_query(
-        "import sys; print('%d.%d' % (sys.version_info.major, "
-        "sys.version_info.minor))",
+        "import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+        ,
         path,
     )
     if re.match(r'([0-9]*)\.([0-9]*)', ver) is None:
@@ -403,9 +403,8 @@ def get_python_long_version(path):
     """Return long version (X.Y.Z) for the Python distribution located in
     *path*"""
     ver = python_query(
-        "import sys; print('%d.%d.%d' % "
-        "(sys.version_info.major, sys.version_info.minor,"
-        "sys.version_info.micro))",
+        "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
+        ,
         path,
     )
     if (
@@ -634,10 +633,10 @@ def extract_exe(fname, targetdir=None, verbose=False):
         targetdir = _create_temp_dir()
     extract = '7z.exe'
     assert is_program_installed(extract), (
-        "Required program '%s' was not found" % extract
+        f"Required program '{extract}' was not found"
     )
     bname = Path(fname).name
-    args = ['x', '-o%s' % targetdir, '-aos', bname]
+    args = ['x', f'-o{targetdir}', '-aos', bname]
     if verbose:
         retcode = subprocess.call(
             [extract] + args, cwd=str(Path(fname).parent)
@@ -653,8 +652,7 @@ def extract_exe(fname, targetdir=None, verbose=False):
         retcode = p.returncode
     if retcode != 0:
         raise RuntimeError(
-            "Failed to extract %s (return code: %d)"
-            % (fname, retcode)
+            f"Failed to extract {fname} (return code: {retcode})"
         )
     return targetdir
 
@@ -676,7 +674,7 @@ def extract_archive(fname, targetdir=None, verbose=False):
         obj = tarfile.open(fname, mode='r:gz')
     else:
         raise RuntimeError(
-            "Unsupported archive filename %s" % fname
+            f"Unsupported archive filename {fname}"
         )
     obj.extractall(path=targetdir)
     return targetdir
@@ -727,7 +725,7 @@ def build_wininst(
         archstr = (
             'win32' if architecture == 32 else 'win-amd64'
         )
-        cmd += ['--plat-name=%s' % archstr]
+        cmd += [f'--plat-name={archstr}']
     cmd += [installer]
     # root = a tmp dir in windows\tmp,
     if verbose:
@@ -769,8 +767,7 @@ def build_wininst(
             break
     else:
         raise RuntimeError(
-            "Build failed: not a pure Python package? %s"
-            % distdir
+            f"Build failed: not a pure Python package? {distdir}"
         )
     src_fname = str(Path(distdir) / distname)
     if copy_to is None:
@@ -781,8 +778,7 @@ def build_wininst(
         if verbose:
             print(
                 (
-                    "Move: %s --> %s"
-                    % (src_fname, (dst_fname))
+                    f"Move: {src_fname} --> {dst_fname}"
                 )
             )
             # remove tempo dir 'root' no more needed
@@ -821,14 +817,14 @@ def direct_pip_install(
             stderr=subprocess.PIPE,
         )
         stdout, stderr = p.communicate()
-        the_log = "%s" % stdout + "\n %s" % stderr
+        the_log = f"{stdout}" + f"\n {stderr}"
 
         if (
             ' not find ' in the_log
             or ' not found ' in the_log
         ):
-            print("Failed to Install: \n %s \n" % fname)
-            print("msg: %s" % the_log)
+            print(f"Failed to Install: \n {fname} \n")
+            print(f"msg: {the_log}")
             raise RuntimeError
         p.stdout.close()
         p.stderr.close()
@@ -837,7 +833,7 @@ def direct_pip_install(
         return src_fname
     else:
         if verbose:
-            print("Installed %s" % src_fname)
+            print(f"Installed {src_fname}")
         return src_fname
 
 
@@ -877,7 +873,7 @@ def do_script(
         p.stdout.close()
         p.stderr.close()
     if verbose:
-        print("Executed " % cmd)
+        print("Executed " , cmd)
     return 'ok'
 
 
