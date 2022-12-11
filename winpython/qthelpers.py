@@ -83,10 +83,7 @@ class MacApplication(QApplication):
 def qapplication(translate=True):
     """Return QApplication instance
     Creates it if it doesn't already exist"""
-    if (
-        sys.platform == "darwin"
-        and 'Spyder.app' in __file__
-    ):
+    if sys.platform == "darwin" and "Spyder.app" in __file__:
         SpyderApplication = MacApplication
     else:
         SpyderApplication = QApplication
@@ -94,7 +91,7 @@ def qapplication(translate=True):
     if not app:
         # Set Application name for Gnome 3
         # https://groups.google.com/forum/#!topic/pyside/24qxvwfrRDs
-        app = SpyderApplication(['Spyder'])
+        app = SpyderApplication(["Spyder"])
     if translate:
         install_translator(app)
     return app
@@ -102,15 +99,15 @@ def qapplication(translate=True):
 
 def file_uri(fname):
     """Select the right file uri scheme according to the operating system"""
-    if os.name == 'nt':
+    if os.name == "nt":
         # Local file
-        if re.search(r'^[a-zA-Z]:', fname):
-            return 'file:///' + fname
+        if re.search(r"^[a-zA-Z]:", fname):
+            return "file:///" + fname
         # UNC based path
         else:
-            return 'file://' + fname
+            return "file://" + fname
     else:
-        return 'file://' + fname
+        return "file://" + fname
 
 
 QT_TRANSLATOR = None
@@ -123,13 +120,9 @@ def install_translator(qapp):
         qt_translator = QTranslator()
         if qt_translator.load(
             "qt_" + QLocale.system().name(),
-            QLibraryInfo.location(
-                QLibraryInfo.TranslationsPath
-            ),
+            QLibraryInfo.location(QLibraryInfo.TranslationsPath),
         ):
-            QT_TRANSLATOR = (
-                qt_translator
-            )  # Keep reference alive
+            QT_TRANSLATOR = qt_translator  # Keep reference alive
     if QT_TRANSLATOR is not None:
         qapp.installTranslator(QT_TRANSLATOR)
 
@@ -137,29 +130,22 @@ def install_translator(qapp):
 def keybinding(attr):
     """Return keybinding"""
     ks = getattr(QKeySequence, attr)
-    return from_qvariant(
-        QKeySequence.keyBindings(ks)[0], str
-    )
+    return from_qvariant(QKeySequence.keyBindings(ks)[0], str)
 
 
 def _process_mime_path(path, extlist):
     if path.startswith(r"file://"):
-        if os.name == 'nt':
+        if os.name == "nt":
             # On Windows platforms, a local path reads: file:///c:/...
             # and a UNC based path reads like: file://server/share
-            if path.startswith(
-                r"file:///"
-            ):  # this is a local path
+            if path.startswith(r"file:///"):  # this is a local path
                 path = path[8:]
             else:  # this is a unc path
                 path = path[5:]
         else:
             path = path[7:]
     if Path(path).exists():
-        if (
-            extlist is None
-            or Path(path).suffix in extlist
-        ):
+        if extlist is None or Path(path).suffix in extlist:
             return path
 
 
@@ -171,15 +157,11 @@ def mimedata2url(source, extlist=None):
     pathlist = []
     if source.hasUrls():
         for url in source.urls():
-            path = _process_mime_path(
-                to_text_string(url.toString()), extlist
-            )
+            path = _process_mime_path(to_text_string(url.toString()), extlist)
             if path is not None:
                 pathlist.append(path)
     elif source.hasText():
-        for rawpath in to_text_string(
-            source.text()
-        ).splitlines():
+        for rawpath in to_text_string(source.text()).splitlines():
             path = _process_mime_path(rawpath, extlist)
             if path is not None:
                 pathlist.append(path)
@@ -200,9 +182,7 @@ def action2button(
     button.setDefaultAction(action)
     button.setAutoRaise(autoraise)
     if text_beside_icon:
-        button.setToolButtonStyle(
-            Qt.ToolButtonTextBesideIcon
-        )
+        button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
     return button
 
 
@@ -264,9 +244,7 @@ def add_actions(target, actions, insert_before=None):
         if previous_action.isSeparator():
             previous_action = None
     for action in actions:
-        if (action is None) and (
-            previous_action is not None
-        ):
+        if (action is None) and (previous_action is not None):
             if insert_before is None:
                 target.addSeparator()
             else:
@@ -287,13 +265,9 @@ def add_actions(target, actions, insert_before=None):
 def get_std_icon(name, size=None):
     """Get standard platform icon
     Call 'show_std_icons()' for details"""
-    if not name.startswith('SP_'):
-        name = 'SP_' + name
-    icon = (
-        QWidget()
-        .style()
-        .standardIcon(getattr(QStyle, name))
-    )
+    if not name.startswith("SP_"):
+        name = "SP_" + name
+    icon = QWidget().style().standardIcon(getattr(QStyle, name))
     if size is None:
         return icon
     else:
