@@ -54,12 +54,12 @@ class pipdata:
             if "requires_dist" in meta:
                 for i in meta["requires_dist"]:
                     det = (i + ";").split(";")
-                    
+
                     # req_nameextra is "python-jose[cryptography]"
                     #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
-                    # req_nameextra is "google-cloud-storage" 
+                    # req_nameextra is "google-cloud-storage"
                     #   from "google-cloud-storage (<2.0.0,>=1.26.0)
-                    req_nameextra = re.split(' |;|==|!|>|<', det[0]+ ";")[0]
+                    req_nameextra = re.split(" |;|==|!|>|<", det[0] + ";")[0]
                     req_nameextra = normalize(req_nameextra)
                     req_key = normalize((req_nameextra + "[").split("[")[0])
                     req_key_extra = req_nameextra[len(req_key) + 1 :].split("]")[0]
@@ -187,9 +187,7 @@ class pipdata:
         "return desciption of the package"
         if pp in self.distro:
             return print("\n".join(self.distro[pp]["description"].split(r"\n")))
-        
+
     def pip_list(self):
-        """ do like pip list"""
-        return [(p , self.distro[p]['version']) for p in sorted(self.distro)] 
-    
-    
+        """do like pip list"""
+        return [(p, self.distro[p]["version"]) for p in sorted(self.distro)]
