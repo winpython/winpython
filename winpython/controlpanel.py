@@ -913,7 +913,7 @@ class PMWindow(QMainWindow):
                     QMessageBox.critical(
                         self,
                         "Error",
-                        f"<b>Unable to {action} <i>{<pstr}/i></b>"
+                        f"<b>Unable to {action} <i>{pstr}/i></b>"
                         f"<br><br>Error message:<br>{error}"
                         ,
                     )
