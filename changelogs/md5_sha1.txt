@@ -1,3 +1,14 @@
+### WinPython 2022-04 release (January 22nd, 2023)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | SHA3-256                                                         
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|------------------------------------------------------------------
+5d6c22345a952affe1266a92abf14ceb | 7ba4581efb578247ba3ee2d998162135e3ef83b3 | 7c61728acb13954ba862348116676c30617aec8fc45536fa882c9b0dd9278eda | Winpython64-3.10.9.0dot.exe       |   27 467 759 Bytes | b1a6760c984ccdbd13df31c742bf6dbb2b5246f617781f313e2db843dc6d89ff
+ba3268df9d7e5206dee6b7a42dbab8a7 | 214ebb0110df945f37be8ff884447103b69d7d70 | 49738ff219cd23cd1e96afaf2a6b8eabdcdb04575167dd46e1f132e946821326 | Winpython32-3.10.9.0dot.exe       |   26 249 584 Bytes | 3e39907400b728719093edb0a67213da956f243caeaaf13842faeab1b0ee9235
+46a26e25ca6524ebaabfa04b390d3b91 | da52d4ab1bdf923aaf36f69f5d8eeb057e8eab84 | 1577b72582c04fb43f2353c17d09c41f927f8a4994f33a2a6689e2558ade0204 | Winpython64-3.11.1.0dot.exe       |   24 404 166 Bytes | e5fa479d2d5948f0e399c08bcfe30ed088dc10d726ba2406ec22c5d65a6769f3
+8e3fb06b4ae8e3741207bd650b62df15 | 3a2600c37217d9be245ec67f1a1154af282424d6 | 6d265a1b795d3a444a8890db114f8cd7153b41378a02bd21cb2bcd5ba431c4e3 | Winpython64-3.10.9.0.exe          |  683 571 740 Bytes | 3cef6ad93ef127063b24b112c7a4e9437878033e0dee486c5d80991c964ee860
+8ba6cb889fba7bd208a36cdd123dbcb6 | aa63897b18bb8bb35b236a1068501552290c24f8 | 7664b45097ab206828a9c1de7b03c14d622dc2bb94733075c62a6174c2252698 | Winpython64-3.11.1.0.exe          |  562 936 337 Bytes | 024c570acf8bd6a0f5ce6fad784ff6791323f984c911a81523da485bcc9432ae
+
+
 ### WinPython 2022-03 release (October 30th, 2022)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | SHA3-256                                                         
