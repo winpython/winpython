@@ -5,7 +5,7 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides Windows-specific utilities"""
+"""Provides classes and functions specific to macOS and iOS operating systems"""
 
 import sys
 
@@ -18,14 +18,14 @@ from . import (
     QtModuleNotInOSError,
 )
 
-if sys.platform == 'win32':
+if sys.platform == 'darwin':
     if PYQT5:
-        from PyQt5.QtWinExtras import *
+        from PyQt5.QtMacExtras import *
     elif PYQT6:
-        raise QtModuleNotInQtVersionError(name='QtWinExtras')
+        raise QtModuleNotInQtVersionError(name='QtMacExtras')
     elif PYSIDE2:
-        from PySide2.QtWinExtras import *
+        from PySide2.QtMacExtras import *
     elif PYSIDE6:
-        raise QtModuleNotInQtVersionError(name='QtWinExtras')
+        raise QtModuleNotInQtVersionError(name='QtMacExtras')
 else:
-    raise QtModuleNotInOSError(name='QtWinExtras')
+    raise QtModuleNotInOSError(name='QtMacExtras')

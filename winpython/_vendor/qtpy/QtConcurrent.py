@@ -5,7 +5,7 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtLocation classes and functions."""
+"""Provides QtConcurrent classes and functions."""
 
 from . import (
     PYQT5,
@@ -16,10 +16,10 @@ from . import (
 )
 
 if PYQT5:
-    from PyQt5.QtLocation import *
+    raise QtBindingMissingModuleError(name='QtConcurrent')
 elif PYQT6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    raise QtBindingMissingModuleError(name='QtConcurrent')
 elif PYSIDE2:
-    from PySide2.QtLocation import *
+    from PySide2.QtConcurrent import *
 elif PYSIDE6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    from PySide6.QtConcurrent import *

@@ -11,8 +11,8 @@ Qt binding independent libraries or applications.
 
 If one of the APIs has already been imported, then it will be used.
 
-Otherwise, the shim will automatically select the first available API (PyQt5, PyQt6,
-PySide2 and PySide6); in that case, you can force the use of one
+Otherwise, the shim will automatically select the first available API (PyQt5, PySide2,
+PyQt6 and PySide6); in that case, you can force the use of one
 specific bindings (e.g. if your application is using one specific bindings and
 you need to use library that use QtPy) by setting up the ``QT_API`` environment
 variable.
@@ -25,14 +25,6 @@ For PyQt5, you don't have to set anything as it will be used automatically::
     >>> from qtpy import QtGui, QtWidgets, QtCore
     >>> print(QtWidgets.QWidget)
 
-PyQt6
-=====
-
-    >>> import os
-    >>> os.environ['QT_API'] = 'pyqt6'
-    >>> from qtpy import QtGui, QtWidgets, QtCore
-    >>> print(QtWidgets.QWidget)
-
 PySide2
 ======
 
@@ -41,6 +33,14 @@ packages::
 
     >>> import os
     >>> os.environ['QT_API'] = 'pyside2'
+    >>> from qtpy import QtGui, QtWidgets, QtCore
+    >>> print(QtWidgets.QWidget)
+
+PyQt6
+=====
+
+    >>> import os
+    >>> os.environ['QT_API'] = 'pyqt6'
     >>> from qtpy import QtGui, QtWidgets, QtCore
     >>> print(QtWidgets.QWidget)
 
@@ -61,7 +61,7 @@ import sys
 import warnings
 
 # Version of QtPy
-__version__ = '2.0.0.dev1'
+__version__ = '2.3.0'
 
 
 class PythonQtError(RuntimeError):
@@ -70,6 +70,63 @@ class PythonQtError(RuntimeError):
 
 class PythonQtWarning(Warning):
     """Warning if some features are not implemented in a binding."""
+
+
+class PythonQtValueError(ValueError):
+    """Error raised if an invalid QT_API is specified."""
+
+
+class QtBindingsNotFoundError(PythonQtError):
+    """Error raised if no bindings could be selected."""
+    _msg = 'No Qt bindings could be found'
+    
+    def __init__(self):
+        super().__init__(self._msg)
+
+
+class QtModuleNotFoundError(ModuleNotFoundError, PythonQtError):
+    """Raised when a Python Qt binding submodule is not installed/supported."""
+    _msg = 'The {name} module was not found.'
+    _msg_binding = '{binding}'
+    _msg_extra = ''
+
+    def __init__(self, *, name, msg=None, **msg_kwargs):
+        global API_NAME
+        binding = self._msg_binding.format(binding=API_NAME)
+        msg = msg or f'{self._msg} {self._msg_extra}'.strip()
+        msg = msg.format(name=name, binding=binding, **msg_kwargs)
+        super().__init__(msg, name=name)
+
+
+class QtModuleNotInOSError(QtModuleNotFoundError):
+    """Raised when a module is not supported on the current operating system."""
+    _msg = '{name} does not exist on this operating system.'
+
+
+class QtModuleNotInQtVersionError(QtModuleNotFoundError):
+    """Raised when a module is not implemented in the current Qt version."""
+    _msg = '{name} does not exist in {version}.'
+    
+    def __init__(self, *, name, msg=None, **msg_kwargs):
+        global QT5, QT6
+        version = 'Qt5' if QT5 else 'Qt6'
+        super().__init__(name=name, version=version)
+
+
+class QtBindingMissingModuleError(QtModuleNotFoundError):
+    """Raised when a module is not supported by a given binding."""
+    _msg_extra = 'It is not currently implemented in {binding}.'
+
+
+class QtModuleNotInstalledError(QtModuleNotFoundError):
+    """Raise when a module is supported by the binding, but not installed."""
+    _msg_extra = 'It must be installed separately'
+
+    def __init__(self, *, missing_package=None, **superclass_kwargs):
+        self.missing_package = missing_package
+        if missing_package is not None:
+             self._msg_extra += ' as {missing_package}.'
+        super().__init__(missing_package=missing_package, **superclass_kwargs)
 
 
 # Qt API environment variable name
@@ -93,17 +150,19 @@ QT6_VERSION_MIN = PYQT6_VERSION_MIN = PYSIDE6_VERSION_MIN = '6.2.0'
 
 QT_VERSION_MIN = QT5_VERSION_MIN
 PYQT_VERSION_MIN = PYQT5_VERSION_MIN
-PYSIDE_VERISION_MIN = PYSIDE2_VERSION_MIN
+PYSIDE_VERSION_MIN = PYSIDE2_VERSION_MIN
 
 # Detecting if a binding was specified by the user
 binding_specified = QT_API in os.environ
 
-# Setting a default value for QT_API
-os.environ.setdefault(QT_API, 'pyqt5')
-
-API = os.environ[QT_API].lower()
+API_NAMES = {'pyqt5': 'PyQt5', 'pyside2': 'PySide2',
+             'pyqt6': 'PyQt6', 'pyside6': 'PySide6'}
+API = os.environ.get(QT_API, 'pyqt5').lower()
 initial_api = API
-assert API in (PYQT5_API + PYQT6_API + PYSIDE2_API + PYSIDE6_API)
+if API not in API_NAMES:
+    raise PythonQtValueError(
+        f'Specified QT_API={repr(QT_API.lower())} is not in valid options: '
+        f'{API_NAMES}')
 
 is_old_pyqt = is_pyqt46 = False
 QT5 = PYQT5 = True
@@ -115,14 +174,14 @@ QT_VERSION = None
 
 # Unless `FORCE_QT_API` is set, use previously imported Qt Python bindings
 if not os.environ.get('FORCE_QT_API'):
-    if 'PyQt6' in sys.modules:
-        API = initial_api if initial_api in PYQT6_API else 'pyqt6'
-    elif 'PyQt5' in sys.modules:
+    if 'PyQt5' in sys.modules:
         API = initial_api if initial_api in PYQT5_API else 'pyqt5'
-    elif 'PySide6' in sys.modules:
-        API = initial_api if initial_api in PYSIDE6_API else 'pyside6'
     elif 'PySide2' in sys.modules:
         API = initial_api if initial_api in PYSIDE2_API else 'pyside2'
+    elif 'PyQt6' in sys.modules:
+        API = initial_api if initial_api in PYQT6_API else 'pyqt6'
+    elif 'PySide6' in sys.modules:
+        API = initial_api if initial_api in PYSIDE6_API else 'pyside6'
 
 if API in PYQT5_API:
     try:
@@ -148,19 +207,9 @@ if API in PYQT5_API:
 
             del macos_version
     except ImportError:
-        API = os.environ['QT_API'] = 'pyqt6'
-
-if API in PYQT6_API:
-    try:
-        from PyQt6.QtCore import PYQT_VERSION_STR as PYQT_VERSION  # analysis:ignore
-        from PyQt6.QtCore import QT_VERSION_STR as QT_VERSION  # analysis:ignore
-
-        QT5 = PYQT5 = False
-        QT6 = PYQT6 = True
-
-    except ImportError:
-        API = os.environ['QT_API'] = 'pyside2'
-
+        API = 'pyside2'
+    else:
+        os.environ[QT_API] = API
 
 if API in PYSIDE2_API:
     try:
@@ -181,7 +230,22 @@ if API in PYSIDE2_API:
 
             del macos_version
     except ImportError:
-        API = os.environ['QT_API'] = 'pyside6'
+        API = 'pyqt6'
+    else:
+        os.environ[QT_API] = API
+
+if API in PYQT6_API:
+    try:
+        from PyQt6.QtCore import PYQT_VERSION_STR as PYQT_VERSION  # analysis:ignore
+        from PyQt6.QtCore import QT_VERSION_STR as QT_VERSION  # analysis:ignore
+
+        QT5 = PYQT5 = False
+        QT6 = PYQT6 = True
+
+    except ImportError:
+        API = 'pyside6'
+    else:
+        os.environ[QT_API] = API
 
 if API in PYSIDE6_API:
     try:
@@ -192,7 +256,9 @@ if API in PYSIDE6_API:
         QT6 = PYSIDE6 = True
 
     except ImportError:
-        API = os.environ['QT_API'] = 'pyqt5'
+        raise QtBindingsNotFoundError()
+    else:
+        os.environ[QT_API] = API
 
 
 # If a correct API name is passed to QT_API and it could not be found,
@@ -201,8 +267,9 @@ if API != initial_api and binding_specified:
     warnings.warn('Selected binding "{}" could not be found, '
                   'using "{}"'.format(initial_api, API), RuntimeWarning)
 
-API_NAME = {'pyqt6': 'PyQt6', 'pyqt5': 'PyQt5',
-            'pyside2':'PySide2', 'pyside6': 'PySide6'}[API]
+
+# Set display name of the Qt API
+API_NAME = API_NAMES[API]
 
 try:
     # QtDataVisualization backward compatibility (QtDataVisualization vs. QtDatavisualization)

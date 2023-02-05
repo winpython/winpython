@@ -5,7 +5,7 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtLocation classes and functions."""
+"""Provides access to shiboken."""
 
 from . import (
     PYQT5,
@@ -16,10 +16,12 @@ from . import (
 )
 
 if PYQT5:
-    from PyQt5.QtLocation import *
+    raise QtBindingMissingModuleError(name='shiboken')
 elif PYQT6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    raise QtBindingMissingModuleError(name='shiboken')
 elif PYSIDE2:
-    from PySide2.QtLocation import *
+    from shiboken2 import *
+    import shiboken2 as shiboken
 elif PYSIDE6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    from shiboken6 import *
+    import shiboken6 as shiboken

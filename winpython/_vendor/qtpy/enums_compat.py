@@ -21,7 +21,9 @@ if PYQT6:
         Search enums in the given module and allow unscoped access.
 
         Taken from:
-        https://github.com/pyqtgraph/pyqtgraph/blob/pyqtgraph-0.12.1/pyqtgraph/Qt.py#L331-L377 
+        https://github.com/pyqtgraph/pyqtgraph/blob/pyqtgraph-0.12.1/pyqtgraph/Qt.py#L331-L377
+        and adapted to also copy enum values aliased under different names.
+
         """
         class_names = [name for name in dir(module) if name.startswith('Q')]
         for class_name in class_names:
@@ -33,5 +35,5 @@ if PYQT6:
                 attrib = getattr(klass, attrib_name)
                 if not isinstance(attrib, enum.EnumMeta):
                     continue
-                for enum_obj in attrib:
-                    setattr(klass, enum_obj.name, enum_obj)
+                for name, value in attrib.__members__.items():
+                    setattr(klass, name, value)

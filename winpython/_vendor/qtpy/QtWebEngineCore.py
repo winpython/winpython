@@ -4,18 +4,32 @@
 # Licensed under the terms of the MIT License
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
+
 """Provides QtWebEngineCore classes and functions."""
 
-# Local imports
-from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6, PythonQtError
+from . import (
+    PYQT5,
+    PYQT6,
+    PYSIDE2,
+    PYSIDE6,
+    QtModuleNotInstalledError,
+)
 
 if PYQT5:
-    from PyQt5.QtWebEngineCore import *
+    try:
+        from PyQt5.QtWebEngineCore import *
+    except ModuleNotFoundError as error:
+        raise QtModuleNotInstalledError(
+            name='QtWebEngineCore', missing_package='PyQtWebEngine'
+        ) from error
 elif PYQT6:
-    from PyQt6.QtWebEngineCore import *
+    try:
+        from PyQt6.QtWebEngineCore import *
+    except ModuleNotFoundError as error:
+        raise QtModuleNotInstalledError(
+            name='QtWebEngineCore', missing_package='PyQt6-WebEngine'
+        ) from error
 elif PYSIDE2:
     from PySide2.QtWebEngineCore import *
 elif PYSIDE6:
     from PySide6.QtWebEngineCore import *
-else:
-    raise PythonQtError('No Qt bindings could be found')

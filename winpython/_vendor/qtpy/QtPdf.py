@@ -5,7 +5,7 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtLocation classes and functions."""
+"""Provides QtPdf classes and functions."""
 
 from . import (
     PYQT5,
@@ -16,10 +16,12 @@ from . import (
 )
 
 if PYQT5:
-    from PyQt5.QtLocation import *
+    raise QtBindingMissingModuleError(name='QtPdf')
 elif PYQT6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    # Available with version >=6.4.0
+    from PyQt6.QtPdf import *
 elif PYSIDE2:
-    from PySide2.QtLocation import *
+    raise QtBindingMissingModuleError(name='QtPdf')
 elif PYSIDE6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    # Available with version >=6.4.0
+    from PySide6.QtPdf import *

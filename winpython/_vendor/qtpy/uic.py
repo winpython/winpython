@@ -86,6 +86,18 @@ else:
         from PySide2.QtUiTools import QUiLoader
         try:
             from pyside2uic import compileUi
+            # Patch UIParser as xml.etree.Elementree.Element.getiterator
+            # was deprecated since Python 3.2 and removed in Python 3.9
+            # https://docs.python.org/3.9/whatsnew/3.9.html#removed
+            from pyside2uic.uiparser import UIParser
+            from xml.etree.ElementTree import Element
+            class ElemPatched(Element):
+                def getiterator(self, *args, **kwargs):
+                    return self.iter(*args, **kwargs)
+            def readResources(self, elem):
+                return self._readResources(ElemPatched(elem))
+            UIParser._readResources = UIParser.readResources
+            UIParser.readResources = readResources
         except ImportError:
             pass
 
@@ -247,6 +259,7 @@ else:
         import sys
         from io import StringIO
         from xml.etree.ElementTree import ElementTree
+        
         from . import QtWidgets
 
         # Parse the UI file

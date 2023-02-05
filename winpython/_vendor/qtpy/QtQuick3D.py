@@ -5,15 +5,21 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtSvg classes and functions."""
+"""Provides QtQuick3D classes and functions."""
 
-from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6
+from . import (
+    PYQT5,
+    PYQT6,
+    PYSIDE2,
+    PYSIDE6,
+    QtBindingMissingModuleError,
+)
 
 if PYQT5:
-    from PyQt5.QtSvg import *
+    from PyQt5.QtQuick3D import *
 elif PYQT6:
-    from PyQt6.QtSvg import *
+    from PyQt6.QtQuick3D import *
 elif PYSIDE2:
-    from PySide2.QtSvg import *
+    raise QtBindingMissingModuleError(name='QtQuick3D')
 elif PYSIDE6:
-    from PySide6.QtSvg import *
+    from PySide6.QtQuick3D import *
