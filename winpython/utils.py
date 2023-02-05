@@ -27,7 +27,8 @@ import locale
 import io
 
 # Local imports
-from winpython.py3compat import winreg
+#from winpython.py3compat import winreg
+import winreg
 
 def get_python_executable(path = None):
     """return the python executable"""
