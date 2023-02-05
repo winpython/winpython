@@ -5,7 +5,7 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides Windows-specific utilities"""
+"""Provides Linux-specific utilities"""
 
 import sys
 
@@ -18,14 +18,14 @@ from . import (
     QtModuleNotInOSError,
 )
 
-if sys.platform == 'win32':
+if sys.platform == 'linux':
     if PYQT5:
-        from PyQt5.QtWinExtras import *
+        from PyQt5.QtX11Extras import *
     elif PYQT6:
-        raise QtModuleNotInQtVersionError(name='QtWinExtras')
+        raise QtModuleNotInQtVersionError(name='QtX11Extras')
     elif PYSIDE2:
-        from PySide2.QtWinExtras import *
+        from PySide2.QtX11Extras import *
     elif PYSIDE6:
-        raise QtModuleNotInQtVersionError(name='QtWinExtras')
+        raise QtModuleNotInQtVersionError(name='QtX11Extras')
 else:
-    raise QtModuleNotInOSError(name='QtWinExtras')
+    raise QtModuleNotInOSError(name='QtX11Extras')

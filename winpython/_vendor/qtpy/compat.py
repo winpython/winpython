@@ -7,6 +7,13 @@ Compatibility functions
 """
 import sys
 
+from . import (
+    PYQT5,
+    PYQT6,
+    PYSIDE2,
+    PYSIDE6,
+)
+
 from .QtWidgets import QFileDialog
 
 
@@ -75,7 +82,7 @@ def getexistingdirectory(parent=None, caption='', basedir='',
 def _qfiledialog_wrapper(attr, parent=None, caption='', basedir='',
                          filters='', selectedfilter='', options=None):
     if options is None:
-        options = QFileDialog.Options(0)
+        options = QFileDialog.Option(0)
 
     func = getattr(QFileDialog, attr)
 
@@ -129,3 +136,14 @@ def getsavefilename(parent=None, caption='', basedir='', filters='',
                                 caption=caption, basedir=basedir,
                                 filters=filters, selectedfilter=selectedfilter,
                                 options=options)
+
+# =============================================================================
+def isalive(object):
+    """Wrapper around sip.isdeleted and shiboken.isValid which tests whether
+    an object is currently alive."""
+    if PYQT5 or PYQT6:
+        from . import sip
+        return not sip.isdeleted(object)
+    elif PYSIDE2 or PYSIDE6:
+        from . import shiboken
+        return shiboken.isValid(object)

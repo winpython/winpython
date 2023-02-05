@@ -5,15 +5,21 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtSvg classes and functions."""
+"""Provides QtScxml classes and functions."""
 
-from . import PYQT5, PYQT6, PYSIDE2, PYSIDE6
+from . import (
+    PYQT5,
+    PYQT6,
+    PYSIDE2,
+    PYSIDE6,
+    QtBindingMissingModuleError,
+)
 
 if PYQT5:
-    from PyQt5.QtSvg import *
+    raise QtBindingMissingModuleError(name='QtScxml')
 elif PYQT6:
-    from PyQt6.QtSvg import *
+    raise QtBindingMissingModuleError(name='QtScxml')
 elif PYSIDE2:
-    from PySide2.QtSvg import *
+    from PySide2.QtScxml import *
 elif PYSIDE6:
-    from PySide6.QtSvg import *
+    from PySide6.QtScxml import *

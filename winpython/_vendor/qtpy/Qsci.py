@@ -5,27 +5,32 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtWebEngineQuick classes and functions."""
+"""Provides Qsci classes and functions."""
 
 from . import (
     PYQT5,
     PYQT6,
     PYSIDE2,
     PYSIDE6,
-    QtModuleNotInstalledError,
     QtBindingMissingModuleError,
+    QtModuleNotInstalledError
 )
 
 if PYQT5:
-    raise QtBindingMissingModuleError(name='QtWebEngineQuick')
-elif PYQT6:
     try:
-        from PyQt6.QtWebEngineQuick import *
+        from PyQt5.Qsci import *
     except ModuleNotFoundError as error:
         raise QtModuleNotInstalledError(
-            name='QtWebEngineQuick', missing_package='PyQt6-WebEngine'
+            name='Qsci', missing_package='QScintilla'
+        ) from error
+elif PYQT6:
+    try:
+        from PyQt6.Qsci import *
+    except ModuleNotFoundError as error:
+        raise QtModuleNotInstalledError(
+            name='Qsci', missing_package='PyQt6-QScintilla'
         ) from error
 elif PYSIDE2:
-    raise QtBindingMissingModuleError(name='QtWebEngineQuick')
+    raise QtBindingMissingModuleError(name='Qsci')
 elif PYSIDE6:
-    from PySide6.QtWebEngineQuick import *
+    raise QtBindingMissingModuleError(name='Qsci')

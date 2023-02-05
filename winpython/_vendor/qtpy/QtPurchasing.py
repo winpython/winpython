@@ -5,27 +5,27 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtWebEngineQuick classes and functions."""
+"""Provides QtPurchasing classes and functions."""
 
 from . import (
     PYQT5,
     PYQT6,
     PYSIDE2,
     PYSIDE6,
-    QtModuleNotInstalledError,
     QtBindingMissingModuleError,
+    QtModuleNotInstalledError,
 )
 
 if PYQT5:
-    raise QtBindingMissingModuleError(name='QtWebEngineQuick')
-elif PYQT6:
     try:
-        from PyQt6.QtWebEngineQuick import *
+        from PyQt5.QtPurchasing import *
     except ModuleNotFoundError as error:
         raise QtModuleNotInstalledError(
-            name='QtWebEngineQuick', missing_package='PyQt6-WebEngine'
+            name='QtPurchasing', missing_package='PyQtPurchasing'
         ) from error
+elif PYQT6:
+    raise QtBindingMissingModuleError(name='QtPurchasing')
 elif PYSIDE2:
-    raise QtBindingMissingModuleError(name='QtWebEngineQuick')
+    raise QtBindingMissingModuleError(name='QtPurchasing')
 elif PYSIDE6:
-    from PySide6.QtWebEngineQuick import *
+    raise QtBindingMissingModuleError(name='QtPurchasing')

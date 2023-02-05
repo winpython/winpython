@@ -4,14 +4,22 @@
 # Licensed under the terms of the MIT License
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
+
 """Provides QtXmlPatterns classes and functions."""
 
-# Local imports
-from . import PYSIDE2, PYQT5, PythonQtError
+from . import (
+    PYQT5,
+    PYQT6,
+    PYSIDE2,
+    PYSIDE6,
+    QtBindingMissingModuleError,
+)
 
 if PYQT5:
     from PyQt5.QtXmlPatterns import *
+elif PYQT6:
+    raise QtBindingMissingModuleError(name='QtXmlPatterns')
 elif PYSIDE2:
     from PySide2.QtXmlPatterns import *
-else:
-    raise PythonQtError('No Qt bindings could be found')
+elif PYSIDE6:
+    raise QtBindingMissingModuleError(name='QtXmlPatterns')

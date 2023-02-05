@@ -5,7 +5,7 @@
 # (see LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 
-"""Provides QtLocation classes and functions."""
+"""Provides QtSvgWidgets classes and functions."""
 
 from . import (
     PYQT5,
@@ -16,10 +16,10 @@ from . import (
 )
 
 if PYQT5:
-    from PyQt5.QtLocation import *
+    raise QtBindingMissingModuleError(name='QtSvgWidgets')
 elif PYQT6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    from PyQt6.QtSvgWidgets import *
 elif PYSIDE2:
-    from PySide2.QtLocation import *
+    raise QtBindingMissingModuleError(name='QtSvgWidgets')
 elif PYSIDE6:
-    raise QtBindingMissingModuleError(name='QtLocation')
+    from PySide6.QtSvgWidgets import *
