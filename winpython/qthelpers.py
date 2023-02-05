@@ -53,10 +53,10 @@ import sys
 
 # Local import
 from winpython import config
-from winpython.py3compat import (
-    is_text_string,
-    to_text_string,
-)
+#from winpython.py3compat import (
+#    is_text_string,
+#    to_text_string,
+#)
 
 
 def get_icon(name):
@@ -157,11 +157,13 @@ def mimedata2url(source, extlist=None):
     pathlist = []
     if source.hasUrls():
         for url in source.urls():
-            path = _process_mime_path(to_text_string(url.toString()), extlist)
+            # path = _process_mime_path(to_text_string(url.toString()), extlist)
+            path = _process_mime_path(str(url.toString()), extlist)
             if path is not None:
                 pathlist.append(path)
     elif source.hasText():
-        for rawpath in to_text_string(source.text()).splitlines():
+        # for rawpath in to_text_string(source.text()).splitlines():
+        for rawpath in str(source.text()).splitlines():
             path = _process_mime_path(rawpath, extlist)
             if path is not None:
                 pathlist.append(path)
@@ -216,7 +218,8 @@ def create_action(
         action.toggled.connect(toggled)
         action.setCheckable(True)
     if icon is not None:
-        if is_text_string(icon):
+        # if is_text_string(icon):
+        if isinstance(obj, str)
             icon = get_icon(icon)
         action.setIcon(icon)
     if shortcut is not None:

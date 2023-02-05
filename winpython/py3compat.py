@@ -28,11 +28,7 @@ PY3 = sys.version[0] == '3'
 # ==============================================================================
 # Data types
 # ==============================================================================
-if PY2:
-    # Python 2
-    TEXT_TYPES = (str, unicode)
-    INT_TYPES = (int, long)
-else:
+if True:
     # Python 3
     TEXT_TYPES = (str,)
     INT_TYPES = (int,)
@@ -42,29 +38,7 @@ NUMERIC_TYPES = tuple(list(INT_TYPES) + [float, complex])
 # ==============================================================================
 # Renamed/Reorganized modules
 # ==============================================================================
-if PY2:
-    # Python 2
-    import __builtin__ as builtins
-    import ConfigParser as configparser
-
-    try:
-        import _winreg as winreg
-    except ImportError:
-        pass
-    from sys import maxint as maxsize
-
-    try:
-        import CStringIO as io
-    except ImportError:
-        import StringIO as io
-    try:
-        import cPickle as pickle
-    except ImportError:
-        import pickle
-    from UserDict import DictMixin as MutableMapping
-    import thread as _thread
-    import repr as reprlib
-else:
+if True:
     # Python 3
     import builtins
     import configparser
@@ -85,16 +59,7 @@ else:
 # ==============================================================================
 # Strings
 # ==============================================================================
-if PY2:
-    # Python 2
-    import codecs
-
-    def u(obj):
-        """Make unicode object"""
-        return codecs.unicode_escape_decode(obj)[0]
-
-
-else:
+if True:
     # Python 3
     def u(obj):
         """Return string as it is"""
@@ -104,20 +69,14 @@ else:
 def is_text_string(obj):
     """Return True if `obj` is a text string, False if it is anything else,
     like binary data (Python 3) or QString (Python 2, PyQt API #1)"""
-    if PY2:
-        # Python 2
-        return isinstance(obj, basestring)
-    else:
+    if True:
         # Python 3
         return isinstance(obj, str)
 
 
 def is_binary_string(obj):
     """Return True if `obj` is a binary string, False if it is anything else"""
-    if PY2:
-        # Python 2
-        return isinstance(obj, str)
-    else:
+    if True:
         # Python 3
         return isinstance(obj, bytes)
 
@@ -130,23 +89,14 @@ def is_string(obj):
 
 def is_unicode(obj):
     """Return True if `obj` is unicode"""
-    if PY2:
-        # Python 2
-        return isinstance(obj, unicode)
-    else:
+    if True:
         # Python 3
         return isinstance(obj, str)
 
 
 def to_text_string(obj, encoding=None):
     """Convert `obj` to (unicode) text string"""
-    if PY2:
-        # Python 2
-        if encoding is None:
-            return unicode(obj)
-        else:
-            return unicode(obj, encoding)
-    else:
+    if True:
         # Python 3
         if encoding is None:
             return str(obj)
@@ -159,13 +109,7 @@ def to_text_string(obj, encoding=None):
 
 def to_binary_string(obj, encoding=None):
     """Convert `obj` to binary string (bytes in Python 3, str in Python 2)"""
-    if PY2:
-        # Python 2
-        if encoding is None:
-            return str(obj)
-        else:
-            return obj.encode(encoding)
-    else:
+    if True:
         # Python 3
         return bytes(
             obj, 'utf-8' if encoding is None else encoding
@@ -177,30 +121,21 @@ def to_binary_string(obj, encoding=None):
 # ==============================================================================
 def get_func_code(func):
     """Return function code object"""
-    if PY2:
-        # Python 2
-        return func.func_code
-    else:
+    if True:
         # Python 3
         return func.__code__
 
 
 def get_func_name(func):
     """Return function name"""
-    if PY2:
-        # Python 2
-        return func.func_name
-    else:
+    if True:
         # Python 3
         return func.__name__
 
 
 def get_func_defaults(func):
     """Return function default argument values"""
-    if PY2:
-        # Python 2
-        return func.func_defaults
-    else:
+    if True:
         # Python 3
         return func.__defaults__
 
@@ -210,30 +145,21 @@ def get_func_defaults(func):
 # ==============================================================================
 def get_meth_func(obj):
     """Return method function object"""
-    if PY2:
-        # Python 2
-        return obj.im_func
-    else:
+    if True:
         # Python 3
         return obj.__func__
 
 
 def get_meth_class_inst(obj):
     """Return method class instance"""
-    if PY2:
-        # Python 2
-        return obj.im_self
-    else:
+    if True:
         # Python 3
         return obj.__self__
 
 
 def get_meth_class(obj):
     """Return method class"""
-    if PY2:
-        # Python 2
-        return obj.im_class
-    else:
+    if True:
         # Python 3
         return obj.__self__.__class__
 
@@ -241,16 +167,7 @@ def get_meth_class(obj):
 # ==============================================================================
 # Misc.
 # ==============================================================================
-if PY2:
-    # Python 2
-    input = raw_input
-    getcwd = os.getcwdu
-    cmp = cmp
-    import string
-
-    str_lower = string.lower
-    from itertools import izip_longest as zip_longest
-else:
+if True:
     # Python 3
     input = input
     getcwd = os.getcwd

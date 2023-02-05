@@ -22,17 +22,16 @@ import subprocess
 # Local imports
 from winpython import utils
 from winpython.config import DATA_PATH
-from winpython.py3compat import configparser as cp
+# from winpython.py3compat import configparser as cp
+import configparser as cp
 
 # from former wppm separate script launcher
 import textwrap
 from argparse import ArgumentParser, HelpFormatter, RawTextHelpFormatter
 
-# from winpython import py3compat
-
 from winpython import piptree
 
-#  import information reader
+# import information reader
 # importlib_metadata before Python 3.8
 try:
     from importlib import metadata as metadata  # Python-3.8
