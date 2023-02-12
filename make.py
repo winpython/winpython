@@ -877,6 +877,10 @@ set PYTHON=%WINPYDIR%\python.exe
 set WINPYVER="""
             + self.winpyver
             + r"""
+rem 2023-02-12 try utf-8 on console
+rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
+set PYTHONIOENCODING=utf-8
+
 set HOME=%WINPYDIRBASE%\settings
 rem read https://github.com/winpython/winpython/issues/839
 rem set USERPROFILE=%HOME%
@@ -1032,6 +1036,10 @@ $env:PYTHON = "%WINPYDIR%\python.exe"
 $env:WINPYVER = '"""
             + self.winpyver
             + r"""'
+# rem 2023-02-12 try utf-8 on console
+# rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
+$env:PYTHONIOENCODING = "utf-8"
+
 $env:HOME = "$env:WINPYDIRBASE\settings"
 
 # rem read https://github.com/winpython/winpython/issues/839
