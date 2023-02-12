@@ -1,4 +1,4 @@
-call C:\WinPython-64bit-3.6.8.0\scripts\env.bat
+call C:\WPy64-3890\scripts\env.bat
 
 cd %~dp0
 
