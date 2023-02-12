@@ -176,15 +176,21 @@ def find_closer_version(version1, basedir=None, flavor="", architecture=64):
         name,
     )
     versions = [func(name).groups()[0] for name in os.listdir(builddir) if func(name)]
+    # versions:['3.10.0.1', '3.10.10.0', '3.10.2.0'.... '3.10.8.1', '3.10.9.0']
     try:
         index = versions.index(version1)
     except ValueError:
         raise ValueError(f"Unknown version {version1}")
-    if index == 0:
-        print(f"No version prior to {version1}")
-        index += 1  # we don't want to fail on this
-    return versions[index - 1]
 
+    from packaging import version
+    version_below = '0.0.0.0'
+    for v in versions:
+        if version.parse(v) > version.parse(version_below) and version.parse(v)<version.parse(version1):
+            version_below = v
+    if version_below =='0.0.0.0': 
+        return version1
+    else:
+        return version_below 
 
 def compare_package_indexes(
     version2,
