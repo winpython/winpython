@@ -68,8 +68,6 @@ from winpython.qthelpers import (
 # Local imports
 from winpython import __version__, __project_url__
 from winpython import wppm, associate, utils
-# from winpython.py3compat import getcwd, to_text_string
-
 
 COLUMNS = ACTION, CHECK, NAME, VERSION, DESCRIPTION = list(
     range(5)

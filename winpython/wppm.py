@@ -22,7 +22,6 @@ import subprocess
 # Local imports
 from winpython import utils
 from winpython.config import DATA_PATH
-# from winpython.py3compat import configparser as cp
 import configparser as cp
 
 # from former wppm separate script launcher

@@ -53,10 +53,6 @@ import sys
 
 # Local import
 from winpython import config
-#from winpython.py3compat import (
-#    is_text_string,
-#    to_text_string,
-#)
 
 
 def get_icon(name):
