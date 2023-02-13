@@ -20,7 +20,6 @@ from pathlib import Path
 
 
 # Local imports
-# from winpython.py3compat import winreg
 import winreg
 from winpython import utils
 
