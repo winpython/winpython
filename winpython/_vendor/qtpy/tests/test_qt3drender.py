@@ -1,7 +1,9 @@
 import pytest
-from qtpy import PYQT6
+from qtpy import PYQT6, PYSIDE6
+
 
 @pytest.mark.skipif(PYQT6, reason="Not complete in PyQt6")
+@pytest.mark.skipif(PYSIDE6, reason="Not complete in PySide6")
 def test_qt3drender():
     """Test the qtpy.Qt3DRender namespace"""
     Qt3DRender = pytest.importorskip("qtpy.Qt3DRender")

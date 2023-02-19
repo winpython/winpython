@@ -21,5 +21,3 @@ def test_qdesktopservice():
     from qtpy.QtGui import QDesktopServices
 
     assert QDesktopServices.setUrlHandler is not None
-
-

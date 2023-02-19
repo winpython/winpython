@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_qt3dextras():
     """Test the qtpy.Qt3DExtras namespace"""
     Qt3DExtras = pytest.importorskip("qtpy.Qt3DExtras")
