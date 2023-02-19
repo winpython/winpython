@@ -1,6 +1,7 @@
 import pytest
 from qtpy import PYSIDE2, PYSIDE6, PYQT5, PYQT6
 
+
 def test_qtremoteobjects():
     """Test the qtpy.QtRemoteObjects namespace"""
     QtRemoteObjects = pytest.importorskip("qtpy.QtRemoteObjects")

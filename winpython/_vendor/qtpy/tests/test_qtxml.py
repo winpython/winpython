@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_qtxml():
     """Test the qtpy.QtXml namespace"""
     from qtpy import QtXml

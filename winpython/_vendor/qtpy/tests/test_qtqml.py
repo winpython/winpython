@@ -1,10 +1,11 @@
 import pytest
-from qtpy import PYQT5, PYSIDE2
+from qtpy import PYQT5, PYSIDE2, PYSIDE6
 
-@pytest.mark.skipif(not (PYQT5 or PYSIDE2), reason="Only available in Qt5 bindings")
+
 def test_qtqml():
     """Test the qtpy.QtQml namespace"""
     from qtpy import QtQml
+
     assert QtQml.QJSEngine is not None
     assert QtQml.QJSValue is not None
     assert QtQml.QJSValueIterator is not None
@@ -20,7 +21,7 @@ def test_qtqml():
     assert QtQml.QQmlFileSelector is not None
     assert QtQml.QQmlIncubationController is not None
     assert QtQml.QQmlIncubator is not None
-    if not PYSIDE2:
+    if not (PYSIDE2 or PYSIDE6):
         # https://wiki.qt.io/Qt_for_Python_Missing_Bindings#QtQml
         assert QtQml.QQmlListProperty is not None
     assert QtQml.QQmlListReference is not None

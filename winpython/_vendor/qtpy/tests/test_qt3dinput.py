@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_qt3dinput():
     """Test the qtpy.Qt3DInput namespace"""
     Qt3DInput = pytest.importorskip("qtpy.Qt3DInput")
@@ -26,4 +27,3 @@ def test_qt3dinput():
     assert Qt3DInput.QAction is not None
     assert Qt3DInput.QAbstractPhysicalDevice is not None
     assert Qt3DInput.QAxisSetting is not None
-    
