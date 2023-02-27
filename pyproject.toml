@@ -1,0 +1,31 @@
+[build-system]  # flit_core seems the step after 'setuptools','wheel','build','twine' (see https://github.com/pypa/build/issues/394)
+requires = ["flit_core"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "WinPython"
+authors = [
+    {name = "Pierre Raybaut"},
+    {name = "stonebig"},
+]
+dependencies = []
+requires-python = ">=3.6"
+readme = "README.rst"
+license = {file = "LICENSE"}
+classifiers=[
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3',
+    'Development Status :: 5 - Production/Stable',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Software Development :: Widget Sets',
+]
+dynamic = ["version",]
+description="WinPython distribution tools, including WPPM"
+
+[project.urls]
+Documentation = "https://winpython.github.io/"
+Source = "https://github.com/winpython/winpython"
+
+[project.scripts]
+wpcp = "winpython.controlpanel:main"
+wppm = "winpython.wppm:main"

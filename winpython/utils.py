@@ -786,6 +786,83 @@ def build_wininst(
         return dst_fname
 
 
+def buildflit_wininst(
+    root,
+    python_exe=None,
+    copy_to=None,
+    architecture=None,  # shall be unused
+    verbose=False,
+    installer='bdist_wininst',  # unused
+):
+    """Build wininst installer from Python package located in *root*
+    with flit"""
+    if python_exe is None:
+        python_exe = sys.executable
+    assert Path(python_exe).is_file()
+    cmd = [python_exe, '-m' ,'flit', 'build']
+    if architecture is not None:
+        archstr = (
+            'win32' if architecture == 32 else 'win-amd64'
+        )
+    # root = a tmp dir in windows\tmp,
+    if verbose:
+        subprocess.call(cmd, cwd=root)
+    else:
+        p = subprocess.Popen(
+            cmd,
+            cwd=root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        p.communicate()
+        p.stdout.close()
+        p.stderr.close()
+    distdir = str(Path(root) / 'dist')
+    if not Path(distdir).is_dir():
+        raise RuntimeError(
+            "Build failed: see package README file for further"
+            " details regarding installation requirements.\n\n"
+            "For more concrete debugging infos, please try to build "
+            "the package from the command line:\n"
+            "1. Open a WinPython command prompt\n"
+            "2. Change working directory to the appropriate folder\n"
+            "3. Type `python -m filt build`"
+        )
+    pattern = WININST_PATTERN.replace(
+        r'(win32|win\-amd64)', archstr
+    )
+    for distname in os.listdir(distdir):
+        match = re.match(pattern, distname)
+        if match is not None:
+            break
+        # for wheels (winpython here)
+        match = re.match(SOURCE_PATTERN, distname)
+        if match is not None:
+            break
+        match = re.match(WHEELBIN_PATTERN, distname)
+        if match is not None:
+            break
+    else:
+        raise RuntimeError(
+            f"Build failed: not a pure Python package? {distdir}"
+        )
+    src_fname = str(Path(distdir) / distname)
+    if copy_to is None:
+        return src_fname
+    else:
+        dst_fname = str(Path(copy_to) / distname)
+        shutil.move(src_fname, dst_fname)
+        if verbose:
+            print(
+                (
+                    f"Move: {src_fname} --> {dst_fname}"
+                )
+            )
+            # remove tempo dir 'root' no more needed
+            shutil.rmtree(root, onerror=onerror)
+        return dst_fname
+
+
 def direct_pip_install(
     fname,
     python_exe=None,
