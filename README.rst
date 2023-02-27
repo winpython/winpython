@@ -3,7 +3,7 @@ WinPython tools
 
 Copyright @ 2012-2013 Pierre Raybaut
 
-Copyright @ 2014-2019+ The Winpython development team https://github.com/winpython/
+Copyright @ 2014-2023+ The Winpython development team https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
@@ -22,7 +22,7 @@ WinPython Package Manager (WPPM)
   a graphical layer over pip, to let you install/uninstall 
   to your WinPython distribution any standard Python package built  
   as source  (e.g. "dummypackage-2.1.zip" or "dummypackage-2.1.tar.gz") 
-  or as wheel (e.g. "dummypackage-2.1-py2.py3-none-any.whl")
+  or as wheel (e.g. "dummypackage-2.1-py3-none-any.whl")
 			
 WinPython build toolchain
   make.py is the script used to 
@@ -31,7 +31,7 @@ WinPython build toolchain
 Dependencies
 ------------   
 
-* Python2 >= 2.7 or Python3 >= 3.4 (Python>= 3.7 is recommended)
+* Python3 >= 3.4 (Python>= 3.7 is recommended)
 
 * PyQt5 >= 5.6 or PySide2>=5.11 (PyQt5 >=5.12 or Pyside2 >= 5.12 is recommended)
 
