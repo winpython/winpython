@@ -3,7 +3,7 @@ requires = ["flit_core"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "WinPython"
+name = "winpython"
 authors = [
     {name = "Pierre Raybaut"},
     {name = "stonebig"},
