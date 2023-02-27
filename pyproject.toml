@@ -14,6 +14,11 @@ readme = "README.rst"
 license = {file = "LICENSE"}
 classifiers=[
     'License :: OSI Approved :: MIT License',
+    'Operating System :: MacOS',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: OS Independent',
+    'Operating System :: POSIX',
+    'Operating System :: Unix',
     'Programming Language :: Python :: 3',
     'Development Status :: 5 - Production/Stable',
     'Topic :: Scientific/Engineering',
@@ -21,6 +26,7 @@ classifiers=[
 ]
 dynamic = ["version",]
 description="WinPython distribution tools, including WPPM"
+keywords = ["PySide6", "PyQt6", "PyQt5", "PySide2"]
 
 [project.urls]
 Documentation = "https://winpython.github.io/"
