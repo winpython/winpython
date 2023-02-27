@@ -2041,7 +2041,8 @@ def rebuild_winpython(basedir, targetdir, architecture=64, verbose=False):
     for name in os.listdir(packdir):
         if name.startswith("winpython-") and name.endswith((".exe", ".whl")):
             os.remove(str(Path(packdir) / name))
-    utils.build_wininst(
+    #  utils.build_wininst is replaced per flit 2023-02-27
+    utils.buildflit_wininst(
         str(Path(__file__).resolve().parent),
         copy_to=packdir,
         architecture=architecture,
