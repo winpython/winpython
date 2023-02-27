@@ -1,9 +1,9 @@
 WinPython tools
 ===============
 
-Copyright © 2012-2013 Pierre Raybaut
+Copyright @ 2012-2013 Pierre Raybaut
 
-Copyright © 2014-2019+ The Winpython development team https://github.com/winpython/
+Copyright @ 2014-2019+ The Winpython development team https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
@@ -49,8 +49,9 @@ Installation
     
 From the source package (see section 'Building dependencies'), you may 
 install WinPython using the integrated setup.py script based on Python 
-standard library `distutils` with the following command::
-    python setup.py install
+standard library `distutils` with the following command:
+
+**python setup.py install**
 
 Note that `distutils` does *not* uninstall previous versions of Python 
 packages: it simply copies files on top of an existing installation. 
