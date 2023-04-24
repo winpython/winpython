@@ -1816,7 +1816,13 @@ cd/D "%WINPYDIR%"
 "%WINPYDIR%\scripts\pyzo.exe" %*
 """,
         )
-
+        
+        self.create_batch_script(  # virtual environment mimicking
+            "activate.bat",
+            r"""@echo off
+call "%~dp0env.bat"  %*
+""",
+        )
         # pre-run mingw batch
         print("now pre-running extra mingw")
         filepath = str(Path(self.winpydir) / "scripts" / "make_cython_use_mingw.bat")
@@ -1842,6 +1848,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
 
 """,
         )
+        
+
 
     def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
         """tools\..\run_complement.bat for final complements"""
