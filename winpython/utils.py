@@ -264,7 +264,12 @@ def create_shortcut(
     ipf = ilink.QueryInterface(pythoncom.IID_IPersistFile)
     if not filename.endswith('.lnk'):
         filename += '.lnk'
-    ipf.Save(filename, 0)
+    print(f'ipf.save *{filename}*')    
+    try:
+        ipf.Save(filename, 0)
+    except:
+        print ("a fail !")
+        pass
 
 
 # =============================================================================
