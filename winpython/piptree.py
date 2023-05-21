@@ -107,27 +107,33 @@ class pipdata:
         """build a nested list of needed packages with given extra and depth"""
         envi = {"extra": extra, **self.environment}
         p = normalize(pp)
+
+        # several extras request management: example dask[array,diagnostics] 
+        extras = extra.split(",")
+
         ret_all = []
-        if p in path:
+        if p+"["+extra+"]" in path: # for dask[complete]->dask[array,test,..]
             print("cycle!", "->".join(path + [p]))
         elif p in self.distro and len(path) <= depth:
-            if extra == "":
-                ret = [f'{p}=={self.distro[p]["version"]} {version_req}']
-            else:
-                ret = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}']
-            for r in self.distro[p]["requires_dist"]:
-                if r["req_key"] in self.distro:
-                    if "req_marker" not in r or Marker(r["req_marker"]).evaluate(
-                        environment=envi
-                    ):
-                        ret += self._downraw(
-                            r["req_key"],
-                            r["req_extra"],
-                            r["req_version"],
-                            depth,
-                            path + [p],
-                        )
-            ret_all += [ret]
+            for extra in extras:  # several extras request management
+                envi = {"extra": extra, **self.environment}
+                if extra == "":
+                    ret = [f'{p}=={self.distro[p]["version"]} {version_req}']
+                else:
+                    ret = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}']
+                for r in self.distro[p]["requires_dist"]:
+                    if r["req_key"] in self.distro:
+                        if "req_marker" not in r or Marker(r["req_marker"]).evaluate(
+                            environment=envi
+                        ):
+                            ret += self._downraw(
+                                r["req_key"],
+                                r["req_extra"],
+                                r["req_version"],
+                                depth,
+                                path + [p+"["+extra+"]"],
+                            )
+                ret_all += [ret]
         return ret_all
 
     def _upraw(self, pp, extra="", version_req="", depth=20, path=[]):
