@@ -215,7 +215,7 @@ def create_action(
         action.setCheckable(True)
     if icon is not None:
         # if is_text_string(icon):
-        if isinstance(obj, str)
+        if isinstance(icon, str):
             icon = get_icon(icon)
         action.setIcon(icon)
     if shortcut is not None:
