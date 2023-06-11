@@ -79,7 +79,7 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
     # machine which is not connected to the internet
     # we store only  normalized names now (PEP 503)
     db = cp.ConfigParser()
-    db.readfp(open(str(Path(DATA_PATH) / database)))
+    db.read_file(open(str(Path(DATA_PATH) / database)))
     my_metadata = dict(
         description="",
         url="https://pypi.org/project/" + name,
