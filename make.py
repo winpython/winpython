@@ -1545,7 +1545,7 @@ rem backward compatibility for non-IDLEX users
 if exist "%WINPYDIR%\scripts\idlex.pyw" (
     "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
 ) else (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
+    echo "%WINPYDIR%\scripts\idlex.pyw" for IDLEX not found !"
 )
 """,
             do_changes=changes,
