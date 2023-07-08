@@ -2022,7 +2022,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 + f"{self.winpyver2}.md"
             )
         )
-        open(fname, "w").write(self.package_index_wiki)
+        open(fname, "w", encoding='utf-8').write(self.package_index_wiki)
         # Copy to winpython/changelogs
         shutil.copyfile(
             fname,

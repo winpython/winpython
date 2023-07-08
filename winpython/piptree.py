@@ -14,10 +14,13 @@ def normalize(this):
 class pipdata:
     """Wrapper aroud pip inspect"""
 
-    def __init__(self):
+    def __init__(self, Target=None):
 
         # get pip_inpsect raw data in json form
-        pip_inspect = utils.exec_run_cmd(["pip", "inspect"])
+        if Target == None:
+            pip_inspect = utils.exec_run_cmd(["pip", "inspect"])
+        else:
+            pip_inspect = utils.exec_run_cmd(["chcp", "65001" ,"&", Target , "-m", "pip", "inspect"])        
         pip_json = json.loads(pip_inspect)
 
         # create a distro{} dict of Packages
@@ -194,6 +197,9 @@ class pipdata:
         if pp in self.distro:
             return print("\n".join(self.distro[pp]["description"].split(r"\n")))
 
-    def pip_list(self):
+    def pip_list(self, full=False):
         """do like pip list"""
-        return [(p, self.distro[p]["version"]) for p in sorted(self.distro)]
+        if full:
+            return [(p, self.distro[p]["version"], self.distro[p]["summary"]) for p in sorted(self.distro)]
+        else:
+            return [(p, self.distro[p]["version"]) for p in sorted(self.distro)]

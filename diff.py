@@ -95,8 +95,12 @@ class PackageIndex(object):
             / f"WinPython{self.flavor}-{self.architecture}bit-{self.version}.md"
         )
 
-        with open(fname, "r") as fdesc:  # python3 doesn't like 'rb'
-            text = fdesc.read()
+        try:
+            with open(fname, "r", encoding = 'utf-8') as fdesc:  # python3 doesn't like 'rb'
+                text = fdesc.read()
+        except:
+            with open(fname, "r") as fdesc:  # python3 doesn't like 'rb'
+                text = fdesc.read()            
         self.from_text(text)
 
     def from_text(self, text):
