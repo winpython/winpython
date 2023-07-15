@@ -1,3 +1,11 @@
+### WinPython 2023-02 release (July 15th, 2023)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
+83b5c99aa9303f93c06241928a1ef51c | 8c28ab41e68f53faa081530324c26dbe7b028935 | 09dacbf391adb11ace34eb90cd02ae3fc3749df612b8a1fd288e7e5c47bc1973 | Winpython64-3.11.4.0dot.exe       |   31 541 585 Bytes | ea780b4c7781dda507a09fa7ef856fe58b2f49959f849f3f1a01106d5fda35fe
+6d9f7fed5327257aa86be3b7caa6916d | 11dbfa8c2ec1d225bdb0c6f19f75d62c12e640c4 | 193233967bd2b6a6cd705ac3b17dac9c4864ae8e56744a2b89caed91f2fb6f05 | Winpython64-3.11.4.0.exe          |  785 746 334 Bytes | feba52aca59c85f8efce1ee58fd28c052f7505966728268481f9405956e70f41
+
+
 ### WinPython 2023-01 post1 release (May 27th, 2023)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
