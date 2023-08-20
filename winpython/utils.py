@@ -215,7 +215,17 @@ def get_winpython_start_menu_folder(current=True):
             )
     return str(Path(folder) / 'WinPython')
 
-
+def remove_winpython_start_menu_folder(current=True):
+    """Create WinPython Start menu folder -- remove it if it already exists"""
+    path = get_winpython_start_menu_folder(current=current)
+    if Path(path).is_dir():
+        try:
+            shutil.rmtree(path, onerror=onerror)
+        except WindowsError:
+            print(
+                f"Directory {path} could not be removed",
+                file=sys.stderr,
+            )
 
 def create_winpython_start_menu_folder(current=True):
     """Create WinPython Start menu folder -- remove it if it already exists"""
@@ -228,8 +238,8 @@ def create_winpython_start_menu_folder(current=True):
                 f"Directory {path} could not be removed",
                 file=sys.stderr,
             )
-    else:
-        os.mkdir(path)
+    # create, or re-create !
+    os.mkdir(path)
     return path
 
 
