@@ -16,8 +16,6 @@ package distribution on Microsoft Windows platforms with ``py2exe`` or on
 all platforms thanks to ``cx_Freeze``.
 """
 
-from __future__ import print_function
-
 import sys
 import os
 from pathlib import Path

@@ -10,8 +10,6 @@ WinPython diff script
 Created on Tue Jan 29 11:56:54 2013
 """
 
-from __future__ import print_function, with_statement
-
 import os
 from pathlib import Path
 import re

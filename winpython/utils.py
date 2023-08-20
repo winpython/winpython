@@ -10,8 +10,6 @@ WinPython utilities
 Created on Tue Aug 14 14:08:40 2012
 """
 
-from __future__ import print_function
-
 import os
 from pathlib import Path
 import subprocess
