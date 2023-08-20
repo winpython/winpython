@@ -15,6 +15,7 @@ from __future__ import print_function
 import sys
 import os
 from pathlib import Path
+import platform
 
 #  import subprocess
 
@@ -35,11 +36,26 @@ EWI = "Edit with IDLE"
 EWS = "Edit with Spyder"
 
 KEY_S = r"Software\Python"
-KEY_S0 = KEY_S + r"\PythonCore"
+KEY_S0 = KEY_S + r"\WinPython" # was PythonCore before PEP-0514
 KEY_S1 = KEY_S0 + r"\%s"
 
+def _remove_start_menu_folder(target, current=True):
+    "remove menu Folder for target WinPython"
+    import importlib.util
+    win32com_exists = importlib.util.find_spec('win32com') is not None
+
+    # we return nothing if no win32com package
+    if win32com_exists:
+        utils.remove_winpython_start_menu_folder(current=current)
 
 def _get_shortcut_data(target, current=True):
+    "get windows menu access, if win32com exists otherwise nothing"
+    import importlib.util
+    win32com_exists = importlib.util.find_spec('win32com') is not None
+
+    # we return nothing if no win32com package
+    if not win32com_exists:
+        return []
     wpgroup = utils.create_winpython_start_menu_folder(current=current)
     wpdir = str(Path(target).parent)
     data = []
@@ -221,16 +237,71 @@ def register(target, current=True):
     )
 
     # PythonCore entries
-    short_version = utils.get_python_infos(target)[0]
-    long_version = utils.get_python_long_version(target)
-    key_core = (KEY_S1 % short_version) + r"\%s"
+    python_infos = utils.get_python_infos(target)  #   ('3.11', 64)
+    short_version = python_infos[0]  # 3.11 from ('3.11', 64)
+    long_version = utils.get_python_long_version(target)  # 3.11.5
+    key_core = (KEY_S1 % short_version) + r"\%s"  # Winpython\3.11
+    
+    # PEP-0514 additions, with standard Python practice
+    SupportUrl="https://winpython.github.io"
+    SysArchitecture = platform.architecture()[0]  # '64bit'
+    SysVersion = '.'.join(platform.python_version_tuple()[:2])  # '3.11' 
+    Version = platform.python_version()  # '3.11.5'
+
+    # But keep consistent with past possibilities until more alignement
+    SysArchitecture = f'{python_infos[1]}bit' # '64bit'
+    SysVersion = short_version
+    Version = long_version
+
+    DisplayName = f'Python {Version} ({SysArchitecture})'
+    key_short = (KEY_S1 % short_version) # WinPython\3.11
+    key_keys={'DisplayName':DisplayName,
+               'SupportUrl':SupportUrl,
+               'SysVersion':SysVersion,
+               'SysArchitecture':SysArchitecture,
+               'Version':Version}
+
+    regkey = winreg.CreateKey(root, key_short)
+    # see https://www.programcreek.com/python/example/106949/winreg.CreateKey
+    # winreg.SetValueEx(key, '', reg.REG_SZ, '')
+    for k, v in key_keys.items():
+        winreg.SetValueEx(
+            regkey,
+            k,
+            0,
+            winreg.REG_SZ,
+            v,
+        )
+    winreg.CloseKey(regkey)    
+   
+    # pep-0514 additions at InstallPathLevel
+    ExecutablePath = python
+    WindowedExecutablePath = pythonw
+    
+    key_short = key_core % "InstallPath" # WinPython\3.11\InstallPath
+    key_keys={'ExecutablePath':ExecutablePath,
+               'WindowedExecutablePath':WindowedExecutablePath}
+    
+    regkey = winreg.CreateKey(root, key_core % "InstallPath")
     winreg.SetValueEx(
-        winreg.CreateKey(root, key_core % "InstallPath"),
+        regkey,
         "",
         0,
         winreg.REG_SZ,
-        target,
+        target + '\\',
     )
+    for k, v in key_keys.items():
+        winreg.SetValueEx(
+            regkey,
+            k,
+            0,
+            winreg.REG_SZ,
+            v,
+        )
+    winreg.CloseKey(regkey)
+
+    
+    
     winreg.SetValueEx(
         winreg.CreateKey(root, key_core % r"InstallPath\InstallGroup"),
         "",
@@ -330,10 +401,12 @@ def unregister(target, current=True):
                 r"Unable to remove %s\%s" % (rootkey, key),
                 file=sys.stderr,
             )
-    # Start menu shortcuts
-    for path, desc, fname in _get_shortcut_data(target, current=current):
-        if Path(fname).exists():
-            os.remove(fname)
+    # remove menu shortcuts
+    _remove_start_menu_folder(target, current=current)
+    
+    #for path, desc, fname in _get_shortcut_data(target, current=current):
+    #    if Path(fname).exists():
+    #        os.remove(fname)
 
 
 if __name__ == "__main__":
