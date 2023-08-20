@@ -10,8 +10,6 @@ Register a Python distribution
 Created on Tue Aug 21 21:46:30 2012
 """
 
-from __future__ import print_function
-
 import sys
 import os
 from pathlib import Path

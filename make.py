@@ -10,8 +10,6 @@ WinPython build script
 Created on Sun Aug 12 11:17:50 2012
 """
 
-from __future__ import print_function
-
 import os
 from pathlib import Path
 import re

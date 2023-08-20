@@ -10,8 +10,6 @@ Created on Thu Oct 04 11:02:40 2012
 @author: Pierre Raybaut
 """
 
-from __future__ import print_function
-
 import sys
 import os
 from pathlib import Path
