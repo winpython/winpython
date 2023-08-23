@@ -2,11 +2,10 @@ rem  this replace running manually from spyder the make.py
 rem  to launch from a winpython module 'make' directory 
 
 set my_original_path=%path%
-set my_buildenv=C:\winpython-64bit-3.4.3.7Qt5
 
-set my_root_dir_for_builds=C:\Winp
-set my_python_target=39
-set my_pyver=3.9
+set my_root_dir_for_builds=C:\WinP
+set my_python_target=311
+set my_pyver=3.11
 
 set my_flavor=
 
@@ -22,14 +21,13 @@ set my_arch=64
 set my_preclear_build_directory=Yes
 
 set tmp_reqdir=%my_root_dir_for_builds%\bd%my_python_target%
-										
 
-set my_requirements=C:\Winp\bd39\Qt5_requirements64.txt
+set my_requirements=C:\WinP\bd311\Qt5_requirements64.txt
 
-set my_find_links=C:\Winp\packages.srcreq
+set my_find_links=C:\WinP\packages.srcreq
 
-set my_source_dirs=C:\Winp\bd39\packages.win-amd64
-set my_toolsdirs=C:\WinP\bdTools\Tools64
+set my_source_dirs=C:\WinP\bd311\packages.win-amd64
+set my_toolsdirs=C:\WinP\bdTools\tools64
 set my_docsdirs=C:\WinP\bdDocs\docs
 set my_install_options=--no-index --pre --trusted-host=None
 

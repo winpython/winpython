@@ -9,24 +9,24 @@ cffi
 numba
 maturin
 
-# done in pre-step in mkl
-numpy
-scipy
-numexpr
-##mkl_service
+# done in pre-step
+## numpy
+## scipy
+## numexpr
+## mkl_service
 
 # pytorch eco-system
-Torch
-torchvision
-torchaudio
-botorch
-fastai
-dask_ml
+#Torch
+#torchvision
+#torchaudio
+#botorch
+#fastai
+#dask_ml
 
 #LLM huggingface
-openai
-transformers[torch]
-accelerate
+#openai
+#transformers[torch]
+#accelerate
 
 
 # complementary tools
@@ -367,7 +367,4 @@ missingno
 
 # for flask
 waitress
-
-
-
 

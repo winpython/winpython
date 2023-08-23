@@ -1,13 +1,7 @@
 rem first line check
 echo  keep me in ansi =utf-8 without BOM  (notepad plus plus or win10 screwing up for compatibility)
 
-rem 2020-09-26 Jupyterlab-3 simplification
-rem 2020-09-27 Jupyterlab-3 5S (looking for missing detail) 
-rem 2020-10-25no_more_needed "nbextension enable" no more needed for bqplot, ipyleaflet, ipympl
-rem 2021-01-30: jupyterlab2 final stuff removal
-rem 2021-03-13: notebook classic stuff removal
 rem 2021-05-23: use "%PYTHON%" for the executable instead of "%WINPYDIR%\python.exe"
-rem 2021-11-12: patch numba restrictor
 rem 2022-10-19 patch cpython bug https://github.com/winpython/winpython/issues/1121
  
 rem if build error, launch "WinPython Command Prompt.exe" dos ico, then try manual install of requirements.txt 
@@ -36,25 +30,6 @@ if not exist "%WINPYDIR%\Lib\site-packages\mingwpy" set pydistutils_cfg=%WINPYDI
 if not exist "%WINPYDIR%\Lib\site-packages\mingwpy" echo [config]>%pydistutils_cfg%
 
 
-rem * ==================
-echo finish install of bqplot (for VSCode 2021-03-13)
-rem * =================
-if exist  "%WINPYDIR%\Lib\site-packages\bqplot" "%WINPYDIR%\Scripts\jupyter.exe" nbextension enable --py --sys-prefix bqplot
-
-						 
-rem * ==================
-echo finish install of nteract_on_jupyter (2018-12-27)
-rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
-
-
-rem * ==================
-echo finish install of nteract_on_jupyter (2018-12-27)
-rem * ================= 
-if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" serverextension enable nteract_on_jupyter
-if exist  "%WINPYDIR%\Lib\site-packages\nteract_on_jupyter" "%WINPYDIR%\Scripts\jupyter.exe" server extension enable nteract_on_jupyter
-
-
 
 rem * =================
 echo finish install seaborn iris example
@@ -62,19 +37,8 @@ rem * =================
 if exist  "%WINPYDIR%\Lib\site-packages\seaborn" "%PYTHON%" -c "import seaborn as sns;sns.set();sns.load_dataset('iris')"
 
 
-rem  ** Active patchs**
-rem * ===========================
-echo 2021-04-17 patch jupyter_lsp-1.1.4
-rem see https://github.com/krassowski/jupyterlab-lsp/pull/580/files
-rem * ===========================
+rem  ** Active patchs*************************************************************************************************
 
-rem in DOS, the variable must be set befor the parenthesis block....
-set this_source='%WINPYDIR%\Lib\site-packages\jupyter_lsp\virtual_documents_shadow.py'
-if exist  "%WINPYDIR%\Lib\site-packages\jupyter_lsp-1.1.4.dist-info" (
-   echo "**%this_source%**"
-   "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
-   "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
-) 
 
 
 rem * ===========================
@@ -88,50 +52,30 @@ if exist  "%qt56p%" (
   echo "I DIDN'T patch of numba !"
 )
 
-rem * ===========================
-rem 2021-11-12: patch numba-0.54.1 restrictor
-rem * ===========================
-set qt56p=%WINPYDIR%\Lib\site-packages\numba
-if exist  "%qt56p%" (
-  "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\numba\__init__.py', 'numpy_version > (1, 20):', 'numpy_version > (1, 21):  # stonebig relax patch' )"
-  echo "DID I patch numba%??"
-) else (
-  echo "I DIDN'T patch of numba !"
-)
+
+rem  ** Example of live file replacement (not active)***********************************************************************************************
 
 rem * ===========================
-rem 2020-05-15 patch statsmodels-0.12.2 for PyPi
+echo 2021-04-17 patch jupyter_lsp-1.1.4
+rem see https://github.com/krassowski/jupyterlab-lsp/pull/580/files
 rem * ===========================
-if exist  "%WINPYDIR%\site-packages\statsmodels-0.12.2.dist-info" (
-   echo "coucou PyPy"
-   copy/Y "C:\WinP\tempo_fixes\statsmodels\tools\docstring.py" "%WINPYDIR%\site-packages\statsmodels\tools\docstring.py"
-   copy/Y "C:\WinP\tempo_fixes\statsmodels\tsa\forecasting\stl.py" "%WINPYDIR%\site-packages\statsmodels\tsa\forecasting\stl.py"
-   copy/Y "C:\WinP\tempo_fixes\statsmodels\tsa\vector_ar\api.py" "%WINPYDIR%\site-packages\statsmodels\tsa\vector_ar\api.py"
 
-)
+rem in DOS, the variable must be set befor the parenthesis block....
+set this_source='%WINPYDIR%\Lib\site-packages\jupyter_lsp\virtual_documents_shadow.py'
+if exist  "%WINPYDIR%\Lib\site-packages\jupyter_lsp-1.1.4.dist-info" (
+   echo "**%this_source%**"
+   "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'read_text()', 'read_text(encoding='+chr(39)+'utf-8'+chr(39)+')' )"
+   "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r%this_source%, 'join(self.lines))', 'join(self.lines), encoding='+chr(39)+'utf-8'+chr(39)+')' )"
+) 
 
-
-rem  ** Example of live file replacement (not active)**
 rem * ===========================
 rem 2020-05-15 patch jedi-0.17.0
 rem * ===========================
 																															
 if exist  "%WINPYDIR%\Lib\site-packages\jedi-0.17.0.dist-info" copy/Y "C:\WinP\tempo_fixes\Jedi-0.17.0\api\__init__.py" "%WINPYDIR%\Lib\site-packages\Jedi-0.17.0\api\__init__.py"
 
-rem  ** Example of live source patch (not active)***
 rem * =================
-rem echo tornado Python-3.8.0  fix 2019-06-28  https://github.com/tornadoweb/tornado/issues/2656#issuecomment-491400255
-rem * ==================
 
-rem KEEP as example for next time needed
-
-set qt56p=%WINPYDIR%\Lib\site-packages\tornado-6.0.3.dist-info
-if exist  "%qt56p%" (
-  "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\tornado\platform\asyncio.py', 'import asyncio', 'import asyncio;asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # python-3.8.0' )"
-  rem echo "DID I patch   %qt56p% ??"
-) else (
-  rem echo "I DIDN'T patch of %qt56p% !"
-)
 
 echo JUPYTERLAB_DIR=%JUPYTERLAB_DIR%  default is ~/.jupyter/lab
 echo JUPYTERLAB_SETTINGS_DIR=%JUPYTERLAB_SETTINGS_DIR% , default is ~/.jupyter/lab/user-settings/
@@ -165,17 +109,18 @@ echo see https://groups.google.com/forum/#!topic/spyderlib/dH5VXlTc30s
 rem * ============================
 if  exist "%WINPYDIR%\..\settings\.spyder-py3\temp.py" del  "%WINPYDIR%\..\settings\.spyder-py3\temp.py"
 
-
-rem * ====================
-echo patch spyder update reflex (2019-05-18 : spyder, not spyderlib !)
-rem * ====================
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\Lib\site-packages\spyder\config\main.py', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': True', ' '+chr(39)+'check_updates_on_startup'+chr(39)+': False' )"
+rem * ============================
+rem 2023-02-12: paching pip-23.0.0 pip\_vend_r\rich patch cpython bug https://github.com/pypa/pip/issues/11798
+rem * ============================
+if exist  "%WINPYDIR%\Lib\site-packages\pip-23.0.dist-info" (
+   echo "coucou Pip-23.0 crashing  _vendor/rich"
+   copy/Y "C:\WinP\tempo_fixes\pip\_vendor\rich\_win32_console.py" "%WINPYDIR%\site-packages\pip\_vendor\rich\_win32_console.py"
+)
 
 rem * ====================
 echo summary 20202-04-11
 rem * ====================
 pip check
-if exist  "%WINPYDIR%\Lib\site-packages\pipdeptree" pipdeptree
 
 
 @echo on
