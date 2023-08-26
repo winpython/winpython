@@ -46,7 +46,7 @@ echo ------------------
 echo 0.0 Initialize variables  
 echo ------------------
 
-if "%my_release_level%"=="" set my_release_level=b5
+if "%my_release_level%"=="" set my_release_level=b4
 
 set my_basedir=%my_root_dir_for_builds%\bd%my_python_target%
 
@@ -58,6 +58,10 @@ rem  2021-04-22 : path PyPy3 (as we don't try to copy PyPy3.exe to Python.exe)
 if "%target_python_exe%"=="" set target_python_exe=python.exe
 
 
+if %my_python_target%==37 (
+   set my_python_target_release=3712
+   set my_release=1
+)
 if %my_python_target%==38 (
    set my_python_target_release=3812
    set my_release=1
@@ -72,10 +76,12 @@ if %my_python_target%==310 (
    set my_release=2
 )
 
+
 if %my_python_target%==311 (
-   set my_python_target_release=3115
-   set my_release=0
+   set my_python_target_release=3114
+   set my_release=1
 )
+
 
 if %my_python_target%==312 (
    set my_python_target_release=3120
