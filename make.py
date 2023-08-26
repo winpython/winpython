@@ -353,7 +353,11 @@ class WinPythonDistribution(object):
         if pandocexe is not None:
             pandocver = utils.get_pandoc_version(str(Path(pandocexe).parent))
             installed_tools += [("Pandoc", pandocver)]
- 
+        vscodeexe = get_tool_path_file(r"\t\VSCode\Code.exe")
+        if vscodeexe is not None:
+            installed_tools += [
+                ("VSCode", utils.getFileProperties(vscodeexe)["FileVersion"])
+            ]
         tools = []
         for name, ver in installed_tools:
             metadata = wppm.get_package_metadata("tools.ini", name)
@@ -1831,11 +1835,14 @@ call "%~dp0env.bat"  %*
 rem launcher for VScode
 call "%~dp0env_for_icons.bat" %*
 rem cd/D "%WINPYWORKDIR1%"
+if exist "%WINPYDIR%\..\t\vscode\code.exe" (
+    "%WINPYDIR%\..\t\vscode\code.exe" %*
+) else (
 if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
     "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe"  %*
 ) else (
     "code.exe" %*
-)
+))
 
 """,
         )
