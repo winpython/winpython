@@ -1,3 +1,12 @@
+### WinPython 2023-03 release (September 28th, 2023)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
+e7c9bbe0480296192a087475214d82d0 | c1d70b0602357614f993975ebff149cb8db4d56b | 9399d24addcfa14450b408c1988b0350f4e9d58ab2ae9a2445b9dab6484f4fae | Winpython64-3.11.5.0dot.exe       |   25 139 984 Bytes | 368c68f07f5717ec69523f0d0ca3d3de97394c489baa74301a2ad498a767c43e
+c6a63eca7bb0ed59612781cb508ce4a7 | 0a1f13fac46a9457ca26144cedc2b6d981ba5d9b | 5b053362706b2cb9561ebd064570813dafc99598b7c7d9473e7361313b820178 | Winpython64-3.11.5.0.exe          |  790 793 444 Bytes | 21a9014a64ed7f4ab8668599d744ee54a14893e62f6ad9b5a394ce7b96040d6b
+9fe0fd44b0f33c4d23739245c5b491af | 24d47348cf722c79ba354b854733c4e2d808cc83 | 0b2037660064589dd73a58ac17f44d9e657cfc5fcea92cec9223185243a0a3bc | Winpython64-3.11.5.0mkl.exe       |  789 143 611 Bytes | c09c0831480e2da584509fa8e2a2ea9a98d87e84eebf5eb8f9061e8ec9b82e31
+
+
 ### WinPython 2023-02 release (July 15th, 2023)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
@@ -542,7 +551,7 @@ ebf731a31cd779b9a9e9df2b0a37ed9f | 296ba7018a3b3168d8296390ac4a01d3dd23dab2 | wi
 6d203d40558aebcc80cbef0ef5503aa1 | 7f6477ae92fbecf57497e57628a873bcce14f7cf | winpython-32bit-3.4.3.5.exe    | 226 997 189 Bytes
 2b9b518146b7f7f010ef1d4ef9691849 | 2b382f36cf8f2144d610748e36fa052839433e98 | winpython-64bit-2.7.10.2.exe   | 278 219 513 Bytes
 f383793798e1899531bf11c33e47cf5b | acaa8e0b62e6741d7d699ea9961ee0cc640c8323 | winpython-32bit-2.7.10.2.exe   | 223 506 901 Bytes
-2b6b44ac91847974eaf78df69b35b590 | e9cb4b45e850aefa71721d1f866a4f08fd1399b1 | winpython-64bit-3.4.3.5qt5.exe | 286 088 943 Bytes
+2b6b44ac91847974eaf78df69b35b590 | e9cb4b45e850aefa71721d1f866a4f08fd1399b1 | winpython-64bit-3.4.3.5qt5.exe | 286 088 943 Bytes
 
 
 
