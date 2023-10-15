@@ -81,18 +81,19 @@ echo JUPYTERLAB_DIR=%JUPYTERLAB_DIR%  default is ~/.jupyter/lab
 echo JUPYTERLAB_SETTINGS_DIR=%JUPYTERLAB_SETTINGS_DIR% , default is ~/.jupyter/lab/user-settings/
 echo JUPYTERLAB_WORKSPACES_DIR=%JUPYTERLAB_WORKSPACES_DIR% , default is ~/.jupyter/lab/workspaces/
 
-%WINPYDIR%\Scripts\jupyter.exe" lab path
+"%WINPYDIR%\Scripts\jupyter.exe" lab path
 
 
 rem jupyter labextension update --all  (will rebuild if needed)
 rem 2020-12-31 tweaks
 rem see https://jupyter.readthedocs.io/en/latest/use/jupyter-directories.html
 if exist  "%WINPYDIR%\Lib\site-packages\jupyterlab" (
-"%WINPYDIR%\Scripts\jupyter.exe"jupyter labextension list
-"%WINPYDIR%\Scripts\jupyter.exe"jupyter  --paths  
+"%WINPYDIR%\Scripts\jupyter.exe" labextension list
+"%WINPYDIR%\Scripts\jupyter.exe"  --paths  
 )
 
-if exist  "%WINPYDIR%\Lib\site-packages\notebook" "%WINPYDIR%\Scripts\jupyter.exe" nbextension list
+REM 2023-10-15: 'nbextension' was Jupyter3 days
+rem if exist  "%WINPYDIR%\Lib\site-packages\notebook" "%WINPYDIR%\Scripts\jupyter.exe" nbextension list
 
 
 rem * ===================
