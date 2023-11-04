@@ -80,9 +80,9 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
     # we store only  normalized names now (PEP 503)
     db = cp.ConfigParser()
     try:
-        db.read_file(open(str(Path(DATA_PATH) / database)), encoding = 'utf-8')
+        db.read_file(open(str(Path(DATA_PATH) / database), encoding = 'utf-8'))
     except:
-         db.read_file(open(str(Path(DATA_PATH) / database)))
+        db.read_file(open(str(Path(DATA_PATH) / database)))
     my_metadata = dict(
         description="",
         url="https://pypi.org/project/" + name,
@@ -115,7 +115,7 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
         try:
             db[normalize(name)] = {}
             db[normalize(name)]["description"] = my_metadata["description"]
-            with open(str(Path(DATA_PATH) / database), "w") as configfile:
+            with open(str(Path(DATA_PATH) / database), "w",  encoding='UTF-8') as configfile:
                 db.write(configfile)
         except:
             pass
