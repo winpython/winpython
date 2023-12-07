@@ -2,8 +2,8 @@
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
 ---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
-caee336c14ba1f26fcd4c927cead6324 | bf8dd90cb0ce5eed6c673becf2b1175a0775f08f | f9a0d61aa67bc227cc52980de59a412fefa1a046fb77eceb8a968c395461ddeb | Winpython64-3.11.6.0dotrc.exe     |   25 119 557 Bytes | d755b391350b37da3d03b19f824f1943cea94d9942f58f2188c3b40d6f473a1a
-a3806b2346de8795572c36c0dd5d57c7 | c03a02245b93ac2925ff64ee83ea85e6910ee923 | eb7faa7ccdbfa4ef0f4e3eb575272ce13d997bdbc57758672ebbe80a7f1845dc | Winpython64-3.11.6.0rc.exe        |  826 835 174 Bytes | 72a8c156b77f94477155c8c6c83149ddd6c553e3def82f0ab50e91e614012e09
+caee336c14ba1f26fcd4c927cead6324 | bf8dd90cb0ce5eed6c673becf2b1175a0775f08f | f9a0d61aa67bc227cc52980de59a412fefa1a046fb77eceb8a968c395461ddeb | Winpython64-3.11.6.0dot.exe       |   25 119 557 Bytes | d755b391350b37da3d03b19f824f1943cea94d9942f58f2188c3b40d6f473a1a
+a3806b2346de8795572c36c0dd5d57c7 | c03a02245b93ac2925ff64ee83ea85e6910ee923 | eb7faa7ccdbfa4ef0f4e3eb575272ce13d997bdbc57758672ebbe80a7f1845dc | Winpython64-3.11.6.0.exe          |  826 835 174 Bytes | 72a8c156b77f94477155c8c6c83149ddd6c553e3def82f0ab50e91e614012e09
 a41642f31097e07f07181eee31737f0b | bc533b5d8d74a91de86ae19a83f70f4c7817fb66 | 2afffd563b0fc5c7a49b3a3d3500a9a624e4e03fe8b616cae808027916babcb3 | Winpython64-3.12.0.1dotb5.exe     |   24 095 700 Bytes | 42e9d9801bc26454f60ef530278ac02f08d90911c990991e13f91da08462fec5
 73c01e518a3da0d338fb14be0c67c52c | 7dfbee2cb84686fb88e75a8d453fc41b60d222cb | 2d55dc7bed91858629bafeba5d5e703b51f45c46dc12044dea7f9f709269fdce | Winpython64-3.12.0.1b5.exe        |  571 171 632 Bytes | f8aaa787d763e4e350b618cbd19401c49c5197d18b6b1348669df5b41ca10aff
 
