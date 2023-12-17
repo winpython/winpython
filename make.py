@@ -872,6 +872,7 @@ set WINPYDIR=%WINPYDIRBASE%"""
             + r"""
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 set PYTHON=%WINPYDIR%\python.exe
+set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
 set WINPYVER="""
             + self.winpyver
             + r"""
@@ -1029,6 +1030,7 @@ $env:WINPYDIR = $env:WINPYDIRBASE+"""
             + r"""
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 $env:PYTHON = "%WINPYDIR%\python.exe"
+$env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs"
 
 
 $env:WINPYVER = '"""
@@ -1479,7 +1481,7 @@ cmd.exe /k""",
             r"""@echo off
 call "%~dp0env_for_icons.bat"  %*
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
-%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe
+"%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe"
 exit
 """,
         )
