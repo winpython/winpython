@@ -871,7 +871,7 @@ set WINPYDIR=%WINPYDIRBASE%"""
             + self.python_name
             + r"""
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
-set PYTHON=%WINPYDIR%\\python.exe
+set PYTHON=%WINPYDIR%\python.exe
 set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
 set WINPYVER="""
             + self.winpyver
@@ -1029,8 +1029,8 @@ $env:WINPYDIR = $env:WINPYDIRBASE+"""
             + '"'
             + r"""
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
-$env:PYTHON = "%WINPYDIR%\\python.exe"
-$env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\\Lib;%WINPYDIR%\DLLs"
+$env:PYTHON = "%WINPYDIR%\python.exe"
+$env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs"
 
 
 $env:WINPYVER = '"""
