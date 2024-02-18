@@ -966,6 +966,31 @@ def do_script(
         print("Executed " , cmd)
     return 'ok'
 
+def columns_width(list_of_lists):
+        """return the maximum string length of each column of a list of list"""
+        if not isinstance(list_of_lists, list):
+            return [0]
+ 
+        # Transpose the list of lists using zip
+        transposed_lists = list(zip(*list_of_lists))
+        # Calculate the maximum width for each column
+        column_widths = [max(len(str(item)) for item in sublist) for sublist in transposed_lists]
+        return column_widths
+
+def formatted_list(list_of_list, full=False, max_width=70):
+        """format a list_of_list to fix length columns"""
+        columns_size = columns_width(list_of_list)
+        nb_columns = len(columns_size)
+
+        # normalize each columns to columns_size[col] width, in the limit of max_width
+        
+        zz = [
+            list(
+                line[col].ljust(columns_size[col])[:max_width] for col in range(nb_columns)
+            )
+            for line in list_of_list
+        ]
+        return zz
 
 if __name__ == '__main__':
 

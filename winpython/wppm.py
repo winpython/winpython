@@ -819,6 +819,24 @@ from {bold}WinPython{unbold} Start menu group."
             help="show  l levels_of_depth",
         )
         parser.add_argument(
+            "-ls",
+            "--list",
+            dest="list",
+            action="store_const",
+            const=True,
+            default=False,
+            help="list packages matching the given regular expression",
+        )
+        parser.add_argument(
+            "-v",
+            "--verbose",
+            dest="verbose",
+            action="store_const",
+            const=True,
+            default=False,
+            help="show packages summary",
+        )
+        parser.add_argument(
             "--register",
             dest="registerWinPython",
             action="store_const",
@@ -844,12 +862,19 @@ from {bold}WinPython{unbold} Start menu group."
         if args.pipdown:
             pip = piptree.pipdata()
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-            pip.down(pack, extra, args.levels_of_depth)
+            pip.down(pack, extra, args.levels_of_depth, verbose=args.verbose)
             sys.exit()
         elif args.pipup:
             pip = piptree.pipdata()
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-            pip.up(pack, extra, args.levels_of_depth)
+            pip.up(pack, extra, args.levels_of_depth, verbose=args.verbose)
+            sys.exit()
+        elif args.list:
+            pip = piptree.pipdata()
+            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
+            listed = utils.formatted_list(todo)
+            for p in listed:
+                print(*p)
             sys.exit()
         if args.registerWinPython:
             print(registerWinPythonHelp)
