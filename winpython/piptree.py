@@ -32,6 +32,7 @@ class pipdata:
         #             req_version = version needed
         #             req_marker = marker of the requirement (if any)
         self.distro = {}
+        self.raw = {}
         replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
         self.environment = {
             "implementation_name": sys.implementation.name,
@@ -54,6 +55,7 @@ class pipdata:
             name = meta["name"]
             key = normalize(name)
             requires = []
+            self.raw[key] = meta
             if "requires_dist" in meta:
                 for i in meta["requires_dist"]:
                     det = (i + ";").split(";")
@@ -207,3 +209,4 @@ class pipdata:
             return [(p, self.distro[p]["version"], self.distro[p]["summary"]) for p in sorted(self.distro)]
         else:
             return [(p, self.distro[p]["version"]) for p in sorted(self.distro)]
+

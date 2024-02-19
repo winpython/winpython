@@ -18,6 +18,7 @@ import shutil
 import re
 import sys
 import subprocess
+import json
 
 # Local imports
 from winpython import utils
@@ -828,13 +829,22 @@ from {bold}WinPython{unbold} Start menu group."
             help="list packages matching the given regular expression",
         )
         parser.add_argument(
+            "-lsa",
+            "--list_all",
+            dest="all",
+            action="store_const",
+            const=True,
+            default=False,
+            help="list all detail of packages matching the given regular expression (pip inspect)",
+        )
+        parser.add_argument(
             "-v",
             "--verbose",
             dest="verbose",
             action="store_const",
             const=True,
             default=False,
-            help="show packages summary",
+            help="show more from package summary and description",
         )
         parser.add_argument(
             "--register",
@@ -876,6 +886,19 @@ from {bold}WinPython{unbold} Start menu group."
             for p in listed:
                 print(*p)
             sys.exit()
+        elif args.all:
+            pip = piptree.pipdata()
+            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
+            for l in todo:
+                # print(pip.distro[l[0]])
+                title = f"**  Package: {l[0]}  **"
+                print("\n"+"*"*len(title), f"\n{title}", "\n"+"*"*len(title) )
+                for key, value in pip.raw[l[0]].items():
+                    rawtext=json.dumps(value, indent=2)
+                    lines = [l for l in rawtext.split(r"\n") if len(l.strip()) > 2]
+                    if key.lower() != 'description' or args.verbose==True:
+                        print(f"{key}: ","\n".join(lines).replace('"', ""))
+            sys.exit()            
         if args.registerWinPython:
             print(registerWinPythonHelp)
             if utils.is_python_distribution(args.target):
