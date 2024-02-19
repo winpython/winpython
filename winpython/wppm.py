@@ -744,7 +744,7 @@ when installing old Pythons with the official installer before 'py'
 .
 """
 
-        unregisterWinPythonHelp = """Unregister distribution
+        unregisterWinPythonHelp = f"""Unregister distribution
 ({bold}experimental{unbold})
 This will remove file extensions associations, icons and
 Windows explorer's context menu entries ('Edit with IDLE', ...)
