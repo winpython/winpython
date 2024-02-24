@@ -738,12 +738,12 @@ call "%~dp0env_for_icons.bat"
             args=r"/k winpython.bat",
         )
 
-        self.create_launcher(
-            "IDLEX.exe",
-            "python.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs winidlex.bat",
-        )
+        #self.create_launcher(
+        #    "IDLEX.exe",
+        #    "python.ico",
+        #    command="wscript.exe",
+        #    args=r"Noshell.vbs winidlex.bat",
+        #)
 
         self.create_launcher(
             "IDLE (Python GUI).exe",
@@ -819,12 +819,12 @@ call "%~dp0env_for_icons.bat"
             args=r"/k winjupyter_lab.bat",
         )
 
-        self.create_launcher(
-            "Pyzo.exe",
-            "pyzologo.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs winpyzo.bat",
-        )
+        #self.create_launcher(
+        #    "Pyzo.exe",
+        #    "pyzologo.ico",
+        #    command="wscript.exe",
+        #    args=r"Noshell.vbs winpyzo.bat",
+        #)
 
         # VSCode launcher
         self.create_launcher(
