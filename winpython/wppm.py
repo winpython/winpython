@@ -847,30 +847,33 @@ Remove menu group {unbold}WinPython{unbold} .
         )
 
         args = parser.parse_args()
-
+        targetpython = None
+        if args.target and not args.target==sys.prefix:
+            targetpython = args.target if args.target[-4:] == '.exe' else args.target+r'\python.exe'
+            # print(targetpython)
         if args.install and args.uninstall:
             raise RuntimeError("Incompatible arguments: --install and --uninstall")
         if args.registerWinPython and args.unregisterWinPython:
             raise RuntimeError("Incompatible arguments: --install and --uninstall")
         if args.pipdown:
-            pip = piptree.pipdata()
+            pip = piptree.pipdata(Target=targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
             pip.down(pack, extra, args.levels_of_depth, verbose=args.verbose)
             sys.exit()
         elif args.pipup:
-            pip = piptree.pipdata()
+            pip = piptree.pipdata(Target=targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
             pip.up(pack, extra, args.levels_of_depth, verbose=args.verbose)
             sys.exit()
         elif args.list:
-            pip = piptree.pipdata()
+            pip = piptree.pipdata(Target=targetpython)
             todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
             listed = utils.formatted_list(todo)
             for p in listed:
                 print(*p)
             sys.exit()
         elif args.all:
-            pip = piptree.pipdata()
+            pip = piptree.pipdata(Target=targetpython)
             todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
             for l in todo:
                 # print(pip.distro[l[0]])

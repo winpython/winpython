@@ -20,7 +20,7 @@ class pipdata:
         if Target == None:
             pip_inspect = utils.exec_run_cmd(["pip", "inspect"])
         else:
-            pip_inspect = utils.exec_run_cmd(["chcp", "65001" ,"&", Target , "-m", "pip", "inspect"])        
+            pip_inspect = utils.exec_run_cmd([Target , "-m", "pip", "inspect"])        
         pip_json = json.loads(pip_inspect)
 
         # create a distro{} dict of Packages
