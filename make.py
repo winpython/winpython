@@ -717,12 +717,13 @@ call "%~dp0env_for_icons.bat"
             command="$SYSDIR\cmd.exe",
             args=r"/k cmd.bat",
         )
-        self.create_launcher(
-            "WinPython Powershell Prompt.exe",
-            "powershell.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k cmd_ps.bat",
-        )
+        # removed to reduce number of icons
+        #self.create_launcher(
+        #    "WinPython Powershell Prompt.exe",
+        #    "powershell.ico",
+        #    command="$SYSDIR\cmd.exe",
+        #    args=r"/k cmd_ps.bat",
+        #)
 
         self.create_launcher(
             "WinPython Terminal.exe",
@@ -737,13 +738,6 @@ call "%~dp0env_for_icons.bat"
             command="$SYSDIR\cmd.exe",
             args=r"/k winpython.bat",
         )
-
-        #self.create_launcher(
-        #    "IDLEX.exe",
-        #    "python.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs winidlex.bat",
-        #)
 
         self.create_launcher(
             "IDLE (Python GUI).exe",
@@ -769,8 +763,10 @@ call "%~dp0env_for_icons.bat"
         self.create_launcher(
             "WinPython Control Panel.exe",
             "winpython.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs wpcp.bat",
+            # command="wscript.exe",
+            # args=r"Noshell.vbs wpcp.bat",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k wpcp.bat",
         )
 
         # Multi-Qt launchers
@@ -818,13 +814,6 @@ call "%~dp0env_for_icons.bat"
             command="$SYSDIR\cmd.exe",
             args=r"/k winjupyter_lab.bat",
         )
-
-        #self.create_launcher(
-        #    "Pyzo.exe",
-        #    "pyzologo.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs winpyzo.bat",
-        #)
 
         # VSCode launcher
         self.create_launcher(
@@ -1513,44 +1502,6 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
         )
 
         self.create_batch_script(
-            "idlex.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
-rem backward compatibility for non-IDLEX users
-if exist "%WINPYDIR%\scripts\idlex.pyw" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
-) else (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
-)
-""",
-            do_changes=changes,
-        )
-
-        self.create_batch_script(
-            "idle.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
-"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
-
-""",
-            do_changes=changes,
-        )
-        self.create_batch_script(
-            "winidlex.bat",
-            r"""@echo off
-
-call "%~dp0env_for_icons.bat"  %*
-cd/D "%WINPYWORKDIR1%"
-rem backward compatibility for non-IDLEX users
-if exist "%WINPYDIR%\scripts\idlex.pyw" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\scripts\idlex.pyw" %*
-) else (
-    echo "%WINPYDIR%\scripts\idlex.pyw" for IDLEX not found !"
-)
-""",
-            do_changes=changes,
-        )
-        self.create_batch_script(
             "winidle.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"  %*
@@ -1560,18 +1511,6 @@ cd/D "%WINPYWORKDIR1%"
             do_changes=changes,
         )
 
-        self.create_batch_script(
-            "spyder.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-rem cd/D "%WINPYWORKDIR%"
-if exist "%WINPYDIR%\scripts\spyder3.exe" (
-   "%WINPYDIR%\scripts\spyder3.exe" %* -w "%WINPYWORKDIR1%"
-) else (
-   "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
-)  
-""",
-        )
         self.create_batch_script(
             "winspyder.bat",
             r"""@echo off
@@ -1599,15 +1538,6 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
         )
 
         self.create_batch_script(
-            "ipython_notebook.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-"%WINPYDIR%\scripts\jupyter-notebook.exe" %*
-""",
-        )
-
-        self.create_batch_script(
             "winipython_notebook.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat" %*
@@ -1631,15 +1561,6 @@ cd/D "%WINPYWORKDIR1%"
 call "%~dp0env_for_icons.bat" %*
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-lab.exe" %*
-""",
-        )
-
-        self.create_batch_script(
-            "qtconsole.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-"%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
 """,
         )
 
@@ -1786,14 +1707,13 @@ call "%~dp0unregister_python.bat" --all""",
             "wpcp.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-"%WINPYDIR%\python.exe" -m winpython.controlpanel %*
+rem cd/D "%WINPYWORKDIR1%"
+rem "%WINPYDIR%\python.exe" -m winpython.controlpanel %*
+if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd/d %WINPYWORKDIR1%
+cmd.exe /k "echo wppm & echo & wppm"
 """,
             do_changes=changes,
         )
-
-        # self.create_python_batch('wpcp.bat', '-m winpython.controlpanel',
-        #                         workdir=r'"%WINPYDIR%\Scripts"')
 
         self.create_batch_script(
             "upgrade_pip.bat",
