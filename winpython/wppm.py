@@ -730,29 +730,14 @@ def main(test=False):
         bold = "\033[1m"
         unbold = "\033[0m"
         registerWinPythonHelp = f"""Register distribution
-({bold}experimental{unbold})
-This will associate file extensions, icons and
-Windows explorer's context menu entries ('Edit with IDLE', ...)
-with selected Python distribution in Windows registry.
-
-Shortcuts for all WinPython launchers will be installed
-in {unbold}WinPython{unbold} Start menu group (replacing existing
-shortcuts).
-
-{bold}Note{unbold}: these actions are similar to those performed 
-when installing old Pythons with the official installer before 'py'
-.
+Associate file extensions, icons and context menu entries with this WinPython.
+Create a menu group {unbold}WinPython{unbold} for this WinPython launchers.
 """
 
         unregisterWinPythonHelp = f"""Unregister distribution
-({bold}experimental{unbold})
-This will remove file extensions associations, icons and
-Windows explorer's context menu entries ('Edit with IDLE', ...)
-with selected Python distribution in Windows registry.
-
-Shortcuts for all WinPython launchers will be removed
-from {bold}WinPython{unbold} Start menu group."
-."""
+De-Associate file extensions, icons and context menu entries from this WinPython.
+Remove menu group {unbold}WinPython{unbold} .
+"""
 
         parser = ArgumentParser(
             description="WinPython Package Manager: view, install, "
@@ -770,7 +755,6 @@ from {bold}WinPython{unbold} Start menu group."
         )
         parser.add_argument(
             "-t",
-            "--target",
             dest="target",
             default=sys.prefix,
             help="path to target Python distribution " f'(default: "{sys.prefix}")',
@@ -782,7 +766,7 @@ from {bold}WinPython{unbold} Start menu group."
             action="store_const",
             const=True,
             default=False,
-            help="install package (this is the default action)",
+            help="install a given package wheel (otherwise use pip)",
         )
         parser.add_argument(
             "-u",
@@ -800,7 +784,7 @@ from {bold}WinPython{unbold} Start menu group."
             action="store_const",
             const=True,
             default=False,
-            help="show reverse dependancies of the package",
+            help="show reverse dependancies of the given package[option]. {unbold}wppm -r pytest[test]{unbold}",
         )
         parser.add_argument(
             "-p",
@@ -809,15 +793,14 @@ from {bold}WinPython{unbold} Start menu group."
             action="store_const",
             const=True,
             default=False,
-            help="show  dependancies of the package",
+            help="show dependancies of the given package[option]. {unbold}wppm -p pandas[test]{unbold}",
         )
         parser.add_argument(
             "-l",
-            "--levels_of_depth",
-            dest="levels_of_depth",
+            dest="levels",
             type=int,
             default=2,
-            help="show  l levels_of_depth",
+            help="show l levels of depth of hierarchy from given package",
         )
         parser.add_argument(
             "-ls",
@@ -826,7 +809,7 @@ from {bold}WinPython{unbold} Start menu group."
             action="store_const",
             const=True,
             default=False,
-            help="list packages matching the given regular expression",
+            help="list packages matching the given expression. {unbold}wppm -ls{unbold}",
         )
         parser.add_argument(
             "-lsa",
@@ -835,7 +818,7 @@ from {bold}WinPython{unbold} Start menu group."
             action="store_const",
             const=True,
             default=False,
-            help="list all detail of packages matching the given regular expression (pip inspect)",
+            help="list details of packages matching the given regular expression (pip inspect)",
         )
         parser.add_argument(
             "-v",
