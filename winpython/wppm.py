@@ -858,12 +858,12 @@ Remove menu group {unbold}WinPython{unbold} .
         if args.pipdown:
             pip = piptree.pipdata(Target=targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-            pip.down(pack, extra, args.levels_of_depth, verbose=args.verbose)
+            pip.down(pack, extra, args.levels, verbose=args.verbose)
             sys.exit()
         elif args.pipup:
             pip = piptree.pipdata(Target=targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-            pip.up(pack, extra, args.levels_of_depth, verbose=args.verbose)
+            pip.up(pack, extra, args.levels, verbose=args.verbose)
             sys.exit()
         elif args.list:
             pip = piptree.pipdata(Target=targetpython)
