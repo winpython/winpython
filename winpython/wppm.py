@@ -9,8 +9,6 @@ WinPython Package Manager
 
 Created on Fri Aug 03 14:32:26 2012
 """
-# pypy3 to patch from 'python' to 'pypy3': 379 493 497 627 692 696 743 767 785
-from __future__ import print_function
 
 import os
 from pathlib import Path
@@ -730,19 +728,15 @@ def main(test=False):
         bold = "\033[1m"
         unbold = "\033[0m"
         registerWinPythonHelp = f"""Register distribution
-Associate file extensions, icons and context menu entries with this WinPython.
-Create a menu group {unbold}WinPython{unbold} for this WinPython launchers.
+Associate file extensions, icons and context menu {unbold}WinPython{unbold} with this WinPython.
 """
 
         unregisterWinPythonHelp = f"""Unregister distribution
-De-Associate file extensions, icons and context menu entries from this WinPython.
-Remove menu group {unbold}WinPython{unbold} .
+De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} from this WinPython.
 """
 
         parser = ArgumentParser(
-            description="WinPython Package Manager: view, install, "
-            "uninstall or upgrade Python packages on a Windows "
-            "Python distribution like WinPython.",
+            description="WinPython Package Manager: handle a WinPython Distribution and its packages",
             formatter_class=RawTextHelpFormatter,
         )
         parser.add_argument(
@@ -751,31 +745,7 @@ Remove menu group {unbold}WinPython{unbold} .
             nargs="?",
             default="",
             type=str,
-            help="path to a Python package, or package name",
-        )
-        parser.add_argument(
-            "-t",
-            dest="target",
-            default=sys.prefix,
-            help="path to target Python distribution " f'(default: "{sys.prefix}")',
-        )
-        parser.add_argument(
-            "-i",
-            "--install",
-            dest="install",
-            action="store_const",
-            const=True,
-            default=False,
-            help="install a given package wheel (otherwise use pip)",
-        )
-        parser.add_argument(
-            "-u",
-            "--uninstall",
-            dest="uninstall",
-            action="store_const",
-            const=True,
-            default=False,
-            help="uninstall package",
+            help="optional package name or package wheel",
         )
         parser.add_argument(
             "-r",
@@ -784,7 +754,7 @@ Remove menu group {unbold}WinPython{unbold} .
             action="store_const",
             const=True,
             default=False,
-            help="show reverse dependancies of the given package[option]. {unbold}wppm -r pytest[test]{unbold}",
+            help=f"show reverse dependancies of the given package[option]. {unbold}wppm -r pytest[test]{unbold}",
         )
         parser.add_argument(
             "-p",
@@ -793,14 +763,14 @@ Remove menu group {unbold}WinPython{unbold} .
             action="store_const",
             const=True,
             default=False,
-            help="show dependancies of the given package[option]. {unbold}wppm -p pandas[test]{unbold}",
+            help=f"show dependancies of the given package[option]. {unbold}wppm -p pandas[test]{unbold}",
         )
         parser.add_argument(
             "-l",
             dest="levels",
             type=int,
             default=2,
-            help="show l levels of depth of hierarchy from given package",
+            help="show l levels of depth of hierarchy from given package default is 2 levels",
         )
         parser.add_argument(
             "-ls",
@@ -809,7 +779,7 @@ Remove menu group {unbold}WinPython{unbold} .
             action="store_const",
             const=True,
             default=False,
-            help="list packages matching the given expression. {unbold}wppm -ls{unbold}",
+            help=f"list packages matching the given package expression. {unbold}wppm -ls{unbold}",
         )
         parser.add_argument(
             "-lsa",
@@ -845,7 +815,30 @@ Remove menu group {unbold}WinPython{unbold} .
             default=False,
             help=unregisterWinPythonHelp,
         )
-
+        parser.add_argument(
+            "-t",
+            dest="target",
+            default=sys.prefix,
+            help="path to target Python distribution " f'(default: "{sys.prefix}")',
+        )
+        parser.add_argument(
+            "-i",
+            "--install",
+            dest="install",
+            action="store_const",
+            const=True,
+            default=False,
+            help="install a given package wheel (use pip for more features)",
+        )
+        parser.add_argument(
+            "-u",
+            "--uninstall",
+            dest="uninstall",
+            action="store_const",
+            const=True,
+            default=False,
+            help="uninstall package",
+        )
         args = parser.parse_args()
         targetpython = None
         if args.target and not args.target==sys.prefix:
@@ -868,7 +861,8 @@ Remove menu group {unbold}WinPython{unbold} .
         elif args.list:
             pip = piptree.pipdata(Target=targetpython)
             todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
-            listed = utils.formatted_list(todo)
+            titles = [['Package', 'Version', 'Summary'],['_' * max(x, 6) for x in utils.columns_width(todo)]] 
+            listed = utils.formatted_list(titles + todo)
             for p in listed:
                 print(*p)
             sys.exit()
