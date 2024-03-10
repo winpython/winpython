@@ -736,9 +736,7 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
 """
 
         parser = ArgumentParser(
-            description="WinPython Package Manager: view, install, "
-            "uninstall or upgrade Python packages on a Windows "
-            "Python distribution like WinPython.",
+            description="WinPython Package Manager: handle a WinPython Distribution and its packages",
             formatter_class=RawTextHelpFormatter,
         )
         parser.add_argument(
