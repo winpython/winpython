@@ -155,20 +155,22 @@ class BasePackage(object):
             iscomp = iscomp and self.pyversion == distribution.version
         return iscomp
 
-    def extract_optional_infos(self, update=False):
+    def extract_optional_infos(self, update=False, suggested_summary=None):
         """Extract package optional infos (description, url)
         from the package database"""
         metadata = get_package_metadata("packages.ini", self.name, True, update=update)
         for key, value in list(metadata.items()):
             setattr(self, key, value)
+        if suggested_summary and suggested_summary!="":
+            setattr(self, 'description',suggested_summary)
 
 
 class Package(BasePackage):
-    def __init__(self, fname, update=False):
+    def __init__(self, fname, update=False, suggested_summary=None):
         BasePackage.__init__(self, fname)
         self.files = []
         self.extract_infos()
-        self.extract_optional_infos(update=update)
+        self.extract_optional_infos(update=update,suggested_summary=suggested_summary)
 
     def extract_infos(self):
         """Extract package infos (name, version, architecture)
@@ -245,6 +247,7 @@ class Distribution(object):
         self.target = target
         self.verbose = verbose
         self.indent = indent
+        self.pip = None
 
         # if no target path given, take the current python interpreter one
         if self.target is None:
@@ -340,33 +343,33 @@ python "%~dpn0"""
 
         # Include package installed via pip (not via WPPM)
         wppm = []
-        try:
+        try:  # we try to use also 'pip inspect' via piptree (work for pip>= 22.2)
             if str(Path(sys.executable).parent) == self.target:
-                #  win pip 22.2, we can use pip inspect API
-                pip = piptree.pipdata()
-                pip_list = pip.pip_list()
+                self.pip = piptree.pipdata()
             else:
-                #  indirect way: we use pip list (for now)
-                cmdx = [
-                    utils.get_python_executable(self.target),  # PyPy !
-                    "-m",
-                    "pip",
-                    "list",
-                ]
-                pip_list_raw = utils.exec_run_cmd(cmdx).splitlines()
-                # pip list gives 2 lines of titles to ignore
-                pip_list = [l.split() for l in pip_list_raw[2:]]
-            # there are only Packages installed with pip now
-            # create pip package list
-            wppm = [
-                Package(
-                    f"{i[0].replace('-', '_').lower()}-{i[1]}-py2.py3-none-any.whl",
-                    update=update,
-                )
-                for i in pip_list
-            ]
+                self.pip = piptree.pipdata(Target=utils.get_python_executable(self.target))
+            pip_list = self.pip.pip_list()
         except:
-            pass
+            # if failure back to pip list (will use packages.ini for names)
+            cmdx = [
+                utils.get_python_executable(self.target),  # PyPy !
+                "-m",
+                "pip",
+                "list",
+            ]
+            pip_list_raw = utils.exec_run_cmd(cmdx).splitlines()
+            # pip list gives 2 lines of titles to ignore
+            pip_list = [l.split() for l in pip_list_raw[2:]]
+
+        # create pip package list
+        wppm = [
+            Package(
+                f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl",
+                update=update,
+                suggested_summary=self.pip.summary(i[0]) if self.pip else None
+            )
+            for i in pip_list
+        ]
         return sorted(wppm, key=lambda tup: tup.name.lower())
 
     def find_package(self, name):
@@ -842,8 +845,8 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
         args = parser.parse_args()
         targetpython = None
         if args.target and not args.target==sys.prefix:
-            targetpython = args.target if args.target[-4:] == '.exe' else args.target+r'\python.exe'
-            # print(targetpython)
+            targetpython = args.target if args.target[-4:] == '.exe' else str(Path(args.target) / 'python.exe')
+            # print(targetpython.resolve() to check)
         if args.install and args.uninstall:
             raise RuntimeError("Incompatible arguments: --install and --uninstall")
         if args.registerWinPython and args.unregisterWinPython:
