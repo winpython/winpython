@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json, sys, re, platform, os
+import json, sys, re, platform, os, sysconfig
 import re
 from winpython import utils
 from collections import OrderedDict
@@ -17,10 +17,13 @@ class pipdata:
     def __init__(self, Target=None):
 
         # get pip_inpsect raw data in json form
+        #os.environ["pythonutf8"] = "1" causes issues in movable, so limit to there
         if Target == None:
-            pip_inspect = utils.exec_run_cmd(["pip", "inspect"])
+            #pip_inspect = utils.exec_run_cmd(["pip", "inspect"])
+            pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & python -X utf8=1 -m pip inspect', sys.prefix)        
         else:
-            pip_inspect = utils.exec_run_cmd([Target , "-m", "pip", "inspect"])        
+            #pip_inspect = utils.exec_run_cmd([Target , "-X" ,"utf8=1", "-m", "pip", "inspect"]) 
+            pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & "{Target}" -X utf8=1 -m pip inspect', sys.prefix)          
         pip_json = json.loads(pip_inspect)
 
         # create a distro{} dict of Packages
@@ -199,9 +202,14 @@ class pipdata:
         print("\n".join(lines).replace('"', ""))
 
     def description(self, pp):
-        "return desciption of the package"
+        "return description of the package"
         if pp in self.distro:
             return print("\n".join(self.distro[pp]["description"].split(r"\n")))
+    
+    def summary(self, pp):
+        "return summary of the package"
+        if pp in self.distro:
+            return  self.distro[pp]["summary"]
 
     def pip_list(self, full=False):
         """do like pip list"""

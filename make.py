@@ -846,7 +846,7 @@ call "%~dp0env_for_icons.bat"
             "env.bat",
             r"""@echo off
 set WINPYDIRBASE=%~dp0..
-
+rem set PYTHONUTF8=1 would create issues in "movable" patching
 rem get a normalize path
 set WINPYDIRBASETMP=%~dp0..
 pushd %WINPYDIRBASETMP%
@@ -997,7 +997,7 @@ if not exist "%winpython_ini%" (
 ###############################
 $0 = $myInvocation.MyCommand.Definition
 $dp0 = [System.IO.Path]::GetDirectoryName($0)
-
+# $env:PYTHONUTF8 = 1 would create issues in "movable" patching
 $env:WINPYDIRBASE = "$dp0\.."
 # get a normalize path
 # http://stackoverflow.com/questions/1645843/resolve-absolute-path-from-relative-path-and-or-file-name

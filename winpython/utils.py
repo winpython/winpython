@@ -323,7 +323,7 @@ def exec_shell_cmd(args, path):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=path,
-        shell=True,
+        shell=True
     )
     return decode_fs_string(process.stdout.read())
 
@@ -333,14 +333,16 @@ def exec_run_cmd(args, path=None):
     # python-3.7+ allows to replace "stdout and stderr ", per "capture_output=True"
     if path:
         process = subprocess.run(args,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                cwd=path)
+                                capture_output=True,
+                                cwd=path, text=True)
+        #return  decode_fs_string(process.stdout)
+        return  process.stdout
     else:
         process = subprocess.run(args,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        return  decode_fs_string(process.stdout)
+                                capture_output=True,
+                                cwd=path, text=True)
+        #return  decode_fs_string(process.stdout)
+        return  process.stdout
 
 
 def get_r_version(path):
