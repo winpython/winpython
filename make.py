@@ -770,26 +770,26 @@ call "%~dp0env_for_icons.bat"
         )
 
         # Multi-Qt launchers
-        self.create_launcher(
-            "Qt Designer.exe",
-            "qtdesigner.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs qtdesigner.bat",
-        )
+        #self.create_launcher(
+        #    "Qt Designer.exe",
+        #    "qtdesigner.ico",
+        #    command="wscript.exe",
+        #    args=r"Noshell.vbs qtdesigner.bat",
+        #)
 
-        self.create_launcher(
-            "Qt Linguist.exe",
-            "qtlinguist.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs qtlinguist.bat",
-        )
+        #self.create_launcher(
+        #    "Qt Linguist.exe",
+        #    "qtlinguist.ico",
+        #    command="wscript.exe",
+        #    args=r"Noshell.vbs qtlinguist.bat",
+        #)
 
-        self.create_launcher(
-            "Qt Assistant.exe",
-            "qtassistant.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs qtassistant.bat",
-        )
+        #self.create_launcher(
+        #    "Qt Assistant.exe",
+        #    "qtassistant.ico",
+        #    command="wscript.exe",
+        #    args=r"Noshell.vbs qtassistant.bat",
+        #)
 
         # Jupyter launchers
         self.create_launcher(
