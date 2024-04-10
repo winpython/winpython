@@ -894,7 +894,7 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
             if theAnswer == "Y":
                 from winpython import associate
 
-                associate.register(dist.target)
+                associate.register(dist.target, verbose=args.verbose)
                 sys.exit()
         if args.unregisterWinPython:
             print(unregisterWinPythonHelp)
@@ -908,7 +908,7 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
             if theAnswer == "Y":
                 from winpython import associate
 
-                associate.unregister(dist.target)
+                associate.unregister(dist.target, verbose=args.verbose)
                 sys.exit()
         elif not args.install and not args.uninstall:
             args.install = True
