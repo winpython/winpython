@@ -214,7 +214,7 @@ def get_winpython_start_menu_folder(current=True):
     return str(Path(folder) / 'WinPython')
 
 def remove_winpython_start_menu_folder(current=True):
-    """Create WinPython Start menu folder -- remove it if it already exists"""
+    """Remove WinPython Start menu folder -- remove it if it already exists"""
     path = get_winpython_start_menu_folder(current=current)
     if Path(path).is_dir():
         try:
@@ -249,6 +249,7 @@ def create_shortcut(
     workdir="",
     iconpath="",
     iconindex=0,
+    verbose=True,
 ):
     """Create Windows shortcut (.lnk file)"""
     import pythoncom
@@ -272,7 +273,8 @@ def create_shortcut(
     ipf = ilink.QueryInterface(pythoncom.IID_IPersistFile)
     if not filename.endswith('.lnk'):
         filename += '.lnk'
-    print(f'ipf.save *{filename}*')    
+    if verbose:
+        print(f'create menu *{filename}*')
     try:
         ipf.Save(filename, 0)
     except:
@@ -386,7 +388,7 @@ def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
     the_exe = get_python_executable(path)
     # debug2021-09-12
-    print(f'"{the_exe}" -c "{cmd}"', ' * ',  path)
+    # print(f'"{the_exe}" -c "{cmd}"', ' * ',  path)
     return exec_shell_cmd(f'"{the_exe}" -c "{cmd}"', path).splitlines()[0]
 
 def python_execmodule(cmd, path):

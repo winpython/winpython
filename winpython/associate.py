@@ -70,10 +70,12 @@ def _get_shortcut_data(target, current=True):
     return data
 
 
-def register(target, current=True):
+def register(target, current=True, verbose=True):
     """Register a Python distribution in Windows registry"""
     root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
 
+    # Creating Registry entries
+    print(f'Creating WinPython registry entries for {target}')
     # Extensions
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C % ".py"),
@@ -333,13 +335,15 @@ def register(target, current=True):
     )
 
     # Create start menu entries for all WinPython launchers
+    print(f'Creating WinPython menu for all icons in {target}')
     for path, desc, fname in _get_shortcut_data(target, current=current):
-        utils.create_shortcut(path, desc, fname)
+        utils.create_shortcut(path, desc, fname, verbose=verbose)
 
 
-def unregister(target, current=True):
+def unregister(target, current=True, verbose=True):
     """Unregister a Python distribution in Windows registry"""
-    # Registry entries
+    # Removing Registry entries
+    print(f'Removing WinPython registry entries for {target}')
     root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
     short_version = utils.get_python_infos(target)[0]
     key_core = (KEY_S1 % short_version) + r"\%s"
@@ -391,15 +395,18 @@ def unregister(target, current=True):
         KEY_S,
     ):
         try:
-            print(key)
+            if verbose:
+                print(key)
             winreg.DeleteKey(root, key)
         except WindowsError:
             rootkey = "HKEY_CURRENT_USER" if current else "HKEY_LOCAL_MACHINE"
-            print(
+            if verbose:
+                print(
                 r"Unable to remove %s\%s" % (rootkey, key),
                 file=sys.stderr,
             )
     # remove menu shortcuts
+    print(f'Removing WinPython menu for all icons in {target}')
     _remove_start_menu_folder(target, current=current)
     
     #for path, desc, fname in _get_shortcut_data(target, current=current):
