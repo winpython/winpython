@@ -46,7 +46,7 @@ echo ------------------
 echo 0.0 Initialize variables  
 echo ------------------
 
-if "%my_release_level%"=="" set my_release_level=b5
+if "%my_release_level%"=="" set my_release_level=b4
 
 set my_basedir=%my_root_dir_for_builds%\bd%my_python_target%
 
@@ -73,12 +73,17 @@ if %my_python_target%==310 (
 )
 
 if %my_python_target%==311 (
-   set my_python_target_release=3115
-   set my_release=0
+   set my_python_target_release=3118
+   set my_release=1
 )
 
 if %my_python_target%==312 (
-   set my_python_target_release=3120
+   set my_python_target_release=3123
+   set my_release=0
+)
+
+if %my_python_target%==313 (
+   set my_python_target_release=3130
    set my_release=0
 )
 
@@ -259,6 +264,11 @@ echo ----------------------------->>%my_archive_log%
 echo 2.3 add mandatory packages for build>>%my_archive_log%
 echo %date% %time%                >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
+
+rem D/2024-04-10: do not override  "/vcruntime140_1.dll" with msvc_runtime wheel
+rem echo python.exe  -c "import sys;from pathlib import Path;f=open(Path(sys.prefix) / 'pyenv.cfg', 'w');f.write('include-system-site-packages = true\n');f.close">>%my_archive_log%
+rem F/2024-04-10
+
 rem D/2020-07-05: install msvc_runtime before packages that may want to compile
 echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
 echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade>>%my_archive_log%
@@ -287,9 +297,7 @@ echo pip install -r %my_requirements_pre% -c %my_constraints%  --pre  --no-index
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
 pip install -r %my_requirements_pre% -c  %my_constraints%   --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  --upgrade %new_resolver%>>%my_archive_log%
-)
-else
-(
+) else (
 echo no packages pre_requirements   
 echo no packages pre_requirements>>%my_archive_log%
 )
