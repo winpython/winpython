@@ -14,6 +14,7 @@ import sys
 import os
 from pathlib import Path
 import platform
+import importlib
 
 #  import subprocess
 
@@ -75,7 +76,8 @@ def register(target, current=True, verbose=True):
     root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
 
     # Creating Registry entries
-    print(f'Creating WinPython registry entries for {target}')
+    if verbose:
+        print(f'Creating WinPython registry entries for {target}')
     # Extensions
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C % ".py"),
@@ -335,7 +337,11 @@ def register(target, current=True, verbose=True):
     )
 
     # Create start menu entries for all WinPython launchers
-    print(f'Creating WinPython menu for all icons in {target}')
+    spec = importlib.util.find_spec('pythoncom')
+    if verbose and spec is None:
+        print(f"Can't create WinPython menu as pywin32 package is not installed")
+    if verbose and spec is not None:
+        print(f'Creating WinPython menu for all icons in {target}')
     for path, desc, fname in _get_shortcut_data(target, current=current):
         utils.create_shortcut(path, desc, fname, verbose=verbose)
 
@@ -343,7 +349,8 @@ def register(target, current=True, verbose=True):
 def unregister(target, current=True, verbose=True):
     """Unregister a Python distribution in Windows registry"""
     # Removing Registry entries
-    print(f'Removing WinPython registry entries for {target}')
+    if verbose:
+        print(f'Removing WinPython registry entries for {target}')
     root = winreg.HKEY_CURRENT_USER if current else winreg.HKEY_LOCAL_MACHINE
     short_version = utils.get_python_infos(target)[0]
     key_core = (KEY_S1 % short_version) + r"\%s"
@@ -406,7 +413,11 @@ def unregister(target, current=True, verbose=True):
                 file=sys.stderr,
             )
     # remove menu shortcuts
-    print(f'Removing WinPython menu for all icons in {target}')
+    spec = importlib.util.find_spec('pythoncom')
+    if verbose and spec is None:
+        print(f"Can't remove WinPython menu as pywin32 package is not installed")
+    if verbose and spec is not None:
+        print(f'Removing WinPython menu for all icons in {target}')
     _remove_start_menu_folder(target, current=current)
     
     #for path, desc, fname in _get_shortcut_data(target, current=current):
