@@ -730,13 +730,9 @@ def main(test=False):
     else:
         bold = "\033[1m"
         unbold = "\033[0m"
-        registerWinPythonHelp = f"""Register distribution
-Associate file extensions, icons and context menu {unbold}WinPython{unbold} with this WinPython.
-"""
+        registerWinPythonHelp = f"Register distribution: associate file extensions, icons and context menu with this WinPython"
 
-        unregisterWinPythonHelp = f"""Unregister distribution
-De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} from this WinPython.
-"""
+        unregisterWinPythonHelp = f"Unregister distribution: de-associate file extensions, icons and context menu from this WinPython"
 
         parser = ArgumentParser(
             description="WinPython Package Manager: handle a WinPython Distribution and its packages",
@@ -749,58 +745,6 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
             default="",
             type=str,
             help="optional package name or package wheel",
-        )
-        parser.add_argument(
-            "-r",
-            "--reverse-tree",
-            dest="pipup",
-            action="store_const",
-            const=True,
-            default=False,
-            help=f"show reverse dependancies of the given package[option]. {unbold}wppm -r pytest[test]{unbold}",
-        )
-        parser.add_argument(
-            "-p",
-            "--package-tree",
-            dest="pipdown",
-            action="store_const",
-            const=True,
-            default=False,
-            help=f"show dependancies of the given package[option]. {unbold}wppm -p pandas[test]{unbold}",
-        )
-        parser.add_argument(
-            "-l",
-            dest="levels",
-            type=int,
-            default=2,
-            help="show l levels of depth of hierarchy from given package default is 2 levels",
-        )
-        parser.add_argument(
-            "-ls",
-            "--list",
-            dest="list",
-            action="store_const",
-            const=True,
-            default=False,
-            help=f"list packages matching the given package expression. {unbold}wppm -ls{unbold}",
-        )
-        parser.add_argument(
-            "-lsa",
-            "--list_all",
-            dest="all",
-            action="store_const",
-            const=True,
-            default=False,
-            help="list details of packages matching the given regular expression (pip inspect)",
-        )
-        parser.add_argument(
-            "-v",
-            "--verbose",
-            dest="verbose",
-            action="store_const",
-            const=True,
-            default=False,
-            help="show more from package summary and description",
         )
         parser.add_argument(
             "--register",
@@ -819,10 +763,59 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
             help=unregisterWinPythonHelp,
         )
         parser.add_argument(
+            "-v",
+            "--verbose",
+            dest="verbose",
+            action="store_const",
+            const=True,
+            default=False,
+            help="show more details on packages and actions",
+        )
+        parser.add_argument(
+            "-ls",
+            "--list",
+            dest="list",
+            action="store_const",
+            const=True,
+            default=False,
+            help=f"list packages matching the given [optionnal] package expression: {unbold}wppm -ls{unbold}, {unbold}wppm -ls pand{unbold}",
+        )   
+        parser.add_argument(
+            "-p",
+            dest="pipdown",
+            action="store_const",
+            const=True,
+            default=False,
+            help=f"show Package dependancies of the given package[option]: {unbold}wppm -p pandas[test]{unbold}",
+        )
+        parser.add_argument(
+            "-r",
+            dest="pipup",
+            action="store_const",
+            const=True,
+            default=False,
+            help=f"show Reverse dependancies of the given package[option]: {unbold}wppm -r pytest[test]{unbold}",
+        )
+        parser.add_argument(
+            "-l",
+            dest="levels",
+            type=int,
+            default=2,
+            help=f"show 'LEVELS' levels of dependancies of the package, default is 2: {unbold}wppm -p pandas -l1{unbold}",
+        )
+        parser.add_argument(
+            "-lsa",
+            dest="all",
+            action="store_const",
+            const=True,
+            default=False,
+            help=f"list details of package names matching given regular expression: {unbold}wppm -lsa pandas -l1{unbold}",
+        )
+        parser.add_argument(
             "-t",
             dest="target",
             default=sys.prefix,
-            help="path to target Python distribution " f'(default: "{sys.prefix}")',
+            help=f'path to target Python distribution (default: "{sys.prefix}")',
         )
         parser.add_argument(
             "-i",
@@ -840,7 +833,7 @@ De-Associate file extensions, icons and context menu {unbold}WinPython{unbold} f
             action="store_const",
             const=True,
             default=False,
-            help="uninstall package",
+            help="uninstall package  (use pip for more features)",
         )
         args = parser.parse_args()
         targetpython = None
