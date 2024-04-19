@@ -870,10 +870,10 @@ def main(test=False):
                 title = f"**  Package: {l[0]}  **"
                 print("\n"+"*"*len(title), f"\n{title}", "\n"+"*"*len(title) )
                 for key, value in pip.raw[l[0]].items():
-                    rawtext=json.dumps(value, indent=2)
+                    rawtext=json.dumps(value, indent=2, ensure_ascii=False)
                     lines = [l for l in rawtext.split(r"\n") if len(l.strip()) > 2]
                     if key.lower() != 'description' or args.verbose==True:
-                        print(f"{key}: ","\n".join(lines).replace('"', ""))
+                        print(f"{key}: ", "\n".join(lines).replace('"', ""))
             sys.exit()            
         if args.registerWinPython:
             print(registerWinPythonHelp)
