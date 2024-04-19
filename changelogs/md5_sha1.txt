@@ -1,3 +1,12 @@
+### WinPython 2024-02 release (April  19th, 2024)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
+54849ef5c9184836c9a2a302a94d3533 | 2bbd296947c11e024850b54cfe81d33f6bcba8c7 | beef54eba558559255a73e59ae1986e8d06a6b12b55e78645ab42b4d6974e124 | Winpython64-3.12.3.0dot.exe       |   24 145 153 Bytes | 25b1156596aa8d6bb4dd7be5a8ac83cd6f5dabab09cfd0497575cc808edcd29f
+b370dd44d87f8c60d6b5ffab78359d98 | b2ebae84570a8882006bf9f976e14fedfdbe5dd8 | 45d5ab340920f291a3497be30f05bb059d05ca15f5882f58fa943abf956de1ea | Winpython64-3.12.3.0.exe          |  894 147 283 Bytes | 258b2e67e81f7e79b345d5a4131345db19a7cbe04af462cbf67e1f6f13f9374a
+544001aa7c8fbdfb9c3378f39a7d7749 | 7a5fa99bde2d46b7a2e00e8b63041dcbd6db7974 | 6ed92865e5b9a900c9a50c17a0d31aa013c71ca362788a21376b41d49dd21894 | Winpython64-3.13.0.0dota6.exe     |   24 506 401 Bytes | 61e48b2fead528afe71f057186dbadac036061b1a775f656922553b6c9961b7d
+
+
 ### WinPython 2024-01 release (February 16th, 2024)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
