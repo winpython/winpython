@@ -717,13 +717,12 @@ call "%~dp0env_for_icons.bat"
             command="$SYSDIR\cmd.exe",
             args=r"/k cmd.bat",
         )
-        # removed to reduce number of icons
-        #self.create_launcher(
-        #    "WinPython Powershell Prompt.exe",
-        #    "powershell.ico",
-        #    command="$SYSDIR\cmd.exe",
-        #    args=r"/k cmd_ps.bat",
-        #)
+        self.create_launcher(
+            "WinPython Powershell Prompt.exe",
+            "powershell.ico",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k cmd_ps.bat",
+        )
 
         self.create_launcher(
             "WinPython Terminal.exe",
@@ -1468,9 +1467,10 @@ cmd.exe /k""",
         self.create_batch_script(
             "WinPython_Terminal.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
-if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
-"%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe"
+rem call "%~dp0env_for_icons.bat"  %*
+rem if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
+rem "%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe"
+Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 exit
 """,
         )
