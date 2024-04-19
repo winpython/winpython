@@ -12,19 +12,9 @@ def normalize(this):
 
 
 class pipdata:
-    """Wrapper aroud pip inspect"""
+    """Wrapper around Distribution.discover() or pip inspect"""
 
     def __init__(self, Target=None):
-
-        # get pip_inpsect raw data in json form
-        #os.environ["pythonutf8"] = "1" causes issues in movable, so limit to there
-        if Target == None:
-            #pip_inspect = utils.exec_run_cmd(["pip", "inspect"])
-            pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & python -X utf8=1 -m pip inspect', sys.prefix)        
-        else:
-            #pip_inspect = utils.exec_run_cmd([Target , "-X" ,"utf8=1", "-m", "pip", "inspect"]) 
-            pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & "{Target}" -X utf8=1 -m pip inspect', sys.prefix)          
-        pip_json = json.loads(pip_inspect)
 
         # create a distro{} dict of Packages
         #  key = normalised package name
@@ -34,6 +24,7 @@ class pipdata:
         #             req_extra = extra branch needed of the package_key ('all' or '')
         #             req_version = version needed
         #             req_marker = marker of the requirement (if any)
+        # on current Python, use from importlib.metadata + Distribution.Discover() for 2x speed-up
         self.distro = {}
         self.raw = {}
         replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
@@ -53,14 +44,21 @@ class pipdata:
             "sys_platform": sys.platform,
         }
 
-        for p in pip_json["installed"]:
-            meta = p["metadata"]
-            name = meta["name"]
-            key = normalize(name)
-            requires = []
-            self.raw[key] = meta
-            if "requires_dist" in meta:
-                for i in meta["requires_dist"]:
+        # get pip_inpsect raw data in json form
+        if Target == None or sys.executable==Target:
+            # self-Distro inspection case
+            # faster then pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & python -X utf8=1 -m pip inspect', sys.prefix) 
+            from importlib.metadata import Distribution 
+            pip_json_installed=Distribution.discover()
+            for p in pip_json_installed: 
+                meta = p.metadata
+                name = p.name
+                version = p.version
+                key = normalize(name)
+                requires = []
+                self.raw[key] = meta
+                if p.requires:
+                 for i in p.requires:
                     det = (i + ";").split(";")
 
                     # req_nameextra is "python-jose[cryptography]"
@@ -83,14 +81,60 @@ class pipdata:
                     if not req_marker == "":
                         req_add["req_marker"] = req_marker
                     requires += [req_add]
-            self.distro[key] = {
-                "name": name,
-                "version": meta["version"],
-                "summary": meta["summary"] if "summary" in meta else "",
-                "requires_dist": requires,
-                "wanted_per": [],
-                "description": meta["description"] if "description" in meta else "",
-            }
+                self.distro[key] = {
+                    "name": name,
+                    "version": p.version,
+                    "summary": meta["Summary"] if "Summary" in meta else "",
+                    "requires_dist": requires,
+                    "wanted_per": [],
+                    "description": meta["Description"] if "Description" in meta else "",
+                }
+        else:
+            # General Any Distro inspection case
+            #  unreliable to utf-8: pip_inspect = utils.exec_run_cmd([Target , "-X" ,"utf8=1", "-m", "pip", "inspect"]) 
+            #  os.environ["pythonutf8"] = "1" causes issues in movable function, so limit to this moment
+            pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & "{Target}" -X utf8=1 -m pip inspect', sys.prefix)          
+            pip_json = json.loads(pip_inspect)
+
+
+            for p in pip_json["installed"]:
+                meta = p["metadata"]
+                name = meta["name"]
+                key = normalize(name)
+                requires = []
+                self.raw[key] = meta
+                if "requires_dist" in meta:
+                    for i in meta["requires_dist"]:
+                        det = (i + ";").split(";")
+
+                        # req_nameextra is "python-jose[cryptography]"
+                        #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
+                        # req_nameextra is "google-cloud-storage"
+                        #   from "google-cloud-storage (<2.0.0,>=1.26.0)
+                        req_nameextra = re.split(" |;|==|!|>|<", det[0] + ";")[0]
+                        req_nameextra = normalize(req_nameextra)
+                        req_key = normalize((req_nameextra + "[").split("[")[0])
+                        req_key_extra = req_nameextra[len(req_key) + 1 :].split("]")[0]
+                        req_version = det[0][len(req_nameextra) :].translate(replacements)
+                        req_marker = det[1]
+
+                        req_add = {
+                        "req_key": req_key,
+                        "req_version": req_version,
+                        "req_extra": req_key_extra,
+                        }
+                        # add the marker of the requirement, if not nothing:
+                        if not req_marker == "":
+                            req_add["req_marker"] = req_marker
+                        requires += [req_add]
+                self.distro[key] = {
+                    "name": name,
+                    "version": meta["version"],
+                    "summary": meta["summary"] if "summary" in meta else "",
+                    "requires_dist": requires,
+                    "wanted_per": [],
+                    "description": meta["description"] if "description" in meta else "",
+                }
         # On a second pass, complement distro in reverse mode with 'wanted-per':
         # - get all downward links in 'requires_dist' of each package
         # - feed the required packages 'wanted_per' as a reverse dict of dict
