@@ -49,29 +49,6 @@ def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def get_official_description(name):
-    """Extract package Summary description from pypi.org"""
-    from winpython import utils
-
-    this = normalize(name)
-    this_len = len(this)
-    pip_ask = ["pip", "search", this, "--retries", "0"]
-    if len(this) < 2:  # don't ask stupid things
-        return ""
-    try:
-        #  .run work when .popen fails when no internet
-        pip_res = (utils.exec_run_cmd(pip_ask) + "\n").splitlines()
-        pip_filter = [
-            l
-            for l in pip_res
-            if this + " (" == normalize(l[:this_len]) + l[this_len : this_len + 2]
-        ]
-        pip_desc = (pip_filter[0][len(this) + 1 :]).split(" - ", 1)[1]
-        return pip_desc.replace("://", " ")
-    except:
-        return ""
-
-
 def get_package_metadata(database, name, gotoWWW=False, update=False):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on
@@ -104,11 +81,7 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
             ).splitlines()[0]
         except:
             pass
-    if my_metadata["description"] == "" and gotoWWW:
-        # still nothing, try look on pypi
-        the_official = get_official_description(name)
-        if the_official != "":
-            my_metadata["description"] = the_official
+
     if update == True and db_desc == "" and my_metadata["description"] != "":
         # we add new findings in our packgages.ini list, if it's required
         try:
