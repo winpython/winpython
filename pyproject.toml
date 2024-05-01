@@ -9,7 +9,7 @@ authors = [
     {name = "stonebig"},
 ]
 dependencies = []
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 readme = "README.rst"
 license = {file = "LICENSE"}
 classifiers=[
@@ -26,12 +26,11 @@ classifiers=[
 ]
 dynamic = ["version",]
 description="WinPython distribution tools, including WPPM"
-keywords = ["PySide6", "PyQt6", "PyQt5", "PySide2"]
+keywords = ["Portable","Windows"]
 
 [project.urls]
 Documentation = "https://winpython.github.io/"
 Source = "https://github.com/winpython/winpython"
 
 [project.scripts]
-wpcp = "winpython.controlpanel:main"
 wppm = "winpython.wppm:main"
