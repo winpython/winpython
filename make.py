@@ -775,28 +775,6 @@ call "%~dp0env_for_icons.bat"
             args=r"/k wpcp.bat",
         )
 
-        # Multi-Qt launchers
-        #self.create_launcher(
-        #    "Qt Designer.exe",
-        #    "qtdesigner.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs qtdesigner.bat",
-        #)
-
-        #self.create_launcher(
-        #    "Qt Linguist.exe",
-        #    "qtlinguist.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs qtlinguist.bat",
-        #)
-
-        #self.create_launcher(
-        #    "Qt Assistant.exe",
-        #    "qtassistant.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs qtassistant.bat",
-        #)
-
         # Jupyter launchers
 
         # removing another Qt string
@@ -1341,37 +1319,6 @@ The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""",
         )
 
         self.create_batch_script(
-            "make_cython_use_mingw.bat",
-            r"""@echo off
-call "%~dp0env.bat"
-
-rem ******************
-rem mingw part
-rem ******************
-
-set pydistutils_cfg=%WINPYDIRBASE%\settings\pydistutils.cfg
-
-set tmp_blank=
-(
-    echo [config]
-    echo compiler=mingw32
-    echo.
-    echo [build]
-    echo compiler=mingw32
-    echo.
-    echo [build_ext]
-    echo compiler=mingw32
-) > "%pydistutils_cfg%"
-
-echo cython has been set to use mingw32
-echo to remove this, remove file "%pydistutils_cfg%"
-
-rem pause
-
-""",
-        )
-
-        self.create_batch_script(
             "make_cython_use_vc.bat",
             r"""@echo off
 call "%~dp0env.bat"
@@ -1556,15 +1503,6 @@ cd/D "%WINPYWORKDIR1%"
         )
 
         self.create_batch_script(
-            "winjupyter_nbclassic.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-"%WINPYDIR%\scripts\jupyter-nbclassic.exe" %*
-""",
-        )
-
-        self.create_batch_script(
             "winjupyter_lab.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat" %*
@@ -1579,110 +1517,6 @@ cd/D "%WINPYWORKDIR1%"
 call "%~dp0env_for_icons.bat" %*
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
-""",
-        )
-
-        self.create_batch_script(
-            "qtdemo.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-if exist "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PyQt5\examples\qtdemo\qtdemo.py"
-)  
-if exist "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py" (
-    "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\PySide2\examples\datavisualization\bars3d.py"
-)
-""",
-            do_changes=changes,
-        )
-
-        self.create_batch_script(
-            "qtdesigner.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-if "%QT_API%"=="" ( set QT_API=pyqt5 )
-if "%QT_API%"=="pyqt5" (
-    if exist "%WINPYDIR%\Scripts\designer.exe" (
-        "%WINPYDIR%\Scripts\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\qt5_applications\Qt\bin\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\qt5_applications\Qt\bin\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5-tools\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\PyQt5\designer.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" (
-        "%WINPYDIR%\Lib\site-packages\PySide2\designer.exe" %*
-    ) else (
-        "%WINPYDIR%\Lib\site-packages\PySide6\designer.exe" %*
-    )
-) else (
-    "%WINPYDIR%\Lib\site-packages\PySide6\designer.exe" %*
-)
-""",
-        )
-
-        self.create_batch_script(
-            "qtassistant.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-if "%QT_API%"=="" ( set QT_API=pyqt5 )
-if "%QT_API%"=="pyqt5" (
-    if exist "%WINPYDIR%\Scripts\assistant.exe" (
-        "%WINPYDIR%\Scripts\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\qt5_applications\Qt\bin\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\qt5_applications\Qt\bin\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5-tools\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\PyQt5\assistant.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\PySide2\assistant.exe" (
-        "%WINPYDIR%\Lib\site-packages\PySide2\assistant.exe" %*
-    ) else (
-        "%WINPYDIR%\Lib\site-packages\PySide6\assistant.exe" %*
-    )
-) else (
-    "%WINPYDIR%\Lib\site-packages\PySide6\assistant.exe" %*
-)
-""",
-        )
-
-        self.create_batch_script(
-            "qtlinguist.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cd/D "%WINPYWORKDIR1%"
-if "%QT_API%"=="" ( set QT_API=pyqt5 )
-if "%QT_API%"=="pyqt5" (
-    if exist "%WINPYDIR%\Scripts\linguist.exe" (
-        "%WINPYDIR%\Scripts\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\qt5_applications\Qt\bin\linguist.exe" (
-        "%WINPYDIR%\Lib\site-packages\qt5_applications\Qt\bin\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\linguist.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\bin\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5-tools\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" (
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" (
-        cd/D "%WINPYDIR%\Lib\site-packages\PyQt5"
-        "%WINPYDIR%\Lib\site-packages\PyQt5\linguist.exe" %*
-        "%WINPYDIR%\Lib\site-packages\pyqt5_tools\linguist.exe" %*
-    ) else if exist "%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" (
-        "%%WINPYDIR%\Lib\site-packages\PySide2\linguist.exe" %*
-    ) else (
-        "%WINPYDIR%\Lib\site-packages\PySide6\linguist.exe" %*
-    )
-) else (
-    "%WINPYDIR%\Lib\site-packages\PySide6\linguist.exe" %*
-)
-
 """,
         )
 
@@ -1737,14 +1571,6 @@ pause
             do_changes=changes,
         )
 
-        self.create_batch_script(
-            "winpyzo.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
-cd/D "%WINPYDIR%"
-"%WINPYDIR%\scripts\pyzo.exe" %*
-""",
-        )
         
         self.create_batch_script(  # virtual environment mimicking
             "activate.bat",
@@ -1752,13 +1578,6 @@ cd/D "%WINPYDIR%"
 call "%~dp0env.bat"  %*
 """,
         )
-        # pre-run mingw batch
-        print("now pre-running extra mingw")
-        filepath = str(Path(self.winpydir) / "scripts" / "make_cython_use_mingw.bat")
-        p = subprocess.Popen(filepath, shell=True, stdout=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-
-        self._print_done()
 
         self.create_batch_script(
             "winvscode.bat",
