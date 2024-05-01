@@ -27,10 +27,17 @@ assert Path(CHANGELOGS_DIR).is_dir()
 
 
 def get_drives():
-    """Return all active drives"""
-    import win32api
+  """
+  This function retrieves a list of existing drives on a Windows system.
 
-    return win32api.GetLogicalDriveStrings().split("\000")[:-1]
+  Returns:
+      list: A list of drive letters (e.g., ['C:', 'D:'])
+  """
+  if hasattr(os, 'listdrives'):  # For Python 3.12 and above
+    return os.listdrives()
+  else:
+    drives = [f"{d}:\\" for d in os.environ.get('HOMEDRIVE', '').split("\\") if d]
+    return drives
 
 
 def get_nsis_exe():
@@ -791,12 +798,14 @@ call "%~dp0env_for_icons.bat"
         #)
 
         # Jupyter launchers
-        self.create_launcher(
-            "IPython Qt Console.exe",
-            "ipython.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs winqtconsole.bat",
-        )
+
+        # removing another Qt string
+        # self.create_launcher(
+        #     "IPython Qt Console.exe",
+        #     "ipython.ico",
+        #     command="wscript.exe",
+        #     args=r"Noshell.vbs winqtconsole.bat",
+        # )
 
         # this one needs a shell to kill fantom processes
         self.create_launcher(
