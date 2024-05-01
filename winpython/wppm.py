@@ -316,23 +316,11 @@ python "%~dpn0"""
 
         # Include package installed via pip (not via WPPM)
         wppm = []
-        try:  # we try to use also 'pip inspect' via piptree (work for pip>= 22.2)
-            if str(Path(sys.executable).parent) == self.target:
-                self.pip = piptree.pipdata()
-            else:
-                self.pip = piptree.pipdata(Target=utils.get_python_executable(self.target))
-            pip_list = self.pip.pip_list()
-        except:
-            # if failure back to pip list (will use packages.ini for names)
-            cmdx = [
-                utils.get_python_executable(self.target),  # PyPy !
-                "-m",
-                "pip",
-                "list",
-            ]
-            pip_list_raw = utils.exec_run_cmd(cmdx).splitlines()
-            # pip list gives 2 lines of titles to ignore
-            pip_list = [l.split() for l in pip_list_raw[2:]]
+        if str(Path(sys.executable).parent) == self.target:
+            self.pip = piptree.pipdata()
+        else:
+            self.pip = piptree.pipdata(Target=utils.get_python_executable(self.target))
+        pip_list = self.pip.pip_list()
 
         # create pip package list
         wppm = [

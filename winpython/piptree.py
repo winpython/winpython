@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# require python 3.8+ because of importlib.metadata
 import json, sys, re, platform, os, sysconfig
 import re
 from collections import OrderedDict
@@ -58,7 +59,7 @@ class pipdata:
             pip_json_installed=distributions(path=[str(Path(Target).parent /'lib'/'site-packages'),])  
         for p in pip_json_installed: 
             meta = p.metadata
-            name = p.name
+            name = p.metadata['Name']  # p.name is not ok in 3.8
             version = p.version
             key = normalize(name)
             requires = []
