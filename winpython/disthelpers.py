@@ -25,7 +25,7 @@ import atexit
 import imp
 from subprocess import Popen, PIPE
 import warnings
-from distutils.version import LooseVersion, StrictVersion
+# decrepited since Pythono-3.10: from distutils.version import LooseVersion, StrictVersion
 
 # ==============================================================================
 # Module, scripts, programs
