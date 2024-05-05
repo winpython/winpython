@@ -7,10 +7,37 @@ from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution , distributions
 from pathlib import Path
 
+# for package.ini safety belt
+from winpython.config import DATA_PATH
+import configparser as cp
+
 def normalize(this):
     """apply https://peps.python.org/pep-0503/#normalized-names"""
     return re.sub(r"[-_.]+", "-", this).lower()
 
+def get_packages_ini_metadata(name):
+    """Extract infos (description, url) from the local database"""
+    # we store only  normalized names now (PEP 503)
+    database= "packages.ini"
+    db = cp.ConfigParser()
+    try:
+        db.read_file(open(str(Path(DATA_PATH) / database), encoding = 'utf-8'))
+    except:
+        db.read_file(open(str(Path(DATA_PATH) / database)))
+    my_metadata = dict(
+        description="",
+        url="https://pypi.org/project/" + name,
+    )
+    for key in my_metadata:
+        # wheel replace '-' per '_' in key
+        for name2 in (name, normalize(name)):
+            try:
+                my_metadata[key] = db.get(name2, key)
+                break
+            except (cp.NoSectionError, cp.NoOptionError):
+                pass
+    db_desc = my_metadata["description"]
+    return my_metadata
 
 class pipdata:
     """Wrapper around Distribution.discover() or pip inspect"""
@@ -91,7 +118,7 @@ class pipdata:
             self.distro[key] = {
                     "name": name,
                     "version": p.version,
-                    "summary": meta["Summary"] if "Summary" in meta else "",
+                    "summary": meta["Summary"] if "Summary" in meta else get_packages_ini_metadata(key)["description"],
                     "requires_dist": requires,
                     "wanted_per": [],
                     "description": meta["Description"] if "Description" in meta else "",
