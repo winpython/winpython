@@ -170,51 +170,6 @@ class Package(BasePackage):
         raise NotImplementedError(f"Not supported package type {bname}")
 
 
-class WininstPackage(BasePackage):
-    def __init__(self, fname, distribution):
-        BasePackage.__init__(self, fname)
-        self.logname = None
-        self.distribution = distribution
-        self.architecture = distribution.architecture
-        self.pyversion = distribution.version
-        self.extract_infos()
-        self.extract_optional_infos()
-
-    def extract_infos(self):
-        """Extract package infos (name, version, architecture)"""
-        match = re.match(r"Remove([a-zA-Z0-9\-\_\.]*)\.exe", self.fname)
-        if match is None:
-            return
-        self.name = match.groups()[0]
-        self.logname = f"{self.name}-wininst.log"
-        fd = open(
-            str(Path(self.distribution.target) / self.logname),
-            "U",
-        )
-        searchtxt = "DisplayName="
-        for line in fd.readlines():
-            pos = line.find(searchtxt)
-            if pos != -1:
-                break
-        else:
-            return
-        fd.close()
-        match = re.match(
-            r"Python %s %s-([0-9\.]*)" % (self.pyversion, self.name),
-            line[pos + len(searchtxt) :],
-        )
-        if match is None:
-            return
-        self.version = match.groups()[0]
-
-    def uninstall(self):
-        """Uninstall package"""
-        subprocess.call(
-            [self.fname, "-u", self.logname],
-            cwd=self.distribution.target,
-        )
-
-
 class Distribution(object):
     def __init__(self, target=None, verbose=False, indent=False):
         self.target = target
@@ -338,15 +293,6 @@ python "%~dpn0"""
         for pack in self.get_installed_packages():
             if normalize(pack.name) == normalize(name):
                 return pack
-
-    def uninstall_existing(self, package):
-        """Uninstall existing package (or package name)"""
-        if isinstance(package, str):
-            pack = self.find_package(package)
-        else:
-            pack = self.find_package(package.name)
-        if pack is not None:
-            self.uninstall(pack)
 
     def patch_all_shebang(
         self,
