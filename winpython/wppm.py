@@ -54,45 +54,7 @@ def get_package_metadata(database, name, gotoWWW=False, update=False):
     # Note: we could use the PyPI database but this has been written on
     # machine which is not connected to the internet
     # we store only  normalized names now (PEP 503)
-    db = cp.ConfigParser()
-    try:
-        db.read_file(open(str(Path(DATA_PATH) / database), encoding = 'utf-8'))
-    except:
-        db.read_file(open(str(Path(DATA_PATH) / database)))
-    my_metadata = dict(
-        description="",
-        url="https://pypi.org/project/" + name,
-    )
-    for key in my_metadata:
-        # wheel replace '-' per '_' in key
-        for name2 in (name, normalize(name)):
-            try:
-                my_metadata[key] = db.get(name2, key)
-                break
-            except (cp.NoSectionError, cp.NoOptionError):
-                pass
-    db_desc = my_metadata.get("description")
-
-    if my_metadata.get("description") == "" and metadata:
-        # nothing in package.ini, we look in our installed packages
-        try:
-            my_metadata["description"] = (
-                metadata(name)["Summary"] + "\n"
-            ).splitlines()[0]
-        except:
-            pass
-
-    if update == True and db_desc == "" and my_metadata["description"] != "":
-        # we add new findings in our packgages.ini list, if it's required
-        try:
-            db[normalize(name)] = {}
-            db[normalize(name)]["description"] = my_metadata["description"]
-            with open(str(Path(DATA_PATH) / database), "w",  encoding='UTF-8') as configfile:
-                db.write(configfile)
-        except:
-            pass
-    return my_metadata
-
+    return piptree.get_package_metadata(database, name, gotoWWW, update)
 
 class BasePackage(object):
     def __init__(self, fname):
