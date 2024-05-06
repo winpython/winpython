@@ -62,15 +62,6 @@ def onerror(function, path, excinfo):
         raise
 
 
-# Exact copy of 'spyderlib.utils.programs.is_program_installed' function
-def is_program_installed(basename):
-    """Return program absolute path if installed in PATH
-    Otherwise, return None"""
-    for path in os.environ["PATH"].split(os.pathsep):
-        abspath = str(Path(path) / basename)
-        if Path(abspath).is_file():
-            return abspath
-
 
 # =============================================================================
 # Environment variables
@@ -641,37 +632,6 @@ def _create_temp_dir():
         tmpdir,
     )
     return tmpdir
-
-
-def extract_exe(fname, targetdir=None, verbose=False):
-    """Extract .exe archive to a temporary directory (if targetdir
-    is None). Return the temporary directory path"""
-    if targetdir is None:
-        targetdir = _create_temp_dir()
-    extract = '7z.exe'
-    assert is_program_installed(extract), (
-        f"Required program '{extract}' was not found"
-    )
-    bname = Path(fname).name
-    args = ['x', f'-o{targetdir}', '-aos', bname]
-    if verbose:
-        retcode = subprocess.call(
-            [extract] + args, cwd=str(Path(fname).parent)
-        )
-    else:
-        p = subprocess.Popen(
-            [extract] + args,
-            cwd=str(Path(fname).parent),
-            stdout=subprocess.PIPE,
-        )
-        p.communicate()
-        p.stdout.close()
-        retcode = p.returncode
-    if retcode != 0:
-        raise RuntimeError(
-            f"Failed to extract {fname} (return code: {retcode})"
-        )
-    return targetdir
 
 
 def extract_archive(fname, targetdir=None, verbose=False):
