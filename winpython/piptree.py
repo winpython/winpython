@@ -15,15 +15,17 @@ def normalize(this):
     """apply https://peps.python.org/pep-0503/#normalized-names"""
     return re.sub(r"[-_.]+", "-", this).lower()
 
-def get_packages_ini_metadata(name):
+def get_package_metadata(database, name, gotoWWW=False, update=False, suggested_summary=None):
     """Extract infos (description, url) from the local database"""
+    # Note: we could use the PyPI database but this has been written on
+    # machine which is not connected to the internet
     # we store only  normalized names now (PEP 503)
-    database= "packages.ini"
     db = cp.ConfigParser()
+    filepath = Path(database) if Path(database).is_absolute() else Path(DATA_PATH) / database
     try:
-        db.read_file(open(str(Path(DATA_PATH) / database), encoding = 'utf-8'))
+        db.read_file(open(str(filepath), encoding = 'utf-8'))
     except:
-        db.read_file(open(str(Path(DATA_PATH) / database)))
+        db.read_file(open(str(filepath)))
     my_metadata = dict(
         description="",
         url="https://pypi.org/project/" + name,
@@ -36,8 +38,32 @@ def get_packages_ini_metadata(name):
                 break
             except (cp.NoSectionError, cp.NoOptionError):
                 pass
-    db_desc = my_metadata["description"]
+    db_desc = my_metadata.get("description")
+
+    if my_metadata.get("description") == "" and suggested_summary:
+        # nothing in package.ini, we look in our installed packages
+        try:
+            my_metadata["description"] = (
+                suggested_summary + "\n"
+            ).splitlines()[0]
+        except:
+            pass
+
+    if update == True and db_desc == "" and my_metadata["description"] != "":
+        # we add new findings in our packgages.ini list, if it's required
+        try:
+            db[normalize(name)] = {}
+            db[normalize(name)]["description"] = my_metadata["description"]
+            with open(str(Path(DATA_PATH) / database), "w",  encoding='UTF-8') as configfile:
+                db.write(configfile)
+        except:
+            pass
     return my_metadata
+
+            
+def get_packages_ini_metadata(name):
+    """Extract infos (description, url) from the local database"""
+    return get_package_metadata("packages.ini", name, False, update=False, suggested_summary=None)
 
 class pipdata:
     """Wrapper around Distribution.discover() or pip inspect"""
