@@ -7,6 +7,7 @@ rem 2020-12-05 : add a constrints.txt file from a recent pip list
 rem 2021-03-20 : track successes packages combination are archived for future contraint update
 rem 2021-04-22 : path PyPy3 (as we don't try to copy PyPy3.exe to Python.exe) 
 rem 2023-08-21a: add a pre_step with my_requirements_pre.txt + my_find_links_pre
+rem 2024-05-12a: use python -m pip instead of pip , and remove --upgrade %new_resolver%
 rem *****************************
 
 rem algorithm:
@@ -46,11 +47,12 @@ echo ------------------
 echo 0.0 Initialize variables  
 echo ------------------
 
-if "%my_release_level%"=="" set my_release_level=b4
+if "%my_release_level%"=="" set my_release_level=b2
 
 set my_basedir=%my_root_dir_for_builds%\bd%my_python_target%
 
-set my_buildenv=C:\WinPdev\WPy64-3890
+rem since 2024-05-01, a building env need is reduced to a WinPythondot 3.8+ augmented with packages: flit + packaging
+set my_buildenv=C:\WinPdev\WPy64-310111
 
 if "%my_constraints%"=="" set my_constraints=C:\WinP\constraints.txt
 
@@ -79,7 +81,7 @@ if %my_python_target%==311 (
 
 if %my_python_target%==312 (
    set my_python_target_release=3123
-   set my_release=0
+   set my_release=1
 )
 
 if %my_python_target%==313 (
@@ -270,9 +272,9 @@ rem echo python.exe  -c "import sys;from pathlib import Path;f=open(Path(sys.pre
 rem F/2024-04-10
 
 rem D/2020-07-05: install msvc_runtime before packages that may want to compile
-echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
-echo pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade>>%my_archive_log%
-pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
+echo python -m pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
+echo python -m pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade>>%my_archive_log%
+python -m pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
 rem F/2020-07-05: install msvc_runtime before packages that may want to compile
 
 
@@ -292,11 +294,11 @@ if not "Z%my_requirements_pre%Z"=="ZZ" (
    rem 2023-08-21a: add a pre_step with my_requirements_pre.txt + my_find_links_pre
 if "%my_find_links_pre%"=="" set my_find_links_pre=%my_find_links%
 
-echo pip install -r %my_requirements_pre% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  --upgrade %new_resolver%
-echo pip install -r %my_requirements_pre% -c %my_constraints%  --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  --upgrade %new_resolver%>>%my_archive_log%
+echo python -m pip install -r %my_requirements_pre% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  
+echo python -m pip install -r %my_requirements_pre% -c %my_constraints%  --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  >>%my_archive_log%
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
-pip install -r %my_requirements_pre% -c  %my_constraints%   --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  --upgrade %new_resolver%>>%my_archive_log%
+python -m pip install -r %my_requirements_pre% -c  %my_constraints%   --pre  --no-index --trusted-host=None --find-links=%my_find_links_pre%  >>%my_archive_log%
 ) else (
 echo no packages pre_requirements   
 echo no packages pre_requirements>>%my_archive_log%
@@ -312,13 +314,13 @@ echo   2.5 add requirement packages_versions>>%my_archive_log%
 echo   %date% %time%                >>%my_archive_log%
 echo ----------------------------->>%my_archive_log%
 
-echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  --upgrade %new_resolver%
-echo pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  --upgrade %new_resolver%>>%my_archive_log%
+echo python -m pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  
+echo python -m pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  >>%my_archive_log%
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
 
 rem 2020-12-05 : add a constraints.txt file from a recent pip list
-pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  --upgrade %new_resolver%>>%my_archive_log%
+python -m pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  >>%my_archive_log%
 
 echo mid of step 2/3
 

@@ -66,7 +66,7 @@ def get_packages_ini_metadata(name):
     return get_package_metadata("packages.ini", name, False, update=False, suggested_summary=None)
 
 class pipdata:
-    """Wrapper around Distribution.discover() or pip inspect"""
+    """Wrapper around Distribution.discover() or Distribution.distributions()"""
 
     def __init__(self, Target=None):
 
@@ -99,11 +99,9 @@ class pipdata:
             "sys_platform": sys.platform,
         }
 
-        # get pip_inpsect raw data in json form
         if Target == None:
             Target = sys.executable 
 
-        # faster then pip_inspect = utils.exec_shell_cmd(f'set pythonutf8=1 & python -X utf8=1 -m pip inspect', sys.prefix) 
         if sys.executable==Target:
             # self-Distro inspection case (use all packages reachable per sys.path I presume )
             pip_json_installed=Distribution.discover()
