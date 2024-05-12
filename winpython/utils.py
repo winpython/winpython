@@ -847,7 +847,7 @@ def direct_pip_install(
     verbose=False,
     install_options=None,
 ):
-    """Direct install via pip !"""
+    """Direct install via python -m pip !"""
     copy_to = str(Path(fname).parent)
 
     if python_exe is None:
@@ -858,7 +858,7 @@ def direct_pip_install(
     cmd = [python_exe, '-m', 'pip', 'install']
     if install_options:
         cmd += install_options  # typically ['--no-deps']
-        print('pip install_options', install_options)
+        print('python -m pip install_options', install_options)
     cmd += [fname]
 
     if verbose:
