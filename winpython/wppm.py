@@ -61,7 +61,6 @@ class BasePackage(object):
         self.fname = fname
         self.name = None
         self.version = None
-        self.architecture = None
         self.pyversion = None
         self.description = None
         self.url = None
@@ -71,20 +70,15 @@ class BasePackage(object):
         pytext = ""
         if self.pyversion is not None:
             pytext = f" for Python {self.pyversion}"
-        if self.architecture is not None:
-            if not pytext:
-                pytext = " for Python"
-            pytext += f" {self.architecture}bits"
+        if not pytext:
+            pytext = " for Python"
         text += f"{pytext}\n{self.description}\nWebsite: {self.url}\n[{Path(self.fname).name}]"
         return text
 
     def is_compatible_with(self, distribution):
         """Return True if package is compatible with distribution in terms of
-        architecture and Python version (if applyable)"""
+        Python version (if applyable)"""
         iscomp = True
-        if self.architecture is not None:
-            # Source distributions (not yet supported though)
-            iscomp = iscomp and self.architecture == distribution.architecture
         if self.pyversion is not None:
             # Non-pure Python package
             iscomp = iscomp and self.pyversion == distribution.version
@@ -108,7 +102,7 @@ class Package(BasePackage):
         self.extract_optional_infos(update=update,suggested_summary=suggested_summary)
 
     def extract_infos(self):
-        """Extract package infos (name, version, architecture)
+        """Extract package infos (name, version)
         from filename (installer basename)"""
         bname = Path(self.fname).name
         if bname.endswith(("32.whl", "64.whl")):
@@ -121,7 +115,6 @@ class Package(BasePackage):
             self.pywheel, abi, arch = bname2[-3:]
             self.pyversion = None  # Let's ignore this  self.pywheel
             # wheel arch is 'win32' or 'win_amd64'
-            self.architecture = 32 if arch == "win32" else 64
             return
         elif bname.endswith((".zip", ".tar.gz", ".whl")):
             # distutils sdist
@@ -320,7 +313,6 @@ python "%~dpn0"""
             fname = utils.do_script(
                 this_script=None,
                 python_exe=executing,
-                architecture=self.architecture,
                 verbose=self.verbose,
                 install_options=complement + my_actions + my_list,
             )
@@ -552,7 +544,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             fname = utils.direct_pip_install(
                 package.fname,
                 python_exe=utils.get_python_executable(self.target),  # PyPy !
-                architecture=self.architecture,
                 verbose=self.verbose,
                 install_options=install_options,
             )
@@ -568,7 +559,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             fname = utils.do_script(
                 script,
                 python_exe=utils.get_python_executable(self.target),  # PyPy3 !
-                architecture=self.architecture,
                 verbose=self.verbose,
                 install_options=install_options,
             )
@@ -781,7 +771,7 @@ def main(test=False):
             else:
                 raise IOError(f"File not found: {args.fname}")
         if utils.is_python_distribution(args.target):
-            dist = Distribution(args.target)
+            dist = Distribution(args.target, verbose=True)
             try:
                 if args.uninstall:
                     package = dist.find_package(args.fname)
