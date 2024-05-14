@@ -843,7 +843,6 @@ def buildflit_wininst(
 def direct_pip_install(
     fname,
     python_exe=None,
-    architecture=None,
     verbose=False,
     install_options=None,
 ):
@@ -895,7 +894,6 @@ def do_script(
     this_script,
     python_exe=None,
     copy_to=None,
-    architecture=None,
     verbose=False,
     install_options=None,
 ):
