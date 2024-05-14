@@ -61,28 +61,14 @@ class BasePackage(object):
         self.fname = fname
         self.name = None
         self.version = None
-        self.pyversion = None
         self.description = None
         self.url = None
 
     def __str__(self):
         text = f"{self.name} {self.version}"
-        pytext = ""
-        if self.pyversion is not None:
-            pytext = f" for Python {self.pyversion}"
-        if not pytext:
-            pytext = " for Python"
+        pytext = " for Python"
         text += f"{pytext}\n{self.description}\nWebsite: {self.url}\n[{Path(self.fname).name}]"
         return text
-
-    def is_compatible_with(self, distribution):
-        """Return True if package is compatible with distribution in terms of
-        Python version (if applyable)"""
-        iscomp = True
-        if self.pyversion is not None:
-            # Non-pure Python package
-            iscomp = iscomp and self.pyversion == distribution.version
-        return iscomp
 
     def extract_optional_infos(self, update=False, suggested_summary=None):
         """Extract package optional infos (description, url)
@@ -113,7 +99,6 @@ class Package(BasePackage):
             self.name = bname2[0]
             self.version = "-".join(list(bname2[1:-3]))
             self.pywheel, abi, arch = bname2[-3:]
-            self.pyversion = None  # Let's ignore this  self.pywheel
             # wheel arch is 'win32' or 'win_amd64'
             return
         elif bname.endswith((".zip", ".tar.gz", ".whl")):
@@ -276,8 +261,6 @@ python "%~dpn0"""
 
     def install(self, package, install_options=None):
         """Install package in distribution"""
-        assert package.is_compatible_with(self)
-
         # wheel addition
         if package.fname.endswith((".whl", ".tar.gz", ".zip")):
             self.install_bdist_direct(package, install_options=install_options)
@@ -778,13 +761,8 @@ def main(test=False):
                     dist.uninstall(package)
                 else:
                     package = Package(args.fname)
-                    if args.install and package.is_compatible_with(dist):
+                    if args.install:
                         dist.install(package)
-                    else:
-                        raise RuntimeError(
-                            "Package is not compatible with Python "
-                            f"{dist.version} {dist.architecture}bit"
-                        )
             except NotImplementedError:
                 raise RuntimeError("Package is not (yet) supported by WPPM")
         else:
