@@ -1803,7 +1803,6 @@ def rebuild_winpython(basedir, targetdir, architecture=64, verbose=False):
         copy_to=packdir,
         architecture=architecture,
         verbose=verbose,
-        installer="bdist_wheel",
     )
 
 

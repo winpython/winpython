@@ -689,9 +689,8 @@ def buildflit_wininst(
     copy_to=None,
     architecture=None,  # shall be unused
     verbose=False,
-    installer='bdist_wininst',  # unused
 ):
-    """Build wininst installer from Python package located in *root*
+    """Build Wheel from Python package located in *root*
     with flit"""
     if python_exe is None:
         python_exe = sys.executable
