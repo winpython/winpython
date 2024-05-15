@@ -363,13 +363,6 @@ python "%~dpn0"""
                     sheb_mov2,
                     sheb_fix,
                 )
-            # ensure pip wheel will register relative PATH in 'RECORD' files
-            # will be in standard pip 8.0.3
-            utils.patch_sourcefile(
-                self.target + (site_package_place + r"pip\wheel.py"),
-                " writer.writerow((f, h, l))",
-                " writer.writerow((normpath(f, lib_dir), h, l))",
-            )
 
             # create movable launchers for previous package installations
             self.patch_all_shebang(to_movable=to_movable)
