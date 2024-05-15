@@ -656,9 +656,6 @@ def extract_archive(fname, targetdir=None, verbose=False):
     obj.extractall(path=targetdir)
     return targetdir
 
-
-WININST_PATTERN = r'([a-zA-Z0-9\-\_]*|[a-zA-Z\-\_\.]*)-([0-9\.\-]*[a-z]*[0-9]?)(-Qt-([0-9\.]+))?.(win32|win\-amd64)(-py([0-9\.]+))?(-setup)?\.exe'
-
 # SOURCE_PATTERN defines what an acceptable source package name is
 # As of 2014-09-08 :
 #    - the wheel package format is accepte in source directory
@@ -687,7 +684,6 @@ def buildflit_wininst(
     root,
     python_exe=None,
     copy_to=None,
-    architecture=None,  # shall be unused
     verbose=False,
 ):
     """Build Wheel from Python package located in *root*
@@ -696,10 +692,7 @@ def buildflit_wininst(
         python_exe = sys.executable
     assert Path(python_exe).is_file()
     cmd = [python_exe, '-m' ,'flit', 'build']
-    if architecture is not None:
-        archstr = (
-            'win32' if architecture == 32 else 'win-amd64'
-        )
+
     # root = a tmp dir in windows\tmp,
     if verbose:
         subprocess.call(cmd, cwd=root)
@@ -724,13 +717,8 @@ def buildflit_wininst(
             "2. Change working directory to the appropriate folder\n"
             "3. Type `python -m filt build`"
         )
-    pattern = WININST_PATTERN.replace(
-        r'(win32|win\-amd64)', archstr
-    )
+
     for distname in os.listdir(distdir):
-        match = re.match(pattern, distname)
-        if match is not None:
-            break
         # for wheels (winpython here)
         match = re.match(SOURCE_PATTERN, distname)
         if match is not None:

@@ -1801,7 +1801,6 @@ def rebuild_winpython(basedir, targetdir, architecture=64, verbose=False):
     utils.buildflit_wininst(
         str(Path(__file__).resolve().parent),
         copy_to=packdir,
-        architecture=architecture,
         verbose=verbose,
     )
 
