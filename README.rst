@@ -42,19 +42,13 @@ Installation
 ------------
     
 From the source package (see section 'Building dependencies'), you may 
-install WinPython using the integrated setup.py script based on Python 
-standard library `distutils` with the following command:
+install WinPython using the following commands:
 
-**python setup.py install**
+**python -m pip install flit**
 
-Note that `distutils` does *not* uninstall previous versions of Python 
-packages: it simply copies files on top of an existing installation. 
-When using this command, it is thus highly recommended to uninstall 
-manually any previous version of WinPython by removing the associated 
-directory ('winpython' in your site-packages directory).
+**python -m flit build**
 
-From the Python package index, you may simply install WinPython *and* 
-upgrade an existing installation using `pip`: https://pypi.org
+**python -m pip install --no-index --trusted-host=None  --find-links=.\dist winpython**
 
 But the easiest way to install the last stable release of WinPython is 
 by using an executable installer: https://winpython.github.io/
