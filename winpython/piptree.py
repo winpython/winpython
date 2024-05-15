@@ -15,7 +15,7 @@ def normalize(this):
     """apply https://peps.python.org/pep-0503/#normalized-names"""
     return re.sub(r"[-_.]+", "-", this).lower()
 
-def get_package_metadata(database, name, gotoWWW=False, update=False, suggested_summary=None):
+def get_package_metadata(database, name, update=False, suggested_summary=None):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on
     # machine which is not connected to the internet
@@ -63,7 +63,7 @@ def get_package_metadata(database, name, gotoWWW=False, update=False, suggested_
             
 def get_packages_ini_metadata(name):
     """Extract infos (description, url) from the local database"""
-    return get_package_metadata("packages.ini", name, False, update=False, suggested_summary=None)
+    return get_package_metadata("packages.ini", name, update=False, suggested_summary=None)
 
 class pipdata:
     """Wrapper around Distribution.discover() or Distribution.distributions()"""
