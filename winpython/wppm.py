@@ -49,12 +49,12 @@ def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def get_package_metadata(database, name, gotoWWW=False, update=False):
+def get_package_metadata(database, name, update=False):
     """Extract infos (description, url) from the local database"""
     # Note: we could use the PyPI database but this has been written on
     # machine which is not connected to the internet
     # we store only  normalized names now (PEP 503)
-    return piptree.get_package_metadata(database, name, gotoWWW, update)
+    return piptree.get_package_metadata(database, name, update)
 
 class BasePackage(object):
     def __init__(self, fname):
@@ -73,7 +73,7 @@ class BasePackage(object):
     def extract_optional_infos(self, update=False, suggested_summary=None):
         """Extract package optional infos (description, url)
         from the package database"""
-        metadata = get_package_metadata("packages.ini", self.name, True, update=update)
+        metadata = get_package_metadata("packages.ini", self.name, update=update)
         for key, value in list(metadata.items()):
             setattr(self, key, value)
         if suggested_summary and suggested_summary!="":
