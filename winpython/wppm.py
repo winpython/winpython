@@ -563,8 +563,6 @@ def main(test=False):
         # dist.install(pack)
         # dist.uninstall(pack)
     else:
-        bold = "\033[1m"
-        unbold = "\033[0m"
         registerWinPythonHelp = f"Register distribution: associate file extensions, icons and context menu with this WinPython"
 
         unregisterWinPythonHelp = f"Unregister distribution: de-associate file extensions, icons and context menu from this WinPython"
@@ -613,7 +611,7 @@ def main(test=False):
             action="store_const",
             const=True,
             default=False,
-            help=f"list packages matching the given [optionnal] package expression: {unbold}wppm -ls{unbold}, {unbold}wppm -ls pand{unbold}",
+            help=f"list packages matching the given [optionnal] package expression: wppm -ls, wppm -ls pand",
         )   
         parser.add_argument(
             "-p",
@@ -621,7 +619,7 @@ def main(test=False):
             action="store_const",
             const=True,
             default=False,
-            help=f"show Package dependancies of the given package[option]: {unbold}wppm -p pandas[test]{unbold}",
+            help=f"show Package dependancies of the given package[option]: wppm -p pandas[test]",
         )
         parser.add_argument(
             "-r",
@@ -629,14 +627,14 @@ def main(test=False):
             action="store_const",
             const=True,
             default=False,
-            help=f"show Reverse dependancies of the given package[option]: {unbold}wppm -r pytest[test]{unbold}",
+            help=f"show Reverse dependancies of the given package[option]: wppm -r pytest[test]",
         )
         parser.add_argument(
             "-l",
             dest="levels",
             type=int,
             default=2,
-            help=f"show 'LEVELS' levels of dependancies of the package, default is 2: {unbold}wppm -p pandas -l1{unbold}",
+            help=f"show 'LEVELS' levels of dependancies of the package, default is 2: wppm -p pandas -l1",
         )
         parser.add_argument(
             "-lsa",
@@ -644,7 +642,7 @@ def main(test=False):
             action="store_const",
             const=True,
             default=False,
-            help=f"list details of package names matching given regular expression: {unbold}wppm -lsa pandas -l1{unbold}",
+            help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1",
         )
         parser.add_argument(
             "-t",
