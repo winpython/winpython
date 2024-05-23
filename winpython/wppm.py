@@ -20,7 +20,6 @@ import json
 
 # Local imports
 from winpython import utils
-from winpython.config import DATA_PATH
 import configparser as cp
 
 # from former wppm separate script launcher

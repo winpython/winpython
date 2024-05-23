@@ -7,8 +7,6 @@ from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution , distributions
 from pathlib import Path
 
-# for package.ini safety belt
-from winpython.config import DATA_PATH
 import configparser as cp
 
 def normalize(this):
@@ -17,9 +15,11 @@ def normalize(this):
 
 def get_package_metadata(database, name, update=False, suggested_summary=None):
     """Extract infos (description, url) from the local database"""
+    # for package.ini safety belt
     # Note: we could use the PyPI database but this has been written on
     # machine which is not connected to the internet
     # we store only  normalized names now (PEP 503)
+    DATA_PATH = str(Path(sys.modules['winpython'].__file__).parent /'data')
     db = cp.ConfigParser()
     filepath = Path(database) if Path(database).is_absolute() else Path(DATA_PATH) / database
     try:
