@@ -115,6 +115,7 @@ class pipdata:
             key = normalize(name)
             requires = []
             provides = {'':None}
+            provided = {'':None}
             self.raw[key] = meta
             if p.requires:
                 for i in p.requires:
@@ -150,6 +151,7 @@ class pipdata:
                     "wanted_per": [],
                     "description": meta["Description"] if "Description" in meta else "",
                     "provides": provides,
+                    "provided": provided,
                 }
 
         # On a second pass, complement distro in reverse mode with 'wanted-per':
@@ -170,6 +172,9 @@ class pipdata:
                     }  # req_key_extra
                     if "req_marker" in r:
                         want_add["req_marker"] = r["req_marker"]  # req_key_extra
+                        if 'extra == ' in r["req_marker"]:
+                            remove_list = {ord("'"):None, ord('"'):None}
+                            self.distro[r["req_key"]]["provided"][r["req_marker"].split('extra == ')[1].translate(remove_list)] = None
                     self.distro[r["req_key"]]["wanted_per"] += [want_add]
 
     def _downraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
@@ -218,14 +223,16 @@ class pipdata:
             summary = f'  {self.distro[p]["summary"]}' if verbose else ''
             if extra == "":
                 ret_all = [f'{p}=={self.distro[p]["version"]} {version_req}{summary}']
-            else:
+            elif extra in self.distro[p]["provided"]:
                 ret_all = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}{summary}']
+            else:
+              return []
             ret = []
             for r in self.distro[p]["wanted_per"]:
                 if r["req_key"] in self.distro and r["req_key"] not in path:
-                    if "req_marker" not in r or Marker(r["req_marker"]).evaluate(
+                    if ("req_marker" not in r and extra =="") or (extra !="" and "req_marker" in r and extra in r["req_marker"] and Marker(r["req_marker"]).evaluate(
                         environment=envi
-                    ):
+                    )):
                         ret += self._upraw(
                             r["req_key"],
                             "",
@@ -248,28 +255,54 @@ class pipdata:
         """print the downward requirements for the package or all packages"""
         if not pp == ".":
             if not extra == ".":
+                if pp in self.distro:
+                    extras = [s for s in extra.split(',') if s in sorted(self.distro[pp]["provides"])]
+                    if extras == []: return ''
                 rawtext = json.dumps(
                     self._downraw(pp, extra, version_req, depth, verbose=verbose), indent=indent
                 )
                 lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-                print("\n".join(lines).replace('"', ""))
+                return ("\n".join(lines).replace('"', ""))
             else:
-                if self.distro[pp]:
+                if pp in self.distro:
+                    r = []
                     for one_extra in sorted(self.distro[pp]["provides"]):
-                        self.down(pp, one_extra, depth, indent, version_req, verbose=verbose)
+                        s = self.down(pp, one_extra, depth, indent, version_req, verbose=verbose)
+                        if s != '': r += [s]
+                    #print(r)    
+                    return '\n'.join([i for i in r if i!= ''])   
         else:
+            r = []
             for one_pp in sorted(self.distro):
-                self.down(one_pp, extra, depth, indent, version_req, verbose=verbose)
+                s = self.down(one_pp, extra, depth, indent, version_req, verbose=verbose)
+                if s != '': r += [s]
+            return '\n'.join([i for i in r if i!= ''])    
 
     def up(self, pp, extra="", depth=99, indent=5, version_req="", verbose=False):
         """print the upward needs for the package"""
+        r = []
         if not pp == ".":
-            rawtext = json.dumps(self._upraw(pp, extra, version_req, depth, verbose=verbose), indent=indent)
-            lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-            print("\n".join(lines).replace('"', ""))
+            if not extra == ".":
+                s = self._upraw(pp, extra, version_req, depth, verbose=verbose)
+                if s == []: return ''
+                rawtext = json.dumps(self._upraw(pp, extra, version_req, depth, verbose=verbose), indent=indent)
+                lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
+                return ("\n".join(i for i in lines if i!= '').replace('"', "") )
+            else:
+                if pp in self.distro:
+                    r = []
+                    for one_extra in sorted(self.distro[pp]["provided"]):
+                        s = self.up(pp, one_extra, depth, indent, version_req, verbose=verbose)
+                        if s != '': r += [s]
+                    return '\n'.join([i for i in r if i!= ''])   
         else:
             for one_pp in sorted(self.distro):
-                self.up(one_pp, extra, depth, indent, version_req, verbose=verbose)
+                s = self.up(one_pp, extra, depth, indent, version_req, verbose=verbose)
+                if s != []: r += [s]
+            if r !=[]:
+                return '\n'.join([i for i in r if i!= ''])
+            else:
+                return
 
     def description(self, pp):
         "return description of the package"

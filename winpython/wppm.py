@@ -679,12 +679,12 @@ def main(test=False):
         if args.pipdown:
             pip = piptree.pipdata(Target=targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-            pip.down(pack, extra, args.levels, verbose=args.verbose)
+            print(pip.down(pack, extra, args.levels, verbose=args.verbose))
             sys.exit()
         elif args.pipup:
             pip = piptree.pipdata(Target=targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-            pip.up(pack, extra, args.levels, verbose=args.verbose)
+            print(pip.up(pack, extra, args.levels, verbose=args.verbose))
             sys.exit()
         elif args.list:
             pip = piptree.pipdata(Target=targetpython)
