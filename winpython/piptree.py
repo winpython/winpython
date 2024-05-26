@@ -150,9 +150,9 @@ class pipdata:
                     "requires_dist": requires,
                     "wanted_per": [],
                     "description": meta["Description"] if "Description" in meta else "",
-                    "provides": provides,
-                    "provided": provided,
-                }
+                    "provides": provides,  # extras of the package: 'array' for dask because dask['array'] defines some extra 
+                    "provided": provided,  # extras from other package: 'test' for pytest because dask['test'] wants pytest
+            }
 
         # On a second pass, complement distro in reverse mode with 'wanted-per':
         # - get all downward links in 'requires_dist' of each package
@@ -166,10 +166,16 @@ class pipdata:
             for r in self.distro[p]["requires_dist"]:
                 if r["req_key"] in self.distro:
                     want_add = {
-                        "req_key": p,
+                        "req_key": p, # p is a string
                         "req_version": r["req_version"],
                         "req_extra": r["req_extra"],
                     }  # req_key_extra
+
+                    # provided = extras in upper packages that triggers the need for this package,
+                    #             like 'pandas[test]->Pytest', so 'test' in distro['pytest']['provided']['test']
+                    #             corner-cases: 'dask[dataframe]' -> dask[array]'
+                    #                           'dask-image ->dask[array]
+
                     if "req_marker" in r:
                         want_add["req_marker"] = r["req_marker"]  # req_key_extra
                         if 'extra == ' in r["req_marker"]:
@@ -187,7 +193,7 @@ class pipdata:
 
         ret_all = []
         if p+"["+extra+"]" in path: # for dask[complete]->dask[array,test,..]
-            print("cycle!", "->".join(path + [p]))
+            print("cycle!", "->".join(path + [p+"["+extra+"]"]))
         elif p in self.distro and len(path) <= depth:
             for extra in extras:  # several extras request management
                 envi = {"extra": extra, **self.environment}
@@ -213,29 +219,35 @@ class pipdata:
         return ret_all
 
     def _upraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
-        """build a nested list of user packages with given extra and depth"""
+        """build a nested list of user packages with given extra and depth
+        from direct dependancies like dask-image <--dask['array']
+        or indirect like Pytest['test'] <-- pandas['test']"""
+
+        remove_list = {ord("'"):None, ord('"'):None} # to clean-up req_extra
         envi = {"extra": extra, **self.environment}
         p = normalize(pp)
+        pe = normalize(f'{pp}[{extra}]')
         ret_all = []
-        if p in path:
-            print("cycle!", "->".join(path + [p]))
+        if pe in path:
+            print("cycle!", "->".join(path + [pe]))
         elif p in self.distro and len(path) <= depth:
             summary = f'  {self.distro[p]["summary"]}' if verbose else ''
             if extra == "":
                 ret_all = [f'{p}=={self.distro[p]["version"]} {version_req}{summary}']
-            elif extra in self.distro[p]["provided"]:
+            elif extra in set(self.distro[p]["provided"]).union(set(self.distro[p]["provides"])): # so that -r pytest[test] gives
                 ret_all = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}{summary}']
             else:
               return []
             ret = []
             for r in self.distro[p]["wanted_per"]:
-                if r["req_key"] in self.distro and r["req_key"] not in path:
-                    if ("req_marker" not in r and extra =="") or (extra !="" and "req_marker" in r and extra in r["req_marker"] and Marker(r["req_marker"]).evaluate(
-                        environment=envi
-                    )):
+                up_req = (r["req_marker"].split('extra == ')+[""])[1].translate(remove_list) if "req_marker" in r else ""
+                if r["req_key"] in self.distro and r["req_key"]+"["+up_req+"]" not in path: # avoids circular links on dask[array]
+                    # must be no extra dependancy, optionnal extra in the package, or provided extra per upper packages 
+                    if ("req_marker" not in r and extra =="") or (extra !="" and extra==up_req and r["req_key"]!=p)  or (extra !="" and "req_marker" in r and extra+',' in r["req_extra"]+',' #bingo1346 contourpy[test-no-images]
+                        ):
                         ret += self._upraw(
                             r["req_key"],
-                            "",
+                            up_req, # pydask[array] going upwards will look for pydask[dataframe]
                             f"[requires: {p}"
                             + (
                                 "[" + r["req_extra"] + "]"
@@ -244,7 +256,7 @@ class pipdata:
                             )
                             + f'{r["req_version"]}]',
                             depth,
-                            path + [p],
+                            path + [pe],
                             verbose=verbose,
                         )
             if not ret == []:
@@ -291,7 +303,7 @@ class pipdata:
             else:
                 if pp in self.distro:
                     r = []
-                    for one_extra in sorted(self.distro[pp]["provided"]):
+                    for one_extra in sorted(set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"]))): #direct and from-upward tags
                         s = self.up(pp, one_extra, depth, indent, version_req, verbose=verbose)
                         if s != '': r += [s]
                     return '\n'.join([i for i in r if i!= ''])   
