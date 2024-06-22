@@ -1,3 +1,14 @@
+### WinPython 2024-03 release (June  22th, 2024)
+
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
+ea2f0d6a1e44c2b08b1706541e0588e1 | 5f04216632e3f5f0ecd58d634efbdde11dc7e3c0 | 0b2bd40fec6c15eb61f113262d9d2dc0a957282dfcb89a017140e06ad932e1d2 | Winpython64-3.12.4.1dot.exe       |   24 167 661 Bytes | f66f57d3994f32fc5e2274b79c740fc98560977cd0a698c596ceebf347b76c4f
+bf2fb1452b011b1a729c5682f9883e7f | 9549c5d16fbfee8669e7b923d8dbfec32cf6b204 | 08903f02514f59c891e3d56d3ff0d092a7d8571daf66237a5a2c2698068981ec | Winpython64-3.12.4.1.exe          |  906 901 445 Bytes | adcc4a1c104e3b9c529c5c4fa86d8edf49caf18aa3fce641210bb752d1a18bfb
+b944d4a32b2973f378cee4cab958d621 | a7ed44fb8fd1cda710dadf1f0d181cc78df91c34 | b4cb7a28284eb36ab0abffc9c751e2302e40430af0af930c365816e33c84a528 | Winpython64-3.13.0.0dotb2b.exe    |   24 443 923 Bytes | d131db5b89594380c4b653d30fdda1a7d2344c86715d47d52c6bfe1761c39913
+38e87ff395374b09f90bdd4868a996b0 | a0421a5f41ac6e6a69629f4f0d2258f3f219ce23 | 08f9a6f75816045d26e38babbde4a04c7da36b7f07863332548fb586a59bcd4b | Winpython64-3.13.0.0freeb2b.exe   |   30 644 666 Bytes | aa877cc35e9e47450991d569277fe203708857be231baaa0149f78ddf7110545
+
+
 ### WinPython 2024-02 release (April  19th, 2024)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
