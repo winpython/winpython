@@ -1,6 +1,6 @@
-## WinPython 3.13.0.0dot 
+## WinPython 3.12.4.1dot 
 
-The following packages are included in WinPython-64bit v3.13.0.0dot b2b.
+The following packages are included in WinPython-64bit v3.12.4.1dot .
 
 <details>
 
@@ -14,10 +14,9 @@ Name | Version | Description
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | 3.13.0 | Python programming language with standard library
+[Python](http://www.python.org/) | 3.12.4 | Python programming language with standard library
 [build](https://pypi.org/project/build) | 1.2.1 | A simple, correct Python build frontend
 [colorama](https://pypi.org/project/colorama) | 0.4.6 | Cross-platform colored terminal text.
-[interpreters_pep_734](https://pypi.org/project/interpreters_pep_734) | 0.1.0 | Use this module to try out multiple interpreters and a per-interpreter GIL in Python 3.13+.  Do not use this for anything important yet.
 [msvc_runtime](https://pypi.org/project/msvc_runtime) | 14.40.33807 | Install the Microsoft™ Visual C++™ runtime DLLs to the sys.prefix and Scripts directories
 [packaging](https://pypi.org/project/packaging) | 24.1 | Core utilities for Python packages
 [pip](https://pypi.org/project/pip) | 24.0 | The PyPA recommended tool for installing Python packages.
