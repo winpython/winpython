@@ -48,12 +48,6 @@ def normalize(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def get_package_metadata(database, name, update=False):
-    """Extract infos (description, url) from the local database"""
-    # Note: we could use the PyPI database but this has been written on
-    # machine which is not connected to the internet
-    # we store only  normalized names now (PEP 503)
-    return piptree.get_package_metadata(database, name, update)
 
 class BasePackage(object):
     def __init__(self, fname):
@@ -84,7 +78,15 @@ class Package(BasePackage):
         BasePackage.__init__(self, fname)
         self.files = []
         self.extract_infos()
-        self.extract_optional_infos(update=update,suggested_summary=suggested_summary)
+        if suggested_summary:
+            setattr(self, 'description',(
+                suggested_summary + "\n"
+            ).splitlines()[0])
+        else:
+            setattr(self, 'description','.')
+        bname = fname.split("-")[0]
+        setattr(self,'url',"https://pypi.org/project/" + bname)
+        #self.extract_optional_infos(update=update,suggested_summary=suggested_summary)
 
     def extract_infos(self):
         """Extract package infos (name, version)
@@ -690,7 +692,7 @@ def main(test=False):
             pip = piptree.pipdata(Target=targetpython)
             todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
             titles = [['Package', 'Version', 'Summary'],['_' * max(x, 6) for x in utils.columns_width(todo)]] 
-            listed = utils.formatted_list(titles + todo)
+            listed = utils.formatted_list(titles + todo, max_width=70)
             for p in listed:
                 print(*p)
             sys.exit()

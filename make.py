@@ -367,7 +367,7 @@ class WinPythonDistribution(object):
             ]
         tools = []
         for name, ver in installed_tools:
-            metadata = wppm.get_package_metadata("tools.ini", name)
+            metadata = utils.get_package_metadata("tools.ini", name)
             url, desc = (
                 metadata["url"],
                 metadata["description"],

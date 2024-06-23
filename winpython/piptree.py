@@ -13,57 +13,15 @@ def normalize(this):
     """apply https://peps.python.org/pep-0503/#normalized-names"""
     return re.sub(r"[-_.]+", "-", this).lower()
 
-def get_package_metadata(database, name, update=False, suggested_summary=None):
-    """Extract infos (description, url) from the local database"""
-    # for package.ini safety belt
-    # Note: we could use the PyPI database but this has been written on
-    # machine which is not connected to the internet
-    # we store only  normalized names now (PEP 503)
-    DATA_PATH = str(Path(sys.modules['winpython'].__file__).parent /'data')
-    db = cp.ConfigParser()
-    filepath = Path(database) if Path(database).is_absolute() else Path(DATA_PATH) / database
-    try:
-        db.read_file(open(str(filepath), encoding = 'utf-8'))
-    except:
-        db.read_file(open(str(filepath)))
-    my_metadata = dict(
-        description="",
-        url="https://pypi.org/project/" + name,
-    )
-    for key in my_metadata:
-        # wheel replace '-' per '_' in key
-        for name2 in (name, normalize(name)):
-            try:
-                my_metadata[key] = db.get(name2, key)
-                break
-            except (cp.NoSectionError, cp.NoOptionError):
-                pass
-    db_desc = my_metadata.get("description")
+def sum_up(this, max_length=144, stop_at=". "):
+    """Keep only 1 line of max_length characters at most"""
+    sumup = (this + os.linesep).splitlines()[0]
+    if len(sumup) > max_length and len(stop_at)>1:
+        sumup = (sumup + stop_at ).split(stop_at)[0]
+    if len(sumup) > max_length:
+        sumup = sumup[:max_length]
+    return sumup
 
-    if my_metadata.get("description") == "" and suggested_summary:
-        # nothing in package.ini, we look in our installed packages
-        try:
-            my_metadata["description"] = (
-                suggested_summary + "\n"
-            ).splitlines()[0]
-        except:
-            pass
-
-    if update == True and db_desc == "" and my_metadata["description"] != "":
-        # we add new findings in our packgages.ini list, if it's required
-        try:
-            db[normalize(name)] = {}
-            db[normalize(name)]["description"] = my_metadata["description"]
-            with open(str(Path(DATA_PATH) / database), "w",  encoding='UTF-8') as configfile:
-                db.write(configfile)
-        except:
-            pass
-    return my_metadata
-
-            
-def get_packages_ini_metadata(name):
-    """Extract infos (description, url) from the local database"""
-    return get_package_metadata("packages.ini", name, update=False, suggested_summary=None)
 
 class pipdata:
     """Wrapper around Distribution.discover() or Distribution.distributions()"""
@@ -146,7 +104,7 @@ class pipdata:
             self.distro[key] = {
                     "name": name,
                     "version": p.version,
-                    "summary": meta["Summary"] if "Summary" in meta else get_packages_ini_metadata(key)["description"],
+                    "summary": meta["Summary"] if "Summary" in meta else "",
                     "requires_dist": requires,
                     "wanted_per": [],
                     "description": meta["Description"] if "Description" in meta else "",
@@ -326,10 +284,10 @@ class pipdata:
         if pp in self.distro:
             return  self.distro[pp]["summary"]
 
-    def pip_list(self, full=False):
+    def pip_list(self, full=False, max_length=144):
         """do like pip list"""
         if full:
-            return [(p, self.distro[p]["version"], self.distro[p]["summary"]) for p in sorted(self.distro)]
+            return [(p, self.distro[p]["version"], sum_up(self.distro[p]["summary"]), max_length) for p in sorted(self.distro)]
         else:
-            return [(p, self.distro[p]["version"]) for p in sorted(self.distro)]
+            return [(p, sum_up(self.distro[p]["version"], max_length)) for p in sorted(self.distro)]
 
