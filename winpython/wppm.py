@@ -69,9 +69,8 @@ class Package(BasePackage):
         self.files = []
         self.extract_infos()
         if suggested_summary:
-            setattr(self, 'description',(
-                suggested_summary + "\n"
-            ).splitlines()[0])
+            setattr(self, 'description',
+                    piptree.sum_up(suggested_summary ))
         else:
             setattr(self, 'description','.')
         bname = fname.split("-")[0]
