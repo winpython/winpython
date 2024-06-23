@@ -20,7 +20,6 @@ import json
 
 # Local imports
 from winpython import utils
-import configparser as cp
 
 # from former wppm separate script launcher
 import textwrap
@@ -63,15 +62,6 @@ class BasePackage(object):
         text += f"{pytext}\n{self.description}\nWebsite: {self.url}\n[{Path(self.fname).name}]"
         return text
 
-    def extract_optional_infos(self, update=False, suggested_summary=None):
-        """Extract package optional infos (description, url)
-        from the package database"""
-        metadata = get_package_metadata("packages.ini", self.name, update=update)
-        for key, value in list(metadata.items()):
-            setattr(self, key, value)
-        if suggested_summary and suggested_summary!="":
-            setattr(self, 'description',suggested_summary)
-
 
 class Package(BasePackage):
     def __init__(self, fname, update=False, suggested_summary=None):
@@ -86,7 +76,6 @@ class Package(BasePackage):
             setattr(self, 'description','.')
         bname = fname.split("-")[0]
         setattr(self,'url',"https://pypi.org/project/" + bname)
-        #self.extract_optional_infos(update=update,suggested_summary=suggested_summary)
 
     def extract_infos(self):
         """Extract package infos (name, version)
