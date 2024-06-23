@@ -41,19 +41,13 @@ except:
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
-# pep503 defines normalized package names: www.python.org/dev/peps/pep-0503
-def normalize(name):
-    """return normalized (unique) name of a package"""
-    return re.sub(r"[-_.]+", "-", name).lower()
-
-
 
 class BasePackage(object):
     def __init__(self, fname):
         self.fname = fname
         self.name = None
         self.version = None
-        self.description = None
+        self.description = ""
         self.url = None
 
     def __str__(self):
@@ -71,8 +65,6 @@ class Package(BasePackage):
         if suggested_summary:
             setattr(self, 'description',
                     piptree.sum_up(suggested_summary ))
-        else:
-            setattr(self, 'description','.')
         bname = fname.split("-")[0]
         setattr(self,'url',"https://pypi.org/project/" + bname)
 
@@ -220,7 +212,7 @@ python "%~dpn0"""
     def find_package(self, name):
         """Find installed package"""
         for pack in self.get_installed_packages():
-            if normalize(pack.name) == normalize(name):
+            if utils.normalize(pack.name) == utils.normalize(name):
                 return pack
 
     def patch_all_shebang(
@@ -553,9 +545,7 @@ def main(test=False):
         # dist.uninstall(pack)
     else:
         registerWinPythonHelp = f"Register distribution: associate file extensions, icons and context menu with this WinPython"
-
         unregisterWinPythonHelp = f"Unregister distribution: de-associate file extensions, icons and context menu from this WinPython"
-
         parser = ArgumentParser(
             description="WinPython Package Manager: handle a WinPython Distribution and its packages",
             formatter_class=RawTextHelpFormatter,
