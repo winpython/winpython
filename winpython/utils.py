@@ -864,7 +864,7 @@ def formatted_list(list_of_list, full=False, max_width=70):
 
 def normalize(this):
     """apply https://peps.python.org/pep-0503/#normalized-names"""
-    return re.sub(r"[-_.]+", "-", name).lower()
+    return re.sub(r"[-_.]+", "-", this).lower()
 
 def get_package_metadata(database, name, update=False, suggested_summary=None):
     """Extract infos (description, url) from the local database"""
