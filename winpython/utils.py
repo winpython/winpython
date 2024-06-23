@@ -862,9 +862,8 @@ def formatted_list(list_of_list, full=False, max_width=70):
         ]
         return zz
 
-# pep503 defines normalized package names: www.python.org/dev/peps/pep-0503
-def normalize(name):
-    """return normalized (unique) name of a package"""
+def normalize(this):
+    """apply https://peps.python.org/pep-0503/#normalized-names"""
     return re.sub(r"[-_.]+", "-", name).lower()
 
 def get_package_metadata(database, name, update=False, suggested_summary=None):
