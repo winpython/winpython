@@ -1670,7 +1670,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             )  # Create/re-create the WinPython base directory
         self._print(f"Creating WinPython {my_winpydir} base directory")
         if Path(self.winpydir).is_dir() and remove_existing and not self.simulation:
-            shutil.rmtree(self.winpydir, onerror=utils.onerror)
+            shutil.rmtree(self.winpydir, onexc=utils.onerror)
         if not Path(self.winpydir).is_dir():
             os.mkdir(self.winpydir)
         if remove_existing and not self.simulation:
