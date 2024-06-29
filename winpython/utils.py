@@ -54,72 +54,13 @@ def onerror(function, path, excinfo):
     attempts to add write permission and then retries.
     If the error is for another reason, it re-raises the error.
 
-    Usage: `shutil.rmtree(path, onerror=onerror)"""
+    Usage: `shutil.rmtree(path, onexc=onerror)"""
     if not os.access(path, os.W_OK):
         # Is the error an access error?
         os.chmod(path, stat.S_IWUSR)
         function(path)
     else:
         raise
-
-
-
-# =============================================================================
-# Environment variables
-# =============================================================================
-def get_env(name, current=True):
-    """Return HKCU/HKLM environment variable name and value
-
-    For example, get_user_env('PATH') may returns:
-    ('Path', u'C:\\Program Files\\Intel\\WiFi\\bin\\')"""
-    root = (
-        winreg.HKEY_CURRENT_USER
-        if current
-        else winreg.HKEY_LOCAL_MACHINE
-    )
-    key = winreg.OpenKey(root, "Environment")
-    for index in range(0, winreg.QueryInfoKey(key)[1]):
-        try:
-            value = winreg.EnumValue(key, index)
-            if value[0].lower() == name.lower():
-                # Return both value[0] and value[1] because value[0] could be
-                # different from name (lowercase/uppercase)
-                return value[0], value[1]
-        except:
-            break
-
-
-def set_env(name, value, current=True):
-    """Set HKCU/HKLM environment variables"""
-    root = (
-        winreg.HKEY_CURRENT_USER
-        if current
-        else winreg.HKEY_LOCAL_MACHINE
-    )
-    key = winreg.OpenKey(root, "Environment")
-    try:
-        _x, key_type = winreg.QueryValueEx(key, name)
-    except WindowsError:
-        key_type = winreg.REG_EXPAND_SZ
-    key = winreg.OpenKey(
-        root, "Environment", 0, winreg.KEY_SET_VALUE
-    )
-    winreg.SetValueEx(key, name, 0, key_type, value)
-    from win32gui import SendMessageTimeout
-    from win32con import (
-        HWND_BROADCAST,
-        WM_SETTINGCHANGE,
-        SMTO_ABORTIFHUNG,
-    )
-
-    SendMessageTimeout(
-        HWND_BROADCAST,
-        WM_SETTINGCHANGE,
-        0,
-        "Environment",
-        SMTO_ABORTIFHUNG,
-        5000,
-    )
 
 
 #==============================================================================
@@ -210,7 +151,7 @@ def remove_winpython_start_menu_folder(current=True):
     path = get_winpython_start_menu_folder(current=current)
     if Path(path).is_dir():
         try:
-            shutil.rmtree(path, onerror=onerror)
+            shutil.rmtree(path, onexc=onerror)
         except WindowsError:
             print(
                 f"Directory {path} could not be removed",
@@ -222,7 +163,7 @@ def create_winpython_start_menu_folder(current=True):
     path = get_winpython_start_menu_folder(current=current)
     if Path(path).is_dir():
         try:
-            shutil.rmtree(path, onerror=onerror)
+            shutil.rmtree(path, onexc=onerror)
         except WindowsError:
             print(
                 f"Directory {path} could not be removed",
@@ -629,7 +570,7 @@ def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
     tmpdir = tempfile.mkdtemp(prefix='wppm_')
     atexit.register(
-        lambda path: shutil.rmtree(path, onerror=onerror),
+        lambda path: shutil.rmtree(path, onexc=onerror),
         tmpdir,
     )
     return tmpdir
@@ -744,7 +685,7 @@ def buildflit_wininst(
                 )
             )
             # remove tempo dir 'root' no more needed
-            shutil.rmtree(root, onerror=onerror)
+            shutil.rmtree(root, onexc=onerror)
         return dst_fname
 
 
