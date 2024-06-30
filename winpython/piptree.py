@@ -200,8 +200,12 @@ class pipdata:
             for r in self.distro[p]["wanted_per"]:
                 up_req = (r["req_marker"].split('extra == ')+[""])[1].translate(remove_list) if "req_marker" in r else ""
                 if r["req_key"] in self.distro and r["req_key"]+"["+up_req+"]" not in path: # avoids circular links on dask[array]
+                    # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['wanted_per'] has:
+                    # {'req_key': 'langchain', 'req_version': '(>=1,<2)',  'req_extra': '',  'req_marker': ' python_version < "3.12"'},
+                    # {'req_key': 'langchain',  'req_version': '(>=1.26.0,<2.0.0)', 'req_extra': '', 'req_marker': ' python_version >= "3.12"'}
                     # must be no extra dependancy, optionnal extra in the package, or provided extra per upper packages 
                     if ("req_marker" not in r and extra =="") or (extra !="" and extra==up_req and r["req_key"]!=p)  or (extra !="" and "req_marker" in r and extra+',' in r["req_extra"]+',' #bingo1346 contourpy[test-no-images]
+                        or  extra+',' in r["req_extra"]+','  and Marker(r["req_marker"]).evaluate(environment=envi)
                         ):
                         ret += self._upraw(
                             r["req_key"],
