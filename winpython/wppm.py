@@ -52,8 +52,7 @@ class BasePackage(object):
 
     def __str__(self):
         text = f"{self.name} {self.version}"
-        pytext = " for Python"
-        text += f"{pytext}\n{self.description}\nWebsite: {self.url}\n[{Path(self.fname).name}]"
+        text += f"\r\n{self.description}\r\nWebsite: {self.url}"
         return text
 
 
