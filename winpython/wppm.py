@@ -68,20 +68,9 @@ class Package(BasePackage):
         setattr(self,'url',"https://pypi.org/project/" + bname)
 
     def extract_infos(self):
-        """Extract package infos (name, version)
-        from filename (installer basename)"""
+        "Extract package (name, version) from filename (installer basename)"
         bname = Path(self.fname).name
-        if bname.endswith(("32.whl", "64.whl")):
-            # {name}[-{bloat}]-{version}-{python tag}-{abi tag}-{platform tag}.whl
-            # ['sounddevice','0.3.5','py2.py3.cp34.cp35','none','win32']
-            # PyQt5-5.7.1-5.7.1-cp34.cp35.cp36-none-win_amd64.whl
-            bname2 = bname[:-4].split("-")
-            self.name = bname2[0]
-            self.version = "-".join(list(bname2[1:-3]))
-            self.pywheel, abi, arch = bname2[-3:]
-            # wheel arch is 'win32' or 'win_amd64'
-            return
-        elif bname.endswith((".zip", ".tar.gz", ".whl")):
+        if bname.endswith((".zip", ".tar.gz", ".whl")):
             # distutils sdist
             infos = utils.get_source_package_infos(bname)
             if infos is not None:
