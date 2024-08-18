@@ -196,6 +196,87 @@ def build_nsis(srcname, dstname, data):
         print("Execution failed:", e, file=sys.stderr)
     os.remove(dstname)
 
+def checkPath(path, mode):
+    """ from https://gist.github.com/flyx/2965682 """ 
+    import os, os.path
+    if not os.path.exists(path) or not os.path.isfile(path):
+        raise ValueError("{0} does not exist or isn't a file.".format(path))
+    if not os.access(path, mode):
+        raise ValueError("Insufficient permissions: {0}".format(path))
+    
+def updateExecutableIcon(executablePath, iconPath):
+    """ from https://gist.github.com/flyx/2965682 """ 
+    import win32api, win32con
+    import struct
+    import math
+    """
+    Updates the icon of a Windows executable file.
+    """
+    
+    checkPath(executablePath, os.W_OK)
+    checkPath(iconPath, os.R_OK)
+    
+    handle = win32api.BeginUpdateResource(executablePath, False)
+    
+    icon = open(iconPath, "rb")
+    
+    fileheader = icon.read(6)
+    
+    # Read icon data
+    image_type, image_count = struct.unpack("xxHH", fileheader)
+    print ("Icon file has type {0} and contains {1} images.".format(image_type, image_count))
+    
+    icon_group_desc = struct.pack("<HHH", 0, image_type, image_count)
+    icon_sizes = []
+    icon_offsets = []
+    
+    # Read data of all included icons
+    for i in range(1, image_count + 1):
+        imageheader = icon.read(16)
+        width, height, colors, panes, bits_per_pixel, image_size, offset =\
+            struct.unpack("BBBxHHLL", imageheader)
+        print ("Image is {0}x{1}, has {2} colors in the palette, {3} planes, {4} bits per pixel.".format(
+            width, height, colors, panes, bits_per_pixel));
+        print ("Image size is {0}, the image content has an offset of {1}".format(image_size, offset));
+        
+        icon_group_desc = icon_group_desc + struct.pack("<BBBBHHIH",
+            width,          # Icon width
+            height,         # Icon height
+            colors,         # Colors (0 for 256 colors)
+            0,              # Reserved2 (must be 0)
+            panes,          # Color planes
+            bits_per_pixel, # Bits per pixel
+            image_size,     # ImageSize
+            i               # Resource ID
+        )
+        icon_sizes.append(image_size)
+        icon_offsets.append(offset)
+    
+    # Read icon content and write it to executable file
+    for i in range(1, image_count + 1):
+        icon_content = icon.read(icon_sizes[i - 1])
+        print ("Read {0} bytes for image #{1}".format(len(icon_content), i))
+        win32api.UpdateResource(handle, win32con.RT_ICON, i, icon_content)
+        
+    win32api.UpdateResource(handle, win32con.RT_GROUP_ICON, "MAINICON", icon_group_desc)
+    
+    win32api.EndUpdateResource(handle, False)
+
+
+def build_shimmy_launcher(launcher_name, command, icon_path):
+    """Build shimmy script"""
+    # access to mkshim.py
+    # define where is mkshim
+    mkshim_program = str(Path(__file__).resolve().parent / "mkshim.py")
+    python_program = utils.get_python_executable()
+
+    # Create the executable using mkshim
+    mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
+    print("zzzz Building shimmy:", mkshim_command)
+    subprocess.run(mkshim_command, shell=True)
+
+    # Embed the icon pywin32
+    updateExecutableIcon(launcher_name, icon_path)
 
 def build_iss(srcname, dstname, data):
     """Build Inno Setup Script"""
@@ -511,6 +592,48 @@ Name | Version | Description
         fd.write(contents_final)
         fd.close()
 
+    def create_launcher_shimmy(
+        self,
+        name,
+        icon,
+        command=None,
+        args=None,
+        workdir=r"$EXEDIR\scripts",
+        launcher="launcher_basic.nsi",
+    ):
+        """Create exe launcher with NSIS"""
+        assert name.endswith(".exe")
+        portable_dir = str(Path(__file__).resolve().parent / "portable")
+        icon_fname = str(Path(portable_dir) / "icons" / icon)
+        assert Path(icon_fname).is_file()
+
+        # Customizing NSIS script
+        if command is None:
+            if args is not None and ".pyw" in args:
+                command = "${WINPYDIR}\pythonw.exe"
+            else:
+                command = "${WINPYDIR}\python.exe"
+        if args is None:
+            args = ""
+        if workdir is None:
+            workdir = ""
+        fname = str(Path(self.winpydir) / (Path(name).stem + ".nsi"))
+
+        data = [
+            ("WINPYDIR", f"$EXEDIR\{self.python_name}"),
+            ("WINPYVER", self.winpyver),
+            ("COMMAND", command),
+            ("PARAMETERS", args),
+            ("WORKDIR", workdir),
+            ("Icon", icon_fname),
+            ("OutFile", name),
+        ]
+        iconlauncherfullname= str(Path(self.winpydir) / name)
+
+        print("yyyy Buildin shimmy:", iconlauncherfullname, command , icon_fname)
+        true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
+        build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname)
+        
     def create_launcher(
         self,
         name,
@@ -718,18 +841,32 @@ call "%~dp0env_for_icons.bat"
         """Create launchers"""
 
         self._print("Creating launchers")
-        self.create_launcher(
+
+        self.create_launcher_shimmy(
             "WinPython Command Prompt.exe",
             "cmd.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k cmd.bat",
+            #command="$SYSDIR\cmd.exe",
+            #args=r"/k cmd.bat",
+            command="scripts\\cmd.bat",
+            args=r"",
         )
+
         self.create_launcher(
             "WinPython Powershell Prompt.exe",
             "powershell.ico",
             command="$SYSDIR\cmd.exe",
             args=r"/k cmd_ps.bat",
         )
+
+        #not yet: workdirectory = icon directory 
+        # self.create_launcher_shimmy(
+        #    "WinPython Powershell PromptShimmy.exe",
+        #    "powershell.ico",
+        #    #command="$SYSDIR\cmd.exe",
+        #    #args=r"/k scripts\\cmd_ps.bat",
+        #    command="scripts\\cmd_ps.bat",
+        #    args=r"",
+        #)
 
         self.create_launcher(
             "WinPython Terminal.exe",
@@ -738,11 +875,21 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs WinPython_Terminal.bat",
         )
 
-        self.create_launcher(
+        #not yet: workdirectory = icon directory 
+        #self.create_launcher_shimmy(
+        #    "WinPython TerminalShimmy.exe",
+        #    "terminal.ico",
+        #    command="wscript.exe",
+        #    args=r"scripts\\Noshell.vbs scripts\\WinPython_Terminal.bat",
+        #)
+
+        self.create_launcher_shimmy(
             "WinPython Interpreter.exe",
             "python.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k winpython.bat",
+            #command="$SYSDIR\cmd.exe",
+            #args=r"/k scripts\\winpython.bat",
+            command="scripts\\winpython.bat",
+            args=r"",
         )
 
         self.create_launcher(
@@ -752,6 +899,16 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs winidle.bat",
         )
 
+        #not yet: dos window behind
+        #self.create_launcher_shimmy(
+        #    "IDLE (Python GUI)Shimmy.exe",
+        #    "python.ico",
+        #    command="wscript.exe",
+        #    args=r"scripts\\Noshell.vbs scripts\\winidle.bat",
+            #command="scripts\\Noshell.vbs scripts\\winidle.bat",
+            #args=r"",
+        #)
+
         self.create_launcher(
             "Spyder.exe",
             "spyder.ico",
@@ -759,25 +916,43 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs winspyder.bat",
         )
 
+        #not yet 
+        #self.create_launcher_shimmy(
+        #    "SpyderShimmy.exe",
+        #    "spyder.ico",
+        #    command="wscript.exe",
+        #    args=r"scripts\\Noshell.vbs scripts\\winspyder.bat",
+        #)
+
         self.create_launcher(
             "Spyder reset.exe",
             "spyder_reset.ico",
             command="wscript.exe",
-            args=r"Noshell.vbs spyder_reset.bat",
+            args=r"scripts\\Noshell.vbs scripts\\spyder_reset.bat",
         )
 
-        self.create_launcher(
+        #not yet 
+        #self.create_launcher_shimmy(
+        #    "Spyder reset.exe",
+        #    "spyder_reset.ico",
+        #    command="wscript.exe",
+        #    args=r"scripts\\Noshell.vbs scripts\\spyder_reset.bat",
+        #)
+
+
+        self.create_launcher_shimmy(
             "WinPython Control Panel.exe",
             "winpython.ico",
             # command="wscript.exe",
             # args=r"Noshell.vbs wpcp.bat",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k wpcp.bat",
+            #command="$SYSDIR\cmd.exe",
+            #args=r"/k scripts\\wpcp.bat",
+            command="scripts\\wpcp.bat",
+            args=r"",
         )
 
         # Jupyter launchers
 
-        # removing another Qt string
         # self.create_launcher(
         #     "IPython Qt Console.exe",
         #     "ipython.ico",
@@ -802,11 +977,11 @@ call "%~dp0env_for_icons.bat"
         )
 
         # VSCode launcher
-        self.create_launcher(
-            "VS Code.exe",
+        self.create_launcher_shimmy(
+            "VS CodeShimmy.exe",
             "code.ico",
             command="wscript.exe",
-            args=r"Noshell.vbs winvscode.bat",
+            args=r"scripts\\Noshell.vbs scripts\\winvscode.bat",
         )
 
         self._print_done()
@@ -1203,8 +1378,8 @@ if not "%~1"=="" (
 	  )
    )
 ) else (
-rem if it is launched from another directory , we keep it that one echo %__CD__%
-if not "%__CD__%"=="%~dp0" set  WINPYWORKDIR1="%__CD__%"
+rem if it is launched from another directory than icon origin , we keep it that one echo %__CD__%
+if not "%__CD__%"=="%~dp0" if not "%__CD__%scripts\"=="%~dp0" set  WINPYWORKDIR1="%__CD__%"
 )
 rem remove potential doublequote
 set WINPYWORKDIR1=%WINPYWORKDIR1:"=%
@@ -1213,6 +1388,13 @@ if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
 
 FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
 %winpythontoexec%set winpythontoexec=
+
+rem 2024-08-18: we go initial directory WINPYWORKDIR if no direction and we are on icon directory
+rem old NSIS launcher is  by default at icon\scripts level
+if  "%__CD__%scripts\"=="%~dp0"  if "%WINPYWORKDIR1%"=="%WINPYDIRBASE%\Notebooks"  cd/D %WINPYWORKDIR1%
+rem new shimmy launcher is by default at icon level
+if  "%__CD__%"=="%~dp0"  if "%WINPYWORKDIR1%"=="%WINPYDIRBASE%\Notebooks"  cd/D %WINPYWORKDIR1%
+
 
 rem ******************
 rem missing student directory part
