@@ -60,9 +60,6 @@ def get_nsis_exe():
         raise RuntimeError("NSIS is not installed on this computer.")
 
 
-NSIS_EXE = get_nsis_exe()  # NSIS Compiler
-
-
 def get_iscc_exe():
     """Return ISCC executable"""
     localdir = str(Path(sys.prefix).parent.parent)
@@ -70,8 +67,6 @@ def get_iscc_exe():
         for dirname in (
             r"C:\Program Files",
             r"C:\Program Files (x86)",
-            # drive+r'PortableApps\NSISPortableANSI',
-            # drive+r'PortableApps\NSISPortable',
             str(Path(localdir) / "Inno Setup 5"),
         ):
             for subdirname in (".", "App"):
@@ -79,11 +74,7 @@ def get_iscc_exe():
                 if Path(exe).is_file():
                     return exe
     else:
-        # raise RuntimeError(
-        print("Inno Setup 5 is not installed on this computer.")
-
-
-ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
+        raise RuntimeError("Inno Setup 5 is not installed on this computer.")
 
 
 def get_7zip_exe():
@@ -100,10 +91,7 @@ def get_7zip_exe():
                 if Path(exe).is_file():
                     return exe
     else:
-        raise RuntimeError("7-Zip is not installed on this computer.")
-
-
-SEVENZIP_EXE = get_7zip_exe()  # Inno Setup Compiler (iscc.exe)
+        raise RuntimeError("NSIS is not installed on this computer.")
 
 
 def replace_in_nsis_file(fname, data):
@@ -171,6 +159,7 @@ def replace_in_7zip_file(fname, data):
 
 def build_nsis(srcname, dstname, data):
     """Build NSIS script"""
+    NSIS_EXE = get_nsis_exe()  # NSIS Compiler
     portable_dir = str(Path(__file__).resolve().parent / "portable")
     shutil.copy(str(Path(portable_dir) / srcname), dstname)
     data = [
@@ -264,22 +253,24 @@ def updateExecutableIcon(executablePath, iconPath):
 
 
 def build_shimmy_launcher(launcher_name, command, icon_path):
-    """Build shimmy script"""
-    # access to mkshim.py
-    # define where is mkshim
+    """Build .exe launcher with mkshim.py and pywin32"""
+
+    # define where is mkshim.py
     mkshim_program = str(Path(__file__).resolve().parent / "mkshim.py")
     python_program = utils.get_python_executable()
 
-    # Create the executable using mkshim
+    # Create the executable using mkshim.py
     mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
-    print("zzzz Building shimmy:", mkshim_command)
+    print("Building .exe launcher with mkshim.py:", mkshim_command)
     subprocess.run(mkshim_command, shell=True)
 
-    # Embed the icon pywin32
-    updateExecutableIcon(launcher_name, icon_path)
+    # Embed the icon with pywin32, if provided
+    if Path(icon_path).is_file():
+        updateExecutableIcon(launcher_name, icon_path)
 
 def build_iss(srcname, dstname, data):
     """Build Inno Setup Script"""
+    ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
     portable_dir = str(Path(__file__).resolve().parent / "portable")
     shutil.copy(str(Path(portable_dir) / srcname), dstname)
     data = [("PORTABLE_DIR", portable_dir)] + list(data)
@@ -303,6 +294,7 @@ def build_iss(srcname, dstname, data):
 
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
+    SEVENZIP_EXE = get_7zip_exe()
     portable_dir = str(Path(__file__).resolve().parent / "portable")
     shutil.copy(str(Path(portable_dir) / srcname), dstname)
     data = [
@@ -599,38 +591,20 @@ Name | Version | Description
         command=None,
         args=None,
         workdir=r"$EXEDIR\scripts",
-        launcher="launcher_basic.nsi",
     ):
-        """Create exe launcher with NSIS"""
+        """Create exe launcher with mkshim.py"""
         assert name.endswith(".exe")
         portable_dir = str(Path(__file__).resolve().parent / "portable")
         icon_fname = str(Path(portable_dir) / "icons" / icon)
         assert Path(icon_fname).is_file()
 
-        # Customizing NSIS script
+        # prepare mkshim.py script
         if command is None:
             if args is not None and ".pyw" in args:
                 command = "${WINPYDIR}\pythonw.exe"
             else:
                 command = "${WINPYDIR}\python.exe"
-        if args is None:
-            args = ""
-        if workdir is None:
-            workdir = ""
-        fname = str(Path(self.winpydir) / (Path(name).stem + ".nsi"))
-
-        data = [
-            ("WINPYDIR", f"$EXEDIR\{self.python_name}"),
-            ("WINPYVER", self.winpyver),
-            ("COMMAND", command),
-            ("PARAMETERS", args),
-            ("WORKDIR", workdir),
-            ("Icon", icon_fname),
-            ("OutFile", name),
-        ]
         iconlauncherfullname= str(Path(self.winpydir) / name)
-
-        print("yyyy Buildin shimmy:", iconlauncherfullname, command , icon_fname)
         true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
         build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname)
         
