@@ -252,16 +252,16 @@ def updateExecutableIcon(executablePath, iconPath):
     win32api.EndUpdateResource(handle, False)
 
 
-def build_shimmy_launcher(launcher_name, command, icon_path):
+def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim240.py'):
     """Build .exe launcher with mkshim.py and pywin32"""
 
-    # define where is mkshim.py
-    mkshim_program = str(Path(__file__).resolve().parent / "mkshim.py")
+    # define where is mkshim
+    mkshim_program = str(Path(__file__).resolve().parent / mkshim_program)
     python_program = utils.get_python_executable()
 
-    # Create the executable using mkshim.py
+    # Create the executable using mkshim.py or mkshim240.py
     mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
-    print("Building .exe launcher with mkshim.py:", mkshim_command)
+    print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
     subprocess.run(mkshim_command, shell=True)
 
     # Embed the icon with pywin32, if provided
