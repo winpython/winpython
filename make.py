@@ -883,7 +883,7 @@ call "%~dp0env_for_icons.bat"
         #)
 
         self.create_launcher_shimmy(
-            "SpyderShimmy.exe",
+            "Spyder.exe",
             "spyder.ico",
             command="Powershell.exe",
             args=r"start-process -WindowStyle Hidden './scripts/winspyder.bat'",
@@ -897,7 +897,7 @@ call "%~dp0env_for_icons.bat"
         #)
 
         self.create_launcher_shimmy(
-            "Spyder resetShimmy.exe",
+            "Spyder reset.exe",
             "spyder_reset.ico",
             command="Powershell.exe",
             args=r"start-process -WindowStyle Hidden './scripts/spyder_reset.bat",
