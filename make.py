@@ -252,8 +252,8 @@ def updateExecutableIcon(executablePath, iconPath):
     win32api.EndUpdateResource(handle, False)
 
 
-def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim240.py'):
-    """Build .exe launcher with mkshim.py and pywin32"""
+def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py'):
+    """Build .exe launcher with mkshim400.py and pywin32"""
 
     # define where is mkshim
     mkshim_program = str(Path(__file__).resolve().parent / mkshim_program)
@@ -590,23 +590,25 @@ Name | Version | Description
         icon,
         command=None,
         args=None,
-        workdir=r"$EXEDIR\scripts",
+        workdir=r"",  # not used, use $env:WINPYDIRICONS variable in command line
+        mkshim_program="mkshim400.py", # to force another one
     ):
-        """Create exe launcher with mkshim.py"""
+        """Create an exe launcher with mkshim.py"""
         assert name.endswith(".exe")
         portable_dir = str(Path(__file__).resolve().parent / "portable")
         icon_fname = str(Path(portable_dir) / "icons" / icon)
         assert Path(icon_fname).is_file()
 
         # prepare mkshim.py script
+        #  $env:WINPYDIRICONS variable give the icons directory
         if command is None:
             if args is not None and ".pyw" in args:
-                command = "${WINPYDIR}\pythonw.exe"
+                command = "${WINPYDIR}\pythonw.exe" #not used
             else:
-                command = "${WINPYDIR}\python.exe"
+                command = "${WINPYDIR}\python.exe"  #not used
         iconlauncherfullname= str(Path(self.winpydir) / name)
         true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
-        build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname)
+        build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program)
         
     def create_launcher(
         self,
@@ -819,97 +821,65 @@ call "%~dp0env_for_icons.bat"
         self.create_launcher_shimmy(
             "WinPython Command Prompt.exe",
             "cmd.ico",
-            #command="$SYSDIR\cmd.exe",
-            #args=r"/k cmd.bat",
-            command="scripts\\cmd.bat",
+            command=".\\cmd.bat",
             args=r"",
+            mkshim_program="mkshim400s.py",
         )
-
-        #self.create_launcher(
-        #    "WinPython Powershell Prompt.exe",
-        #    "powershell.ico",
-        #    command="$SYSDIR\cmd.exe",
-        #    args=r"/k cmd_ps.bat",
-        #)
         
         self.create_launcher_shimmy(
             "WinPython Powershell Prompt.exe",
             "powershell.ico",
-            #command="$SYSDIR\cmd.exe",
-            #args=r"/k scripts\\cmd_ps.bat",
-            command="scripts\\cmd_ps.bat",
-            args=r"",
+            command="Powershell.exe",
+            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
+            #command="%WINPYDIRICONS%\\scripts\\cmd_ps.bat",
+            #args=r"",
         )
 
-        #self.create_launcher(
+        #self.create_launcher_shimmy(
         #    "WinPython Terminal.exe",
         #    "terminal.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs WinPython_Terminal.bat",
+        #    command="Powershell.exe",
+        #    args=r"start-process -WindowStyle Hidden './scripts/WinPython_Terminal.bat",
         #)
 
         self.create_launcher_shimmy(
             "WinPython Interpreter.exe",
             "python.ico",
-            #command="$SYSDIR\cmd.exe",
-            #args=r"/k scripts\\winpython.bat",
-            command="scripts\\winpython.bat",
+            command=".\\winpython.bat",
             args=r"",
+            mkshim_program="mkshim400s.py",
         )
-
-        #self.create_launcher(
-        #    "IDLE (Python GUI).exe",
-        #    "python.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs winidle.bat",
-        #)
-
-        #dos window behind, but that disappear
 
         self.create_launcher_shimmy(
             "IDLE (Python GUI).exe",
             "python.ico",
             command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden './scripts/winidle.bat'",
+            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winidle.bat')",
             #command="scripts\\Noshell.vbs scripts\\winidle.bat",
             #args=r"",
         )
-
-        #self.create_launcher(
-        #    "Spyder.exe",
-        #    "spyder.ico",
-        #    command="wscript.exe",
-        #    args=r"Noshell.vbs winspyder.bat",
-        #)
 
         self.create_launcher_shimmy(
             "Spyder.exe",
             "spyder.ico",
             command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden './scripts/winspyder.bat'",
+            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winspyder.bat')",
         )
-
-        #self.create_launcher(
-        #    "Spyder reset.exe",
-        #    "spyder_reset.ico",
-        #    command="wscript.exe",
-        #    args=r"scripts\\Noshell.vbs scripts\\spyder_reset.bat",
-        #)
 
         self.create_launcher_shimmy(
             "Spyder reset.exe",
             "spyder_reset.ico",
             command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden './scripts/spyder_reset.bat",
+            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\spyder_reset.bat')",
+            #args=r"start-process -WindowStyle Hidden './scripts/spyder_reset.bat",
         )
 
         self.create_launcher_shimmy(
             "WinPython Control Panel.exe",
             "winpython.ico",
-            #command="$SYSDIR\cmd.exe",
-            #args=r"/k scripts\\wpcp.bat",
-            command="scripts\\wpcp.bat",
+            command=".\\wpcp.bat",
             args=r"",
+            mkshim_program="mkshim400s.py",
         )
 
         # Jupyter launchers
@@ -918,41 +888,27 @@ call "%~dp0env_for_icons.bat"
         self.create_launcher_shimmy(
             "Jupyter Notebook.exe",
             "jupyter.ico",
-            #command="$SYSDIR\cmd.exe",
-            #args=r"/k winipython_notebook.bat",  # like VSCode + Rise way
-            command="scripts\\winipython_notebook.bat",
+            command="winipython_notebook.bat",
             args=r"",
+            mkshim_program="mkshim400s.py",
         )
-
-        #self.create_launcher(
-        #    "Jupyter Lab.exe",
-        #    "jupyter.ico",
-        #    command="$SYSDIR\cmd.exe",
-        #    args=r"/k winjupyter_lab.bat",
-        #)
 
         self.create_launcher_shimmy(
             "Jupyter Lab.exe",
             "jupyter.ico",
             #command="$SYSDIR\cmd.exe",
             #args=r"/k winjupyter_lab.bat",
-            command="scripts\\winjupyter_lab.bat",
+            command="winjupyter_lab.bat",
             args=r"",
+            mkshim_program="mkshim400s.py",
         )
-    
-        # VSCode launcher
-        #self.create_launcher_shimmy(
-        #    "VS Code.exe",
-        #    "code.ico",
-        #    command="wscript.exe",
-        #    args=r"scripts\\Noshell.vbs scripts\\winvscode.bat",
-        #)
 
         self.create_launcher_shimmy(
             "VS Code.exe",
             "code.ico",
-            command="scripts\\winvscode.bat",
+            command="winvscode.bat",
             args=r"",
+            mkshim_program="mkshim400s.py",
         )
 
         self._print_done()
@@ -1568,7 +1524,7 @@ set winpython_ini=%~dp0..\\settings\winpython.ini
         self.create_batch_script(
             "cmd.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
+call "%~dp0env_for_icons.bat"
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 cmd.exe /k""",
         )
@@ -1576,7 +1532,7 @@ cmd.exe /k""",
         self.create_batch_script(
             "WinPython_Terminal.bat",
             r"""@echo off
-rem call "%~dp0env_for_icons.bat"  %*
+rem call "%~dp0env_for_icons.bat"
 rem if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 rem "%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
@@ -1587,7 +1543,7 @@ exit
         self.create_batch_script(
             "python.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
+call "%~dp0env_for_icons.bat"
 rem backward compatibility for  python command-line users
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 "%WINPYDIR%\python.exe"  %*
@@ -1598,7 +1554,7 @@ if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
         self.create_batch_script(
             "winpython.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
+call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
 rem backward compatibility for non-ptpython users
 if exist "%WINPYDIR%\scripts\ptpython.exe" (
@@ -1613,7 +1569,7 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
         self.create_batch_script(
             "winidle.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"  %*
+call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 """,
@@ -1623,7 +1579,7 @@ cd/D "%WINPYWORKDIR1%"
         self.create_batch_script(
             "winspyder.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 rem cd/D "%WINPYWORKDIR%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
    "%WINPYDIR%\scripts\spyder3.exe" %* -w "%WINPYWORKDIR1%"
@@ -1636,7 +1592,7 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
         self.create_batch_script(
             "spyder_reset.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\scripts\spyder3.exe" (
     "%WINPYDIR%\scripts\spyder3.exe" --reset %*
@@ -1649,7 +1605,7 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
         self.create_batch_script(
             "winipython_notebook.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
 """,
@@ -1658,7 +1614,7 @@ cd/D "%WINPYWORKDIR1%"
         self.create_batch_script(
             "winjupyter_lab.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-lab.exe" %*
 """,
@@ -1667,7 +1623,7 @@ cd/D "%WINPYWORKDIR1%"
         self.create_batch_script(
             "winqtconsole.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
 """,
@@ -1702,7 +1658,7 @@ call "%~dp0unregister_python.bat" --all""",
         self.create_batch_script(
             "wpcp.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 rem cd/D "%WINPYWORKDIR1%"
 rem "%WINPYDIR%\python.exe" -m winpython.controlpanel %*
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd/d %WINPYWORKDIR1%
@@ -1736,7 +1692,7 @@ call "%~dp0env.bat"  %*
             "winvscode.bat",
             r"""@echo off
 rem launcher for VScode
-call "%~dp0env_for_icons.bat" %*
+call "%~dp0env_for_icons.bat"
 rem cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\..\t\vscode\code.exe" (
     "%WINPYDIR%\..\t\vscode\code.exe" %*
