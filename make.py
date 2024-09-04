@@ -252,8 +252,8 @@ def updateExecutableIcon(executablePath, iconPath):
     win32api.EndUpdateResource(handle, False)
 
 
-def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py'):
-    """Build .exe launcher with mkshim400.py and pywin32"""
+def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py', workdir=''):
+    """Build .exe launcher with mkshim_program and pywin32"""
 
     # define where is mkshim
     mkshim_program = str(Path(__file__).resolve().parent / mkshim_program)
@@ -261,6 +261,8 @@ def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mks
 
     # Create the executable using mkshim.py or mkshim240.py
     mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
+    if workdir !='': # V03 of shim: we can handle an optional sub-directory
+        mkshim_command += f' --subdir "{workdir}"'
     print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
     subprocess.run(mkshim_command, shell=True)
 
@@ -590,7 +592,7 @@ Name | Version | Description
         icon,
         command=None,
         args=None,
-        workdir=r"",  # not used, use $env:WINPYDIRICONS variable in command line
+        workdir=r"",  # ".\script" to go to sub-directory of the icon
         mkshim_program="mkshim400.py", # to force another one
     ):
         """Create an exe launcher with mkshim.py"""
@@ -608,7 +610,7 @@ Name | Version | Description
                 command = "${WINPYDIR}\python.exe"  #not used
         iconlauncherfullname= str(Path(self.winpydir) / name)
         true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
-        build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program)
+        build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program, workdir=workdir)
         
     def create_launcher(
         self,
@@ -823,7 +825,7 @@ call "%~dp0env_for_icons.bat"
             "cmd.ico",
             command=".\\cmd.bat",
             args=r"",
-            mkshim_program="mkshim400s.py",
+            workdir=r".\scripts"
         )
         
         self.create_launcher_shimmy(
@@ -847,7 +849,7 @@ call "%~dp0env_for_icons.bat"
             "python.ico",
             command=".\\winpython.bat",
             args=r"",
-            mkshim_program="mkshim400s.py",
+            workdir=r".\scripts"
         )
 
         self.create_launcher_shimmy(
@@ -879,7 +881,7 @@ call "%~dp0env_for_icons.bat"
             "winpython.ico",
             command=".\\wpcp.bat",
             args=r"",
-            mkshim_program="mkshim400s.py",
+            workdir=r".\scripts"
         )
 
         # Jupyter launchers
@@ -890,7 +892,7 @@ call "%~dp0env_for_icons.bat"
             "jupyter.ico",
             command="winipython_notebook.bat",
             args=r"",
-            mkshim_program="mkshim400s.py",
+            workdir=r".\scripts"
         )
 
         self.create_launcher_shimmy(
@@ -900,7 +902,7 @@ call "%~dp0env_for_icons.bat"
             #args=r"/k winjupyter_lab.bat",
             command="winjupyter_lab.bat",
             args=r"",
-            mkshim_program="mkshim400s.py",
+            workdir=r".\scripts"
         )
 
         self.create_launcher_shimmy(
@@ -908,7 +910,7 @@ call "%~dp0env_for_icons.bat"
             "code.ico",
             command="winvscode.bat",
             args=r"",
-            mkshim_program="mkshim400s.py",
+            workdir=r".\scripts"
         )
 
         self._print_done()
