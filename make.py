@@ -185,72 +185,6 @@ def build_nsis(srcname, dstname, data):
         print("Execution failed:", e, file=sys.stderr)
     os.remove(dstname)
 
-def checkPath(path, mode):
-    """ from https://gist.github.com/flyx/2965682 """ 
-    import os, os.path
-    if not os.path.exists(path) or not os.path.isfile(path):
-        raise ValueError("{0} does not exist or isn't a file.".format(path))
-    if not os.access(path, mode):
-        raise ValueError("Insufficient permissions: {0}".format(path))
-    
-def updateExecutableIcon(executablePath, iconPath):
-    """ from https://gist.github.com/flyx/2965682 """ 
-    import win32api, win32con
-    import struct
-    import math
-    """
-    Updates the icon of a Windows executable file.
-    """
-    
-    checkPath(executablePath, os.W_OK)
-    checkPath(iconPath, os.R_OK)
-    
-    handle = win32api.BeginUpdateResource(executablePath, False)
-    
-    icon = open(iconPath, "rb")
-    
-    fileheader = icon.read(6)
-    
-    # Read icon data
-    image_type, image_count = struct.unpack("xxHH", fileheader)
-    print ("Icon file has type {0} and contains {1} images.".format(image_type, image_count))
-    
-    icon_group_desc = struct.pack("<HHH", 0, image_type, image_count)
-    icon_sizes = []
-    icon_offsets = []
-    
-    # Read data of all included icons
-    for i in range(1, image_count + 1):
-        imageheader = icon.read(16)
-        width, height, colors, panes, bits_per_pixel, image_size, offset =\
-            struct.unpack("BBBxHHLL", imageheader)
-        print ("Image is {0}x{1}, has {2} colors in the palette, {3} planes, {4} bits per pixel.".format(
-            width, height, colors, panes, bits_per_pixel));
-        print ("Image size is {0}, the image content has an offset of {1}".format(image_size, offset));
-        
-        icon_group_desc = icon_group_desc + struct.pack("<BBBBHHIH",
-            width,          # Icon width
-            height,         # Icon height
-            colors,         # Colors (0 for 256 colors)
-            0,              # Reserved2 (must be 0)
-            panes,          # Color planes
-            bits_per_pixel, # Bits per pixel
-            image_size,     # ImageSize
-            i               # Resource ID
-        )
-        icon_sizes.append(image_size)
-        icon_offsets.append(offset)
-    
-    # Read icon content and write it to executable file
-    for i in range(1, image_count + 1):
-        icon_content = icon.read(icon_sizes[i - 1])
-        print ("Read {0} bytes for image #{1}".format(len(icon_content), i))
-        win32api.UpdateResource(handle, win32con.RT_ICON, i, icon_content)
-        
-    win32api.UpdateResource(handle, win32con.RT_GROUP_ICON, "MAINICON", icon_group_desc)
-    
-    win32api.EndUpdateResource(handle, False)
-
 
 def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py', workdir=''):
     """Build .exe launcher with mkshim_program and pywin32"""
@@ -263,12 +197,12 @@ def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mks
     mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
     if workdir !='': # V03 of shim: we can handle an optional sub-directory
         mkshim_command += f' --subdir "{workdir}"'
+    # Embed the icon, if provided
+    if Path(icon_path).is_file():
+        mkshim_command += f' --i "{icon_path}"'
     print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
     subprocess.run(mkshim_command, shell=True)
 
-    # Embed the icon with pywin32, if provided
-    if Path(icon_path).is_file():
-        updateExecutableIcon(launcher_name, icon_path)
 
 def build_iss(srcname, dstname, data):
     """Build Inno Setup Script"""
