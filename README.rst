@@ -56,7 +56,7 @@ by using an executable installer: https://winpython.github.io/
 More informations
 -----------------
 
-* Downloads: https://sourceforge.net/projects/winpython/files/ 
+* Downloads: https://sourceforge.net/projects/winpython/files/ or https://github.com/winpython/winpython/releases
 
 * Development, bug reports and feature requests: https://github.com/winpython/winpython
 
