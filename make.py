@@ -99,27 +99,6 @@ def replace_in_nsis_file(fname, data):
     fd.close()
 
 
-def replace_in_iss_file(fname, data):
-    """Replace text in line starting with *start*, from this position:
-    data is a list of (start, text) tuples"""
-    fd = open(fname, "U")
-    lines = fd.readlines()
-    fd.close()
-    for idx, line in enumerate(lines):
-        for start, text in data:
-            if start not in (
-                "Icon",
-                "OutFile",
-            ) and not start.startswith("!"):
-                start = "#define " + start
-            if line.startswith(start + " "):
-                lines[idx] = line[: len(start) + 1] + f'"{text}"' + "\n"
-    fd = open(fname, "w")
-    fd.writelines(lines)
-    print("Inno Setup for ", fname, "is", lines)
-    fd.close()
-
-
 def replace_in_7zip_file(fname, data):
     """Replace text in line starting with *start*, from this position:
     data is a list of (start, text) tuples"""
@@ -606,26 +585,6 @@ call "%~dp0env_for_icons.bat"
         build_nsis("installer.nsi", fname, data)
         self._print_done()
 
-    def create_installer_inno(self):
-        """Create installer with INNO"""
-        self._print("Creating WinPython installer INNO")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        fname = str(Path(portable_dir) / "installer_INNO-tmp.iss")
-        data = (
-            ("DISTDIR", self.winpydir),
-            ("ARCH", self.winpy_arch),
-            (
-                "VERSION",
-                f"{self.python_fullversion}.{self.build_number}{self.flavor}",
-            ),
-            (
-                "VERSION_INSTALL",
-                f'{self.python_fullversion.replace(".", "")}' + f"{self.build_number}",
-            ),
-            ("RELEASELEVEL", self.release_level),
-        )
-        build_iss("installer_INNO.iss", fname, data)
-        self._print_done()
 
     def create_installer_7zip(self, installer_option=""):
         """Create installer with 7-ZIP"""
@@ -1942,10 +1901,6 @@ def make_all(
     if str(create_installer).lower() != "false" and not simulation:
         if "nsis" in str(create_installer).lower():
             dist.create_installer()  # NSIS installer (can't handle big build)
-        if "inno" in str(create_installer).lower() or (
-            str(create_installer).lower() == "true"
-        ):
-            dist.create_installer_inno()  # INNO Setup 5 (not 7zip friendly)
         if "7zip" in str(create_installer).lower():
             dist.create_installer_7zip(".exe")  # 7-zip (no licence splash screen)
         if ".7z" in str(create_installer).lower():
