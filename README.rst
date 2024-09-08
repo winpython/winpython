@@ -19,7 +19,7 @@ This is the `winpython` Python package, not the distribution itself.
 It includes two main features:
 
 WinPython Package Manager (WPPM)
-  a complementary tool to navigate provided package list or register WinPython 
+  a complementary tool to navigate provided package list or register WinPython. 
   pip is the recommanded way to add or remove packages
 			
 WinPython build toolchain
@@ -35,7 +35,7 @@ Dependencies
 Requirements
 ------------
 
-* NSIS (for icon shortcut creations, installer can be NSIS, INNO, 7-Zip, or nothing)
+* installer can be NSIS, 7-Zip, or nothing
 
 
 Installation
