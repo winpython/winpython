@@ -75,7 +75,7 @@ def get_7zip_exe():
                 if Path(exe).is_file():
                     return exe
     else:
-        raise RuntimeError("NSIS is not installed on this computer.")
+        raise RuntimeError("7ZIP is not installed on this computer.")
 
 
 def replace_in_nsis_file(fname, data):
@@ -563,27 +563,6 @@ call "%~dp0env_for_icons.bat"
             + options
             + " %*",
         )
-
-    def create_installer(self):
-        """Create installer with NSIS"""
-        self._print("Creating WinPython installer")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        fname = str(Path(portable_dir) / "installer-tmp.nsi")
-        data = (
-            ("DISTDIR", self.winpydir),
-            ("ARCH", self.winpy_arch),
-            (
-                "VERSION",
-                f"{self.python_fullversion}.{self.build_number}{self.flavor}",
-            ),
-            (
-                "VERSION_INSTALL",
-                f'{self.python_fullversion.replace(".", "")}' + f"{self.build_number}",
-            ),
-            ("RELEASELEVEL", self.release_level),
-        )
-        build_nsis("installer.nsi", fname, data)
-        self._print_done()
 
 
     def create_installer_7zip(self, installer_option=""):
@@ -1899,8 +1878,6 @@ def make_all(
     )
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
     if str(create_installer).lower() != "false" and not simulation:
-        if "nsis" in str(create_installer).lower():
-            dist.create_installer()  # NSIS installer (can't handle big build)
         if "7zip" in str(create_installer).lower():
             dist.create_installer_7zip(".exe")  # 7-zip (no licence splash screen)
         if ".7z" in str(create_installer).lower():
