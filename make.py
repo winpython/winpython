@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright © 2012 Pierre Raybaut
+# Copyright © 2014-2024+  The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
 
@@ -58,23 +59,6 @@ def get_nsis_exe():
                     return exe
     else:
         raise RuntimeError("NSIS is not installed on this computer.")
-
-
-def get_iscc_exe():
-    """Return ISCC executable"""
-    localdir = str(Path(sys.prefix).parent.parent)
-    for drive in get_drives():
-        for dirname in (
-            r"C:\Program Files",
-            r"C:\Program Files (x86)",
-            str(Path(localdir) / "Inno Setup 5"),
-        ):
-            for subdirname in (".", "App"):
-                exe = str(Path(dirname) / subdirname / "Inno Setup 5" / "iscc.exe")
-                if Path(exe).is_file():
-                    return exe
-    else:
-        raise RuntimeError("Inno Setup 5 is not installed on this computer.")
 
 
 def get_7zip_exe():
@@ -202,30 +186,6 @@ def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mks
         mkshim_command += f' --i "{icon_path}"'
     print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
     subprocess.run(mkshim_command, shell=True)
-
-
-def build_iss(srcname, dstname, data):
-    """Build Inno Setup Script"""
-    ISCC_EXE = get_iscc_exe()  # Inno Setup Compiler (iscc.exe)
-    portable_dir = str(Path(__file__).resolve().parent / "portable")
-    shutil.copy(str(Path(portable_dir) / srcname), dstname)
-    data = [("PORTABLE_DIR", portable_dir)] + list(data)
-    replace_in_iss_file(dstname, data)
-    try:
-        retcode = subprocess.call(
-            f'"{ISCC_EXE}"  "{dstname}"',
-            shell=True,
-            stdout=sys.stderr,
-        )
-        if retcode < 0:
-            print(
-                "Child was terminated by signal",
-                -retcode,
-                file=sys.stderr,
-            )
-    except OSError as e:
-        print("Execution failed:", e, file=sys.stderr)
-    # os.remove(dstname)
 
 
 def build_7zip(srcname, dstname, data):
