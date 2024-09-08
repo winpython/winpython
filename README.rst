@@ -35,7 +35,7 @@ Dependencies
 Requirements
 ------------
 
-* installer can be NSIS, 7-Zip, or nothing
+* installer can be 7-Zip or nothing (just .zip-it)
 
 
 Installation
