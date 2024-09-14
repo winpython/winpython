@@ -238,8 +238,6 @@ class WinPythonDistribution(object):
         self.flavor = flavor
 
         # python_fname = the .zip of the python interpreter PyPy !
-        # impot re
-        # re.match(r'(pypy3*-v|python-)([0-9\.rcba]*)((\.|\-)(amd64|win64)?\.zip')
         try:  # PyPy
             self.python_fname = self.get_package_fname(
                 r"(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip"
@@ -248,16 +246,9 @@ class WinPythonDistribution(object):
             self.python_fname = self.get_package_fname(
                 r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)"
             )
-        # osp.join(self.winpydir, self.python_name) = Directory of Python exec
-        # self.pythondir =osp.join(self.winpydir, self.python_name)
         self.python_name = Path(self.python_fname).name[:-4]
-        self.distname = "winUNKNOWN"  # f'win{self.python_name}' #  PyPy ?
-        # vlst = (
-        #    re.match(r'winpython-([0-9\.]*)', self.distname)
-        #    .groups()[0]
-        #    .split('.')
-        # )
-        self.python_fullversion = "winUNKNOWN"  # '.'.join(vlst[:3])
+        self.distname = "winUNKNOWN"
+        self.python_fullversion = "winUNKNOWN"
 
     @property
     def package_index_wiki(self):
@@ -396,19 +387,13 @@ Name | Version | Description
     def postpath(self):
         """Return PATH contents to be append to the environment variable"""
         path = []
-        # if osp.isfile(self.winpydir + self.THG_PATH):
-        #     path += [r"..\t\TortoiseHg"]
         return path
 
     @property
     def toolsdirs(self):
         """Return tools directory list"""
         # formerly was joining prepared tool dir + the one of building env..
-        return [
-            #    osp.join(
-            #        osp.dirname(osp.abspath(__file__)), 't'
-            #    )
-        ] + self._toolsdirs
+        return [] + self._toolsdirs
 
     @property
     def docsdirs(self):
@@ -649,8 +634,6 @@ call "%~dp0env_for_icons.bat"
             "powershell.ico",
             command="Powershell.exe",
             args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
-            #command="%WINPYDIRICONS%\\scripts\\cmd_ps.bat",
-            #args=r"",
         )
 
         #self.create_launcher_shimmy(
@@ -673,8 +656,6 @@ call "%~dp0env_for_icons.bat"
             "python.ico",
             command="Powershell.exe",
             args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winidle.bat')",
-            #command="scripts\\Noshell.vbs scripts\\winidle.bat",
-            #args=r"",
         )
 
         self.create_launcher_shimmy(
@@ -714,8 +695,6 @@ call "%~dp0env_for_icons.bat"
         self.create_launcher_shimmy(
             "Jupyter Lab.exe",
             "jupyter.ico",
-            #command="$SYSDIR\cmd.exe",
-            #args=r"/k winjupyter_lab.bat",
             command="winjupyter_lab.bat",
             args=r"",
             workdir=r".\scripts"
