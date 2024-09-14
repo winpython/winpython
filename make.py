@@ -812,15 +812,6 @@ if %ERRORLEVEL% NEQ 0 (
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 
-rem ******************
-rem handle R if included
-rem ******************
-if not exist "%WINPYDIRBASE%\t\R\bin" goto r_bad
-set R_HOME=%WINPYDIRBASE%\t\R
-if     "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\i386
-if not "%WINPYARCH%"=="WIN32" set R_HOMEbin=%R_HOME%\bin\x64
-:r_bad
-
 
 rem ******************
 rem handle Julia if included
@@ -887,6 +878,8 @@ if not exist "%winpython_ini%" (
     echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
     echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
+    echo #R_HOME=%%WINPYDIRBASE%%\t\R
+    echo #R_HOMEbin=%%R_HOME%%\bin\x64
 )>> "%winpython_ini%"
 
 """,
@@ -956,18 +949,6 @@ if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
 
-
-#####################
-### handle R if included
-#####################
-if (Test-Path "$env:WINPYDIR\..\t\R\bin") { 
-    $env:R_HOME = "$env:WINPYDIR\..\t\R"
-    $env:R_HOMEbin = "$env:R_HOME\bin\x64"
-    if ("$env:WINPYARCH" -eq "WIN32") {
-        $env:R_HOMEbin = "$env:R_HOME\bin\i386"
-    }
-}
-
 #####################
 ### handle Julia if included
 #####################
@@ -1033,6 +1014,8 @@ if (-not (Test-Path $env:winpython_ini)) {
     "#JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab" | Add-Content -Path $env:winpython_ini
     "#JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces" | Add-Content -Path $env:winpython_ini
     "#WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks" | Add-Content -Path $env:winpython_ini
+    "#R_HOME=%%WINPYDIRBASE%%\t\R" | Add-Content -Path $env:winpython_ini
+    "#R_HOMEbin=%%R_HOME%%\bin\x64" | Add-Content -Path $env:winpython_ini
 }
 
 
