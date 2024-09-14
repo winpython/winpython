@@ -200,7 +200,6 @@ class WinPythonDistribution(object):
     """WinPython distribution"""
 
     MINGW32_PATH = r"\t\mingw32\bin"
-    R_PATH = r"\t\R\bin"
     JULIA_PATH = r"\t\Julia\bin"
     NODEJS_PATH = r"\n"  # r'\t\n'
 
@@ -290,10 +289,6 @@ class WinPythonDistribution(object):
 
         if get_tool_path_file(r"\t\SciTE.exe"):
             installed_tools += [("SciTE", "3.3.7")]
-        rpath = get_tool_path_dir(self.R_PATH)
-        if rpath is not None:
-            rver = utils.get_r_version(rpath)
-            installed_tools += [("R", rver)]
         juliapath = get_tool_path_dir(self.JULIA_PATH)
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
@@ -398,10 +393,6 @@ Name | Version | Description
         #    and osp.isdir(self.winpydir + self.MINGW32_PATH)
         # ):
         #    path += [r".." + self.MINGW32_PATH]
-        # if self.distribution.architecture == 32:
-        #    path += [r".." + self.R_PATH + r"\i386"]
-        # if self.distribution.architecture == 64:
-        #    path += [r".." + self.R_PATH + r"\x64"]
         path += [r".." + self.JULIA_PATH]
 
         path += [r".." + self.NODEJS_PATH]
