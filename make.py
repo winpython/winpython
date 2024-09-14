@@ -814,17 +814,6 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 
 
 rem ******************
-rem handle Julia if included
-rem ******************
-if not exist "%WINPYDIRBASE%\t\Julia\bin" goto julia_bad
-set JULIA_HOME=%WINPYDIRBASE%\t\Julia\bin\
-set JULIA_EXE=julia.exe
-set JULIA=%JULIA_HOME%%JULIA_EXE%
-set JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
-:julia_bad
-
-
-rem ******************
 rem handle PySide2 if included
 rem ******************
 set tmp_pyz=%WINPYDIR%\Lib\site-packages\PySide2
@@ -880,6 +869,10 @@ if not exist "%winpython_ini%" (
     echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
     echo #R_HOME=%%WINPYDIRBASE%%\t\R
     echo #R_HOMEbin=%%R_HOME%%\bin\x64
+    echo #JULIA_HOME=%%WINPYDIRBASE%%\t\Julia\bin\
+    echo #JULIA_EXE=julia.exe
+    echo #JULIA=%%JULIA_HOME%%%%JULIA_EXE%%
+    echo #JULIA_PKGDIR=%%WINPYDIRBASE%%\settings\.julia
 )>> "%winpython_ini%"
 
 """,
@@ -950,16 +943,6 @@ if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API
 
 
 #####################
-### handle Julia if included
-#####################
-if (Test-Path "$env:WINPYDIR\..\t\Julia\bin") {
-    $env:JULIA_HOME = "$env:WINPYDIR\..\t\Julia\bin\"
-    $env:JULIA_EXE = "julia.exe"
-    $env:JULIA = "$env:JULIA_HOME$env:JULIA_EXE"
-    $env:JULIA_PKGDIR = "$env:WINPYDIR\..\settings\.julia"
-}
-
-#####################
 ### handle PySide2 if included
 #####################
 
@@ -1016,6 +999,10 @@ if (-not (Test-Path $env:winpython_ini)) {
     "#WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks" | Add-Content -Path $env:winpython_ini
     "#R_HOME=%%WINPYDIRBASE%%\t\R" | Add-Content -Path $env:winpython_ini
     "#R_HOMEbin=%%R_HOME%%\bin\x64" | Add-Content -Path $env:winpython_ini
+    "#JULIA_HOME=%%WINPYDIRBASE%%\t\Julia\bin\" | Add-Content -Path $env:winpython_ini
+    "#JULIA_EXE=julia.exe" | Add-Content -Path $env:winpython_ini
+    "#JULIA=%%JULIA_HOME%%%%JULIA_EXE%%" | Add-Content -Path $env:winpython_ini
+    "#JULIA_PKGDIR=%%WINPYDIRBASE%%\settings\.julia" | Add-Content -Path $env:winpython_ini
 }
 
 
