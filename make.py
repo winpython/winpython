@@ -870,24 +870,6 @@ set QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
 
 
 rem ******************
-rem handle Pyzo configuration part
-rem ******************
-if not exist "%HOME%\.pyzo" mkdir %HOME%\.pyzo
-if exist "%HOME%\.pyzo\config.ssdf"  goto after_pyzo_conf
-set tmp_pyz="%HOME%\.pyzo\config.ssdf"
-(
-    echo shellConfigs2 = list:
-    echo  dict:
-    echo    name = 'Python'
-    echo    exe = '.\\python.exe'
-    echo    ipython = 'no'
-    echo    gui = 'none'
-)>> "%tmp_pyz%"
-
-:after_pyzo_conf
-
-
-rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
 if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
@@ -1030,22 +1012,6 @@ if (Test-Path "$env:tmp_pyz") {
 $env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\pyqt5_tools"
 if (Test-Path "$env:tmp_pyz") {
    $env:QT_PLUGIN_PATH = "WINPYDIR\Lib\site-packages\pyqt5_tools\Qt\plugins"
-}
-
-
-#####################
-### handle Pyzo configuration part
-#####################
-$env:tmp_pyz = "$env:HOME\.pyzo"
-if (-not (Test-Path "$env:tmp_pyz")) { md -Path "$env:tmp_pyz" }
-$env:tmp_pyz = "$env:HOME\.pyzo\config.ssdf"
-if (-not (Test-Path "$env:tmp_pyz")) {
-shellConfigs2 = list:| Add-Content -Path $env:tmp_pyz
- dict:| Add-Content -Path $env:tmp_pyz
-   name = 'Python'| Add-Content -Path $env:tmp_pyz
-   exe = '.\\python.exe'| Add-Content -Path $env:tmp_pyz
-   ipython = 'no'| Add-Content -Path $env:tmp_pyz
-   gui = 'none'| Add-Content -Path $env:tmp_pyz
 }
 
 
