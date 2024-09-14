@@ -1161,15 +1161,6 @@ The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""",
         )
 
         self.create_batch_script(
-            "make_cython_use_vc.bat",
-            r"""@echo off
-call "%~dp0env.bat"
-set pydistutils_cfg=%WINPYDIRBASE%\settings\pydistutils.cfg
-echo [config]>%pydistutils_cfg%
-        """,
-        )
-
-        self.create_batch_script(
             "make_winpython_movable.bat",
             r"""@echo off
 call "%~dp0env.bat"
