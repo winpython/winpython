@@ -199,7 +199,6 @@ def build_7zip(srcname, dstname, data):
 class WinPythonDistribution(object):
     """WinPython distribution"""
 
-    MINGW32_PATH = r"\t\mingw32\bin"
     JULIA_PATH = r"\t\Julia\bin"
     NODEJS_PATH = r"\n"  # r'\t\n'
 
@@ -386,13 +385,7 @@ Name | Version | Description
             "DLLs",
             "Scripts",
             r"..\t",
-            # r"..\t\mingw32\bin",
         ]
-        # if (
-        #    self.distribution.architecture == 32
-        #    and osp.isdir(self.winpydir + self.MINGW32_PATH)
-        # ):
-        #    path += [r".." + self.MINGW32_PATH]
         path += [r".." + self.JULIA_PATH]
 
         path += [r".." + self.NODEJS_PATH]
