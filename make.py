@@ -247,8 +247,6 @@ class WinPythonDistribution(object):
                 r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)"
             )
         self.python_name = Path(self.python_fname).name[:-4]
-        self.distname = "winUNKNOWN"
-        self.python_fullversion = "winUNKNOWN"
 
     @property
     def package_index_wiki(self):
@@ -277,8 +275,6 @@ class WinPythonDistribution(object):
                 if Path(path).is_dir():
                     return path
 
-        if get_tool_path_file(r"\t\SciTE.exe"):
-            installed_tools += [("SciTE", "3.3.7")]
         juliapath = get_tool_path_dir(self.JULIA_PATH)
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
@@ -1448,11 +1444,9 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         print(
             self.python_fname,
             self.python_name,
-            self.distname,
-            self.python_fullversion,  # PyPy to delete or move
         )
         if my_winpydir is None:
-            self.winpydir = str(Path(self.target) / self.distname)  # PyPy to delete
+            raise RuntimeError("WinPython base directory to create is undefined") 
         else:
             self.winpydir = str(
                 Path(self.target) / my_winpydir
