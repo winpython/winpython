@@ -18,10 +18,6 @@ import shutil
 # Local imports
 from winpython import utils
 
-# pep503 defines normalized package names: www.python.org/dev/peps/pep-0503
-def normalize(name):
-    return re.sub(r"[-_.]+", "-", name).lower()
-
 
 CHANGELOGS_DIR = str(Path(__file__).parent / "changelogs")
 assert Path(CHANGELOGS_DIR).is_dir()

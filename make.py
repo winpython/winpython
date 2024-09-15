@@ -843,20 +843,8 @@ $host.ui.RawUI.ForegroundColor = "White"
         self.create_batch_script(
             "cmd_ps.bat",
             r"""@echo off
-rem safe bet 
 call "%~dp0env_for_icons.bat"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
-exit
-""",
-            do_changes=changes,
-        )
-
-        self.create_batch_script(
-            "WinPython_Interpreter_PS.bat",
-            r"""@echo off
-rem no safe bet (for comparisons)
-Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
-exit
 """,
             do_changes=changes,
         )
@@ -909,10 +897,6 @@ if not exist "%WINPYWORKDIR%" mkdir "%WINPYWORKDIR%"
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYVER:~0,1%"
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
 
-rem ******* make cython use mingwpy part *******
-if not exist "%WINPYDIRBASE%\settings\pydistutils.cfg" goto no_cython
-if not exist "%HOME%\pydistutils.cfg" xcopy   "%WINPYDIRBASE%\settings\pydistutils.cfg" "%HOME%" 
-:no_cython 
 """,
             do_changes=changes,
         )
