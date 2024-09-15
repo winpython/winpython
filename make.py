@@ -371,7 +371,6 @@ Name | Version | Description
         """Return PATH contents to be prepend to the environment variable"""
         path = [
             r"Lib\site-packages\PyQt5",
-            r"Lib\site-packages\PySide2",
             "",  # Python root directory
             "DLLs",
             "Scripts",
@@ -777,19 +776,6 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 
 
 rem ******************
-rem handle PySide2 if included
-rem ******************
-set tmp_pyz=%WINPYDIR%\Lib\site-packages\PySide2
-if not exist "%tmp_pyz%" goto pyside2_conf_exist
-set tmp_pyz=%tmp_pyz%\qt.conf
-if not exist "%tmp_pyz%" (
-    echo [Paths]
-    echo Prefix = .
-    echo Binaries = .
-)>> "%tmp_pyz%"
-:pyside2_conf_exist
-
-rem ******************
 rem handle PyQt5 if included
 rem ******************
 set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt5
@@ -896,20 +882,6 @@ if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
-
-#####################
-### handle PySide2 if included
-#####################
-
-$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PySide2"
-if (Test-Path "$env:tmp_pyz") {
-   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
-   if (-not (Test-Path "$env:tmp_pyz")) {
-      "[Paths]"| Add-Content -Path $env:tmp_pyz
-      "Prefix = ."| Add-Content -Path $env:tmp_pyz
-      "Binaries = ."| Add-Content -Path $env:tmp_pyz
-   }
-}
 
 #####################
 ### handle PyQt5 if included
