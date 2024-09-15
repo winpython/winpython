@@ -41,26 +41,6 @@ def get_drives():
     return drives
 
 
-def get_nsis_exe():
-    """Return NSIS executable"""
-    localdir = str(Path(sys.prefix).parent.parent)
-    for drive in get_drives():
-        for dirname in (
-            r"C:\Program Files",
-            r"C:\Program Files (x86)",
-            drive + r"PortableApps\NSISPortableANSI",
-            drive + r"PortableApps\NSISPortable",
-            str(Path(localdir) / "NSISPortableANSI"),
-            str(Path(localdir) / "NSISPortable"),
-        ):
-            for subdirname in (".", "App"):
-                exe = str(Path(dirname) / subdirname / "NSIS" / "makensis.exe")
-                if Path(exe).is_file():
-                    return exe
-    else:
-        raise RuntimeError("NSIS is not installed on this computer.")
-
-
 def get_7zip_exe():
     """Return 7zip executable"""
     localdir = str(Path(sys.prefix).parent.parent)
@@ -76,27 +56,6 @@ def get_7zip_exe():
                     return exe
     else:
         raise RuntimeError("7ZIP is not installed on this computer.")
-
-
-def replace_in_nsis_file(fname, data):
-    """Replace text in line starting with *start*, from this position:
-    data is a list of (start, text) tuples"""
-    fd = open(fname, "U")
-    lines = fd.readlines()
-    fd.close()
-    for idx, line in enumerate(lines):
-        for start, text in data:
-            if start not in (
-                "Icon",
-                "OutFile",
-            ) and not start.startswith("!"):
-                start = "!define " + start
-            if line.startswith(start + " "):
-                lines[idx] = line[: len(start) + 1] + f'"{text}"' + "\n"
-    fd = open(fname, "w")
-    fd.writelines(lines)
-    print("iss for ", fname, "is", lines)
-    fd.close()
 
 
 def replace_in_7zip_file(fname, data):
@@ -118,35 +77,6 @@ def replace_in_7zip_file(fname, data):
     fd.writelines(lines)
     print("7-zip for ", fname, "is", lines)
     fd.close()
-
-
-def build_nsis(srcname, dstname, data):
-    """Build NSIS script"""
-    NSIS_EXE = get_nsis_exe()  # NSIS Compiler
-    portable_dir = str(Path(__file__).resolve().parent / "portable")
-    shutil.copy(str(Path(portable_dir) / srcname), dstname)
-    data = [
-        (
-            "!addincludedir",
-            str(Path(portable_dir) / "include"),
-        )
-    ] + list(data)
-    replace_in_nsis_file(dstname, data)
-    try:
-        retcode = subprocess.call(
-            f'"{NSIS_EXE}" -V2 "{dstname}"',
-            shell=True,
-            stdout=sys.stderr,
-        )
-        if retcode < 0:
-            print(
-                "Child was terminated by signal",
-                -retcode,
-                file=sys.stderr,
-            )
-    except OSError as e:
-        print("Execution failed:", e, file=sys.stderr)
-    os.remove(dstname)
 
 
 def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py', workdir=''):
@@ -449,44 +379,6 @@ Name | Version | Description
         true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
         build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program, workdir=workdir)
         
-    def create_launcher(
-        self,
-        name,
-        icon,
-        command=None,
-        args=None,
-        workdir=r"$EXEDIR\scripts",
-        launcher="launcher_basic.nsi",
-    ):
-        """Create exe launcher with NSIS"""
-        assert name.endswith(".exe")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        icon_fname = str(Path(portable_dir) / "icons" / icon)
-        assert Path(icon_fname).is_file()
-
-        # Customizing NSIS script
-        if command is None:
-            if args is not None and ".pyw" in args:
-                command = "${WINPYDIR}\pythonw.exe"
-            else:
-                command = "${WINPYDIR}\python.exe"
-        if args is None:
-            args = ""
-        if workdir is None:
-            workdir = ""
-        fname = str(Path(self.winpydir) / (Path(name).stem + ".nsi"))
-
-        data = [
-            ("WINPYDIR", f"$EXEDIR\{self.python_name}"),
-            ("WINPYVER", self.winpyver),
-            ("COMMAND", command),
-            ("PARAMETERS", args),
-            ("WORKDIR", workdir),
-            ("Icon", icon_fname),
-            ("OutFile", name),
-        ]
-
-        build_nsis(launcher, fname, data)
 
     def create_python_batch(
         self,
@@ -1495,10 +1387,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 # self._add_msvc_files()  # replaced per msvc_runtime package
                 self._create_batch_scripts_initial()
                 self._create_batch_scripts()
-                # always create all launchers (as long as it is NSIS-based)
+                # always create all launchers (as long as it is not shimmy-based, to see for after)
                 self._create_launchers()
-            # pre-patch current pip (until default python has pip 8.0.3)
-
             # PyPY must ensure pip
             # "pypy3.exe -m ensurepip"
             utils.python_execmodule("ensurepip", self.distribution.target)
@@ -1531,9 +1421,6 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     print(f"piping {' '.join(actions)}")
                     self._print(f"piping {' '.join(actions)}")
                     self.distribution.do_pip_action(actions)
-                    # actions=["install","-r", req, "--no-index",
-                    #         "--trusted-host=None"]+ links,
-                    #         install_options=None)
             self._run_complement_batch_scripts()
             self.distribution.patch_standard_packages()
         if remove_existing and not self.simulation:
