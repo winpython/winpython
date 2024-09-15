@@ -804,15 +804,6 @@ if not exist "%tmp_pyz%" (
 
 
 rem ******************
-rem handle pyqt5_tools if included
-rem ******************
-set tmp_pyz=%WINPYDIR%\Lib\site-packages\pyqt5_tools
-if not exist "%tmp_pyz%" goto end_pyqt5_tools_conf
-set QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
-:end_pyqt5_tools_conf
-
-
-rem ******************
 rem WinPython.ini part (removed from nsis)
 rem ******************
 if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
@@ -836,6 +827,7 @@ if not exist "%winpython_ini%" (
     echo #JULIA_EXE=julia.exe
     echo #JULIA=%%JULIA_HOME%%%%JULIA_EXE%%
     echo #JULIA_PKGDIR=%%WINPYDIRBASE%%\settings\.julia
+    echo #QT_PLUGIN_PATH=%%WINPYDIR%%\Lib\site-packages\pyqt5_tools\Qt\plugins
 )>> "%winpython_ini%"
 
 """,
@@ -934,15 +926,6 @@ if (Test-Path "$env:tmp_pyz") {
 
 
 #####################
-### handle pyqt5_tools if included
-#####################
-$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\pyqt5_tools"
-if (Test-Path "$env:tmp_pyz") {
-   $env:QT_PLUGIN_PATH = "WINPYDIR\Lib\site-packages\pyqt5_tools\Qt\plugins"
-}
-
-
-#####################
 ### WinPython.ini part (removed from nsis)
 #####################
 if (-not (Test-Path "$env:WINPYDIR\..\settings")) { md -Path "$env:WINPYDIR\..\settings" }
@@ -966,6 +949,7 @@ if (-not (Test-Path $env:winpython_ini)) {
     "#JULIA_EXE=julia.exe" | Add-Content -Path $env:winpython_ini
     "#JULIA=%%JULIA_HOME%%%%JULIA_EXE%%" | Add-Content -Path $env:winpython_ini
     "#JULIA_PKGDIR=%%WINPYDIRBASE%%\settings\.julia" | Add-Content -Path $env:winpython_ini
+    "#QT_PLUGIN_PATH=%%WINPYDIR%%\Lib\site-packages\pyqt5_tools\Qt\plugins" | Add-Content -Path $env:winpython_ini
 }
 
 
