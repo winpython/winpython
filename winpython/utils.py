@@ -63,13 +63,11 @@ def onerror(function, path, excinfo):
         raise
 
 
-#==============================================================================
-# https://stackoverflow.com/questions/580924/how-to-access-a-files-properties-on-windows
 def getFileProperties(fname):
-#==============================================================================
     """
     Read all properties of the given file return them as a dictionary.
     """
+    # from https://stackoverflow.com/questions/580924/how-to-access-a-files-properties-on-windows
     import win32api
     propNames = ('Comments', 'InternalName', 'ProductName',
         'CompanyName', 'LegalCopyright', 'ProductVersion',
@@ -104,9 +102,6 @@ def getFileProperties(fname):
         pass
 
     return props
-# =============================================================================
-# Shortcuts, start menu
-# =============================================================================
 
 
 def get_special_folder_path(path_name):
@@ -215,11 +210,6 @@ def create_shortcut(
         pass
 
 
-# =============================================================================
-# Misc.
-# =============================================================================
-
-
 def print_box(text):
     """Print text in a box"""
     line0 = "+" + ("-" * (len(text) + 2)) + "+"
@@ -235,11 +225,6 @@ def is_python_distribution(path):
     has_exec = Path(get_python_executable(path)).is_file()
     has_site = Path(get_site_packages_path(path)).is_dir()    
     return has_exec and has_site
-
-
-# =============================================================================
-# Shell, Python queries
-# =============================================================================
 
 
 def decode_fs_string(string):
@@ -365,13 +350,10 @@ def get_python_long_version(path):
     return ver
 
 
-# =============================================================================
-# Patch chebang line (courtesy of Christoph Gohlke)
-# =============================================================================
 def patch_shebang_line(
     fname, pad=b' ', to_movable=True, targetdir=""
 ):
-    """Remove absolute path to python.exe in shebang lines, or re-add it"""
+    """Remove absolute path to python.exe in shebang lines in binary files, or re-add it"""
 
     import re
     import sys
@@ -425,9 +407,6 @@ def patch_shebang_line(
         print("failed to patch", fname)
 
 
-# =============================================================================
-# Patch shebang line in .py files
-# =============================================================================
 def patch_shebang_line_py(
     fname, to_movable=True, targetdir=""
 ):
@@ -455,9 +434,6 @@ def patch_shebang_line_py(
             print(line, end='')
 
 
-# =============================================================================
-# Guess encoding (shall rather be utf-8 per default)
-# =============================================================================
 def guess_encoding(csv_file):
     """guess the encoding of the given file"""
     # UTF_8_BOM = "\xEF\xBB\xBF"
@@ -474,9 +450,7 @@ def guess_encoding(csv_file):
         except:
             return [locale.getdefaultlocale()[1], "utf-8"]
             
-# =============================================================================
-# Patch sourcefile (instead of forking packages)
-# =============================================================================
+
 def patch_sourcefile(
     fname, in_text, out_text, silent_mode=False
 ):
@@ -502,9 +476,6 @@ def patch_sourcefile(
                 fh.write(new_content)
 
 
-# =============================================================================
-# Patch sourcelines (instead of forking packages)
-# =============================================================================
 def patch_sourcelines(
     fname,
     in_line_start,
@@ -563,9 +534,6 @@ def patch_sourcelines(
                     )
 
 
-# =============================================================================
-# Extract functions
-# =============================================================================
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
     tmpdir = tempfile.mkdtemp(prefix='wppm_')
