@@ -9,6 +9,7 @@ rem *****************************
 
 rem algorithm:
 rem 0.0 Initialize target environment  
+rem 0.9 Python-3.13.0b3 free-threading tweak 
 rem 1.0 Do cosmetic complements
 rem 2.0 Do active patches 
 rem 3.0 Don't do patches in reserve (examples)
@@ -30,6 +31,29 @@ cd /d %new_winpydir%
 
 call scripts\env.bat
 @echo off
+
+echo ----------------------------------------
+echo 0.9 (%date% %time%) Python-3.13.0b3 free-threading tweak 
+echo ----------------------------------------
+
+if exist "%WINPYDIR%\python3.13t.exe" (
+
+rem "%PYTHON%" -m pip install --pre  --no-index --trusted-host=None  --find-links=C:\WinP\bd313\packages.win-amd64t --upgrade cython
+
+  
+rem make python3.13t binaries the default
+  move "%WINPYDIR%\python.exe" "%WINPYDIR%\python_classic.exe"
+  move  "%WINPYDIR%\pythonw.exe" "%WINPYDIR%\pythonw_classic.exe"
+  copy/Y "%WINPYDIR%\python3.13t.exe" "%WINPYDIR%\python.exe"
+  copy/Y "%WINPYDIR%\pythonw3.13t.exe" "%WINPYDIR%\pythonw.exe"
+
+rem a bug when ipython "help(len)"
+rem  "%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%WINPYDIR%\\Lib\_pyrepl\pager.py', 'tempfilepager(', 'tempfile_pager(' )"
+
+) else (
+  echo "I DIDN'T patch python3.13 !"
+)
+
 
 echo ----------------------------------------
 echo 1.0 (%date% %time%) Do cosmetic complements 
@@ -106,7 +130,7 @@ if exist  "%WINPYDIR%\Lib\site-packages\pip-23.0.dist-info" (
 :the_end
 
 echo ----------------------------------------
-rem 3.0 (%date% %time%) clean-ups (to move to upper stage)
+echo 3.0 (%date% %time%) clean-ups (to move to upper stage)
 echo ----------------------------------------
 
 echo JUPYTERLAB_DIR=%JUPYTERLAB_DIR%  default is ~/.jupyter/lab
