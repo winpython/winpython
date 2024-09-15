@@ -247,8 +247,6 @@ class WinPythonDistribution(object):
                 r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)"
             )
         self.python_name = Path(self.python_fname).name[:-4]
-        self.distname = "winUNKNOWN"
-        self.python_fullversion = "winUNKNOWN"
 
     @property
     def package_index_wiki(self):
@@ -277,8 +275,6 @@ class WinPythonDistribution(object):
                 if Path(path).is_dir():
                     return path
 
-        if get_tool_path_file(r"\t\SciTE.exe"):
-            installed_tools += [("SciTE", "3.3.7")]
         juliapath = get_tool_path_dir(self.JULIA_PATH)
         if juliapath is not None:
             juliaver = utils.get_julia_version(juliapath)
@@ -371,7 +367,6 @@ Name | Version | Description
         """Return PATH contents to be prepend to the environment variable"""
         path = [
             r"Lib\site-packages\PyQt5",
-            r"Lib\site-packages\PySide2",
             "",  # Python root directory
             "DLLs",
             "Scripts",
@@ -777,19 +772,6 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 
 
 rem ******************
-rem handle PySide2 if included
-rem ******************
-set tmp_pyz=%WINPYDIR%\Lib\site-packages\PySide2
-if not exist "%tmp_pyz%" goto pyside2_conf_exist
-set tmp_pyz=%tmp_pyz%\qt.conf
-if not exist "%tmp_pyz%" (
-    echo [Paths]
-    echo Prefix = .
-    echo Binaries = .
-)>> "%tmp_pyz%"
-:pyside2_conf_exist
-
-rem ******************
 rem handle PyQt5 if included
 rem ******************
 set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt5
@@ -896,20 +878,6 @@ if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
-
-#####################
-### handle PySide2 if included
-#####################
-
-$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PySide2"
-if (Test-Path "$env:tmp_pyz") {
-   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
-   if (-not (Test-Path "$env:tmp_pyz")) {
-      "[Paths]"| Add-Content -Path $env:tmp_pyz
-      "Prefix = ."| Add-Content -Path $env:tmp_pyz
-      "Binaries = ."| Add-Content -Path $env:tmp_pyz
-   }
-}
 
 #####################
 ### handle PyQt5 if included
@@ -1476,11 +1444,9 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         print(
             self.python_fname,
             self.python_name,
-            self.distname,
-            self.python_fullversion,  # PyPy to delete or move
         )
         if my_winpydir is None:
-            self.winpydir = str(Path(self.target) / self.distname)  # PyPy to delete
+            raise RuntimeError("WinPython base directory to create is undefined") 
         else:
             self.winpydir = str(
                 Path(self.target) / my_winpydir
