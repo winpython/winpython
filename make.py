@@ -675,35 +675,6 @@ if not exist "%tmp_pyz%" (
     echo Binaries = .
 )>> "%tmp_pyz%"
 :pyqt5_conf_exist
-
-
-rem ******************
-rem WinPython.ini part (removed from nsis)
-rem ******************
-if not exist "%WINPYDIRBASE%\settings" mkdir "%WINPYDIRBASE%\settings" 
-if not exist "%WINPYDIRBASE%\settings\AppData" mkdir "%WINPYDIRBASE%\settings\AppData" 
-if not exist "%WINPYDIRBASE%\settings\AppData\Roaming" mkdir "%WINPYDIRBASE%\settings\AppData\Roaming" 
-set winpython_ini=%WINPYDIRBASE%\settings\winpython.ini
-if not exist "%winpython_ini%" (
-    echo [debug]
-    echo state = disabled
-    echo [environment]
-    echo ## <?> Uncomment lines to override environment variables
-    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%
-    echo #USERPROFILE = %%HOME%%
-    echo #JUPYTER_DATA_DIR = %%HOME%%
-    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
-    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
-    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
-    echo #R_HOME=%%WINPYDIRBASE%%\t\R
-    echo #R_HOMEbin=%%R_HOME%%\bin\x64
-    echo #JULIA_HOME=%%WINPYDIRBASE%%\t\Julia\bin\
-    echo #JULIA_EXE=julia.exe
-    echo #JULIA=%%JULIA_HOME%%%%JULIA_EXE%%
-    echo #JULIA_PKGDIR=%%WINPYDIRBASE%%\settings\.julia
-    echo #QT_PLUGIN_PATH=%%WINPYDIR%%\Lib\site-packages\pyqt5_tools\Qt\plugins
-)>> "%winpython_ini%"
-
 """,
             do_changes=changes,
         )
@@ -812,7 +783,6 @@ if (-not (Test-Path $env:winpython_ini)) {
     "#QT_PLUGIN_PATH=%%WINPYDIR%%\Lib\site-packages\pyqt5_tools\Qt\plugins" | Add-Content -Path $env:winpython_ini
 }
 
-
 } 
 ###############################
 ### Set-WindowSize
@@ -902,21 +872,47 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
             do_changes=changes,
         )
 
-
         self.create_batch_script(
-            "WinPythonIni.py",  # Replaces winpython.vbs
+            "WinPythonIni.py",  # Replaces winpython.vbs, and a bit of env.bat
             r"""
 'prepares a dynamic list of variables settings from a .ini file'
 import os
 import subprocess
+from pathlib import Path
+
+winpython_inidefault=r'''
+[debug]
+state = disabled
+[environment]
+#HOME = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%
+#USERPROFILE = %HOME%
+#JUPYTER_DATA_DIR = %HOME%
+#JUPYTERLAB_SETTINGS_DIR = %HOME%\.jupyter\lab
+#JUPYTERLAB_WORKSPACES_DIR = %HOME%\.jupyter\lab\workspaces
+#WINPYWORKDIR = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\Notebooks
+#R_HOME=%WINPYDIRBASE%\t\R
+#R_HOMEbin=%R_HOME%\bin\x64
+#JULIA_HOME=%WINPYDIRBASE%\t\Julia\bin\
+#JULIA_EXE=julia.exe
+#JULIA=%JULIA_HOME%%JULIA_EXE%
+#JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
+#QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
+'''
 
 def get_file(file_name):
     if file_name.startswith("..\\"):
         file_name = os.path.join(os.path.dirname(os.path.dirname(__file__)), file_name[3:])
     elif file_name.startswith(".\\"):
         file_name = os.path.join(os.path.dirname(__file__), file_name[2:])
-    with open(file_name, 'r') as file:
-        return file.read()
+    try:
+        with open(file_name, 'r') as file:
+           return file.read()
+    except FileNotFoundError:
+        if file_name[-3:] == 'ini':
+            os.makedirs(Path(file_name).parent, exist_ok=True)
+            with open(file_name, 'w') as file:
+                file.write(winpython_inidefault)
+            return winpython_inidefault
 
 def translate(line, env):
     parts = line.split('%')
@@ -934,6 +930,9 @@ def main():
     segment = "environment"
     txt = ""
     env = os.environ.copy() # later_version: env = os.environ
+    
+    # default directories (from .bat)
+    os.makedirs(Path(env['WINPYDIRBASE']) / 'settings' / 'Appdata' / 'Roaming', exist_ok=True) 
     
     for l in my_lines:
         if l.startswith("["):
