@@ -878,8 +878,6 @@ set WINPYWORKDIR1=%WINPYWORKDIR1:"=%
 rem remove some potential last \
 if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
 
-rem 2024-09-22 pythonify
-rem FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
 FOR /F "delims=" %%i IN ('""%WINPYDIR%\python.exe" "%~dp0WinpythonIni.py""') DO set winpythontoexec=%%i
 
 %winpythontoexec%set winpythontoexec=
@@ -904,71 +902,6 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
             do_changes=changes,
         )
 
-        self.create_batch_script(
-            "Noshell.vbs",
-            r"""
-'from http://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window/390129
-If WScript.Arguments.Count >= 1 Then
-    ReDim arr(WScript.Arguments.Count-1)
-    For i = 0 To WScript.Arguments.Count-1
-        Arg = WScript.Arguments(i)
-        If InStr(Arg, " ") > 0 or InStr(Arg, "&") > 0 Then Arg = chr(34) & Arg & chr(34)
-      arr(i) = Arg
-    Next
-
-    RunCmd = Join(arr)
-    CreateObject("Wscript.Shell").Run RunCmd, 0 , True
-End If
-        """,
-        )
-
-        self.create_batch_script(
-            "WinPythonIni.vbs",
-            r"""
-Set colArgs = WScript.Arguments
-If colArgs.Count> 0 Then 
-  Filename=colArgs(0) 
-else 
-  Filename="..\settings\winpython.ini"
-end if
-my_lines = Split(GetFile(FileName) & vbNewLine , vbNewLine )
-segment = "environment"
-txt=""
-Set objWSH =  CreateObject("WScript.Shell")
-For each l in my_lines
-    if left(l, 1)="[" then
-        segment=split(mid(l, 2, 999) & "]","]")(0)
-    ElseIf left(l, 1) <> "#" and instr(l, "=")>0  then
-        data = Split(l & "=", "=")
-        if segment="debug" and trim(data(0))="state" then data(0)= "WINPYDEBUG"
-        if segment="environment" or segment= "debug" then 
-            txt= txt & "set " & rtrim(data(0)) & "=" & translate(ltrim(data(1))) & "&& "
-            objWSH.Environment("PROCESS").Item(rtrim(data(0))) = translate(ltrim(data(1)))
-        end if
-        if segment="debug" and trim(data(0))="state" then txt= txt & "set WINPYDEBUG=" & trim(data(1)) & "&&"
-    End If
-Next
-wscript.echo txt
-
-
-Function GetFile(ByVal FileName)
-    Set FS = CreateObject("Scripting.FileSystemObject")
-    If Left(FileName,3)="..\" then FileName = FS.GetParentFolderName(FS.GetParentFolderName(Wscript.ScriptFullName)) & mid(FileName,3,9999)
-    If Left(FileName,3)=".\" then FileName = FS.GetParentFolderName(FS.GetParentFolderName(Wscript.ScriptFullName)) & mid(FileName,3,9999)
-    On Error Resume Next
-    GetFile = FS.OpenTextFile(FileName).ReadAll
-End Function
-
-Function translate(line)
-    set dos = objWSH.Environment("PROCESS")
-    tab = Split(line & "%", "%")
-    for i = 1 to Ubound(tab) step 2   
-       if tab(i)& "" <> "" and dos.Item(tab(i)) & "" <> "" then tab(i) =  dos.Item(tab(i))
-    next
-    translate =  Join(tab, "") 
-end function
-        """,
-        )
 
         self.create_batch_script(
             "WinPythonIni.py",  # Replaces winpython.vbs
@@ -1017,7 +950,7 @@ def main():
     
     print(txt)
     # later_version:
-    # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True) # Needs to be shell since start isn't an executable, its a shell cmd
+    # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True)
     # p.wait()    # I can wait until finished (although it too finishes after start finishes)
 
 if __name__ == "__main__":
