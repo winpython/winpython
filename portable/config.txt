@@ -1,5 +1,0 @@
-;!@Install@!UTF-8!
-Title="WinPython"
-BeginPrompt="Do you want to install WinPython?"
-InstallPath="."
-;!@InstallEnd@!
