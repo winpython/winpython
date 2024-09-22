@@ -878,7 +878,10 @@ set WINPYWORKDIR1=%WINPYWORKDIR1:"=%
 rem remove some potential last \
 if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
 
-FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
+rem 2024-09-22 pythonify
+rem FOR /F "delims=" %%i IN ('cscript /nologo "%~dp0WinpythonIni.vbs"') DO set winpythontoexec=%%i
+FOR /F "delims=" %%i IN ('""%WINPYDIR%\python.exe" "%~dp0WinpythonIni.py""') DO set winpythontoexec=%%i
+
 %winpythontoexec%set winpythontoexec=
 
 rem 2024-08-18: we go initial directory WINPYWORKDIR if no direction and we are on icon directory
@@ -966,6 +969,62 @@ Function translate(line)
 end function
         """,
         )
+
+        self.create_batch_script(
+            "WinPythonIni.py",  # Replaces winpython.vbs
+            r"""
+'prepares a dynamic list of variables settings from a .ini file'
+import os
+import subprocess
+
+def get_file(file_name):
+    if file_name.startswith("..\\"):
+        file_name = os.path.join(os.path.dirname(os.path.dirname(__file__)), file_name[3:])
+    elif file_name.startswith(".\\"):
+        file_name = os.path.join(os.path.dirname(__file__), file_name[2:])
+    with open(file_name, 'r') as file:
+        return file.read()
+
+def translate(line, env):
+    parts = line.split('%')
+    for i in range(1, len(parts), 2):
+        if parts[i] in env:
+            parts[i] = env[parts[i]]
+    return ''.join(parts)
+
+def main():
+    import sys
+    args = sys.argv[1:]
+    file_name = args[0] if args else "..\\settings\\winpython.ini"
+    
+    my_lines = get_file(file_name).splitlines()
+    segment = "environment"
+    txt = ""
+    env = os.environ.copy() # later_version: env = os.environ
+    
+    for l in my_lines:
+        if l.startswith("["):
+            segment = l[1:].split("]")[0]
+        elif not l.startswith("#") and "=" in l:
+            data = l.split("=", 1)
+            if segment == "debug" and data[0].strip() == "state":
+                data[0] = "WINPYDEBUG"
+            if segment in ["environment", "debug"]:
+                txt += f"set {data[0].strip()}={translate(data[1].strip(), env)}&& "
+                env[data[0].strip()] = translate(data[1].strip(), env)
+            if segment == "debug" and data[0].strip() == "state":
+                txt += f"set WINPYDEBUG={data[1].strip()}&&"
+    
+    print(txt)
+    # later_version:
+    # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True) # Needs to be shell since start isn't an executable, its a shell cmd
+    # p.wait()    # I can wait until finished (although it too finishes after start finishes)
+
+if __name__ == "__main__":
+    main()
+        """,
+        )
+
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
