@@ -662,19 +662,6 @@ if %ERRORLEVEL% NEQ 0 (
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
 
-
-rem ******************
-rem handle PyQt5 if included
-rem ******************
-set tmp_pyz=%WINPYDIR%\Lib\site-packages\PyQt5
-if not exist "%tmp_pyz%" goto pyqt5_conf_exist
-set tmp_pyz=%tmp_pyz%\qt.conf
-if not exist "%tmp_pyz%" (
-    echo [Paths]
-    echo Prefix = .
-    echo Binaries = .
-)>> "%tmp_pyz%"
-:pyqt5_conf_exist
 """,
             do_changes=changes,
         )
@@ -741,47 +728,8 @@ if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
-
-#####################
-### handle PyQt5 if included
-#####################
-$env:tmp_pyz = "$env:WINPYDIR\Lib\site-packages\PyQt5"
-if (Test-Path "$env:tmp_pyz") {
-   $env:tmp_pyz = "$env:tmp_pyz\qt.conf"
-   if (-not (Test-Path "$env:tmp_pyz")) {
-      "[Paths]"| Add-Content -Path $env:tmp_pyz
-      "Prefix = ."| Add-Content -Path $env:tmp_pyz
-      "Binaries = ."| Add-Content -Path $env:tmp_pyz
-   }
-}
-
-
-#####################
-### WinPython.ini part (removed from nsis)
-#####################
-if (-not (Test-Path "$env:WINPYDIR\..\settings")) { md -Path "$env:WINPYDIR\..\settings" }
-if (-not (Test-Path "$env:WINPYDIR\..\settings\AppData")) { md -Path "$env:WINPYDIR\..\settings\AppData" }
-if (-not (Test-Path "$env:WINPYDIR\..\settings\AppData\Roaming")) { md -Path "$env:WINPYDIR\..\settings\AppData\Roaming" }
-$env:winpython_ini = "$env:WINPYDIR\..\settings\winpython.ini"
-if (-not (Test-Path $env:winpython_ini)) {
-    "[debug]" | Add-Content -Path $env:winpython_ini
-    "state = disabled" | Add-Content -Path $env:winpython_ini
-    "[environment]" | Add-Content -Path $env:winpython_ini
-    "## <?> Uncomment lines to override environment variables" | Add-Content -Path $env:winpython_ini
-    "#HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%" | Add-Content -Path $env:winpython_ini
-    "#USERPROFILE = %%HOME%%" | Add-Content -Path $env:winpython_ini
-    "#JUPYTER_DATA_DIR = %%HOME%%" | Add-Content -Path $env:winpython_ini
-    "#JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab" | Add-Content -Path $env:winpython_ini
-    "#JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces" | Add-Content -Path $env:winpython_ini
-    "#WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks" | Add-Content -Path $env:winpython_ini
-    "#R_HOME=%%WINPYDIRBASE%%\t\R" | Add-Content -Path $env:winpython_ini
-    "#R_HOMEbin=%%R_HOME%%\bin\x64" | Add-Content -Path $env:winpython_ini
-    "#JULIA_HOME=%%WINPYDIRBASE%%\t\Julia\bin\" | Add-Content -Path $env:winpython_ini
-    "#JULIA_EXE=julia.exe" | Add-Content -Path $env:winpython_ini
-    "#JULIA=%%JULIA_HOME%%%%JULIA_EXE%%" | Add-Content -Path $env:winpython_ini
-    "#JULIA_PKGDIR=%%WINPYDIRBASE%%\settings\.julia" | Add-Content -Path $env:winpython_ini
-    "#QT_PLUGIN_PATH=%%WINPYDIR%%\Lib\site-packages\pyqt5_tools\Qt\plugins" | Add-Content -Path $env:winpython_ini
-}
+# PyQt5 qt.conf creation and winpython.ini creation done via Winpythonini.py (called per env_for_icons.bat for now)
+# Start-Process -FilePath $env:PYTHON -ArgumentList ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
 
 } 
 ###############################
@@ -798,11 +746,9 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
     $host.ui.rawui.WindowSize = $size   
 }
 # Windows10 yelling at us with 150 40 6000
-# no more needed ?
 # Set-WindowSize 195 40 6000 
 
 ### Colorize to distinguish
-#$host.ui.RawUI.BackgroundColor = "DarkBlue"
 $host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
 
@@ -933,7 +879,20 @@ def main():
     
     # default directories (from .bat)
     os.makedirs(Path(env['WINPYDIRBASE']) / 'settings' / 'Appdata' / 'Roaming', exist_ok=True) 
-    
+
+    # default qt.conf for Qt directories
+    qt_conf='''echo [Paths]
+    echo Prefix = .
+    echo Binaries = .
+    '''
+
+    pathlist = [Path(env['WINPYDIR']) / 'Lib' / 'site-packages' / i for i in ('PyQt5', 'PyQt6', 'Pyside6')] 
+    for p in pathlist:
+        if p.is_dir():
+            if not (p / 'qt.conf').is_file():
+                with open(p / 'qt.conf', 'w') as file:
+                    file.write(qt_conf)
+
     for l in my_lines:
         if l.startswith("["):
             segment = l[1:].split("]")[0]
