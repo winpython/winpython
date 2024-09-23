@@ -829,13 +829,18 @@ from pathlib import Path
 winpython_inidefault=r'''
 [debug]
 state = disabled
+[inactive_environment_per_user]
+## <?> changing this segment to [active_environment_per_user] makes this segment of lines active or not
+HOME = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings
+USERPROFILE = %HOME%
+JUPYTER_DATA_DIR = %HOME%
+WINPYWORKDIR = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\Notebooks
+[inactive_environment_common]
+USERPROFILE = %HOME%
 [environment]
-#HOME = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%
-#USERPROFILE = %HOME%
-#JUPYTER_DATA_DIR = %HOME%
+## <?> Uncomment lines to override environment variables
 #JUPYTERLAB_SETTINGS_DIR = %HOME%\.jupyter\lab
 #JUPYTERLAB_WORKSPACES_DIR = %HOME%\.jupyter\lab\workspaces
-#WINPYWORKDIR = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\Notebooks
 #R_HOME=%WINPYDIRBASE%\t\R
 #R_HOMEbin=%R_HOME%\bin\x64
 #JULIA_HOME=%WINPYDIRBASE%\t\Julia\bin\
@@ -843,6 +848,8 @@ state = disabled
 #JULIA=%JULIA_HOME%%JULIA_EXE%
 #JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 #QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
+
+
 '''
 
 def get_file(file_name):
@@ -900,13 +907,18 @@ def main():
             data = l.split("=", 1)
             if segment == "debug" and data[0].strip() == "state":
                 data[0] = "WINPYDEBUG"
-            if segment in ["environment", "debug"]:
+            if segment in ["environment", "debug", "active_environment_per_user", "active_environment_common"]:
                 txt += f"set {data[0].strip()}={translate(data[1].strip(), env)}&& "
                 env[data[0].strip()] = translate(data[1].strip(), env)
             if segment == "debug" and data[0].strip() == "state":
                 txt += f"set WINPYDEBUG={data[1].strip()}&&"
     
     print(txt)
+
+    # set potential directory
+    for i in ('HOME', 'WINPYWORKDIR'):
+        if i in env:
+            os.makedirs(Path(env[i]), exist_ok=True)
     # later_version:
     # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True)
     # p.wait()    # I can wait until finished (although it too finishes after start finishes)
@@ -964,62 +976,24 @@ pause
 
         self.create_batch_script(
             "make_working_directory_be_not_winpython.bat",
-            r"""@echo off
-set winpython_ini=%~dp0..\\settings\winpython.ini
-(
-    echo [debug]
-    echo state = disabled
-    echo [environment]
-    echo ## <?> Uncomment lines to override environment variables
-    echo HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
-    echo USERPROFILE = %%HOME%%
-    echo JUPYTER_DATA_DIR = %%HOME%%
-    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
-    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
-    echo WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
-) > "%winpython_ini%"
-    call "%~dp0env_for_icons.bat"
-    mkdir %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings
-    mkdir %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings\AppData
-    mkdir %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings\AppData\Roaming
+            r"""call "%~dp0env_for_icons.bat"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[active_environment', '[inactive_environment' )"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[inactive_environment_per_user]', '[active_environment_per_user]' )"
 """,
         )
 
         self.create_batch_script(
             "make_working_directory_be_winpython.bat",
-            r"""@echo off
-set winpython_ini=%~dp0..\\settings\winpython.ini
-(
-    echo [debug]
-    echo state = disabled
-    echo [environment]
-    echo ## <?> Uncomment lines to override environment variables
-    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
-    echo #USERPROFILE = %%HOME%%
-    echo #JUPYTER_DATA_DIR = %%HOME%%
-    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
-    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
-    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
-) > "%winpython_ini%"
+            r"""call "%~dp0env_for_icons.bat"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[active_environment', '[inactive_environment' )"
 """,
         )
 
         self.create_batch_script(
             "make_working_directory_and_userprofile_be_winpython.bat",
-            r"""@echo off
-set winpython_ini=%~dp0..\\settings\winpython.ini
-(
-    echo [debug]
-    echo state = disabled
-    echo [environment]
-    echo ## <?> Uncomment lines to override environment variables
-    echo #HOME = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\settings
-    echo USERPROFILE = %%HOME%%
-    echo #JUPYTER_DATA_DIR = %%HOME%%
-    echo #JUPYTERLAB_SETTINGS_DIR = %%HOME%%\.jupyter\lab
-    echo #JUPYTERLAB_WORKSPACES_DIR = %%HOME%%\.jupyter\lab\workspaces
-    echo #WINPYWORKDIR = %%HOMEDRIVE%%%%HOMEPATH%%\Documents\WinPython%%WINPYVER%%\Notebooks
-) > "%winpython_ini%"
+            r"""call "%~dp0env_for_icons.bat"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[active_environment', '[inactive_environment' )"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[inactive_environment_common]', '[active_environment_common]' )"
 """,
         )
 
