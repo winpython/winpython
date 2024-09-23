@@ -1083,11 +1083,7 @@ cd/D "%WINPYWORKDIR1%"
             r"""@echo off
 call "%~dp0env_for_icons.bat"
 rem cd/D "%WINPYWORKDIR%"
-if exist "%WINPYDIR%\scripts\spyder3.exe" (
-   "%WINPYDIR%\scripts\spyder3.exe" %* -w "%WINPYWORKDIR1%"
-) else (
-   "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
-)  
+"%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
 """,
         )
 
@@ -1096,11 +1092,7 @@ if exist "%WINPYDIR%\scripts\spyder3.exe" (
             r"""@echo off
 call "%~dp0env_for_icons.bat"
 cd/D "%WINPYWORKDIR1%"
-if exist "%WINPYDIR%\scripts\spyder3.exe" (
-    "%WINPYDIR%\scripts\spyder3.exe" --reset %*
-) else (
-    "%WINPYDIR%\scripts\spyder.exe" --reset %*
-)
+"%WINPYDIR%\scripts\spyder.exe" --reset %*
 """,
         )
 
