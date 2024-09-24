@@ -27,35 +27,19 @@ CHANGELOGS_DIR = str(Path(__file__).parent / "changelogs")
 assert Path(CHANGELOGS_DIR).is_dir()
 
 
-def get_drives():
-  """
-  This function retrieves a list of existing drives on a Windows system.
-
-  Returns:
-      list: A list of drive letters (e.g., ['C:', 'D:'])
-  """
-  if hasattr(os, 'listdrives'):  # For Python 3.12 and above
-    return os.listdrives()
-  else:
-    drives = [f"{d}:\\" for d in os.environ.get('HOMEDRIVE', '').split("\\") if d]
-    return drives
-
-
 def get_7zip_exe():
     """Return 7zip executable"""
     localdir = str(Path(sys.prefix).parent.parent)
-    for drive in get_drives():
-        for dirname in (
-            r"C:\Program Files",
-            r"C:\Program Files (x86)",
-            str(Path(localdir) / "7-Zip"),
-        ):
-            for subdirname in (".", "App"):
-                exe = str(Path(dirname) / subdirname / "7-Zip" / "7z.exe")
-                if Path(exe).is_file():
-                    return exe
-    else:
-        raise RuntimeError("7ZIP is not installed on this computer.")
+    for dirname in (
+        r"C:\Program Files",
+        r"C:\Program Files (x86)",
+        str(Path(localdir) / "7-Zip"),
+    ):
+        for subdirname in (".", "App"):
+            exe = str(Path(dirname) / subdirname / "7-Zip" / "7z.exe")
+            if Path(exe).is_file():
+                return exe
+    raise RuntimeError("7ZIP is not installed on this computer.")
 
 
 def replace_in_7zip_file(fname, data):
