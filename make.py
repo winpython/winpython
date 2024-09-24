@@ -7,7 +7,6 @@
 
 """
 WinPython build script
-
 Created on Sun Aug 12 11:17:50 2012
 """
 
@@ -21,7 +20,6 @@ import sys
 # Local imports
 from winpython import wppm, utils
 import diff
-
 
 CHANGELOGS_DIR = str(Path(__file__).parent / "changelogs")
 assert Path(CHANGELOGS_DIR).is_dir()
@@ -645,7 +643,6 @@ if %ERRORLEVEL% NEQ 0 (
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
-
 """,
             do_changes=changes,
         )
@@ -653,9 +650,7 @@ if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
         self.create_batch_script(
             "WinPython_PS_Prompt.ps1",
             r"""
-###############################
 ### WinPython_PS_Prompt.ps1 ###
-###############################
 $0 = $myInvocation.MyCommand.Definition
 $dp0 = [System.IO.Path]::GetDirectoryName($0)
 # $env:PYTHONUTF8 = 1 would create issues in "movable" patching
@@ -682,7 +677,6 @@ $env:WINPYDIR = $env:WINPYDIRBASE+"""
 $env:PYTHON = "%WINPYDIR%\python.exe"
 $env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs"
 
-
 $env:WINPYVER = '"""
             + self.winpyver
             + r"""'
@@ -701,7 +695,6 @@ $env:WINPYARCH = 'WIN32'
 if ($env:WINPYARCH.subString($env:WINPYARCH.length-5, 5) -eq 'amd64')  {
    $env:WINPYARCH = 'WIN-AMD64' } 
 
-
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
  $env:PATH = """
             + '"'
@@ -714,11 +707,10 @@ if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API
 
 # PyQt5 qt.conf creation and winpython.ini creation done via Winpythonini.py (called per env_for_icons.bat for now)
 # Start-Process -FilePath $env:PYTHON -ArgumentList ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
-
 } 
-###############################
+
 ### Set-WindowSize
-###############################
+
 Function Set-WindowSize {
 Param([int]$x=$host.ui.rawui.windowsize.width,
       [int]$y=$host.ui.rawui.windowsize.heigth,
@@ -735,7 +727,6 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
 ### Colorize to distinguish
 $host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
-
 """,
             do_changes=changes,
         )
@@ -805,7 +796,7 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
         self.create_batch_script(
             "WinPythonIni.py",  # Replaces winpython.vbs, and a bit of env.bat
             r"""
-'prepares a dynamic list of variables settings from a .ini file'
+# Prepares a dynamic list of variables settings from a .ini file
 import os
 import subprocess
 from pathlib import Path
@@ -832,8 +823,6 @@ USERPROFILE = %HOME%
 #JULIA=%JULIA_HOME%%JULIA_EXE%
 #JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 #QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
-
-
 '''
 
 def get_file(file_name):
@@ -1111,8 +1100,6 @@ call "%~dp0unregister_python.bat" --all""",
             "wpcp.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-rem cd/D "%WINPYWORKDIR1%"
-rem "%WINPYDIR%\python.exe" -m winpython.controlpanel %*
 if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd/d %WINPYWORKDIR1%
 cmd.exe /k "echo wppm & wppm"
 """,
@@ -1154,7 +1141,6 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
 ) else (
     "code.exe" %*
 ))
-
 """,
         )
         
@@ -1250,12 +1236,12 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             indent=True,
         )
 
-        # PyPy: get Fullversion from the executable
+        # get Fullversion from the executable
         self.python_fullversion = utils.get_python_long_version(
             self.distribution.target
         )
 
-        # PyPY: Assert that WinPython version and real python version do match
+        # Assert that WinPython version and real python version do match
         self._print(
             f"Python version{self.python_fullversion.replace('.','')}"
             + f"\nDistro Name {self.distribution.target}"
@@ -1268,13 +1254,10 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
 
         if remove_existing:
             if not self.simulation:
-                # self._add_msvc_files()  # replaced per msvc_runtime package
                 self._create_batch_scripts_initial()
                 self._create_batch_scripts()
-                # always create all launchers (as long as it is not shimmy-based, to see for after)
                 self._create_launchers()
-            # PyPY must ensure pip
-            # "pypy3.exe -m ensurepip"
+            # PyPy must ensure pip via: "pypy3.exe -m ensurepip"
             utils.python_execmodule("ensurepip", self.distribution.target)
 
             self.distribution.patch_standard_packages("pip")
@@ -1287,9 +1270,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 self._print(f"piping {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(req)
-            # no more directory base package install: use requirements.txt
-            # 2019-05-03 removed self._install_all_other_packages()
-            print("self.simulation zz", self.simulation)
+            print("self.simulation:", self.simulation)
             if not self.simulation:
                 self._copy_dev_tools()
                 self._copy_dev_docs()
@@ -1313,8 +1294,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self._print_done()
         # Writing package index
         self._print("Writing package index")
-        # winpyver2 = need the version without build part
-        # but with self.distribution.architecture
+        # winpyver2 = the version without build part but with self.distribution.architecture
         self.winpyver2 = f"{self.python_fullversion}.{self.build_number}"
         fname = str(
             Path(self.winpydir).parent
@@ -1344,17 +1324,16 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_done()
 
 
-def rebuild_winpython(basedir, targetdir, architecture=64, verbose=False):
+def rebuild_winpython(codedir, targetdir, architecture=64, verbose=False):
     """Rebuild winpython package from source"""
-    basedir = basedir
-    packdir = targetdir
-    for name in os.listdir(packdir):
+    
+    for name in os.listdir(targetdir):
         if name.startswith("winpython-") and name.endswith((".exe", ".whl", ".gz")):
-            os.remove(str(Path(packdir) / name))
+            os.remove(str(Path(targetdir) / name))
     #  utils.build_wininst is replaced per flit 2023-02-27
     utils.buildflit_wininst(
-        str(Path(__file__).resolve().parent),
-        copy_to=packdir,
+        codedir,
+        copy_to=targetdir,
         verbose=verbose,
     )
 
@@ -1420,7 +1399,7 @@ def make_all(
 
     # Rebuild Winpython in this wheel dir
     rebuild_winpython(
-        basedir=basedir,
+        codedir=str(Path(__file__).resolve().parent), # winpython source dir
         targetdir=wheeldir,
         architecture=architecture,
     )
@@ -1490,11 +1469,11 @@ def make_all(
     #          ,find_links=osp.join(basedir, 'packages.srcreq'))
     if str(create_installer).lower() != "false" and not simulation:
         if "7zip" in str(create_installer).lower():
-            dist.create_installer_7zip(".exe")  # 7-zip (no licence splash screen)
+            dist.create_installer_7zip(".exe")
         if ".7z" in str(create_installer).lower():
-            dist.create_installer_7zip(".7z")  # 7-zip (no licence splash screen)
+            dist.create_installer_7zip(".7z")
         if ".zip" in str(create_installer).lower():
-            dist.create_installer_7zip(".zip")  # 7-zip (no licence splash screen)
+            dist.create_installer_7zip(".zip")
     return dist
 
 
