@@ -24,6 +24,38 @@ import diff
 CHANGELOGS_DIR = str(Path(__file__).parent / "changelogs")
 assert Path(CHANGELOGS_DIR).is_dir()
 
+def get_drives():
+  """
+  This function retrieves a list of existing drives on a Windows system.
+
+  Returns:
+      list: A list of drive letters (e.g., ['C:', 'D:'])
+  """
+  if hasattr(os, 'listdrives'):  # For Python 3.12 and above
+    return os.listdrives()
+  else:
+    drives = [f"{d}:\\" for d in os.environ.get('HOMEDRIVE', '').split("\\") if d]
+    return drives
+  
+
+def get_nsis_exe():
+    """Return NSIS executable"""
+    localdir = str(Path(sys.prefix).parent.parent)
+    for drive in get_drives():
+        for dirname in (
+            r"C:\Program Files",
+            r"C:\Program Files (x86)",
+            drive + r"PortableApps\NSISPortableANSI",
+            drive + r"PortableApps\NSISPortable",
+            str(Path(localdir) / "NSISPortableANSI"),
+            str(Path(localdir) / "NSISPortable"),
+        ):
+            for subdirname in (".", "App"):
+                exe = str(Path(dirname) / subdirname / "NSIS" / "makensis.exe")
+                if Path(exe).is_file():
+                    return exe
+    else:
+        raise RuntimeError("NSIS is not installed on this computer.")
 
 def get_7zip_exe():
     """Return 7zip executable"""
@@ -39,6 +71,25 @@ def get_7zip_exe():
                 return exe
     raise RuntimeError("7ZIP is not installed on this computer.")
 
+def replace_in_nsis_file(fname, data):
+    """Replace text in line starting with *start*, from this position:
+    data is a list of (start, text) tuples"""
+    fd = open(fname, "U")
+    lines = fd.readlines()
+    fd.close()
+    for idx, line in enumerate(lines):
+        for start, text in data:
+            if start not in (
+                "Icon",
+                "OutFile",
+            ) and not start.startswith("!"):
+                start = "!define " + start
+            if line.startswith(start + " "):
+                lines[idx] = line[: len(start) + 1] + f'"{text}"' + "\n"
+    fd = open(fname, "w")
+    fd.writelines(lines)
+    print("iss for ", fname, "is", lines)
+    fd.close()
 
 def replace_in_7zip_file(fname, data):
     """Replace text in line starting with *start*, from this position:
@@ -78,6 +129,33 @@ def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mks
     print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
     subprocess.run(mkshim_command, shell=True)
 
+def build_nsis(srcname, dstname, data):
+    """Build NSIS script"""
+    NSIS_EXE = get_nsis_exe()  # NSIS Compiler
+    portable_dir = str(Path(__file__).resolve().parent / "portable")
+    shutil.copy(str(Path(portable_dir) / srcname), dstname)
+    data = [
+        (
+            "!addincludedir",
+            str(Path(portable_dir) / "include"),
+        )
+    ] + list(data)
+    replace_in_nsis_file(dstname, data)
+    try:
+        retcode = subprocess.call(
+            f'"{NSIS_EXE}" -V2 "{dstname}"',
+            shell=True,
+            stdout=sys.stderr,
+        )
+        if retcode < 0:
+            print(
+                "Child was terminated by signal",
+                -retcode,
+                file=sys.stderr,
+            )
+    except OSError as e:
+        print("Execution failed:", e, file=sys.stderr)
+    os.remove(dstname)
 
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
@@ -159,6 +237,7 @@ class WinPythonDistribution(object):
                 r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)"
             )
         self.python_name = Path(self.python_fname).name[:-4]
+        self.python_namedir ="python"
 
     @property
     def package_index_wiki(self):
@@ -258,7 +337,10 @@ Name | Version | Description
     @property
     def python_dir(self):
         """Return Python dirname (full path) of the target distribution"""
-        return str(Path(self.winpydir) / self.python_name)  # python.exe path
+        if (Path(self.winpydir) / self.python_namedir).is_dir(): # 2024-12-22
+            return str(Path(self.winpydir) / self.python_namedir) # /python path
+        else:
+            return str(Path(self.winpydir) / self.python_name)  # python.exe path
 
     @property
     def winpy_arch(self):
@@ -359,8 +441,46 @@ Name | Version | Description
                 command = "${WINPYDIR}\python.exe"  #not used
         iconlauncherfullname= str(Path(self.winpydir) / name)
         true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
-        build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program, workdir=workdir)
-        
+        # build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program, workdir=workdir)
+
+    def create_launcher(
+        self,
+        name,
+        icon,
+        command=None,
+        args=None,
+        workdir=r"$EXEDIR\scripts",
+        launcher="launcher_basic.nsi",
+    ):
+        """Create exe launcher with NSIS"""
+        assert name.endswith(".exe")
+        portable_dir = str(Path(__file__).resolve().parent / "portable")
+        icon_fname = str(Path(portable_dir) / "icons" / icon)
+        assert Path(icon_fname).is_file()
+
+        # Customizing NSIS script
+        if command is None:
+            if args is not None and ".pyw" in args:
+                command = "${WINPYDIR}\pythonw.exe"
+            else:
+                command = "${WINPYDIR}\python.exe"
+        if args is None:
+            args = ""
+        if workdir is None:
+            workdir = ""
+        fname = str(Path(self.winpydir) / (Path(name).stem + ".nsi"))
+
+        data = [
+            ("WINPYDIR", f"$EXEDIR\{self.python_namedir}"), #2024-12-22
+            ("WINPYVER", self.winpyver),
+            ("COMMAND", command),
+            ("PARAMETERS", args),
+            ("WORKDIR", workdir),
+            ("Icon", icon_fname),
+            ("OutFile", name),
+        ]
+
+        build_nsis(launcher, fname, data)
 
     def create_python_batch(
         self,
@@ -445,6 +565,9 @@ call "%~dp0env_for_icons.bat"
             targetdir=self.python_dir + r"\..",
         )
         self._print_done()
+        # relocate to /python
+        if Path(self.python_namedir) != Path(self.winpydir) / self.python_namedir: #2024-12-22 to /python
+            os.rename(Path(self.python_dir), Path(self.winpydir) / self.python_namedir)
 
     def _copy_dev_tools(self):
         """Copy dev tools"""
@@ -498,12 +621,26 @@ call "%~dp0env_for_icons.bat"
             workdir=r".\scripts"
         )
         
+        self.create_launcher(
+            "WinPython Command Prompt.exe",
+            "cmd.ico",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k cmd.bat",
+        )    
+    
         self.create_launcher_shimmy(
             "WinPython Powershell Prompt.exe",
             "powershell.ico",
             command="Powershell.exe",
             args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
         )
+
+        self.create_launcher(
+            "WinPython Powershell Prompt.exe",
+            "powershell.ico",
+            command="wscript.exe",
+            args=r"Noshell.vbs cmd_ps.bat",
+       )
 
         #self.create_launcher_shimmy(
         #    "WinPython Terminal.exe",
@@ -520,6 +657,13 @@ call "%~dp0env_for_icons.bat"
             workdir=r".\scripts"
         )
 
+        self.create_launcher(
+            "WinPython Interpreter.exe",
+            "python.ico",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k winpython.bat",
+        )
+
         self.create_launcher_shimmy(
             "IDLE (Python GUI).exe",
             "python.ico",
@@ -527,11 +671,25 @@ call "%~dp0env_for_icons.bat"
             args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winidle.bat')",
         )
 
+        self.create_launcher(
+            "IDLE (Python GUI).exe",
+            "python.ico",
+            command="wscript.exe",
+            args=r"Noshell.vbs winidle.bat",
+        )
+
         self.create_launcher_shimmy(
             "Spyder.exe",
             "spyder.ico",
             command="Powershell.exe",
             args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winspyder.bat')",
+        )
+
+        self.create_launcher(
+            "Spyder.exe",
+            "spyder.ico",
+            command="wscript.exe",
+            args=r"Noshell.vbs winspyder.bat",
         )
 
         self.create_launcher_shimmy(
@@ -542,12 +700,26 @@ call "%~dp0env_for_icons.bat"
             #args=r"start-process -WindowStyle Hidden './scripts/spyder_reset.bat",
         )
 
+        self.create_launcher(
+            "Spyder reset.exe",
+            "spyder_reset.ico",
+            command="wscript.exe",
+            args=r"Noshell.vbs spyder_reset.bat",
+        )
+
         self.create_launcher_shimmy(
             "WinPython Control Panel.exe",
             "winpython.ico",
             command=".\\wpcp.bat",
             args=r"",
             workdir=r".\scripts"
+        )
+
+        self.create_launcher(
+            "WinPython Control Panel.exe",
+            "winpython.ico",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k wpcp.bat",
         )
 
         # Jupyter launchers
@@ -561,6 +733,14 @@ call "%~dp0env_for_icons.bat"
             workdir=r".\scripts"
         )
 
+        self.create_launcher(
+            "Jupyter Notebook.exe",
+            "jupyter.ico",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k winipython_notebook.bat",  # like VSCode + Rise way
+            # args=r'/k winjupyter_nbclassic.bat',  # Jupyterlab in classic look
+        )
+
         self.create_launcher_shimmy(
             "Jupyter Lab.exe",
             "jupyter.ico",
@@ -569,12 +749,27 @@ call "%~dp0env_for_icons.bat"
             workdir=r".\scripts"
         )
 
+        self.create_launcher(
+            "Jupyter Lab.exe",
+            "jupyter.ico",
+            command="$SYSDIR\cmd.exe",
+            args=r"/k winjupyter_lab.bat",
+        )
+
         self.create_launcher_shimmy(
             "VS Code.exe",
             "code.ico",
             command="winvscode.bat",
             args=r"",
             workdir=r".\scripts"
+        )
+
+        # VSCode launcher
+        self.create_launcher(
+            "VS Code.exe",
+            "code.ico",
+            command="wscript.exe",
+            args=r"Noshell.vbs winvscode.bat",
         )
 
         self._print_done()
@@ -611,7 +806,7 @@ popd
 
 set WINPYDIR=%WINPYDIRBASE%"""
             + "\\"
-            + self.python_name
+            + self.python_namedir
             + r"""
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 set PYTHON=%WINPYDIR%\python.exe
@@ -662,7 +857,7 @@ $env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
 # avoid double_init (will only resize screen)
 if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""
             + '"\\'
-            + self.python_name
+            + self.python_namedir
             + '"'
             + r""")) ) {
 
@@ -670,7 +865,7 @@ if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""
 $env:WINPYDIR = $env:WINPYDIRBASE+"""
             + '"'
             + "\\"
-            + self.python_name
+            + self.python_namedir
             + '"'
             + r"""
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
@@ -791,6 +986,24 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
 
 """,
             do_changes=changes,
+        )
+
+        self.create_batch_script(
+            "Noshell.vbs",
+            r"""
+'from http://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window/390129
+If WScript.Arguments.Count >= 1 Then
+    ReDim arr(WScript.Arguments.Count-1)
+    For i = 0 To WScript.Arguments.Count-1
+        Arg = WScript.Arguments(i)
+        If InStr(Arg, " ") > 0 or InStr(Arg, "&") > 0 Then Arg = chr(34) & Arg & chr(34)
+      arr(i) = Arg
+    Next
+
+    RunCmd = Join(arr)
+    CreateObject("Wscript.Shell").Run RunCmd, 0 , True
+End If
+        """,
         )
 
         self.create_batch_script(
