@@ -613,14 +613,7 @@ call "%~dp0env_for_icons.bat"
 
         self._print("Creating launchers")
 
-        self.create_launcher_shimmy(
-            "WinPython Command Prompt.exe",
-            "cmd.ico",
-            command=".\\cmd.bat",
-            args=r"",
-            workdir=r".\scripts"
-        )
-        
+    
         self.create_launcher(
             "WinPython Command Prompt.exe",
             "cmd.ico",
@@ -628,12 +621,12 @@ call "%~dp0env_for_icons.bat"
             args=r"/k cmd.bat",
         )    
     
-        self.create_launcher_shimmy(
-            "WinPython Powershell Prompt.exe",
-            "powershell.ico",
-            command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
-        )
+        #self.create_launcher_shimmy(
+        #    "WinPython Powershell Prompt.exe",
+        #    "powershell.ico",
+        #    command="Powershell.exe",
+        #    args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
+        #)
 
         self.create_launcher(
             "WinPython Powershell Prompt.exe",
@@ -642,33 +635,11 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs cmd_ps.bat",
        )
 
-        #self.create_launcher_shimmy(
-        #    "WinPython Terminal.exe",
-        #    "terminal.ico",
-        #    command="Powershell.exe",
-        #    args=r"start-process -WindowStyle Hidden './scripts/WinPython_Terminal.bat",
-        #)
-
-        self.create_launcher_shimmy(
-            "WinPython Interpreter.exe",
-            "python.ico",
-            command=".\\winpython.bat",
-            args=r"",
-            workdir=r".\scripts"
-        )
-
         self.create_launcher(
             "WinPython Interpreter.exe",
             "python.ico",
             command="$SYSDIR\cmd.exe",
             args=r"/k winpython.bat",
-        )
-
-        self.create_launcher_shimmy(
-            "IDLE (Python GUI).exe",
-            "python.ico",
-            command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winidle.bat')",
         )
 
         self.create_launcher(
@@ -678,13 +649,6 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs winidle.bat",
         )
 
-        self.create_launcher_shimmy(
-            "Spyder.exe",
-            "spyder.ico",
-            command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\winspyder.bat')",
-        )
-
         self.create_launcher(
             "Spyder.exe",
             "spyder.ico",
@@ -692,27 +656,11 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs winspyder.bat",
         )
 
-        self.create_launcher_shimmy(
-            "Spyder reset.exe",
-            "spyder_reset.ico",
-            command="Powershell.exe",
-            args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\spyder_reset.bat')",
-            #args=r"start-process -WindowStyle Hidden './scripts/spyder_reset.bat",
-        )
-
         self.create_launcher(
             "Spyder reset.exe",
             "spyder_reset.ico",
             command="wscript.exe",
             args=r"Noshell.vbs spyder_reset.bat",
-        )
-
-        self.create_launcher_shimmy(
-            "WinPython Control Panel.exe",
-            "winpython.ico",
-            command=".\\wpcp.bat",
-            args=r"",
-            workdir=r".\scripts"
         )
 
         self.create_launcher(
@@ -724,15 +672,6 @@ call "%~dp0env_for_icons.bat"
 
         # Jupyter launchers
 
-        # this one needs a shell to kill fantom processes
-        self.create_launcher_shimmy(
-            "Jupyter Notebook.exe",
-            "jupyter.ico",
-            command="winipython_notebook.bat",
-            args=r"",
-            workdir=r".\scripts"
-        )
-
         self.create_launcher(
             "Jupyter Notebook.exe",
             "jupyter.ico",
@@ -741,27 +680,11 @@ call "%~dp0env_for_icons.bat"
             # args=r'/k winjupyter_nbclassic.bat',  # Jupyterlab in classic look
         )
 
-        self.create_launcher_shimmy(
-            "Jupyter Lab.exe",
-            "jupyter.ico",
-            command="winjupyter_lab.bat",
-            args=r"",
-            workdir=r".\scripts"
-        )
-
         self.create_launcher(
             "Jupyter Lab.exe",
             "jupyter.ico",
             command="$SYSDIR\cmd.exe",
             args=r"/k winjupyter_lab.bat",
-        )
-
-        self.create_launcher_shimmy(
-            "VS Code.exe",
-            "code.ico",
-            command="winvscode.bat",
-            args=r"",
-            workdir=r".\scripts"
         )
 
         # VSCode launcher
