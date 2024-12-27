@@ -369,15 +369,15 @@ def patch_shebang_line(
     executable = sys.executable
     if sys.version_info[0] == 2:
         shebang_line = re.compile(
-            r"(#!.*pythonw?\.exe)"
+            r"(#!.*pythonw?\.exe)\"?"
         )  # Python2.7
     else:
         shebang_line = re.compile(
-            b"(#!.*pythonw?\.exe)"
+            b"(#!.*pythonw?\.exe)\"?"
         )  # Python3+
         if 'pypy3' in sys.executable:
             shebang_line = re.compile(
-            b"(#!.*pypy3w?\.exe)"
+            b"(#!.*pypy3w?\.exe)\"?"
         )  # Pypy3+
             
         target_dir = target_dir.encode('utf-8')
