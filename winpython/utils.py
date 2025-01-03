@@ -268,7 +268,7 @@ def exec_run_cmd(args, path=None):
 def get_r_version(path):
     """Return version of the R installed in *path*"""
     return (
-        exec_shell_cmd('dir ..\README.R*', path)
+        exec_shell_cmd(r'dir ..\README.R*', path)
         .splitlines()[-3]
         .split("-")[-1]
     )
@@ -373,11 +373,11 @@ def patch_shebang_line(
         )  # Python2.7
     else:
         shebang_line = re.compile(
-            b"(#!.*pythonw?\.exe)\"?"
+            rb"(#!.*pythonw?\.exe)\"?"
         )  # Python3+
         if 'pypy3' in sys.executable:
             shebang_line = re.compile(
-            b"(#!.*pypy3w?\.exe)\"?"
+            rb"(#!.*pypy3w?\.exe)\"?"
         )  # Pypy3+
             
         target_dir = target_dir.encode('utf-8')
@@ -420,15 +420,15 @@ def patch_shebang_line_py(
         # WinPython doesn't break running executable files.
         return
     if to_movable:
-        exec_path = '#!.\python.exe'
+        exec_path = r'#!.\python.exe'
         if 'pypy3' in sys.executable:  # PyPy !
-            exec_path = '#!.\pypy3.exe'
+            exec_path = r'#!.\pypy3.exe'
     else:
         exec_path = '#!' + sys.executable
     for line in fileinput.input(fname, inplace=True):
-        if re.match('^#\!.*python\.exe$', line) is not None:
+        if re.match(r'^#\!.*python\.exe$', line) is not None:
             print(exec_path)
-        elif re.match('^#\!.*pypy3\.exe$', line) is not None:# PyPy !
+        elif re.match(r'^#\!.*pypy3\.exe$', line) is not None:# PyPy !
             print(exec_path)          
         else:
             print(line, end='')
