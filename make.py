@@ -620,13 +620,6 @@ call "%~dp0env_for_icons.bat"
             command="$SYSDIR\cmd.exe",
             args=r"/k cmd.bat",
         )    
-    
-        #self.create_launcher_shimmy(
-        #    "WinPython Powershell Prompt.exe",
-        #    "powershell.ico",
-        #    command="Powershell.exe",
-        #    args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
-        #)
 
         self.create_launcher(
             "WinPython Powershell Prompt.exe",
