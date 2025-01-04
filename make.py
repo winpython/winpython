@@ -688,6 +688,12 @@ call "%~dp0env_for_icons.bat"
             args=r"Noshell.vbs winvscode.bat",
         )
 
+        # 2025-01-04: copy launchers premade per the Datalab-Python way
+        portable_dir = str(Path(__file__).resolve().parent / "portable"  / "launchers_final")
+        for path in Path(portable_dir).rglob('*.exe'):
+            shutil.copy2(path, Path(self.winpydir) )
+            print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",Path(self.winpydir))
+
         self._print_done()
 
     def _create_batch_scripts_initial(self):
