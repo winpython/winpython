@@ -112,23 +112,6 @@ def replace_in_7zip_file(fname, data):
     fd.close()
 
 
-def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py', workdir=''):
-    """Build .exe launcher with mkshim_program and pywin32"""
-
-    # define where is mkshim
-    mkshim_program = str(Path(__file__).resolve().parent / mkshim_program)
-    python_program = utils.get_python_executable()
-
-    # Create the executable using mkshim.py or mkshim240.py
-    mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
-    if workdir !='': # V03 of shim: we can handle an optional sub-directory
-        mkshim_command += f' --subdir "{workdir}"'
-    # Embed the icon, if provided
-    if Path(icon_path).is_file():
-        mkshim_command += f' --i "{icon_path}"'
-    print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
-    subprocess.run(mkshim_command, shell=True)
-
 def build_nsis(srcname, dstname, data):
     """Build NSIS script"""
     NSIS_EXE = get_nsis_exe()  # NSIS Compiler
@@ -417,32 +400,6 @@ Name | Version | Description
         fd.write(contents_final)
         fd.close()
 
-    def create_launcher_shimmy(
-        self,
-        name,
-        icon,
-        command=None,
-        args=None,
-        workdir=r"",  # ".\script" to go to sub-directory of the icon
-        mkshim_program="mkshim400.py", # to force another one
-    ):
-        """Create an exe launcher with mkshim.py"""
-        assert name.endswith(".exe")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        icon_fname = str(Path(portable_dir) / "icons" / icon)
-        assert Path(icon_fname).is_file()
-
-        # prepare mkshim.py script
-        #  $env:WINPYDIRICONS variable give the icons directory
-        if command is None:
-            if args is not None and ".pyw" in args:
-                command = "${WINPYDIR}\pythonw.exe" #not used
-            else:
-                command = "${WINPYDIR}\python.exe"  #not used
-        iconlauncherfullname= str(Path(self.winpydir) / name)
-        true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
-        # build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program, workdir=workdir)
-
     def create_launcher(
         self,
         name,
@@ -687,6 +644,12 @@ call "%~dp0env_for_icons.bat"
             command="wscript.exe",
             args=r"Noshell.vbs winvscode.bat",
         )
+
+        # 2025-01-04: copy launchers premade per the Datalab-Python way
+        portable_dir = str(Path(__file__).resolve().parent / "portable"  / "launchers_final")
+        for path in Path(portable_dir).rglob('*.exe'):
+            shutil.copy2(path, Path(self.winpydir) )
+            print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",Path(self.winpydir))
 
         self._print_done()
 
