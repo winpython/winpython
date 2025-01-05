@@ -3,7 +3,7 @@ DataLab-WinPython launcher script
 ---------------------------------
 
 Licensed under the terms of the BSD 3-Clause
-(see ../LICENSE for details)
+(see ./LICENSE for details)
 
 */
 

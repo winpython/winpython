@@ -87,7 +87,6 @@ def build_7zip(srcname, dstname, data):
             )
     except OSError as e:
         print("Execution failed:", e, file=sys.stderr)
-    # os.remove(dstname)
 
 
 class WinPythonDistribution(object):
@@ -448,6 +447,8 @@ call "%~dp0env_for_icons.bat"
         for path in Path(portable_dir).rglob('*.exe'):
             shutil.copy2(path, Path(self.winpydir) )
             print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",Path(self.winpydir))
+        for path in (Path(__file__).resolve().parent / "portable").rglob('licence*.*'):
+            shutil.copy2(path, Path(self.winpydir) )
 
         self._print_done()
 
@@ -1000,7 +1001,7 @@ call "%~dp0env.bat"  %*
             r"""@echo off
 rem launcher for VScode
 call "%~dp0env_for_icons.bat"
-rem cd/D "%WINPYWORKDIR1%"
+cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\..\t\vscode\code.exe" (
     "%WINPYDIR%\..\t\vscode\code.exe" %*
 ) else (
@@ -1011,7 +1012,6 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
 ))
 """,
         )
-        
 
 
     def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
