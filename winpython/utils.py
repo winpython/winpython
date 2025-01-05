@@ -267,39 +267,27 @@ def exec_run_cmd(args, path=None):
 
 def get_r_version(path):
     """Return version of the R installed in *path*"""
-    return (
-        exec_shell_cmd(r'dir ..\README.R*', path)
-        .splitlines()[-3]
-        .split("-")[-1]
-    )
+    return exec_shell_cmd(r"dir ..\README.R*", path).splitlines()[-3].split("-")[-1]
 
 
 def get_julia_version(path):
     """Return version of the Julia installed in *path*"""
-    return (
-        exec_shell_cmd('julia.exe -v', path)
-        .splitlines()[0]
-        .split(" ")[-1]
-    )
+    return exec_shell_cmd("julia.exe -v", path).splitlines()[0].split(" ")[-1]
 
 
 def get_nodejs_version(path):
     """Return version of the Nodejs installed in *path*"""
-    return exec_shell_cmd('node -v', path).splitlines()[0]
+    return exec_shell_cmd("node -v", path).splitlines()[0]
 
 
 def get_npmjs_version(path):
     """Return version of the Nodejs installed in *path*"""
-    return exec_shell_cmd('npm -v', path).splitlines()[0]
+    return exec_shell_cmd("npm -v", path).splitlines()[0]
 
 
 def get_pandoc_version(path):
     """Return version of the Pandoc executable in *path*"""
-    return (
-        exec_shell_cmd('pandoc -v', path)
-        .splitlines()[0]
-        .split(" ")[-1]
-    )
+    return exec_shell_cmd("pandoc -v", path).splitlines()[0].split(" ")[-1]
 
 
 def python_query(cmd, path):
@@ -307,7 +295,9 @@ def python_query(cmd, path):
     the_exe = get_python_executable(path)
     # debug2021-09-12
     # print(f'"{the_exe}" -c "{cmd}"', ' * ',  path)
+
     return exec_shell_cmd(f'"{the_exe}" -c "{cmd}"', path).splitlines()[0]
+
 
 def python_execmodule(cmd, path):
     """Execute Python command using the Python interpreter located in *path*"""
@@ -319,18 +309,14 @@ def get_python_infos(path):
     """Return (version, architecture) for the Python distribution located in
     *path*. The version number is limited to MAJOR.MINOR, the architecture is
     an integer: 32 or 64"""
-    is_64 = python_query(
-        'import sys; print(sys.maxsize > 2**32)', path
-    )
-    arch = {'True': 64, 'False': 32}.get(is_64, None)
+    is_64 = python_query("import sys; print(sys.maxsize > 2**32)", path)
+    arch = {"True": 64, "False": 32}.get(is_64, None)
     ver = python_query(
-        "import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')"
-        ,
+        "import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')",
         path,
     )
-    if re.match(r'([0-9]*)\.([0-9]*)', ver) is None:
+    if re.match(r"([0-9]*)\.([0-9]*)", ver) is None:
         ver = None
-  
     return ver, arch
 
 
@@ -338,21 +324,15 @@ def get_python_long_version(path):
     """Return long version (X.Y.Z) for the Python distribution located in
     *path*"""
     ver = python_query(
-        "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
-        ,
+        "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')",
         path,
     )
-    if (
-        re.match(r'([0-9]*)\.([0-9]*)\.([0-9]*)', ver)
-        is None
-    ):
+    if re.match(r"([0-9]*)\.([0-9]*)\.([0-9]*)", ver) is None:
         ver = None
     return ver
 
 
-def patch_shebang_line(
-    fname, pad=b' ', to_movable=True, targetdir=""
-):
+def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
     """Remove absolute path to python.exe in shebang lines in binary files, or re-add it"""
 
     import re
@@ -362,39 +342,28 @@ def patch_shebang_line(
     target_dir = targetdir  # movable option
     if to_movable == False:
         target_dir = os.path.abspath(os.path.dirname(fname))
-        target_dir = (
-            os.path.abspath(os.path.join(target_dir, r'..'))
-            + '\\'
-        )
+        target_dir = os.path.abspath(os.path.join(target_dir, r"..")) + "\\"
     executable = sys.executable
 
-    shebang_line = re.compile(
-        rb"""(#!.*pythonw?\.exe)"?"""
-    )  # Python3+
-    if 'pypy3' in sys.executable:
-        shebang_line = re.compile(
-        rb"""(#!.*pypy3w?\.exe)"?"""
-    )  # Pypy3+
-    target_dir = target_dir.encode('utf-8')
+    shebang_line = re.compile(rb"""(#!.*pythonw?\.exe)"?""")  # Python3+
+    if "pypy3" in sys.executable:
+        shebang_line = re.compile(rb"""(#!.*pypy3w?\.exe)"?""")  # Pypy3+
+    target_dir = target_dir.encode("utf-8")
 
-    with open(fname, 'rb') as fh:
+    with open(fname, "rb") as fh:
         initial_content = fh.read()
         fh.close
         fh = None
-    content = shebang_line.split(
-        initial_content, maxsplit=1
-    )
+    content = shebang_line.split(initial_content, maxsplit=1)
     if len(content) != 3:
         return
     exe = os.path.basename(content[1][2:])
-    content[1] = (
-        b'#!' + target_dir + exe
-    )  # + (pad * (len(content[1]) - len(exe) - 2))
-    final_content = b''.join(content)
+    content[1] = b"#!" + target_dir + exe  # + (pad * (len(content[1]) - len(exe) - 2))
+    final_content = b"".join(content)
     if initial_content == final_content:
         return
     try:
-        with open(fname, 'wb') as fo:
+        with open(fname, "wb") as fo:
             fo.write(final_content)
             fo.close
             fo = None
@@ -403,9 +372,8 @@ def patch_shebang_line(
         print("failed to patch", fname)
 
 
-def patch_shebang_line_py(
-    fname, to_movable=True, targetdir=""
-):
+def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
+    """Changes shebang line in '.py' file to relative or absolue path"""
     """Changes shebang line in '.py' file to relative or absolue path"""
     import fileinput
     import re
@@ -443,9 +411,7 @@ def guess_encoding(csv_file):
             return [locale.getdefaultlocale()[1], "utf-8"]
             
 
-def patch_sourcefile(
-    fname, in_text, out_text, silent_mode=False
-):
+def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
     """Replace a string in a source file"""
     import io
 
@@ -472,15 +438,15 @@ def patch_sourcelines(
     fname,
     in_line_start,
     out_line,
-    endline='\n',
+    endline="\n",
     silent_mode=False,
 ):
-    """Replace the middle of lines between in_line_start and endline """
+    """Replace the middle of lines between in_line_start and endline"""
     import io
 
     if Path(fname).is_file():
         the_encoding = guess_encoding(fname)[0]
-        with io.open(fname, 'r', encoding=the_encoding) as fh:
+        with io.open(fname, "r", encoding=the_encoding) as fh:
             contents = fh.readlines()
             content = "".join(contents)
             for l in range(len(contents)):
@@ -491,9 +457,7 @@ def patch_sourcelines(
                     )
                     ending = ""
                     if middle.find(endline) > 0:
-                        ending = endline + endline.join(
-                            middle.split(endline)[1:]
-                        )
+                        ending = endline + endline.join(middle.split(endline)[1:])
                         middle = middle.split(endline)[0]
                     middle = out_line
                     new_line = begining + middle + ending
@@ -512,7 +476,8 @@ def patch_sourcelines(
         if not new_content == content:
             # if not silent_mode:
             #    print("patching ", fname, "from", content, "to", new_content)
-            with io.open(fname, 'wt', encoding=the_encoding) as fh:
+
+            with io.open(fname, "wt", encoding=the_encoding) as fh:
                 try:
                     fh.write(new_content)
                 except:
@@ -663,10 +628,10 @@ def direct_pip_install(
     assert Path(python_exe).is_file()
     myroot = str(Path(python_exe).parent)
 
-    cmd = [python_exe, '-m', 'pip', 'install']
+    cmd = [python_exe, "-m", "pip", "install"]
     if install_options:
         cmd += install_options  # typically ['--no-deps']
-        print('python -m pip install_options', install_options)
+        print("python -m pip install_options", install_options)
     cmd += [fname]
 
     if verbose:
@@ -681,10 +646,7 @@ def direct_pip_install(
         stdout, stderr = p.communicate()
         the_log = f"{stdout}" + f"\n {stderr}"
 
-        if (
-            ' not find ' in the_log
-            or ' not found ' in the_log
-        ):
+        if " not find " in the_log or " not found " in the_log:
             print(f"Failed to Install: \n {fname} \n")
             print(f"msg: {the_log}")
             raise RuntimeError
