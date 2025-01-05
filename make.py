@@ -24,38 +24,6 @@ import diff
 CHANGELOGS_DIR = str(Path(__file__).parent / "changelogs")
 assert Path(CHANGELOGS_DIR).is_dir()
 
-def get_drives():
-  """
-  This function retrieves a list of existing drives on a Windows system.
-
-  Returns:
-      list: A list of drive letters (e.g., ['C:', 'D:'])
-  """
-  if hasattr(os, 'listdrives'):  # For Python 3.12 and above
-    return os.listdrives()
-  else:
-    drives = [f"{d}:\\" for d in os.environ.get('HOMEDRIVE', '').split("\\") if d]
-    return drives
-  
-
-def get_nsis_exe():
-    """Return NSIS executable"""
-    localdir = str(Path(sys.prefix).parent.parent)
-    for drive in get_drives():
-        for dirname in (
-            r"C:\Program Files",
-            r"C:\Program Files (x86)",
-            drive + r"PortableApps\NSISPortableANSI",
-            drive + r"PortableApps\NSISPortable",
-            str(Path(localdir) / "NSISPortableANSI"),
-            str(Path(localdir) / "NSISPortable"),
-        ):
-            for subdirname in (".", "App"):
-                exe = str(Path(dirname) / subdirname / "NSIS" / "makensis.exe")
-                if Path(exe).is_file():
-                    return exe
-    else:
-        raise RuntimeError("NSIS is not installed on this computer.")
 
 def get_7zip_exe():
     """Return 7zip executable"""
@@ -71,25 +39,6 @@ def get_7zip_exe():
                 return exe
     raise RuntimeError("7ZIP is not installed on this computer.")
 
-def replace_in_nsis_file(fname, data):
-    """Replace text in line starting with *start*, from this position:
-    data is a list of (start, text) tuples"""
-    fd = open(fname, "U")
-    lines = fd.readlines()
-    fd.close()
-    for idx, line in enumerate(lines):
-        for start, text in data:
-            if start not in (
-                "Icon",
-                "OutFile",
-            ) and not start.startswith("!"):
-                start = "!define " + start
-            if line.startswith(start + " "):
-                lines[idx] = line[: len(start) + 1] + f'"{text}"' + "\n"
-    fd = open(fname, "w")
-    fd.writelines(lines)
-    print("iss for ", fname, "is", lines)
-    fd.close()
 
 def replace_in_7zip_file(fname, data):
     """Replace text in line starting with *start*, from this position:
@@ -111,51 +60,6 @@ def replace_in_7zip_file(fname, data):
     print("7-zip for ", fname, "is", lines)
     fd.close()
 
-
-def build_shimmy_launcher(launcher_name, command, icon_path, mkshim_program='mkshim400.py', workdir=''):
-    """Build .exe launcher with mkshim_program and pywin32"""
-
-    # define where is mkshim
-    mkshim_program = str(Path(__file__).resolve().parent / mkshim_program)
-    python_program = utils.get_python_executable()
-
-    # Create the executable using mkshim.py or mkshim240.py
-    mkshim_command = f'{python_program} "{mkshim_program}" -f "{launcher_name}" -c "{command}"'
-    if workdir !='': # V03 of shim: we can handle an optional sub-directory
-        mkshim_command += f' --subdir "{workdir}"'
-    # Embed the icon, if provided
-    if Path(icon_path).is_file():
-        mkshim_command += f' --i "{icon_path}"'
-    print(f"Building .exe launcher with {mkshim_program}:", mkshim_command)
-    subprocess.run(mkshim_command, shell=True)
-
-def build_nsis(srcname, dstname, data):
-    """Build NSIS script"""
-    NSIS_EXE = get_nsis_exe()  # NSIS Compiler
-    portable_dir = str(Path(__file__).resolve().parent / "portable")
-    shutil.copy(str(Path(portable_dir) / srcname), dstname)
-    data = [
-        (
-            "!addincludedir",
-            str(Path(portable_dir) / "include"),
-        )
-    ] + list(data)
-    replace_in_nsis_file(dstname, data)
-    try:
-        retcode = subprocess.call(
-            f'"{NSIS_EXE}" -V2 "{dstname}"',
-            shell=True,
-            stdout=sys.stderr,
-        )
-        if retcode < 0:
-            print(
-                "Child was terminated by signal",
-                -retcode,
-                file=sys.stderr,
-            )
-    except OSError as e:
-        print("Execution failed:", e, file=sys.stderr)
-    os.remove(dstname)
 
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
@@ -348,15 +252,6 @@ Name | Version | Description
         return f"{self.distribution.architecture}"
 
     @property
-    def py_arch(self):
-        """Return distribution architecture, in Python distutils format:
-        win-amd64 or win32"""
-        if self.distribution.architecture == 64:
-            return "win-amd64"
-        else:
-            return "win32"
-
-    @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
         path = [
@@ -416,71 +311,6 @@ Name | Version | Description
         fd = open(str(Path(scriptdir) / name), "w")
         fd.write(contents_final)
         fd.close()
-
-    def create_launcher_shimmy(
-        self,
-        name,
-        icon,
-        command=None,
-        args=None,
-        workdir=r"",  # ".\script" to go to sub-directory of the icon
-        mkshim_program="mkshim400.py", # to force another one
-    ):
-        """Create an exe launcher with mkshim.py"""
-        assert name.endswith(".exe")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        icon_fname = str(Path(portable_dir) / "icons" / icon)
-        assert Path(icon_fname).is_file()
-
-        # prepare mkshim.py script
-        #  $env:WINPYDIRICONS variable give the icons directory
-        if command is None:
-            if args is not None and ".pyw" in args:
-                command = "${WINPYDIR}\pythonw.exe" #not used
-            else:
-                command = "${WINPYDIR}\python.exe"  #not used
-        iconlauncherfullname= str(Path(self.winpydir) / name)
-        true_command = command.replace(r"$SYSDIR\cmd.exe","cmd.exe")+ " " + args
-        # build_shimmy_launcher(iconlauncherfullname, true_command, icon_fname, mkshim_program=mkshim_program, workdir=workdir)
-
-    def create_launcher(
-        self,
-        name,
-        icon,
-        command=None,
-        args=None,
-        workdir=r"$EXEDIR\scripts",
-        launcher="launcher_basic.nsi",
-    ):
-        """Create exe launcher with NSIS"""
-        assert name.endswith(".exe")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        icon_fname = str(Path(portable_dir) / "icons" / icon)
-        assert Path(icon_fname).is_file()
-
-        # Customizing NSIS script
-        if command is None:
-            if args is not None and ".pyw" in args:
-                command = "${WINPYDIR}\pythonw.exe"
-            else:
-                command = "${WINPYDIR}\python.exe"
-        if args is None:
-            args = ""
-        if workdir is None:
-            workdir = ""
-        fname = str(Path(self.winpydir) / (Path(name).stem + ".nsi"))
-
-        data = [
-            ("WINPYDIR", f"$EXEDIR\{self.python_namedir}"), #2024-12-22
-            ("WINPYVER", self.winpyver),
-            ("COMMAND", command),
-            ("PARAMETERS", args),
-            ("WORKDIR", workdir),
-            ("Icon", icon_fname),
-            ("OutFile", name),
-        ]
-
-        build_nsis(launcher, fname, data)
 
     def create_python_batch(
         self,
@@ -613,87 +443,11 @@ call "%~dp0env_for_icons.bat"
 
         self._print("Creating launchers")
 
-    
-        self.create_launcher(
-            "WinPython Command Prompt.exe",
-            "cmd.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k cmd.bat",
-        )    
-    
-        #self.create_launcher_shimmy(
-        #    "WinPython Powershell Prompt.exe",
-        #    "powershell.ico",
-        #    command="Powershell.exe",
-        #    args=r"start-process -WindowStyle Hidden -FilePath ([dollar]ENV:WINPYDIRICONS + '\scripts\cmd_ps.bat')",
-        #)
-
-        self.create_launcher(
-            "WinPython Powershell Prompt.exe",
-            "powershell.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs cmd_ps.bat",
-       )
-
-        self.create_launcher(
-            "WinPython Interpreter.exe",
-            "python.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k winpython.bat",
-        )
-
-        self.create_launcher(
-            "IDLE (Python GUI).exe",
-            "python.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs winidle.bat",
-        )
-
-        self.create_launcher(
-            "Spyder.exe",
-            "spyder.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs winspyder.bat",
-        )
-
-        self.create_launcher(
-            "Spyder reset.exe",
-            "spyder_reset.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs spyder_reset.bat",
-        )
-
-        self.create_launcher(
-            "WinPython Control Panel.exe",
-            "winpython.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k wpcp.bat",
-        )
-
-        # Jupyter launchers
-
-        self.create_launcher(
-            "Jupyter Notebook.exe",
-            "jupyter.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k winipython_notebook.bat",  # like VSCode + Rise way
-            # args=r'/k winjupyter_nbclassic.bat',  # Jupyterlab in classic look
-        )
-
-        self.create_launcher(
-            "Jupyter Lab.exe",
-            "jupyter.ico",
-            command="$SYSDIR\cmd.exe",
-            args=r"/k winjupyter_lab.bat",
-        )
-
-        # VSCode launcher
-        self.create_launcher(
-            "VS Code.exe",
-            "code.ico",
-            command="wscript.exe",
-            args=r"Noshell.vbs winvscode.bat",
-        )
+        # 2025-01-04: copy launchers premade per the Datalab-Python way
+        portable_dir = str(Path(__file__).resolve().parent / "portable"  / "launchers_final")
+        for path in Path(portable_dir).rglob('*.exe'):
+            shutil.copy2(path, Path(self.winpydir) )
+            print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",Path(self.winpydir))
 
         self._print_done()
 
@@ -748,8 +502,6 @@ rem set WINPYDIRBASE=
 set JUPYTER_DATA_DIR=%HOME%
 set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
 set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
-set WINPYARCH=WIN32
-if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 set FINDDIR=%WINDIR%\system32
 echo ";%PATH%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
 if %ERRORLEVEL% NEQ 0 (
@@ -809,9 +561,6 @@ $env:HOME = "$env:WINPYDIRBASE\settings"
 
 $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
-$env:WINPYARCH = 'WIN32'
-if ($env:WINPYARCH.subString($env:WINPYARCH.length-5, 5) -eq 'amd64')  {
-   $env:WINPYARCH = 'WIN-AMD64' } 
 
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
  $env:PATH = """
@@ -911,23 +660,6 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
             do_changes=changes,
         )
 
-        self.create_batch_script(
-            "Noshell.vbs",
-            r"""
-'from http://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window/390129
-If WScript.Arguments.Count >= 1 Then
-    ReDim arr(WScript.Arguments.Count-1)
-    For i = 0 To WScript.Arguments.Count-1
-        Arg = WScript.Arguments(i)
-        If InStr(Arg, " ") > 0 or InStr(Arg, "&") > 0 Then Arg = chr(34) & Arg & chr(34)
-      arr(i) = Arg
-    Next
-
-    RunCmd = Join(arr)
-    CreateObject("Wscript.Shell").Run RunCmd, 0 , True
-End If
-        """,
-        )
 
         self.create_batch_script(
             "WinPythonIni.py",  # Replaces winpython.vbs, and a bit of env.bat
@@ -1351,7 +1083,10 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             )  # Create/re-create the WinPython base directory
         self._print(f"Creating WinPython {my_winpydir} base directory")
         if Path(self.winpydir).is_dir() and remove_existing and not self.simulation:
-            shutil.rmtree(self.winpydir, onexc=utils.onerror)
+            try:
+                shutil.rmtree(self.winpydir, onexc=utils.onerror)
+            except TypeError: # before 3.12
+                shutil.rmtree(self.winpydir, onerror=utils.onerror)    
         if not Path(self.winpydir).is_dir():
             os.mkdir(self.winpydir)
         if remove_existing and not self.simulation:

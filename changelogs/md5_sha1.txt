@@ -1,3 +1,18 @@
+### WinPython 2024-05 release (January 3rd, 2025)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
+3378af265aefee3129171e3165448cfb | cfa99a4fed09996492fd72e2a0d8a441a46050b3 | 2727f61b2702232337a46e39c006f24bd1084395cdf27d076c55d39756c406cc | Winpython64-3.12.8.0dot.exe       |   23 442 531 Bytes | efde9241b8922abab035f388e1125069a43bb9d3d48ec5d1667b7d81b4d47061
+139c4bbd020a3082ba164c3e7d32ef59 | a09a8a71047e2b0a5c4f39585249de862c279130 | fabb3f7af4e00fd1b45874d37a63ed2239f62c0935834aa91b83645ba04cd7ba | Winpython64-3.12.8.0dot.7z        |   23 227 496 Bytes | 186585ae19af5abf541f88a2a7d6acccc894565280c4e5ca93afdff408160a97
+6e72ee9a3e348c2b3babb90762e85e29 | 65e1f774b02f20c8d386c058a3ed1f797a22d20e | c4c59403370e62169bbeba06f140f0da76b2ee5a5a51ebcfdb3d3ad663b2688a | Winpython64-3.12.8.0slim.exe      |  672 113 338 Bytes | 219537f13844cdae7ecc4d00053830e7572a66b46b7f4cdc2c41b6131e6213c9
+07fcf9589f8470a53abfa0320d77ba2a | 3c24c434e4b95d131ef4b6b9703cbaf2a96d41c3 | c872dcb59302af13ce098e6904dff8fe778cd950b8219189d8634bade609bdbb | Winpython64-3.12.8.0slim.7z       |  671 899 744 Bytes | 7111b4bf2ee2497296ab0d022606fbcad7d291f8ff10a0cf768dfc44a42423f4
+2d60b1a863fed5cf63d7430d0904a461 | e2a2838cecec6bdeb9d48b998e1b41b362649063 | 338a117a537b9b061314fc38f1a957c34b851d8399edc9705261810da6f2e167 | Winpython64-3.13.1.0dot.exe       |   25 157 185 Bytes | 09ec69f4e2e2487b6636cb5f4b242091f9c1b0f9b1c3b2e78b2d4fa0fee0c56d
+7699b8f3727548585c17fa806dfc4d14 | 6e5cc08f958f3c92674a18451a3e1d2a6e49894b | 582985c573c900d1120fc0eae54290c607e578eb055679673170f9ef943c13a2 | Winpython64-3.13.1.0dot.7z        |   24 942 148 Bytes | da0233c851631a8d12c86e0d6781e092d562874d8a7c1b337ccd1fac7c235efb
+db2769c756bc3eb4bd40a941dc667d72 | 5bfcc0492025b606681563c3c73d8b2e5b415313 | 47b9a4ce75efb29d78dda80716d6c35f9a13621efd3a89ef8242a114ef8001a3 | Winpython64-3.13.1.0dot.zip       |   39 640 324 Bytes | 1c37c1a2f32e43770f6d105948d7866acd5331c1a19b1c70c5d276604db2a45c
+efe121af4dca37595c871fec340a2bda | 44e6d681f5c6ffb7f1e1fef27ecd800cf04d0fff | ed86375c2d6a9de8bddf9889058e299f50ea26432e00e9a74d1d20771e388c55 | Winpython64-3.13.1.0slim.exe      |  600 808 320 Bytes | 9f2ed14f54002545e6999321bb981ccb74e280b6786fa289aba7bc09877d71a9
+a24d30ebbf06848279f3a46ed60d42d7 | 982e4c1eb1fcb03432ac4f5eac0d252a9fd65776 | 87fb127b075f0de76f854da6e17bc02819e093cd6b87f7a94d4831c7c490a286 | Winpython64-3.13.1.0slim.7z       |  600 593 165 Bytes | 882600d3c84c9734cdace8f1445c60777a91b6678541ee6755b816509ecfb234
+
+
 ### WinPython 2024-04 release (September 14th, 2024)
 
 
