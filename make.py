@@ -252,15 +252,6 @@ Name | Version | Description
         return f"{self.distribution.architecture}"
 
     @property
-    def py_arch(self):
-        """Return distribution architecture, in Python distutils format:
-        win-amd64 or win32"""
-        if self.distribution.architecture == 64:
-            return "win-amd64"
-        else:
-            return "win32"
-
-    @property
     def prepath(self):
         """Return PATH contents to be prepend to the environment variable"""
         path = [
@@ -511,8 +502,6 @@ rem set WINPYDIRBASE=
 set JUPYTER_DATA_DIR=%HOME%
 set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
 set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
-set WINPYARCH=WIN32
-if  "%WINPYDIR:~-5%"=="amd64" set WINPYARCH=WIN-AMD64
 set FINDDIR=%WINDIR%\system32
 echo ";%PATH%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
 if %ERRORLEVEL% NEQ 0 (
@@ -572,9 +561,6 @@ $env:HOME = "$env:WINPYDIRBASE\settings"
 
 $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
-$env:WINPYARCH = 'WIN32'
-if ($env:WINPYARCH.subString($env:WINPYARCH.length-5, 5) -eq 'amd64')  {
-   $env:WINPYARCH = 'WIN-AMD64' } 
 
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
  $env:PATH = """
