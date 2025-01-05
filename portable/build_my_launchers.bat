@@ -1,5 +1,6 @@
-rem build lmaunchers in WINDOWS and CONSOLE version
-rem tweaked from @datalab-winpython provided code
+rem build launchers in WINDOWS and CONSOLE version
+rem tweaked from @datalab-winpython provided code in \launchers_src
+rem  @datalab-winpython licence is in \launchers_src\LICENCE
 @echo off
 
 set VCVARS_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"

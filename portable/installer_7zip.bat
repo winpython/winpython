@@ -43,7 +43,8 @@ rem 7-zip uncompress the directory compressed %DISTDIR% (no option to change it 
 rem ================================================================
 rem  2019-03-16 copy license at source (due to 7zip limitations)
 
-copy/Y %PORTABLE_DIR%\license.txt %DISTDIR%\license.txt
+REM 2025-01-05 done in make.py 
+rem copy/Y %PORTABLE_DIR%\license.txt %DISTDIR%\license.txt
 
 rem ================================================================
 
