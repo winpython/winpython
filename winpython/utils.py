@@ -367,20 +367,16 @@ def patch_shebang_line(
             + '\\'
         )
     executable = sys.executable
-    if sys.version_info[0] == 2:
+
+    shebang_line = re.compile(
+        rb"""(#!.*pythonw?\.exe)"?"""
+    )  # Python3+
+    if 'pypy3' in sys.executable:
         shebang_line = re.compile(
-            r"""(#!.*pythonw?\.exe)"?"""
-        )  # Python2.7
-    else:
-        shebang_line = re.compile(
-            rb"""(#!.*pythonw?\.exe)"?"""
-        )  # Python3+
-        if 'pypy3' in sys.executable:
-            shebang_line = re.compile(
-            rb"""(#!.*pypy3w?\.exe)"?"""
-        )  # Pypy3+
-            
-        target_dir = target_dir.encode('utf-8')
+        rb"""(#!.*pypy3w?\.exe)"?"""
+    )  # Pypy3+
+    target_dir = target_dir.encode('utf-8')
+
     with open(fname, 'rb') as fh:
         initial_content = fh.read()
         fh.close
@@ -415,10 +411,6 @@ def patch_shebang_line_py(
     import re
     import sys
 
-    if sys.version_info[0] == 2:
-        # Python 2.x doesn't create .py files for .exe files. So, Moving
-        # WinPython doesn't break running executable files.
-        return
     if to_movable:
         exec_path = r'#!.\python.exe'
         if 'pypy3' in sys.executable:  # PyPy !
