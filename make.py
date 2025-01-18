@@ -612,12 +612,12 @@ Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-Executi
             "env_for_icons.bat",
             r"""@echo off
 call "%~dp0env.bat"
-set WINPYWORKDIR=%WINPYDIRBASE%\Notebooks
 
 rem default is as before: Winpython ..\Notebooks
+set WINPYWORKDIR=%WINPYDIRBASE%\Notebooks
 set WINPYWORKDIR1=%WINPYWORKDIR%
 
-rem if we have a file or directory in %1 parameter, we use that directory 
+rem if we have a file or directory in %1 parameter, we use that directory to define WINPYWORKDIR1
 if not "%~1"=="" (
    if exist "%~1" (
       if exist "%~1\" (
@@ -641,11 +641,13 @@ FOR /F "delims=" %%i IN ('""%WINPYDIR%\python.exe" "%~dp0WinpythonIni.py""') DO 
 
 %winpythontoexec%set winpythontoexec=
 
-rem 2024-08-18: we go initial directory WINPYWORKDIR if no direction and we are on icon directory
+rem 2025-01-18: we go directory WINPYWORKDIR1 if we are on icon or script directory
+rem nota: WINPYWORKDRI1 can have be overwriten per winpython.ini
+
 rem old NSIS launcher is  by default at icon\scripts level
-if  "%__CD__%scripts\"=="%~dp0"  if "%WINPYWORKDIR1%"=="%WINPYDIRBASE%\Notebooks"  cd/D %WINPYWORKDIR1%
+if  "%__CD__%scripts\"=="%~dp0"  cd/D %WINPYWORKDIR1%
 rem new shimmy launcher is by default at icon level
-if  "%__CD__%"=="%~dp0"  if "%WINPYWORKDIR1%"=="%WINPYDIRBASE%\Notebooks"  cd/D %WINPYWORKDIR1%
+if  "%__CD__%"=="%~dp0" cd/D %WINPYWORKDIR1%
 
 
 rem ******************
@@ -842,7 +844,7 @@ pause
         self.create_batch_script(
             "cmd.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 cmd.exe /k""",
         )
 
@@ -857,7 +859,7 @@ exit
         self.create_batch_script(
             "python.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 "%WINPYDIR%\python.exe"  %*
 """,
             do_changes=changes,
@@ -866,7 +868,7 @@ call "%~dp0env_for_icons.bat"
         self.create_batch_script(
             "winpython.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 rem backward compatibility for non-ptpython users
 if exist "%WINPYDIR%\scripts\ptpython.exe" (
     "%WINPYDIR%\scripts\ptpython.exe" %*
@@ -880,7 +882,7 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
         self.create_batch_script(
             "winidle.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 """,
             do_changes=changes,
@@ -889,7 +891,7 @@ call "%~dp0env_for_icons.bat"
         self.create_batch_script(
             "winspyder.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
 """,
         )
@@ -905,7 +907,7 @@ call "%~dp0env_for_icons.bat"
         self.create_batch_script(
             "winipython_notebook.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
 """,
         )
@@ -913,7 +915,7 @@ call "%~dp0env_for_icons.bat"
         self.create_batch_script(
             "winjupyter_lab.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 "%WINPYDIR%\scripts\jupyter-lab.exe" %*
 """,
         )
@@ -921,7 +923,7 @@ call "%~dp0env_for_icons.bat"
         self.create_batch_script(
             "winqtconsole.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
 """,
         )
@@ -955,7 +957,7 @@ call "%~dp0unregister_python.bat" --all""",
         self.create_batch_script(
             "wpcp.bat",
             r"""@echo off
-call "%~dp0env_for_icons.bat"
+call "%~dp0env_for_icons.bat" %*
 cmd.exe /k "echo wppm & wppm"
 """,
             do_changes=changes,
