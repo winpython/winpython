@@ -843,16 +843,12 @@ pause
             "cmd.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 cmd.exe /k""",
         )
 
         self.create_batch_script(
             "WinPython_Terminal.bat",
             r"""@echo off
-rem call "%~dp0env_for_icons.bat"
-rem if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
-rem "%USERPROFILE%\AppData\Local\Microsoft\WindowsApps\wt.exe"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 exit
 """,
@@ -862,8 +858,6 @@ exit
             "python.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-rem backward compatibility for  python command-line users
-if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
 "%WINPYDIR%\python.exe"  %*
 """,
             do_changes=changes,
@@ -873,7 +867,6 @@ if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd %WINPYWORKDIR1%
             "winpython.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 rem backward compatibility for non-ptpython users
 if exist "%WINPYDIR%\scripts\ptpython.exe" (
     "%WINPYDIR%\scripts\ptpython.exe" %*
@@ -888,7 +881,6 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
             "winidle.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
 """,
             do_changes=changes,
@@ -898,7 +890,6 @@ cd/D "%WINPYWORKDIR1%"
             "winspyder.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-rem cd/D "%WINPYWORKDIR%"
 "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
 """,
         )
@@ -907,7 +898,6 @@ rem cd/D "%WINPYWORKDIR%"
             "spyder_reset.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\spyder.exe" --reset %*
 """,
         )
@@ -916,7 +906,6 @@ cd/D "%WINPYWORKDIR1%"
             "winipython_notebook.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
 """,
         )
@@ -925,7 +914,6 @@ cd/D "%WINPYWORKDIR1%"
             "winjupyter_lab.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-lab.exe" %*
 """,
         )
@@ -934,7 +922,6 @@ cd/D "%WINPYWORKDIR1%"
             "winqtconsole.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 "%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
 """,
         )
@@ -969,7 +956,6 @@ call "%~dp0unregister_python.bat" --all""",
             "wpcp.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-if not "%WINPYWORKDIR%"=="%WINPYWORKDIR1%" cd/d %WINPYWORKDIR1%
 cmd.exe /k "echo wppm & wppm"
 """,
             do_changes=changes,
@@ -999,9 +985,7 @@ call "%~dp0env.bat"  %*
         self.create_batch_script(
             "winvscode.bat",
             r"""@echo off
-rem launcher for VScode
 call "%~dp0env_for_icons.bat"
-cd/D "%WINPYWORKDIR1%"
 if exist "%WINPYDIR%\..\t\vscode\code.exe" (
     "%WINPYDIR%\..\t\vscode\code.exe" %*
 ) else (
