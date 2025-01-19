@@ -473,8 +473,8 @@ call "%~dp0env_for_icons.bat"
             "env.bat",
             r"""@echo off
 set WINPYDIRBASE=%~dp0..
-rem set PYTHONUTF8=1 would create issues in "movable" patching
-rem get a normalize path
+
+rem get a normalized path
 set WINPYDIRBASETMP=%~dp0..
 pushd %WINPYDIRBASETMP%
 set WINPYDIRBASE=%__CD__%
@@ -492,14 +492,16 @@ set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
 set WINPYVER="""
             + self.winpyver
             + r"""
-rem 2023-02-12 try utf-8 on console
+
+rem 2023-02-12 utf-8 on console to avoid pip crash
 rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
 set PYTHONIOENCODING=utf-8
+rem set PYTHONUTF8=1 creates issues in "movable" patching
+
 
 set HOME=%WINPYDIRBASE%\settings
-rem read https://github.com/winpython/winpython/issues/839
+rem see https://github.com/winpython/winpython/issues/839
 rem set USERPROFILE=%HOME%
-rem set WINPYDIRBASE=
 set JUPYTER_DATA_DIR=%HOME%
 set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
 set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
@@ -637,24 +639,20 @@ set WINPYWORKDIR1=%WINPYWORKDIR1:"=%
 rem remove some potential last \
 if "%WINPYWORKDIR1:~-1%"=="\" set WINPYWORKDIR1=%WINPYWORKDIR1:~0,-1%
 
+rem you can use winpython.ini to change defaults
 FOR /F "delims=" %%i IN ('""%WINPYDIR%\python.exe" "%~dp0WinpythonIni.py""') DO set winpythontoexec=%%i
-
 %winpythontoexec%set winpythontoexec=
 
-rem 2025-01-18: we go directory WINPYWORKDIR1 if we are on icon or script directory
-rem nota: WINPYWORKDRI1 can have be overwriten per winpython.ini
 
-rem old NSIS launcher is  by default at icon\scripts level
+rem Preventive Working Directories creation if needed
+if not "%WINPYWORKDIR%"=="" if not exist "%WINPYWORKDIR%" mkdir "%WINPYWORKDIR%"
+if not "%WINPYWORKDIR1%"=="" if not exist "%WINPYWORKDIR1%" mkdir "%WINPYWORKDIR1%"
+
+
+rem Change of directory only if we are in a launcher directory
 if  "%__CD__%scripts\"=="%~dp0"  cd/D %WINPYWORKDIR1%
-rem new shimmy launcher is by default at icon level
-if  "%__CD__%"=="%~dp0" cd/D %WINPYWORKDIR1%
+if  "%__CD__%"=="%~dp0"          cd/D %WINPYWORKDIR1%
 
-
-rem ******************
-rem missing student directory part
-rem ******************
-
-if not exist "%WINPYWORKDIR%" mkdir "%WINPYWORKDIR%"
 
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYVER:~0,1%"
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
