@@ -27,12 +27,12 @@ assert Path(CHANGELOGS_DIR).is_dir()
 
 def get_7zip_exe():
     """Return 7zip executable"""
-    localdir = str(Path(sys.prefix).parent.parent)
-    for dirname in (
-        r"C:\Program Files",
-        r"C:\Program Files (x86)",
-        str(Path(localdir) / "7-Zip"),
-    ):
+    SEVEN_ZIP_DIRS = [
+       r"C:\Program Files",
+       r"C:\Program Files (x86)",
+       str(Path(sys.prefix).parent.parent / "7-Zip")
+       ]
+    for dirname in SEVEN_ZIP_DIRS:
         for subdirname in (".", "App"):
             exe = str(Path(dirname) / subdirname / "7-Zip" / "7z.exe")
             if Path(exe).is_file():
@@ -48,18 +48,14 @@ def replace_in_7zip_file(fname, data):
     fd.close()
     for idx, line in enumerate(lines):
         for start, text in data:
-            if start not in (
-                "Icon",
-                "OutFile",
-            ) and not start.startswith("!"):
+            if start not in ("Icon", "OutFile") and not start.startswith("!"):
                 start = "set " + start
             if line.startswith(start + "="):
                 lines[idx] = line[: len(start) + 1] + f"{text}" + "\n"
-    fd = open(fname, "w")
-    fd.writelines(lines)
-    print("7-zip for ", fname, "is", lines)
-    fd.close()
 
+    with open(fname, "w") as fd:
+        fd.writelines(lines)
+    print("7-zip for ", fname, "is", lines)
 
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
@@ -79,15 +75,8 @@ def build_7zip(srcname, dstname, data):
             shell=True,
             stdout=sys.stderr,
         )
-        if retcode < 0:
-            print(
-                "Child was terminated by signal",
-                -retcode,
-                file=sys.stderr,
-            )
-    except OSError as e:
+    except subprocess.CalledProcessError as e:
         print("Execution failed:", e, file=sys.stderr)
-
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
@@ -984,9 +973,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
     def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
         """tools\..\run_complement.bat for final complements"""
         print(f"now {this_batch} in tooldirs\..")
-        for post_complement in list(
-            set([str(Path(s).parent) for s in self._toolsdirs])
-        ):
+        unique_toolsdirs = set([str(Path(s).parent) for s in self._toolsdirs])
+        for post_complement in unique_toolsdirs:
             filepath = str(Path(post_complement) / this_batch)
             if Path(filepath).is_file():
                 print(f'launch "{filepath}"  for  "{self.winpydir}"')
@@ -997,28 +985,9 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                         shell=True,
                         stdout=sys.stderr,
                     )
-                    if retcode < 0:
-                        print(
-                            "Child was terminated by signal",
-                            -retcode,
-                            file=sys.stderr,
-                        )
-                        self._print(
-                            "Child was terminated by signal ! ",
-                            -retcode,
-                            file=sys.stderr,
-                        )
-                except OSError as e:
-                    print(
-                        "Execution failed:",
-                        e,
-                        file=sys.stderr,
-                    )
-                    self._print(
-                        "Execution failed !:",
-                        e,
-                        file=sys.stderr,
-                    )
+                except subprocess.CalledProcessError as e:
+                    print("Execution failed:", e, file=sys.stderr)
+                    self._print("Execution failed !:", e, file=sys.stderr)
         self._print_done()
 
     def make(
