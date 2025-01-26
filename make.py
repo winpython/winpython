@@ -351,64 +351,58 @@ call "%~dp0env_for_icons.bat"
     def _copy_dev_tools(self):
         """Copy dev tools"""
         self._print(f"Copying tools from {self.toolsdirs} to {self.winpydir}/t")
-        toolsdir = str(Path(self.winpydir) / "t")
-        os.makedirs(Path(toolsdir), exist_ok=True)  
-        for dirname in [
-            ok_dir for ok_dir in self.toolsdirs if Path(ok_dir).is_dir()
-        ]:  # the ones in the make.py script environment
+        toolsdir = Path(self.winpydir) / "t"
+        toolsdir.mkdir(parents=True, exist_ok=True)
+        for dirname in [ok_dir for ok_dir in self.toolsdirs if Path(ok_dir).is_dir()]:
             for name in os.listdir(dirname):
-                path = str(Path(dirname) / name)
-                copy = shutil.copytree if Path(path).is_dir() else shutil.copyfile
+                path = Path(dirname) / name
+                copy = shutil.copytree if path.is_dir() else shutil.copyfile
                 if self.verbose:
-                    print(path + " --> " + str(Path(toolsdir) / name))
-                copy(path, str(Path(toolsdir) / name))
+                    print(f"{path} --> {toolsdir / name}")
+                copy(path, toolsdir / name)
         self._print_done()
         # move node higher
-        nodejs_current = str(Path(toolsdir) / "n")
-        nodejs_target = self.winpydir + self.NODEJS_PATH
-        if nodejs_current != nodejs_target and Path(nodejs_current).is_dir():
+        nodejs_current = toolsdir / "n"
+        nodejs_target = Path(self.winpydir) / self.NODEJS_PATH
+        if nodejs_current != nodejs_target and nodejs_current.is_dir():
             shutil.move(nodejs_current, nodejs_target)
 
     def _copy_dev_docs(self):
         """Copy dev docs"""
-        docsdir = str(Path(self.winpydir) / "notebooks")
-        self._print(f"Copying Noteebook docs from {self.docsdirs} to {docsdir}")
-        os.makedirs(Path(docsdir), exist_ok=True)      
-        docsdir = str(Path(self.winpydir) / "notebooks" / "docs")
-        os.makedirs(Path(docsdir), exist_ok=True)  
+        docsdir = Path(self.winpydir) / "notebooks"
+        self._print(f"Copying Notebook docs from {self.docsdirs} to {docsdir}")
+        docsdir.mkdir(parents=True, exist_ok=True)
+        docsdir = docsdir / "docs"
+        docsdir.mkdir(parents=True, exist_ok=True)
         for dirname in self.docsdirs:
             for name in os.listdir(dirname):
-                path = str(Path(dirname) / name)
-                copy = shutil.copytree if Path(path).is_dir() else shutil.copyfile
-                copy(path, str(Path(docsdir) / name))
+                path = Path(dirname) / name
+                copy = shutil.copytree if path.is_dir() else shutil.copyfile
+                copy(path, docsdir / name)
                 if self.verbose:
-                    print(path + " --> " + str(Path(docsdir) / name))
+                    print(f"{path} --> {docsdir / name}")
         self._print_done()
 
     def _create_launchers(self):
         """Create launchers"""
-
         self._print("Creating launchers")
-
         # 2025-01-04: copy launchers premade per the Datalab-Python way
-        portable_dir = str(Path(__file__).resolve().parent / "portable"  / "launchers_final")
-        for path in Path(portable_dir).rglob('*.exe'):
-            shutil.copy2(path, Path(self.winpydir) )
+        portable_dir = Path(__file__).resolve().parent / "portable" / "launchers_final"
+        for path in portable_dir.rglob('*.exe'):
+            shutil.copy2(path, Path(self.winpydir))
             print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",Path(self.winpydir))
         for path in (Path(__file__).resolve().parent / "portable").rglob('licence*.*'):
-            shutil.copy2(path, Path(self.winpydir) )
-
+            shutil.copy2(path, Path(self.winpydir))
         self._print_done()
 
     def _create_batch_scripts_initial(self):
         """Create batch scripts"""
         self._print("Creating batch scripts initial")
-        conv = lambda path: ";".join(["%WINPYDIR%\\" + pth for pth in path])
+        conv = lambda path: ";".join([f"%WINPYDIR%\\{pth}" for pth in path])
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
 
-        convps = lambda path: ";".join(["$env:WINPYDIR\\" + pth for pth in path])
+        convps = lambda path: ";".join([f"$env:WINPYDIR\\{pth}" for pth in path])
         pathps = convps(self.prepath) + ";$env:path;" + convps(self.postpath)
-
         # PyPy3
         shorty = self.distribution.short_exe
         changes = (
@@ -417,56 +411,47 @@ call "%~dp0env_for_icons.bat"
         )
         if (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
             changes += ((r"\Lib\idlelib", r"\lib-python\3\idlelib"),)
-        self.create_batch_script(
-            "env.bat",
-            r"""@echo off
+
+        env_script_content = f"""@echo off
 set WINPYDIRBASE=%~dp0..
 
 rem get a normalized path
 set WINPYDIRBASETMP=%~dp0..
 pushd %WINPYDIRBASETMP%
 set WINPYDIRBASE=%__CD__%
-if "%WINPYDIRBASE:~-1%"=="\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
+if "%WINPYDIRBASE:~-1%"=="\\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
 set WINPYDIRBASETMP=
 popd
 
-set WINPYDIR=%WINPYDIRBASE%"""
-            + "\\"
-            + self.python_namedir
-            + r"""
-rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
-set PYTHON=%WINPYDIR%\python.exe
-set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
-set WINPYVER="""
-            + self.winpyver
-            + r"""
+set WINPYDIR=%WINPYDIRBASE%\\{self.python_namedir}
+rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%\\python.exe
+set PYTHON=%WINPYDIR%\\python.exe
+set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\\Lib;%WINPYDIR%\\DLLs
+set WINPYVER={self.winpyver}
 
 rem 2023-02-12 utf-8 on console to avoid pip crash
 rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
 set PYTHONIOENCODING=utf-8
 rem set PYTHONUTF8=1 creates issues in "movable" patching
 
-
-set HOME=%WINPYDIRBASE%\settings
+set HOME=%WINPYDIRBASE%\\settings
 rem see https://github.com/winpython/winpython/issues/839
 rem set USERPROFILE=%HOME%
 set JUPYTER_DATA_DIR=%HOME%
-set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
-set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
-set FINDDIR=%WINDIR%\system32
-echo ";%PATH%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
+set JUPYTER_CONFIG_DIR=%WINPYDIR%\\etc\\jupyter
+set JUPYTER_CONFIG_PATH=%WINPYDIR%\\etc\\jupyter
+set FINDDIR=%WINDIR%\\system32
+echo ";%PATH%;" | %FINDDIR%\\find.exe /C /I ";%WINPYDIR%\\;" >nul
 if %ERRORLEVEL% NEQ 0 (
-   set "PATH="""
-            + path
-            + r""""
+   set "PATH={path}"
    cd .
-)         
+)
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
-if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
-""",
-            do_changes=changes,
-        )
+if exist "%WINPYDIR%\\Lib\\site-packages\\PyQt5\\__init__.py" set QT_API=pyqt5
+"""
+
+        self.create_batch_script("env.bat", env_script_content, do_changes=changes)
 
         self.create_batch_script(
             "WinPython_PS_Prompt.ps1",
