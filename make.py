@@ -11,71 +11,107 @@ Created on Sun Aug 12 11:17:50 2012
 """
 
 import os
-from pathlib import Path
 import re
-import subprocess
 import shutil
+import subprocess
 import sys
+from pathlib import Path
 
-# Local imports
 from winpython import wppm, utils
+# Local imports
 import diff
 
-CHANGELOGS_DIR = str(Path(__file__).parent / "changelogs")
-assert Path(CHANGELOGS_DIR).is_dir()
+CHANGELOGS_DIR = Path(__file__).parent / "changelogs"
+PORTABLE_DIR = Path(__file__).parent / "portable"
+
+assert CHANGELOGS_DIR.is_dir(), f"Changelogs directory not found: {CHANGELOGS_DIR}"
+assert PORTABLE_DIR.is_dir(), f"Portable directory not found: {PORTABLE_DIR}"
 
 
-def get_7zip_exe():
-    """Return 7zip executable"""
-    SEVEN_ZIP_DIRS = [
-       r"C:\Program Files",
-       r"C:\Program Files (x86)",
-       str(Path(sys.prefix).parent.parent / "7-Zip")
-       ]
-    for dirname in SEVEN_ZIP_DIRS:
-        for subdirname in (".", "App"):
-            exe = Path(dirname) / subdirname / "7-Zip" / "7z.exe"
-            if exe.is_file():
-                return str(exe)
+def find_7zip_executable() -> str:
+    """
+    Locates the 7-Zip executable (7z.exe) in common installation directories.
+
+    Raises:
+        RuntimeError: If 7-Zip executable is not found.
+
+    Returns:
+        str: Path to the 7-Zip executable.
+    """
+    program_files_dirs = [
+        Path(r"C:\Program Files"),
+        Path(r"C:\Program Files (x86)"),
+        Path(sys.prefix).parent.parent / "7-Zip",
+    ]
+    for base_dir in program_files_dirs:
+        for subdir in [".", "App"]:
+            exe_path = base_dir / subdir / "7-Zip" / "7z.exe"
+            if exe_path.is_file():
+                return str(exe_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
 
-def replace_in_7zip_file(fname, data):
-    """Replace text in line starting with *start*, from this position:
-    data is a list of (start, text) tuples"""
-    with open(fname, "r") as fd:
-        lines = fd.readlines()
 
-    for idx, line in enumerate(lines):
-        for start, text in data:
-            if start not in ("Icon", "OutFile") and not start.startswith("!"):
-                start = "set " + start
-            if line.startswith(start + "="):
-                lines[idx] = line[: len(start) + 1] + f"{text}" + "\n"
+def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
+    """
+    Replaces lines in a file that start with a given prefix.
 
-    with open(fname, "w") as fd:
-        fd.writelines(lines)
-    print("7-zip for ", fname, "is", lines)
+    Args:
+        filepath: Path to the file to modify.
+        replacements: A list of tuples, where each tuple contains:
+            - The prefix of the line to replace (str).
+            - The new text for the line (str).
+    """
+    lines: list[str] = []
+    with open(filepath, "r") as f:
+        lines = f.readlines()
 
-def build_7zip(srcname, dstname, data):
-    """7-Zip Setup Script"""
-    SEVENZIP_EXE = get_7zip_exe()
-    portable_dir = Path(__file__).resolve().parent / "portable"
-    shutil.copy(portable_dir / srcname, dstname)
+    updated_lines = list(lines)  # Create a mutable copy
+
+    for index, line in enumerate(lines):
+        for prefix, new_text in replacements:
+            start_prefix = prefix
+            if prefix not in ("Icon", "OutFile") and not prefix.startswith("!"):
+                start_prefix = "set " + prefix
+            if line.startswith(start_prefix + "="):
+                updated_lines[index] = f"{start_prefix}={new_text}\n"
+
+    with open(filepath, "w") as f:
+        f.writelines(updated_lines)
+    print(f"Updated 7-zip script: {filepath}")
+
+
+def build_installer_7zip(
+    script_template_path: Path, output_script_path: Path, replacements: list[tuple[str, str]]
+):
+    """
+    Creates a 7-Zip installer script by copying a template and applying text replacements.
+
+    Args:
+        script_template_path: Path to the template 7-Zip script (.bat file).
+        output_script_path: Path to save the generated 7-Zip script.
+        replacements: A list of tuples for text replacements (prefix, new_text).
+    """
+    sevenzip_exe = find_7zip_executable()
+    shutil.copy(script_template_path, output_script_path)
+
+    # Standard replacements for all 7zip scripts
     data = [
-        ("PORTABLE_DIR", str(portable_dir)),
-        ("SEVENZIP_EXE", SEVENZIP_EXE),
-    ] + list(data)
-    replace_in_7zip_file(dstname, data)
+        ("PORTABLE_DIR", str(PORTABLE_DIR)),
+        ("SEVENZIP_EXE", sevenzip_exe),
+    ] + replacements
+
+    replace_lines_in_file(output_script_path, data)
+
     try:
-        # instead of a 7zip command line, we launch a script that does it
-        # retcode = subprocess.call(f'"{SEVENZIP_EXE}"  "{dstname}"'),
-        retcode = subprocess.call(
-            f'"{dstname}"  ',
-            shell=True,
-            stdout=sys.stderr,
-        )
+        # Execute the generated 7-Zip script
+        command = f'"{output_script_path}"'
+        print(f"Executing 7-Zip script: {command}")
+        subprocess.run(
+            command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stdout
+        )  # Use subprocess.run for better error handling
     except subprocess.CalledProcessError as e:
-        print("Execution failed:", e, file=sys.stderr)
+        print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
+
 
 class WinPythonDistribution(object):
     """WinPython distribution"""
@@ -301,56 +337,67 @@ call "%~dp0env_for_icons.bat"
 {changedir}{command}{script_name}{options} %*""",
         )
 
+    def create_installer_7zip(self, installer_type: str = ".exe"):
+        """
+        Creates a WinPython installer using 7-Zip.
 
-    def create_installer_7zip(self, installer_option=""):
-        """Create installer with 7-ZIP"""
-        self._print("Creating WinPython installer 7-ZIP")
-        portable_dir = str(Path(__file__).resolve().parent / "portable")
-        fname = str(Path(portable_dir) / "installer_7zip-tmp.bat")
-        data = (
-            ("DISTDIR", self.winpydir),
-            ("ARCH", self.winpy_arch),
-            (
-                "VERSION",
-                f"{self.python_fullversion}.{self.build_number}{self.flavor}",
-            ),
+        Args:
+            installer_type: Type of installer to create (".exe", ".7z", ".zip").
+        """
+        self._print_action(f"Creating WinPython installer ({installer_type})")
+        template_name = "installer_7zip.bat"
+        output_name = "installer_7zip-tmp.bat" # temp file to avoid overwriting template
+        if installer_type not in [".exe", ".7z", ".zip"]:
+            print(f"Warning: Unsupported installer type '{installer_type}'. Defaulting to .exe")
+            installer_type = ".exe"
+
+        replacements = [
+            ("DISTDIR", str(self.winpydir)),
+            ("ARCH", str(self.winpy_arch)),
+            ("VERSION", f"{self.python_fullversion}.{self.build_number}{self.flavor}"),
             (
                 "VERSION_INSTALL",
                 f'{self.python_fullversion.replace(".", "")}{self.build_number}',
             ),
             ("RELEASELEVEL", self.release_level),
-            ("INSTALLER_OPTION", installer_option),
-        )
-        build_7zip("installer_7zip.bat", fname, data)
-        self._print_done()
+            ("INSTALLER_OPTION", installer_type), # Pass installer type as option to bat script
+        ]
 
-    def _print(self, text):
-        """Print action text indicating progress"""
+        build_installer_7zip(
+            PORTABLE_DIR / template_name,
+            PORTABLE_DIR / output_name,
+            replacements
+        )
+        self._print_action_done()
+
+
+    def _print_action(self, text: str):
+        """Prints an action message with progress indicator."""
         if self.verbose:
             utils.print_box(text)
         else:
-            print(text + "...", end=" ")
+            print(f"{text}... ", end="", flush=True)
 
-    def _print_done(self):
-        """Print OK at the end of a process"""
+    def _print_action_done(self):
+        """Prints "OK" to indicate action completion."""
         if not self.verbose:
             print("OK")
 
     def _extract_python(self):
         """Extracting Python installer, creating distribution object"""
-        self._print("Extracting Python .zip version")
+        self._print_action("Extracting Python .zip version")
         utils.extract_archive(
             self.python_fname,
             targetdir=self.python_dir + r"\..",
         )
-        self._print_done()
+        self._print_action_done()
         # relocate to /python
         if Path(self.python_namedir) != Path(self.winpydir) / self.python_namedir: #2024-12-22 to /python
             os.rename(Path(self.python_dir), Path(self.winpydir) / self.python_namedir)
 
     def _copy_dev_tools(self):
         """Copy dev tools"""
-        self._print(f"Copying tools from {self.toolsdirs} to {self.winpydir}/t")
+        self._print_action(f"Copying tools from {self.toolsdirs} to {self.winpydir}/t")
         toolsdir = Path(self.winpydir) / "t"
         toolsdir.mkdir(parents=True, exist_ok=True)
         for dirname in [ok_dir for ok_dir in self.toolsdirs if Path(ok_dir).is_dir()]:
@@ -360,7 +407,7 @@ call "%~dp0env_for_icons.bat"
                 if self.verbose:
                     print(f"{path} --> {toolsdir / name}")
                 copy(path, toolsdir / name)
-        self._print_done()
+        self._print_action_done()
         # move node higher
         nodejs_current = toolsdir / "n"
         nodejs_target = Path(self.winpydir) / self.NODEJS_PATH
@@ -370,7 +417,7 @@ call "%~dp0env_for_icons.bat"
     def _copy_dev_docs(self):
         """Copy dev docs"""
         docsdir = Path(self.winpydir) / "notebooks"
-        self._print(f"Copying Notebook docs from {self.docsdirs} to {docsdir}")
+        self._print_action(f"Copying Notebook docs from {self.docsdirs} to {docsdir}")
         docsdir.mkdir(parents=True, exist_ok=True)
         docsdir = docsdir / "docs"
         docsdir.mkdir(parents=True, exist_ok=True)
@@ -381,11 +428,11 @@ call "%~dp0env_for_icons.bat"
                 copy(path, docsdir / name)
                 if self.verbose:
                     print(f"{path} --> {docsdir / name}")
-        self._print_done()
+        self._print_action_done()
 
     def _create_launchers(self):
         """Create launchers"""
-        self._print("Creating launchers")
+        self._print_action("Creating launchers")
         # 2025-01-04: copy launchers premade per the Datalab-Python way
         portable_dir = Path(__file__).resolve().parent / "portable" / "launchers_final"
         for path in portable_dir.rglob('*.exe'):
@@ -393,11 +440,11 @@ call "%~dp0env_for_icons.bat"
             print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",Path(self.winpydir))
         for path in (Path(__file__).resolve().parent / "portable").rglob('licence*.*'):
             shutil.copy2(path, Path(self.winpydir))
-        self._print_done()
+        self._print_action_done()
 
     def _create_batch_scripts_initial(self):
         """Create batch scripts"""
-        self._print("Creating batch scripts initial")
+        self._print_action("Creating batch scripts initial")
         conv = lambda path: ";".join([f"%WINPYDIR%\\{pth}" for pth in path])
         path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
 
@@ -706,7 +753,7 @@ if __name__ == "__main__":
 
     def _create_batch_scripts(self):
         """Create batch scripts"""
-        self._print("Creating batch scripts")
+        self._print_action("Creating batch scripts")
 
         # PyPy3
         shorty = self.distribution.short_exe
@@ -939,7 +986,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             filepath = str(Path(post_complement) / this_batch)
             if Path(filepath).is_file():
                 print(f'launch "{filepath}"  for  "{self.winpydir}"')
-                self._print(f'launch "{filepath}"  for  "{self.winpydir}" !')
+                self._print_action(f'launch "{filepath}"  for  "{self.winpydir}" !')
                 try:
                     retcode = subprocess.call(
                         f'"{filepath}"   "{self.winpydir}"',
@@ -948,8 +995,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     )
                 except subprocess.CalledProcessError as e:
                     print("Execution failed:", e, file=sys.stderr)
-                    self._print("Execution failed !:", e, file=sys.stderr)
-        self._print_done()
+                    self._print_action("Execution failed !:", e, file=sys.stderr)
+        self._print_action_done()
 
     def make(
         self,
@@ -973,7 +1020,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.winpydir = str(
                 Path(self.target) / my_winpydir
             )  # Create/re-create the WinPython base directory
-        self._print(f"Creating WinPython {my_winpydir} base directory")
+        self._print_action(f"Creating WinPython {my_winpydir} base directory")
         if Path(self.winpydir).is_dir() and remove_existing:
             try:
                 shutil.rmtree(self.winpydir, onexc=utils.onerror)
@@ -985,7 +1032,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             # (necessary if user is starting an application with a batch)
             os.makedirs(Path(self.winpydir) / "settings" / "AppData" / "Roaming", exist_ok=True)
             self._extract_python()  # unzip Python interpreter
-        self._print_done()
+        self._print_action_done()
 
         self.distribution = wppm.Distribution(
             self.python_dir,
@@ -999,7 +1046,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         )
 
         # Assert that WinPython version and real python version do match
-        self._print(
+        self._print_action(
             f"Python version{self.python_fullversion.replace('.','')}"
             + f"\nDistro Name {self.distribution.target}"
         )
@@ -1023,7 +1070,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 if self.install_options is not None:
                     actions += self.install_options
                 print(f"piping {' '.join(actions)}")
-                self._print(f"piping {' '.join(actions)}")
+                self._print_action(f"piping {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(req)
             self._copy_dev_tools()
@@ -1037,16 +1084,16 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     if self.install_options is not None:
                         actions += self.install_options
                     print(f"piping {' '.join(actions)}")
-                    self._print(f"piping {' '.join(actions)}")
+                    self._print_action(f"piping {' '.join(actions)}")
                     self.distribution.do_pip_action(actions)
             self._run_complement_batch_scripts()
             self.distribution.patch_standard_packages()
 
-            self._print("Cleaning up distribution")
+            self._print_action("Cleaning up distribution")
             self.distribution.clean_up()
-            self._print_done()
+            self._print_action_done()
         # Writing package index
-        self._print("Writing package index")
+        self._print_action("Writing package index")
         # winpyver2 = the version without build part but with self.distribution.architecture
         self.winpyver2 = f"{self.python_fullversion}.{self.build_number}"
         fname = str(
@@ -1063,10 +1110,10 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             fname,
             str(Path(CHANGELOGS_DIR) / Path(fname).name),
         )
-        self._print_done()
+        self._print_action_done()
 
         # Writing changelog
-        self._print("Writing changelog")
+        self._print_action("Writing changelog")
         diff.write_changelog(
             self.winpyver2,
             basedir=self.basedir,
@@ -1074,7 +1121,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             release_level=self.release_level,
             architecture=self.distribution.architecture,
         )
-        self._print_done()
+        self._print_action_done()
 
 
 def rebuild_winpython(codedir, targetdir, architecture=64, verbose=False):

@@ -165,7 +165,7 @@ def create_winpython_start_menu_folder(current=True):
                 file=sys.stderr,
             )
     # create, or re-create !
-    os.mkdir(path)
+    Path(path).mkdir(parents=True, exist_ok=True)
     return path
 
 
@@ -509,7 +509,7 @@ def extract_archive(fname, targetdir=None, verbose=False):
         targetdir = _create_temp_dir()
     else:
         try:
-            os.mkdir(targetdir)
+            Path(targetdir).mkdir(parents=True, exist_ok=True)
         except:
             pass
     if Path(fname).suffix in ('.zip', '.exe'):
@@ -786,8 +786,7 @@ if __name__ == '__main__':
     # print dname+':', '\n', get_python_infos(dname)
 
     tmpdir = r'D:\Tests\winpython_tests'
-    if not Path(tmpdir).is_dir():
-        os.mkdir(tmpdir)
+    Path(tmpdir).mkdir(parents=True, exist_ok=True)    
     print(
         (
             extract_archive(
