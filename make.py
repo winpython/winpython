@@ -34,18 +34,17 @@ def get_7zip_exe():
        ]
     for dirname in SEVEN_ZIP_DIRS:
         for subdirname in (".", "App"):
-            exe = str(Path(dirname) / subdirname / "7-Zip" / "7z.exe")
-            if Path(exe).is_file():
-                return exe
+            exe = Path(dirname) / subdirname / "7-Zip" / "7z.exe"
+            if exe.is_file():
+                return str(exe)
     raise RuntimeError("7ZIP is not installed on this computer.")
-
 
 def replace_in_7zip_file(fname, data):
     """Replace text in line starting with *start*, from this position:
     data is a list of (start, text) tuples"""
-    fd = open(fname, "U")
-    lines = fd.readlines()
-    fd.close()
+    with open(fname, "r") as fd:
+        lines = fd.readlines()
+
     for idx, line in enumerate(lines):
         for start, text in data:
             if start not in ("Icon", "OutFile") and not start.startswith("!"):
@@ -60,10 +59,10 @@ def replace_in_7zip_file(fname, data):
 def build_7zip(srcname, dstname, data):
     """7-Zip Setup Script"""
     SEVENZIP_EXE = get_7zip_exe()
-    portable_dir = str(Path(__file__).resolve().parent / "portable")
-    shutil.copy(str(Path(portable_dir) / srcname), dstname)
+    portable_dir = Path(__file__).resolve().parent / "portable"
+    shutil.copy(portable_dir / srcname, dstname)
     data = [
-        ("PORTABLE_DIR", portable_dir),
+        ("PORTABLE_DIR", str(portable_dir)),
         ("SEVENZIP_EXE", SEVENZIP_EXE),
     ] + list(data)
     replace_in_7zip_file(dstname, data)
@@ -103,12 +102,8 @@ class WinPythonDistribution(object):
         self.release_level = release_level
         self.target = target
         self.wheeldir = wheeldir
-        if toolsdirs is None:
-            toolsdirs = []
-        self._toolsdirs = toolsdirs
-        if docsdirs is None:
-            docsdirs = []
-        self._docsdirs = docsdirs
+        self._toolsdirs = toolsdirs if toolsdirs is not None else []
+        self._docsdirs = docsdirs if docsdirs is not None else []
         self.verbose = verbose
         self.winpydir = None  # new WinPython BaseDirectory
         self.distribution = None
@@ -127,7 +122,7 @@ class WinPythonDistribution(object):
                 r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)"
             )
         self.python_name = Path(self.python_fname).name[:-4]
-        self.python_namedir ="python"
+        self.python_namedir = "python"
 
     @property
     def package_index_wiki(self):
@@ -244,13 +239,11 @@ Name | Version | Description
     @property
     def postpath(self):
         """Return PATH contents to be append to the environment variable"""
-        path = []
-        return path
+        return []
 
     @property
     def toolsdirs(self):
         """Return tools directory list"""
-        # formerly was joining prepared tool dir + the one of building env..
         return [] + self._toolsdirs
 
     @property
@@ -273,17 +266,16 @@ Name | Version | Description
 
     def create_batch_script(self, name, contents, do_changes=None):
         """Create batch script %WINPYDIR%/name"""
-        scriptdir = str(Path(self.winpydir) / "scripts")
-        os.makedirs(Path(scriptdir), exist_ok=True)     
+        scriptdir = Path(self.winpydir) / "scripts"
+        scriptdir.mkdir(parents=True, exist_ok=True)
         print("dochanges for %s %", name, do_changes)
         # live patch pypy3
         contents_final = contents
-        if do_changes != None:
+        if do_changes is not None:
             for i in do_changes:
                 contents_final = contents_final.replace(i[0], i[1])
-        fd = open(str(Path(scriptdir) / name), "w")
-        fd.write(contents_final)
-        fd.close()
+        with open(scriptdir / name, "w") as fd:
+            fd.write(contents_final)
 
     def create_python_batch(
         self,
@@ -294,35 +286,19 @@ Name | Version | Description
         command=None,
     ):
         """Create batch file to run a Python script"""
-        if options is None:
-            options = ""
-        else:
-            options = " " + options
+        options = f" {options}" if options else ""
         if command is None:
             if script_name.endswith(".pyw"):
                 command = 'start "%WINPYDIR%\pythonw.exe"'
             else:
                 command = '"%WINPYDIR%\python.exe"'
-        changedir = ""
-        if workdir is not None:
-            workdir = workdir
-            changedir = (
-                r"""cd/D %s
-"""
-                % workdir
-            )
-        if script_name != "":
-            script_name = " " + script_name
+        changedir = f"cd/D {workdir}\n" if workdir else ""
+        script_name = f" {script_name}" if script_name else ""
         self.create_batch_script(
             name,
-            r"""@echo off
+            f"""@echo off
 call "%~dp0env_for_icons.bat"
-"""
-            + changedir
-            + command
-            + script_name
-            + options
-            + " %*",
+{changedir}{command}{script_name}{options} %*""",
         )
 
 
@@ -340,11 +316,11 @@ call "%~dp0env_for_icons.bat"
             ),
             (
                 "VERSION_INSTALL",
-                f'{self.python_fullversion.replace(".", "")}' + f"{self.build_number}",
+                f'{self.python_fullversion.replace(".", "")}{self.build_number}',
             ),
             ("RELEASELEVEL", self.release_level),
+            ("INSTALLER_OPTION", installer_option),
         )
-        data += (("INSTALLER_OPTION", installer_option),)
         build_7zip("installer_7zip.bat", fname, data)
         self._print_done()
 
