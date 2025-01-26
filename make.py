@@ -285,8 +285,7 @@ Name | Version | Description
     def create_batch_script(self, name, contents, do_changes=None):
         """Create batch script %WINPYDIR%/name"""
         scriptdir = str(Path(self.winpydir) / "scripts")
-        if not Path(scriptdir).is_dir():
-            os.mkdir(scriptdir)
+        os.makedirs(Path(scriptdir), exist_ok=True)     
         print("dochanges for %s %", name, do_changes)
         # live patch pypy3
         contents_final = contents
@@ -388,7 +387,7 @@ call "%~dp0env_for_icons.bat"
         """Copy dev tools"""
         self._print(f"Copying tools from {self.toolsdirs} to {self.winpydir}/t")
         toolsdir = str(Path(self.winpydir) / "t")
-        os.mkdir(toolsdir)
+        os.makedirs(Path(toolsdir), exist_ok=True)  
         for dirname in [
             ok_dir for ok_dir in self.toolsdirs if Path(ok_dir).is_dir()
         ]:  # the ones in the make.py script environment
@@ -409,11 +408,9 @@ call "%~dp0env_for_icons.bat"
         """Copy dev docs"""
         docsdir = str(Path(self.winpydir) / "notebooks")
         self._print(f"Copying Noteebook docs from {self.docsdirs} to {docsdir}")
-        if not Path(docsdir).is_dir():
-            os.mkdir(docsdir)
+        os.makedirs(Path(docsdir), exist_ok=True)      
         docsdir = str(Path(self.winpydir) / "notebooks" / "docs")
-        if not Path(docsdir).is_dir():
-            os.mkdir(docsdir)
+        os.makedirs(Path(docsdir), exist_ok=True)  
         for dirname in self.docsdirs:
             for name in os.listdir(dirname):
                 path = str(Path(dirname) / name)
@@ -1034,7 +1031,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         located in wheeldir
 
         remove_existing=True: (default) install all from scratch
-        remove_existing=False: only for test purpose (launchers/scripts)
+        remove_existing=False: for complementary purposes (create installers)
         requirements=file(s) of requirements (separated by space if several)"""
         print(
             self.python_fname,
@@ -1052,20 +1049,14 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 shutil.rmtree(self.winpydir, onexc=utils.onerror)
             except TypeError: # before 3.12
                 shutil.rmtree(self.winpydir, onerror=utils.onerror)    
-        if not Path(self.winpydir).is_dir():
-            os.mkdir(self.winpydir)
+        os.makedirs(Path(self.winpydir), exist_ok=True)    
         if remove_existing:
-            # Create settings directory
-            # (only necessary if user is starting an application with a batch
-            #  scripts before using an executable launcher, because the latter
-            #  is creating the directory automatically)
-            os.mkdir(str(Path(self.winpydir) / "settings"))
-            os.mkdir(str(Path(self.winpydir) / "settings" / "AppData"))
-            os.mkdir(str(Path(self.winpydir) / "settings" / "AppData" / "Roaming"))
+            # preventive re-Creation of settings directory
+            # (necessary if user is starting an application with a batch)
+            os.makedirs(Path(self.winpydir) / "settings" / "AppData" / "Roaming", exist_ok=True)
+            self._extract_python()  # unzip Python interpreter
         self._print_done()
 
-        if remove_existing:
-            self._extract_python()  # unzip Python interpreter
         self.distribution = wppm.Distribution(
             self.python_dir,
             verbose=self.verbose,
@@ -1120,7 +1111,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     self.distribution.do_pip_action(actions)
             self._run_complement_batch_scripts()
             self.distribution.patch_standard_packages()
-        if remove_existing:
+
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
@@ -1223,8 +1214,7 @@ def make_all(
 
     # Create Build director, where Winpython will be constructed
     builddir = str(Path(basedir) / ("bu" + flavor))
-    if not Path(builddir).is_dir():
-        os.mkdir(builddir)
+    os.makedirs(Path(builddir), exist_ok=True)    
     # use source_dirs as the directory to re-build Winpython wheel
     wheeldir = source_dirs
 
