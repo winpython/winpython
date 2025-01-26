@@ -72,7 +72,7 @@ def build_7zip(srcname, dstname, data):
     ] + list(data)
     replace_in_7zip_file(dstname, data)
     try:
-        # insted of a 7zip command line, we launch a script that does it
+        # instead of a 7zip command line, we launch a script that does it
         # retcode = subprocess.call(f'"{SEVENZIP_EXE}"  "{dstname}"'),
         retcode = subprocess.call(
             f'"{dstname}"  ',
@@ -103,7 +103,6 @@ class WinPythonDistribution(object):
         wheeldir,
         toolsdirs=None,
         verbose=False,
-        simulation=False,
         basedir=None,
         install_options=None,
         flavor="",
@@ -125,7 +124,6 @@ class WinPythonDistribution(object):
         self.winpydir = None  # new WinPython BaseDirectory
         self.distribution = None
         self.installed_packages = []
-        self.simulation = simulation
         self.basedir = basedir  # added to build from winpython
         self.install_options = install_options
         self.flavor = flavor
@@ -148,26 +146,14 @@ class WinPythonDistribution(object):
         installed_tools = []
 
         def get_tool_path_file(relpath):
-            if self.simulation:
-                for dirname in self.toolsdirs:
-                    path = dirname + relpath.replace(r"\t", "")
-                    if Path(path).is_file():
-                        return path
-            else:
-                path = self.winpydir + relpath
-                if Path(path).is_file():
-                    return path
+            path = self.winpydir + relpath
+            if Path(path).is_file():
+                return path
 
         def get_tool_path_dir(relpath):
-            if self.simulation:
-                for dirname in self.toolsdirs:
-                    path = dirname + relpath.replace(r"\t", "")
-                    if Path(path).is_dir():
-                        return path
-            else:
-                path = self.winpydir + relpath
-                if Path(path).is_dir():
-                    return path
+            path = self.winpydir + relpath
+            if Path(path).is_dir():
+                return path
 
         juliapath = get_tool_path_dir(self.JULIA_PATH)
         if juliapath is not None:
@@ -1043,18 +1029,13 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         remove_existing=True,
         requirements=None,
         my_winpydir=None,
-    ):  # , find_links=None):
+    ):
         """Make WinPython distribution in target directory from the installers
         located in wheeldir
 
         remove_existing=True: (default) install all from scratch
         remove_existing=False: only for test purpose (launchers/scripts)
         requirements=file(s) of requirements (separated by space if several)"""
-        if self.simulation:
-            print(
-                "WARNING: this is just a simulation!",
-                file=sys.stderr,
-            )
         print(
             self.python_fname,
             self.python_name,
@@ -1066,14 +1047,14 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 Path(self.target) / my_winpydir
             )  # Create/re-create the WinPython base directory
         self._print(f"Creating WinPython {my_winpydir} base directory")
-        if Path(self.winpydir).is_dir() and remove_existing and not self.simulation:
+        if Path(self.winpydir).is_dir() and remove_existing:
             try:
                 shutil.rmtree(self.winpydir, onexc=utils.onerror)
             except TypeError: # before 3.12
                 shutil.rmtree(self.winpydir, onerror=utils.onerror)    
         if not Path(self.winpydir).is_dir():
             os.mkdir(self.winpydir)
-        if remove_existing and not self.simulation:
+        if remove_existing:
             # Create settings directory
             # (only necessary if user is starting an application with a batch
             #  scripts before using an executable launcher, because the latter
@@ -1083,7 +1064,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             os.mkdir(str(Path(self.winpydir) / "settings" / "AppData" / "Roaming"))
         self._print_done()
 
-        if remove_existing and not self.simulation:
+        if remove_existing:
             self._extract_python()  # unzip Python interpreter
         self.distribution = wppm.Distribution(
             self.python_dir,
@@ -1108,10 +1089,9 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         )
 
         if remove_existing:
-            if not self.simulation:
-                self._create_batch_scripts_initial()
-                self._create_batch_scripts()
-                self._create_launchers()
+            self._create_batch_scripts_initial()
+            self._create_batch_scripts()
+            self._create_launchers()
             # PyPy must ensure pip via: "pypy3.exe -m ensurepip"
             utils.python_execmodule("ensurepip", self.distribution.target)
 
@@ -1125,11 +1105,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 self._print(f"piping {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(req)
-            print("self.simulation:", self.simulation)
-            if not self.simulation:
-                self._copy_dev_tools()
-                self._copy_dev_docs()
-        if not self.simulation:
+            self._copy_dev_tools()
+            self._copy_dev_docs()
 
             if requirements:
                 if not list(requirements) == requirements:
@@ -1143,7 +1120,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     self.distribution.do_pip_action(actions)
             self._run_complement_batch_scripts()
             self.distribution.patch_standard_packages()
-        if remove_existing and not self.simulation:
+        if remove_existing:
             self._print("Cleaning up distribution")
             self.distribution.clean_up()
             self._print_done()
@@ -1213,7 +1190,6 @@ def make_all(
     verbose=False,
     remove_existing=True,
     create_installer=True,
-    simulation=False,
     install_options=["--no-index"],
     flavor="",
     requirements=None,
@@ -1280,7 +1256,6 @@ def make_all(
         wheeldir,
         toolsdirs,
         verbose=verbose,
-        simulation=simulation,
         basedir=basedir,
         install_options=install_options + find_list,
         flavor=flavor,
@@ -1321,14 +1296,13 @@ def make_all(
         requirements=requirements,
         my_winpydir=my_winpydir,
     )
-    #          ,find_links=osp.join(basedir, 'packages.srcreq'))
-    if str(create_installer).lower() != "false" and not simulation:
-        if "7zip" in str(create_installer).lower():
-            dist.create_installer_7zip(".exe")
-        if ".7z" in str(create_installer).lower():
-            dist.create_installer_7zip(".7z")
+    if str(create_installer).lower() != "false":
         if ".zip" in str(create_installer).lower():
             dist.create_installer_7zip(".zip")
+        if ".7z" in str(create_installer).lower():
+            dist.create_installer_7zip(".7z")
+        if "7zip" in str(create_installer).lower():
+            dist.create_installer_7zip(".exe")
     return dist
 
 
