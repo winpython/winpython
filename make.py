@@ -161,8 +161,13 @@ class WinPythonDistributionBuilder(object):
         self.python_dir_name = "python"
 
     @property
-    def package_index_wiki(self):
-        """Return Package Index page in Wiki format"""
+    def package_index_markdown(self) -> str:
+        """
+        Generates a Markdown formatted package index page.
+
+        Returns:
+            str: Markdown content for the package index.
+        """
         installed_tools = []
 
         def get_tool_path_file(relpath):
@@ -274,17 +279,17 @@ Name | Version | Description
 
     @property
     def post_path_entries(self) -> list[str]:
-        """Return PATH contents to be append to the environment variable"""
+        """Returns a list of PATH entries to append to the environment."""
         return []
 
     @property
     def toolsdirs(self):
-        """Return tools directory list"""
+        """Returns the list of tools directories to include."""
         return [] + self._toolsdirs
 
     @property
     def docsdirs(self):
-        """Return docs directory list"""
+        """Returns the list of documentation directories to include."""
         if (Path(__file__).resolve().parent / "docs").is_dir():
             return [str(Path(__file__).resolve().parent / "docs")] + self._docsdirs
         else:
@@ -397,7 +402,7 @@ call "%~dp0env_for_icons.bat"
         if not self.verbose:
             print("OK")
 
-    def _extract_python(self):
+    def _extract_python_archive(self):
         """Extracting Python installer, creating distribution object"""
         self._print_action("Extracting Python .zip version")
         utils.extract_archive(
@@ -409,7 +414,7 @@ call "%~dp0env_for_icons.bat"
         if Path(self.python_dir_name) != Path(self.winpy_dir) / self.python_dir_name: #2024-12-22 to /python
             os.rename(Path(self.python_dir), Path(self.winpy_dir) / self.python_dir_name)
 
-    def _copy_dev_tools(self):
+    def _copy_tools(self):
         """Copy dev tools"""
         self._print_action(f"Copying tools from {self.toolsdirs} to {self.winpy_dir}/t")
         toolsdir = Path(self.winpy_dir) / "t"
@@ -428,7 +433,7 @@ call "%~dp0env_for_icons.bat"
         if nodejs_current != nodejs_target and nodejs_current.is_dir():
             shutil.move(nodejs_current, nodejs_target)
 
-    def _copy_dev_docs(self):
+    def _copy_documentation(self):
         """Copy dev docs"""
         docsdir = Path(self.winpy_dir) / "notebooks"
         self._print_action(f"Copying Notebook docs from {self.docsdirs} to {docsdir}")
@@ -700,7 +705,7 @@ def main():
     env = os.environ.copy() # later_version: env = os.environ
     
     # default directories (from .bat)
-    os.makedirs(Path(env['WINPYDIRBASE']) / 'settings' / 'Appdata' / 'Roaming', exist_ok=True) 
+    os.makedirs(Path(env['WINPYDIRBASE']) / 'settings' / 'Appdata' / 'Roaming', exist_ok=True)
 
     # default qt.conf for Qt directories
     qt_conf='''echo [Paths]
@@ -708,7 +713,7 @@ def main():
     echo Binaries = .
     '''
 
-    pathlist = [Path(env['WINPYDIR']) / 'Lib' / 'site-packages' / i for i in ('PyQt5', 'PyQt6', 'Pyside6')] 
+    pathlist = [Path(env['WINPYDIR']) / 'Lib' / 'site-packages' / i for i in ('PyQt5', 'PyQt6', 'Pyside6')]
     for p in pathlist:
         if p.is_dir():
             if not (p / 'qt.conf').is_file():
@@ -741,11 +746,9 @@ def main():
 if __name__ == "__main__":
     main()
         """
-        
         self.create_batch_script("WinPythonIni.py", winpython_ini_py_content)
 
         self._print_action_done()
-
 
 
     def _create_standard_batch_scripts(self):
@@ -761,9 +764,7 @@ if __name__ == "__main__":
             batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
 
 
-        self.create_batch_script(
-            "readme.txt",
-            r"""These batch files are required to run WinPython icons.
+        self.create_batch_script("readme.txt", """These batch files are required to run WinPython icons.
 
 These files should help the user writing his/her own
 specific batch file to call Python scripts inside WinPython.
@@ -921,24 +922,26 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action_done()
 
 
-    def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
-        """tools\..\run_complement.bat for final complements"""
-        print(f"now {this_batch} in tooldirs\..")
-        unique_toolsdirs = set([str(Path(s).parent) for s in self._toolsdirs])
-        for post_complement in unique_toolsdirs:
-            filepath = str(Path(post_complement) / this_batch)
-            if Path(filepath).is_file():
-                print(f'launch "{filepath}"  for  "{self.winpy_dir}"')
-                self._print_action(f'launch "{filepath}"  for  "{self.winpy_dir}" !')
+    def _run_complementary_batch_scripts(self, script_name="run_complement.bat"):
+        """Runs complementary batch scripts from tools directories."""
+        print(f"Running {script_name} from tools directories...")
+        unique_tools_parent_dirs = set(str(Path(s).parent) for s in self.tools_directories)
+        for tools_parent_dir in unique_tools_parent_dirs:
+            script_path = Path(tools_parent_dir) / script_name
+            if script_path.is_file():
+                print(f'  Executing "{script_path}" for "{self.winpy_dir}"')
+                self._print_action(f'Executing "{script_path}" for "{self.winpy_dir}" !')
                 try:
-                    retcode = subprocess.call(
-                        f'"{filepath}"   "{self.winpy_dir}"',
+                    subprocess.run(
+                        [str(script_path), str(self.winpy_dir)],
                         shell=True,
-                        stdout=sys.stderr,
+                        check=True,
+                        stderr=sys.stderr,
+                        stdout=sys.stdout
                     )
                 except subprocess.CalledProcessError as e:
-                    print("Execution failed:", e, file=sys.stderr)
-                    self._print_action("Execution failed !:", e, file=sys.stderr)
+                    print(f"  Execution failed: {e}", file=sys.stderr)
+                    self._print_action(f"Execution failed: {e}!")
         self._print_action_done()
 
     def make(
@@ -973,8 +976,9 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         if remove_existing:
             # preventive re-Creation of settings directory
             # (necessary if user is starting an application with a batch)
-            os.makedirs(Path(self.winpy_dir) / "settings" / "AppData" / "Roaming", exist_ok=True)
-            self._extract_python()  # unzip Python interpreter
+            (Path(self.winpy_dir) / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True) # Ensure settings dir exists
+            self._extract_python_archive()
+
         self._print_action_done()
 
         self.distribution = wppm.Distribution(
@@ -1003,21 +1007,20 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self._create_initial_batch_scripts()
             self._create_standard_batch_scripts()
             self._create_launchers()
-            # PyPy must ensure pip via: "pypy3.exe -m ensurepip"
-            utils.python_execmodule("ensurepip", self.distribution.target)
+            utils.python_execmodule("ensurepip", self.distribution.target) # Ensure pip is installed for PyPy
 
             self.distribution.patch_standard_packages("pip")
-            # not forced update of pip (FIRST) and setuptools here
-            for req in ("pip", "setuptools", "wheel", "winpython"):
-                actions = ["install", "--upgrade", "--pre", req]
-                if self.install_options is not None:
-                    actions += self.install_options
-                print(f"piping {' '.join(actions)}")
-                self._print_action(f"piping {' '.join(actions)}")
+            # Upgrade essential packages
+            essential_packages = ["pip", "setuptools", "wheel", "winpython"]
+            for package_name in essential_packages:
+                actions = ["install", "--upgrade", "--pre", package_name] + self.install_options
+                print(f"Piping: {' '.join(actions)}")
+                self._print_action(f"Piping: {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
-                self.distribution.patch_standard_packages(req)
-            self._copy_dev_tools()
-            self._copy_dev_docs()
+                self.distribution.patch_standard_packages(package_name)
+
+            self._copy_tools()
+            self._copy_documentation()
 
             if requirements:
                 if not list(requirements) == requirements:
@@ -1029,7 +1032,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     print(f"piping {' '.join(actions)}")
                     self._print_action(f"piping {' '.join(actions)}")
                     self.distribution.do_pip_action(actions)
-            self._run_complement_batch_scripts()
+            self._run_complementary_batch_scripts()
             self.distribution.patch_standard_packages()
 
             self._print_action("Cleaning up distribution")
@@ -1047,7 +1050,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                 + f"{self.winpyver2}.md"
             )
         )
-        open(fname, "w", encoding='utf-8').write(self.package_index_wiki)
+        open(fname, "w", encoding='utf-8').write(self.package_index_markdown)
         # Copy to winpython/changelogs
         shutil.copyfile(
             fname,
@@ -1081,7 +1084,7 @@ def rebuild_winpython(codedir, targetdir, architecture=64, verbose=False):
     )
 
 
-def transform_in_list(list_in, list_type=None):
+def _parse_list_argument(list_in, list_type=None):
     """Transform a 'String or List' in List"""
     if list_in is None:
         list_in = ""
@@ -1146,17 +1149,17 @@ def make_all(
     )
 
     # Optional pre-defined toolsdirs
-    toolsdirs = transform_in_list(toolsdirs, "toolsdirs=")
+    toolsdirs = _parse_list_argument(toolsdirs, "toolsdirs=")
 
     # Optional pre-defined toolsdirs
     print("docsdirs input", docsdirs)
-    docsdirs = transform_in_list(docsdirs, "docsdirs=")
+    docsdirs = _parse_list_argument(docsdirs, "docsdirs=")
     print("docsdirs output", docsdirs)
 
     # install_options = ['--no-index', '--pre', f'--find-links={wheeldir)']
-    install_options = transform_in_list(install_options, "install_options")
+    install_options = _parse_list_argument(install_options, "install_options")
 
-    find_links = transform_in_list(find_links, "find_links")
+    find_links = _parse_list_argument(find_links, "find_links")
 
     find_list = [f"--find-links={l}" for l in find_links + [wheeldir]]
     builder = WinPythonDistributionBuilder(
