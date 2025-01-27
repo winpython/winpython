@@ -107,7 +107,7 @@ def build_installer_7zip(
         command = f'"{output_script_path}"'
         print(f"Executing 7-Zip script: {command}")
         subprocess.run(
-            command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stdout
+            command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr #=sys.stdout
         )  # Use subprocess.run for better error handling
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
@@ -158,7 +158,7 @@ class WinPythonDistributionBuilder(object):
                 r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)"
             )
         self.python_name = Path(self.python_fname).name[:-4]
-        self.python_namedir = "python"
+        self.python_dir_name = "python"
 
     @property
     def package_index_wiki(self):
@@ -166,12 +166,12 @@ class WinPythonDistributionBuilder(object):
         installed_tools = []
 
         def get_tool_path_file(relpath):
-            path = self.winpy_dir + relpath
+            path = Path(self.winpy_dir) / relpath
             if Path(path).is_file():
                 return path
 
         def get_tool_path_dir(relpath):
-            path = self.winpy_dir + relpath
+            path = Path(self.winpy_dir) / relpath
             if Path(path).is_dir():
                 return path
 
@@ -237,17 +237,17 @@ Name | Version | Description
             + "\n\n</details>\n"
         )
 
-    # @property makes self.winpyver becomes a call to self.winpyver()
+    # @property makes self.winpython_version_name becomes a call to self.winpython_version_name()
     @property
-    def winpyver(self):
+    def winpython_version_name(self):
         """Return WinPython version (with flavor and release level!)"""
         return f"{self.python_fullversion}.{self.build_number}{self.flavor}{self.release_level}"
 
     @property
     def python_dir(self):
         """Return Python dirname (full path) of the target distribution"""
-        if (Path(self.winpy_dir) / self.python_namedir).is_dir(): # 2024-12-22
-            return str(Path(self.winpy_dir) / self.python_namedir) # /python path
+        if (Path(self.winpy_dir) / self.python_dir_name).is_dir(): # 2024-12-22
+            return str(Path(self.winpy_dir) / self.python_dir_name) # /python path
         else:
             return str(Path(self.winpy_dir) / self.python_name)  # python.exe path
 
@@ -257,7 +257,7 @@ Name | Version | Description
         return f"{self.distribution.architecture}"
 
     @property
-    def prepath(self):
+    def pre_path_entries(self) -> list[str]:
         """Return PATH contents to be prepend to the environment variable"""
         path = [
             r"Lib\site-packages\PyQt5",
@@ -273,7 +273,7 @@ Name | Version | Description
         return path
 
     @property
-    def postpath(self):
+    def post_path_entries(self) -> list[str]:
         """Return PATH contents to be append to the environment variable"""
         return []
 
@@ -300,42 +300,56 @@ Name | Version | Description
         else:
             raise RuntimeError(f"Could not find required package matching {pattern}")
 
-    def create_batch_script(self, name, contents, do_changes=None):
-        """Create batch script %WINPYDIR%/name"""
-        scriptdir = Path(self.winpy_dir) / "scripts"
-        scriptdir.mkdir(parents=True, exist_ok=True)
-        print("dochanges for %s %", name, do_changes)
-        # live patch pypy3
-        contents_final = contents
-        if do_changes is not None:
-            for i in do_changes:
-                contents_final = contents_final.replace(i[0], i[1])
-        with open(scriptdir / name, "w") as fd:
-            fd.write(contents_final)
+    def create_batch_script(self, name: str, contents: str, replacements: list[tuple[str, str]] = None):
+        """
+        Creates a batch script in the WinPython scripts directory.
 
-    def create_python_batch(
+        Args:
+            name: The name of the batch script file.
+            contents: The contents of the batch script.
+            replacements: A list of tuples for text replacements in the content.
+        """
+        script_dir = Path(self.winpy_dir) / "scripts" if self.winpy_dir else None
+        if not script_dir:
+            print("Warning: WinPython directory not set, cannot create batch script.")
+            return
+        script_dir.mkdir(parents=True, exist_ok=True)
+        final_contents = contents
+        if replacements:
+            for old_text, new_text in replacements:
+                final_contents = final_contents.replace(old_text, new_text)
+        script_path = script_dir / name
+        with open(script_path, "w") as f:
+            f.write(final_contents)
+        print(f"Created batch script: {script_path}")
+
+    def create_python_launcher_batch(
         self,
-        name,
-        script_name,
-        workdir=None,
-        options=None,
-        command=None,
+        name: str,
+        script_name: str,
+        working_dir: str = None,
+        options: str = None,
+        command: str = None,
     ):
-        """Create batch file to run a Python script"""
-        options = f" {options}" if options else ""
+        """
+        Creates a batch file to launch a Python script within the WinPython environment.
+
+        Args:
+            name: The name of the batch file.
+            script_name: The name of the Python script to execute.
+            working_dir: Optional working directory for the script.
+            options: Optional command-line options for the script.
+            command: Optional command to execute python, defaults to python.exe or pythonw.exe
+        """
+        options_str = f" {options}" if options else ""
         if command is None:
-            if script_name.endswith(".pyw"):
-                command = 'start "%WINPYDIR%\pythonw.exe"'
-            else:
-                command = '"%WINPYDIR%\python.exe"'
-        changedir = f"cd/D {workdir}\n" if workdir else ""
-        script_name = f" {script_name}" if script_name else ""
-        self.create_batch_script(
-            name,
-            f"""@echo off
+            command = '"%WINPYDIR%\\pythonw.exe"' if script_name.endswith(".pyw") else '"%WINPYDIR%\\python.exe"'
+        change_dir_cmd = f"cd /D {working_dir}\n" if working_dir else ""
+        script_name_str = f" {script_name}" if script_name else ""
+        batch_content = f"""@echo off
 call "%~dp0env_for_icons.bat"
-{changedir}{command}{script_name}{options} %*""",
-        )
+{change_dir_cmd}{command}{script_name_str}{options_str} %*"""
+        self.create_batch_script(name, batch_content)
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """
@@ -392,8 +406,8 @@ call "%~dp0env_for_icons.bat"
         )
         self._print_action_done()
         # relocate to /python
-        if Path(self.python_namedir) != Path(self.winpy_dir) / self.python_namedir: #2024-12-22 to /python
-            os.rename(Path(self.python_dir), Path(self.winpy_dir) / self.python_namedir)
+        if Path(self.python_dir_name) != Path(self.winpy_dir) / self.python_dir_name: #2024-12-22 to /python
+            os.rename(Path(self.python_dir), Path(self.winpy_dir) / self.python_dir_name)
 
     def _copy_dev_tools(self):
         """Copy dev tools"""
@@ -442,24 +456,28 @@ call "%~dp0env_for_icons.bat"
             shutil.copy2(path, Path(self.winpy_dir))
         self._print_action_done()
 
-    def _create_batch_scripts_initial(self):
-        """Create batch scripts"""
-        self._print_action("Creating batch scripts initial")
-        conv = lambda path: ";".join([f"%WINPYDIR%\\{pth}" for pth in path])
-        path = conv(self.prepath) + ";%PATH%;" + conv(self.postpath)
 
-        convps = lambda path: ";".join([f"$env:WINPYDIR\\{pth}" for pth in path])
-        pathps = convps(self.prepath) + ";$env:path;" + convps(self.postpath)
-        # PyPy3
-        shorty = self.distribution.short_exe
-        changes = (
-            (r"DIR%\python.exe", r"DIR%" + "\\" + shorty),
-            (r"DIR%\PYTHON.EXE", r"DIR%" + "\\" + shorty),
-        )
-        if (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
-            changes += ((r"\Lib\idlelib", r"\lib-python\3\idlelib"),)
+    def _create_initial_batch_scripts(self):
+        """Creates initial batch scripts, including environment setup."""
+        self._print_action("Creating initial batch scripts")
 
-        env_script_content = f"""@echo off
+        path_entries_str = ";".join([rf"%WINPYDIR%\{pth}" for pth in self.pre_path_entries])
+        full_path_env_var = f"{path_entries_str};%PATH%;" + ";".join([rf"%WINPYDIR%\{pth}" for pth in self.post_path_entries])
+
+        path_entries_ps_str = ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.pre_path_entries])
+        full_path_ps_env_var = f"{path_entries_ps_str};$env:path;" + ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.post_path_entries])
+
+        # Replacements for batch scripts (PyPy compatibility)
+        exe_name = self.distribution.short_exe if self.distribution else "python.exe" # default to python.exe if distribution is not yet set
+        batch_replacements = [
+            (r"DIR%\\python.exe", rf"DIR%\\{exe_name}"),
+            (r"DIR%\\PYTHON.EXE", rf"DIR%\\{exe_name}"),
+        ]
+        if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
+            batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
+
+
+        env_bat_content = f"""@echo off
 set WINPYDIRBASE=%~dp0..
 
 rem get a normalized path
@@ -470,11 +488,11 @@ if "%WINPYDIRBASE:~-1%"=="\\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
 set WINPYDIRBASETMP=
 popd
 
-set WINPYDIR=%WINPYDIRBASE%\\{self.python_namedir}
+set WINPYDIR=%WINPYDIRBASE%\\{self.python_dir_name}
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%\\python.exe
 set PYTHON=%WINPYDIR%\\python.exe
 set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\\Lib;%WINPYDIR%\\DLLs
-set WINPYVER={self.winpyver}
+set WINPYVER={self.winpython_version_name}
 
 rem 2023-02-12 utf-8 on console to avoid pip crash
 rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
@@ -490,7 +508,7 @@ set JUPYTER_CONFIG_PATH=%WINPYDIR%\\etc\\jupyter
 set FINDDIR=%WINDIR%\\system32
 echo ";%PATH%;" | %FINDDIR%\\find.exe /C /I ";%WINPYDIR%\\;" >nul
 if %ERRORLEVEL% NEQ 0 (
-   set "PATH={path}"
+   set "PATH={full_path_env_var}"
    cd .
 )
 
@@ -498,12 +516,9 @@ rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\\Lib\\site-packages\\PyQt5\\__init__.py" set QT_API=pyqt5
 """
 
-        self.create_batch_script("env.bat", env_script_content, do_changes=changes)
+        self.create_batch_script("env.bat", env_bat_content, replacements=batch_replacements)
 
-        self.create_batch_script(
-            "WinPython_PS_Prompt.ps1",
-            r"""
-### WinPython_PS_Prompt.ps1 ###
+        ps1_content = r"""### WinPython_PS_Prompt.ps1 ###
 $0 = $myInvocation.MyCommand.Definition
 $dp0 = [System.IO.Path]::GetDirectoryName($0)
 # $env:PYTHONUTF8 = 1 would create issues in "movable" patching
@@ -513,26 +528,13 @@ $env:WINPYDIRBASE = "$dp0\.."
 $env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
 
 # avoid double_init (will only resize screen)
-if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"""
-            + '"\\'
-            + self.python_namedir
-            + '"'
-            + r""")) ) {
-
-
-$env:WINPYDIR = $env:WINPYDIRBASE+"""
-            + '"'
-            + "\\"
-            + self.python_namedir
-            + '"'
-            + r"""
+if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+""" + '"\\' + self.python_dir_name + '"' + r""")) ) {
+$env:WINPYDIR = $env:WINPYDIRBASE+""" + '"\\' + self.python_dir_name + '"' + r"""
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 $env:PYTHON = "%WINPYDIR%\python.exe"
 $env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs"
 
-$env:WINPYVER = '"""
-            + self.winpyver
-            + r"""'
+$env:WINPYVER = '""" + self.winpython_version_name + r"""'
 # rem 2023-02-12 try utf-8 on console
 # rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
 $env:PYTHONIOENCODING = "utf-8"
@@ -546,18 +548,14 @@ $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
 
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
- $env:PATH = """
-            + '"'
-            + pathps
-            + '"'
-            + r""" }
+ $env:PATH = """ + '"' + full_path_ps_env_var + '"' + r""" }
 
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
 # PyQt5 qt.conf creation and winpython.ini creation done via Winpythonini.py (called per env_for_icons.bat for now)
 # Start-Process -FilePath $env:PYTHON -ArgumentList ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
-} 
+
 
 ### Set-WindowSize
 
@@ -577,22 +575,19 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
 ### Colorize to distinguish
 $host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
-""",
-            do_changes=changes,
-        )
+}
+"""
 
-        self.create_batch_script(
-            "cmd_ps.bat",
-            r"""@echo off
+        self.create_batch_script("WinPython_PS_Prompt.ps1", ps1_content, replacements=batch_replacements)
+
+
+        cmd_ps_bat_content = r"""@echo off
 call "%~dp0env_for_icons.bat"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
-""",
-            do_changes=changes,
-        )
+"""
+        self.create_batch_script("cmd_ps.bat", cmd_ps_bat_content, replacements=batch_replacements)
 
-        self.create_batch_script(
-            "env_for_icons.bat",
-            r"""@echo off
+        env_for_icons_bat_content = r"""@echo off
 call "%~dp0env.bat"
 
 rem default is as before: Winpython ..\Notebooks
@@ -637,14 +632,12 @@ if  "%__CD__%"=="%~dp0"          cd/D %WINPYWORKDIR1%
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYVER:~0,1%"
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
 
-""",
-            do_changes=changes,
-        )
+"""
+        self.create_batch_script("env_for_icons.bat", env_for_icons_bat_content, replacements=batch_replacements)
 
 
-        self.create_batch_script(
-            "WinPythonIni.py",  # Replaces winpython.vbs, and a bit of env.bat
-            r"""
+        # Replaces winpython.vbs, and a bit of env.bat
+        winpython_ini_py_content = r"""
 # Prepares a dynamic list of variables settings from a .ini file
 import os
 import subprocess
@@ -747,22 +740,27 @@ def main():
 
 if __name__ == "__main__":
     main()
-        """,
-        )
+        """
+        
+        self.create_batch_script("WinPythonIni.py", winpython_ini_py_content)
+
+        self._print_action_done()
 
 
-    def _create_batch_scripts(self):
-        """Create batch scripts"""
-        self._print_action("Creating batch scripts")
 
-        # PyPy3
-        shorty = self.distribution.short_exe
-        changes = (
-            (r"DIR%\python.exe", r"DIR%" + "\\" + shorty),
-            (r"DIR%\PYTHON.EXE", r"DIR%" + "\\" + shorty),
-        )
-        if (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
-            changes += ((r"\Lib\idlelib", r"\lib-python\3\idlelib"),)
+    def _create_standard_batch_scripts(self):
+        """Creates standard WinPython batch scripts for various actions."""
+        self._print_action("Creating standard batch scripts")
+
+        exe_name = self.distribution.short_exe if self.distribution else "python.exe"
+        batch_replacements = [
+            (r"DIR%\\python.exe", rf"DIR%\\{exe_name}"),
+            (r"DIR%\\PYTHON.EXE", rf"DIR%\\{exe_name}"),
+        ]
+        if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
+            batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
+
+
         self.create_batch_script(
             "readme.txt",
             r"""These batch files are required to run WinPython icons.
@@ -780,7 +778,7 @@ echo patch pip and current launchers for move
 
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
 pause""",
-            do_changes=changes,
+            replacements=batch_replacements
         )
 
         self.create_batch_script(
@@ -790,57 +788,35 @@ call "%~dp0env.bat"
 echo patch pip and current launchers for non-move
 
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
-pause
-        """,
-            do_changes=changes,
+pause""",
+            replacements=batch_replacements
         )
 
-        self.create_batch_script(
-            "make_working_directory_be_not_winpython.bat",
-            r"""call "%~dp0env_for_icons.bat"
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[active_environment', '[inactive_environment' )"
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[inactive_environment_per_user]', '[active_environment_per_user]' )"
-""",
-        )
+        for ini_patch_script in [
+            ("make_working_directory_be_not_winpython.bat", "[active_environment", "[inactive_environment", "[inactive_environment_per_user]", "[active_environment_per_user]"),
+            ("make_working_directory_be_winpython.bat", "[active_environment", "[inactive_environment"),
+            ("make_working_directory_and_userprofile_be_winpython.bat", "[active_environment", "[inactive_environment", "[inactive_environment_common]", "[active_environment_common]")
+            ]:
+            name, patch1_start, patch1_end, *patch2 = ini_patch_script
+            content = f"""call "%~dp0env_for_icons.bat"
+"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '{patch1_start}', '{patch1_end}' )"
+"""
+            if patch2:
+                content += f""""%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '{patch2[0]}', '{patch2[1]}' )" """
+            self.create_batch_script(name, content)
 
-        self.create_batch_script(
-            "make_working_directory_be_winpython.bat",
-            r"""call "%~dp0env_for_icons.bat"
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[active_environment', '[inactive_environment' )"
-""",
-        )
 
-        self.create_batch_script(
-            "make_working_directory_and_userprofile_be_winpython.bat",
-            r"""call "%~dp0env_for_icons.bat"
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[active_environment', '[inactive_environment' )"
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '[inactive_environment_common]', '[active_environment_common]' )"
-""",
-        )
-
-        self.create_batch_script(
-            "cmd.bat",
-            r"""@echo off
+        self.create_batch_script("cmd.bat", r"""@echo off
 call "%~dp0env_for_icons.bat" %*
-cmd.exe /k""",
-        )
+cmd.exe /k""", replacements=batch_replacements)
 
-        self.create_batch_script(
-            "WinPython_Terminal.bat",
-            r"""@echo off
+        self.create_batch_script("WinPython_Terminal.bat", r"""@echo off
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
-exit
-""",
-        )
+exit""", replacements=batch_replacements)
 
-        self.create_batch_script(
-            "python.bat",
-            r"""@echo off
+        self.create_batch_script("python.bat", r"""@echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\python.exe"  %*
-""",
-            do_changes=changes,
-        )
+"%WINPYDIR%\python.exe"  %*""", replacements=batch_replacements)
 
         self.create_batch_script(
             "winpython.bat",
@@ -851,94 +827,68 @@ if exist "%WINPYDIR%\scripts\ptpython.exe" (
     "%WINPYDIR%\scripts\ptpython.exe" %*
 ) else (
     "%WINPYDIR%\python.exe"  %*
-)
-""",
-            do_changes=changes,
+)""",
+            replacements=batch_replacements
         )
 
         self.create_batch_script(
             "winidle.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*
-""",
-            do_changes=changes,
+"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*""",
+            replacements=batch_replacements
         )
 
         self.create_batch_script(
             "winspyder.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%"
-""",
+"%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%" """,
         )
 
         self.create_batch_script(
             "spyder_reset.bat",
             r"""@echo off
 call "%~dp0env_for_icons.bat"
-"%WINPYDIR%\scripts\spyder.exe" --reset %*
-""",
+"%WINPYDIR%\scripts\spyder.exe" --reset %*""",
         )
 
-        self.create_batch_script(
-            "winipython_notebook.bat",
-            r"""@echo off
+        for jupyter_script in [
+            ("winipython_notebook.bat", "jupyter-notebook.exe"),
+            ("winjupyter_lab.bat", "jupyter-lab.exe"),
+            ("winqtconsole.bat", "jupyter-qtconsole.exe"),
+            ]:
+            name, exe = jupyter_script
+            self.create_batch_script(name, f"""@echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\jupyter-notebook.exe" %*
-""",
-        )
+"%WINPYDIR%\\scripts\\{exe}" %*""")
 
-        self.create_batch_script(
-            "winjupyter_lab.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\jupyter-lab.exe" %*
-""",
-        )
 
-        self.create_batch_script(
-            "winqtconsole.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\jupyter-qtconsole.exe" %*
-""",
-        )
-
-        self.create_python_batch(
+        self.create_python_launcher_batch(
             "register_python.bat",
             r'"%WINPYDIR%\Lib\site-packages\winpython\register_python.py"',
-            workdir=r'"%WINPYDIR%\Scripts"',
+            working_dir=r'"%WINPYDIR%\Scripts"',
         )
 
-        self.create_python_batch(
+        self.create_python_launcher_batch(
             "unregister_python.bat",
             r'"%WINPYDIR%\Lib\site-packages\winpython\unregister_python.py"',
-            workdir=r'"%WINPYDIR%\Scripts"',
+            working_dir=r'"%WINPYDIR%\Scripts"',
         )
 
-        self.create_batch_script(
-            "register_python_for_all.bat",
-            r"""@echo off
+        for register_all_script in [
+            ("register_python_for_all.bat", "register_python.bat"),
+            ("unregister_python_for_all.bat", "unregister_python.bat"),
+            ]:
+            name, base_script = register_all_script
+            self.create_batch_script(name, f"""@echo off
 call "%~dp0env.bat"
-call "%~dp0register_python.bat" --all""",
-        )
+call "%~dp0{base_script}" --all""")
 
-        self.create_batch_script(
-            "unregister_python_for_all.bat",
-            r"""@echo off
-call "%~dp0env.bat"
-call "%~dp0unregister_python.bat" --all""",
-        )
 
-        self.create_batch_script(
-            "wpcp.bat",
-            r"""@echo off
+        self.create_batch_script("wpcp.bat", r"""@echo off
 call "%~dp0env_for_icons.bat" %*
-cmd.exe /k "echo wppm & wppm"
-""",
-            do_changes=changes,
-        )
+cmd.exe /k "echo wppm & wppm" """, replacements=batch_replacements)
 
         self.create_batch_script(
             "upgrade_pip.bat",
@@ -948,22 +898,15 @@ echo this will upgrade pip with latest version, then patch it for WinPython port
 pause
 "%WINPYDIR%\python.exe" -m pip install --upgrade pip
 "%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
-pause
-""",
-            do_changes=changes,
+pause""",
+            replacements=batch_replacements
         )
 
-        
-        self.create_batch_script(  # virtual environment mimicking
-            "activate.bat",
-            r"""@echo off
-call "%~dp0env.bat"  %*
-""",
-        )
+        self.create_batch_script("activate.bat", r"""@echo off
+call "%~dp0env.bat"  %*""", replacements=batch_replacements)
 
-        self.create_batch_script(
-            "winvscode.bat",
-            r"""@echo off
+
+        vscode_bat_content = r"""@echo off
 call "%~dp0env_for_icons.bat"
 if exist "%WINPYDIR%\..\t\vscode\code.exe" (
     "%WINPYDIR%\..\t\vscode\code.exe" %*
@@ -972,9 +915,10 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
     "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe"  %*
 ) else (
     "code.exe" %*
-))
-""",
-        )
+))"""
+        self.create_batch_script("winvscode.bat", vscode_bat_content)
+
+        self._print_action_done()
 
 
     def _run_complement_batch_scripts(self, this_batch="run_complement.bat"):
@@ -1056,8 +1000,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         )
 
         if remove_existing:
-            self._create_batch_scripts_initial()
-            self._create_batch_scripts()
+            self._create_initial_batch_scripts()
+            self._create_standard_batch_scripts()
             self._create_launchers()
             # PyPy must ensure pip via: "pypy3.exe -m ensurepip"
             utils.python_execmodule("ensurepip", self.distribution.target)
