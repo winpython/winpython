@@ -113,19 +113,21 @@ def build_installer_7zip(
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
 
-class WinPythonDistributionBuilder(object):
-    """WinPython distribution"""
+class WinPythonDistributionBuilder:
+    """
+    Builds a WinPython distribution.
+    """
 
-    JULIA_PATH_REL = r"\t\Julia\bin"
-    NODEJS_PATH_REL = r"\n"  # r'\t\n'
+    JULIA_PATH_REL = r"\t\Julia\bin"  # Relative path within WinPython dir
+    NODEJS_PATH_REL = r"\n"  # Relative path within WinPython dir
 
     def __init__(
         self,
         build_number,
         release_level,
         target,
-        wheeldir,
-        toolsdirs=None,
+        wheels_dir: Path,
+        tools_dirs: list[Path] = None,
         verbose=False,
         basedir=None,
         install_options=None,
@@ -137,8 +139,8 @@ class WinPythonDistributionBuilder(object):
         self.build_number = build_number
         self.release_level = release_level
         self.target = target
-        self.wheeldir = wheeldir
-        self._toolsdirs = toolsdirs if toolsdirs is not None else []
+        self.wheels_dir = Path(wheels_dir)  # Ensure Path object
+        self.tools_dirs = tools_dirs or []
         self._docsdirs = docsdirs if docsdirs is not None else []
         self.verbose = verbose
         self.winpy_dir: Path | None = None  # Will be set during build
@@ -273,22 +275,19 @@ Name | Version | Description
         if self.distribution:
             return self.distribution.architecture
         return 64 # Default to 64 if distribution is not initialized yet
-    
+
     @property
     def pre_path_entries(self) -> list[str]:
-        """Return PATH contents to be prepend to the environment variable"""
-        path = [
+        """Returns a list of PATH entries to prepend to the environment."""
+        return [
             r"Lib\site-packages\PyQt5",
             "",  # Python root directory
             "DLLs",
             "Scripts",
             r"..\t",
+            r".." + self.JULIA_PATH_REL,
+            r".." + self.NODEJS_PATH_REL,
         ]
-        path += [r".." + self.JULIA_PATH_REL]
-
-        path += [r".." + self.NODEJS_PATH_REL]
-
-        return path
 
     @property
     def post_path_entries(self) -> list[str]:
@@ -296,9 +295,9 @@ Name | Version | Description
         return []
 
     @property
-    def toolsdirs(self):
+    def tools_directories(self) -> list[Path]:
         """Returns the list of tools directories to include."""
-        return [] + self._toolsdirs
+        return self.tools_dirs
 
     @property
     def docsdirs(self):
@@ -309,8 +308,8 @@ Name | Version | Description
             return self._docsdirs
 
     def get_package_fname(self, pattern):
-        """Get package matching pattern in wheeldir"""
-        path = self.wheeldir
+        """Get package matching pattern in wheels_dir"""
+        path = self.wheels_dir
         for fname in os.listdir(path):
             match = re.match(pattern, fname)
             if match is not None or pattern == fname:
@@ -428,23 +427,35 @@ call "%~dp0env_for_icons.bat"
             os.rename(Path(self.python_executable_dir), Path(self.winpy_dir) / self.python_dir_name)
 
     def _copy_tools(self):
-        """Copy dev tools"""
-        self._print_action(f"Copying tools from {self.toolsdirs} to {self.winpy_dir}/t")
-        toolsdir = Path(self.winpy_dir) / "t"
-        toolsdir.mkdir(parents=True, exist_ok=True)
-        for dirname in [ok_dir for ok_dir in self.toolsdirs if Path(ok_dir).is_dir()]:
-            for name in os.listdir(dirname):
-                path = Path(dirname) / name
-                copy = shutil.copytree if path.is_dir() else shutil.copyfile
-                if self.verbose:
-                    print(f"{path} --> {toolsdir / name}")
-                copy(path, toolsdir / name)
+        """Copies development tools to the WinPython 't' directory."""
+        tools_target_dir = self.winpy_dir / "t"
+        self._print_action(f"Copying tools to {tools_target_dir}")
+        tools_target_dir.mkdir(parents=True, exist_ok=True)
+        for source_dir in self.tools_directories:
+            if not source_dir.is_dir():
+                print(f"Warning: Tools directory not found: {source_dir}")
+                continue
+            for item_name in os.listdir(source_dir):
+                source_item = source_dir / item_name
+                target_item = tools_target_dir / item_name
+                copy_func = shutil.copytree if source_item.is_dir() else shutil.copy2
+                try:
+                    copy_func(source_item, target_item)
+                    if self.verbose:
+                        print(f"  Copied: {source_item} -> {target_item}")
+                except Exception as e:
+                    print(f"Error copying {source_item} to {target_item}: {e}")
+
+        # Special handling for Node.js to move it up one level
+        nodejs_current_dir = tools_target_dir / "n"
+        nodejs_target_dir = self.winpy_dir / self.NODEJS_PATH_REL
+        if nodejs_current_dir != nodejs_target_dir and nodejs_current_dir.is_dir():
+            try:
+                shutil.move(nodejs_current_dir, nodejs_target_dir)
+            except Exception as e:
+                print(f"Error moving Node.js directory: {e}")
+
         self._print_action_done()
-        # move node higher
-        nodejs_current = toolsdir / "n"
-        nodejs_target = Path(self.winpy_dir) / self.NODEJS_PATH_REL
-        if nodejs_current != nodejs_target and nodejs_current.is_dir():
-            shutil.move(nodejs_current, nodejs_target)
 
     def _copy_documentation(self):
         """Copy dev docs"""
@@ -964,7 +975,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         my_winpydir=None,
     ):
         """Make WinPython distribution in target directory from the installers
-        located in wheeldir
+        located in wheels_dir
 
         remove_existing=True: (default) install all from scratch
         remove_existing=False: for complementary purposes (create installers)
@@ -1150,35 +1161,35 @@ def make_all(
     builddir = str(Path(basedir) / ("bu" + flavor))
     os.makedirs(Path(builddir), exist_ok=True)    
     # use source_dirs as the directory to re-build Winpython wheel
-    wheeldir = source_dirs
+    wheels_dir = source_dirs
 
     # Rebuild Winpython in this wheel dir
     rebuild_winpython(
         codedir=str(Path(__file__).resolve().parent), # winpython source dir
-        targetdir=wheeldir,
+        targetdir=wheels_dir,
         architecture=architecture,
     )
 
-    # Optional pre-defined toolsdirs
-    toolsdirs = _parse_list_argument(toolsdirs, "toolsdirs=")
+    # Parse list arguments
+    tools_dirs_list = _parse_list_argument(toolsdirs)
 
     # Optional pre-defined toolsdirs
     print("docsdirs input", docsdirs)
     docsdirs = _parse_list_argument(docsdirs, "docsdirs=")
     print("docsdirs output", docsdirs)
 
-    # install_options = ['--no-index', '--pre', f'--find-links={wheeldir)']
+    # install_options = ['--no-index', '--pre', f'--find-links={wheels_dir)']
     install_options = _parse_list_argument(install_options, "install_options")
 
     find_links = _parse_list_argument(find_links, "find_links")
 
-    find_list = [f"--find-links={l}" for l in find_links + [wheeldir]]
+    find_list = [f"--find-links={l}" for l in find_links + [wheels_dir]]
     builder = WinPythonDistributionBuilder(
         build_number,
         release_level,
         builddir,
-        wheeldir,
-        toolsdirs,
+        wheels_dir=wheels_dir,
+        tools_dirs=[Path(d) for d in tools_dirs_list],
         verbose=verbose,
         basedir=basedir,
         install_options=install_options + find_list,
