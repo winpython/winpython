@@ -116,8 +116,8 @@ def build_installer_7zip(
 class WinPythonDistributionBuilder(object):
     """WinPython distribution"""
 
-    JULIA_PATH = r"\t\Julia\bin"
-    NODEJS_PATH = r"\n"  # r'\t\n'
+    JULIA_PATH_REL = r"\t\Julia\bin"
+    NODEJS_PATH_REL = r"\n"  # r'\t\n'
 
     def __init__(
         self,
@@ -168,62 +168,13 @@ class WinPythonDistributionBuilder(object):
         Returns:
             str: Markdown content for the package index.
         """
-        installed_tools = []
+        installed_tools_md = self._get_installed_tools_markdown()
+        installed_packages_md = self._get_installed_packages_markdown()
+        python_description = "Python programming language with standard library"
 
-        def get_tool_path_file(relpath):
-            path = Path(self.winpy_dir) / relpath
-            if Path(path).is_file():
-                return path
+        return f"""## WinPython {self.winpython_version_name}
 
-        def get_tool_path_dir(relpath):
-            path = Path(self.winpy_dir) / relpath
-            if Path(path).is_dir():
-                return path
-
-        juliapath = get_tool_path_dir(self.JULIA_PATH)
-        if juliapath is not None:
-            juliaver = utils.get_julia_version(juliapath)
-            installed_tools += [("Julia", juliaver)]
-        nodepath = get_tool_path_dir(self.NODEJS_PATH)
-        if nodepath is not None:
-            nodever = utils.get_nodejs_version(nodepath)
-            installed_tools += [("Nodejs", nodever)]
-            npmver = utils.get_npmjs_version(nodepath)
-            installed_tools += [("npmjs", npmver)]
-        pandocexe = get_tool_path_file(r"\t\pandoc.exe")
-        if pandocexe is not None:
-            pandocver = utils.get_pandoc_version(str(Path(pandocexe).parent))
-            installed_tools += [("Pandoc", pandocver)]
-        vscodeexe = get_tool_path_file(r"\t\VSCode\Code.exe")
-        if vscodeexe is not None:
-            installed_tools += [
-                ("VSCode", utils.getFileProperties(vscodeexe)["FileVersion"])
-            ]
-        tools = []
-        for name, ver in installed_tools:
-            metadata = utils.get_package_metadata("tools.ini", name)
-            url, desc = (
-                metadata["url"],
-                metadata["description"],
-            )
-            tools += [f"[{name}]({url}) | {ver} | {desc}"]
-        # get all packages installed in the changelog, whatever the method
-        self.installed_packages = self.distribution.get_installed_packages(update=True)
-
-        packages = [
-            f"[{pack.name}]({pack.url}) | {pack.version} | {pack.description}"
-            for pack in sorted(
-                self.installed_packages,
-                key=lambda p: p.name.lower(),
-            )
-        ]
-        python_desc = "Python programming language with standard library"
-        tools_f = "\n".join(tools)
-        packages_f = "\n".join(packages)
-        return (
-            f"""## WinPython {self.winpyver2 + self.flavor} 
-
-The following packages are included in WinPython-{self.winpy_arch}bit v{self.winpyver2+self.flavor} {self.release_level}.
+The following packages are included in WinPython-{self.architecture_bits}bit v{self.winpython_version_name} {self.release_level}.
 
 <details>
 
@@ -231,36 +182,98 @@ The following packages are included in WinPython-{self.winpy_arch}bit v{self.win
 
 Name | Version | Description
 -----|---------|------------
-{tools_f}
+{installed_tools_md}
 
 ### Python packages
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | {self.python_fullversion} | {python_desc}
-{packages_f}"""
-            + "\n\n</details>\n"
-        )
+[Python](http://www.python.org/) | {self.python_full_version} | {python_description}
+{installed_packages_md}
+
+</details>
+"""
+    def _get_installed_tools_markdown(self) -> str:
+        """Generates Markdown for installed tools section in package index."""
+        installed_tools = []
+
+        def get_tool_path(rel_path):
+            path = Path(self.winpy_dir) / rel_path if self.winpy_dir else None
+            return path if path and (path.is_file() or path.is_dir()) else None
+
+        julia_path = get_tool_path(self.JULIA_PATH_REL)
+        if julia_path:
+            julia_version = utils.get_julia_version(str(julia_path))
+            installed_tools.append(("Julia", julia_version))
+
+        nodejs_path = get_tool_path(self.NODEJS_PATH_REL)
+        if nodejs_path:
+            node_version = utils.get_nodejs_version(str(nodejs_path))
+            installed_tools.append(("Nodejs", node_version))
+            npm_version = utils.get_npmjs_version(str(nodejs_path))
+            installed_tools.append(("npmjs", npm_version))
+
+        pandoc_exe = get_tool_path(r"\t\pandoc.exe")
+        if pandoc_exe:
+            pandoc_version = utils.get_pandoc_version(str(pandoc_exe.parent))
+            installed_tools.append(("Pandoc", pandoc_version))
+
+        vscode_exe = get_tool_path(r"\t\VSCode\Code.exe")
+        if vscode_exe:
+            vscode_version = utils.getFileProperties(str(vscode_exe))["FileVersion"]
+            installed_tools.append(("VSCode", vscode_version))
+
+        tool_lines = []
+        for name, version in installed_tools:
+            metadata = utils.get_package_metadata("tools.ini", name)
+            url, description = metadata["url"], metadata["description"]
+            tool_lines.append(f"[{name}]({url}) | {version} | {description}")
+        return "\n".join(tool_lines)
+
+    def _get_installed_packages_markdown(self) -> str:
+        """Generates Markdown for installed packages section in package index."""
+        if self.distribution is None:
+            return "" # Distribution not initialized yet.
+        self.installed_packages = self.distribution.get_installed_packages(update=True)
+        package_lines = [
+            f"[{pkg.name}]({pkg.url}) | {pkg.version} | {pkg.description}"
+            for pkg in sorted(self.installed_packages, key=lambda p: p.name.lower())
+        ]
+        return "\n".join(package_lines)
 
     # @property makes self.winpython_version_name becomes a call to self.winpython_version_name()
     @property
     def winpython_version_name(self):
         """Return WinPython version (with flavor and release level!)"""
-        return f"{self.python_fullversion}.{self.build_number}{self.flavor}{self.release_level}"
+        return f"{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
 
     @property
-    def python_dir(self):
-        """Return Python dirname (full path) of the target distribution"""
-        if (Path(self.winpy_dir) / self.python_dir_name).is_dir(): # 2024-12-22
-            return str(Path(self.winpy_dir) / self.python_dir_name) # /python path
+    def python_full_version(self) -> str:
+        """
+        Retrieves the Python full version string from the distribution.
+        Will be set after _extract_python is called and distribution is initialized.
+        """
+        if self.distribution is None:
+            return "0.0.0" # Placeholder before initialization
+        return utils.get_python_long_version(self.distribution.target)
+
+    @property
+    def python_executable_dir(self) -> str:
+        """Returns the directory containing the Python executable."""
+        python_path_dir = Path(self.winpy_dir) / self.python_dir_name if self.winpy_dir else None
+        if python_path_dir and python_path_dir.is_dir():
+            return str(python_path_dir)
         else:
-            return str(Path(self.winpy_dir) / self.python_name)  # python.exe path
+            python_path_exe = Path(self.winpy_dir) / self.python_name if self.winpy_dir else None # Fallback for older structure
+            return str(python_path_exe) if python_path_exe else ""
 
     @property
-    def winpy_arch(self):
-        """Return WinPython architecture"""
-        return f"{self.distribution.architecture}"
-
+    def architecture_bits(self) -> int:
+        """Returns the architecture (32 or 64 bits) of the distribution."""
+        if self.distribution:
+            return self.distribution.architecture
+        return 64 # Default to 64 if distribution is not initialized yet
+    
     @property
     def pre_path_entries(self) -> list[str]:
         """Return PATH contents to be prepend to the environment variable"""
@@ -271,9 +284,9 @@ Name | Version | Description
             "Scripts",
             r"..\t",
         ]
-        path += [r".." + self.JULIA_PATH]
+        path += [r".." + self.JULIA_PATH_REL]
 
-        path += [r".." + self.NODEJS_PATH]
+        path += [r".." + self.NODEJS_PATH_REL]
 
         return path
 
@@ -372,11 +385,11 @@ call "%~dp0env_for_icons.bat"
 
         replacements = [
             ("DISTDIR", str(self.winpy_dir)),
-            ("ARCH", str(self.winpy_arch)),
-            ("VERSION", f"{self.python_fullversion}.{self.build_number}{self.flavor}"),
+            ("ARCH", str(self.architecture_bits)),
+            ("VERSION", f"{self.python_full_version}.{self.build_number}{self.flavor}"),
             (
                 "VERSION_INSTALL",
-                f'{self.python_fullversion.replace(".", "")}{self.build_number}',
+                f'{self.python_full_version.replace(".", "")}{self.build_number}',
             ),
             ("RELEASELEVEL", self.release_level),
             ("INSTALLER_OPTION", installer_type), # Pass installer type as option to bat script
@@ -407,12 +420,12 @@ call "%~dp0env_for_icons.bat"
         self._print_action("Extracting Python .zip version")
         utils.extract_archive(
             self.python_fname,
-            targetdir=self.python_dir + r"\..",
+            targetdir=self.python_executable_dir + r"\..",
         )
         self._print_action_done()
         # relocate to /python
         if Path(self.python_dir_name) != Path(self.winpy_dir) / self.python_dir_name: #2024-12-22 to /python
-            os.rename(Path(self.python_dir), Path(self.winpy_dir) / self.python_dir_name)
+            os.rename(Path(self.python_executable_dir), Path(self.winpy_dir) / self.python_dir_name)
 
     def _copy_tools(self):
         """Copy dev tools"""
@@ -429,7 +442,7 @@ call "%~dp0env_for_icons.bat"
         self._print_action_done()
         # move node higher
         nodejs_current = toolsdir / "n"
-        nodejs_target = Path(self.winpy_dir) / self.NODEJS_PATH
+        nodejs_target = Path(self.winpy_dir) / self.NODEJS_PATH_REL
         if nodejs_current != nodejs_target and nodejs_current.is_dir():
             shutil.move(nodejs_current, nodejs_target)
 
@@ -982,24 +995,22 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action_done()
 
         self.distribution = wppm.Distribution(
-            self.python_dir,
+            self.python_executable_dir,
             verbose=self.verbose,
             indent=True,
         )
 
-        # get Fullversion from the executable
-        self.python_fullversion = utils.get_python_long_version(
-            self.distribution.target
-        )
+
+
 
         # Assert that WinPython version and real python version do match
         self._print_action(
-            f"Python version{self.python_fullversion.replace('.','')}"
+            f"Python version{self.python_full_version.replace('.','')}"
             + f"\nDistro Name {self.distribution.target}"
         )
-        assert self.python_fullversion.replace(".", "") in self.distribution.target, (
+        assert self.python_full_version.replace(".", "") in self.distribution.target, (
             "Distro Directory doesn't match the Python version it ships"
-            + f"\nPython version: {self.python_fullversion.replace('.','')}"
+            + f"\nPython version: {self.python_full_version.replace('.','')}"
             + f"\nDistro Name: {self.distribution.target}"
         )
 
@@ -1041,7 +1052,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         # Writing package index
         self._print_action("Writing package index")
         # winpyver2 = the version without build part but with self.distribution.architecture
-        self.winpyver2 = f"{self.python_fullversion}.{self.build_number}"
+        self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
         fname = str(
             Path(self.winpy_dir).parent
             / (
