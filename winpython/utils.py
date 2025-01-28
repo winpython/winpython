@@ -610,7 +610,10 @@ def buildflit_wininst(
                 )
             )
             # remove tempo dir 'root' no more needed
-            shutil.rmtree(root, onexc=onerror)
+            #try:
+            #    shutil.rmtree(root, onexc=onerror)
+            #except TypeError: # before 3.12
+            #    shutil.rmtree(root, onerror=onerror)
         return dst_fname
 
 
