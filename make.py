@@ -125,7 +125,7 @@ class WinPythonDistributionBuilder:
         self,
         build_number: int,
         release_level: str,
-        target,
+        target_dir: Path,
         wheels_dir: Path,
         tools_dirs: list[Path] = None,
         docs_dirs: list[Path] = None,
@@ -151,15 +151,15 @@ class WinPythonDistributionBuilder:
         """
         self.build_number = build_number
         self.release_level = release_level
-        self.target = target
+        self.target_dir = Path(target_dir)  # Ensure Path object
         self.wheels_dir = Path(wheels_dir)  # Ensure Path object
         self.tools_dirs = tools_dirs or []
         self.docs_dirs = docs_dirs or []
         self.verbose = verbose
         self.winpy_dir: Path | None = None  # Will be set during build
-        self.distribution = None
+        self.distribution: wppm.Distribution | None = None # Will be set during build
         self.installed_packages = []
-        self.base_dir = base_dir  # added to build from winpython
+        self.base_dir = base_dir
         self.install_options = install_options
         self.flavor = flavor
 
@@ -187,9 +187,9 @@ class WinPythonDistributionBuilder:
         installed_packages_md = self._get_installed_packages_markdown()
         python_description = "Python programming language with standard library"
 
-        return f"""## WinPython {self.winpython_version_name}
+        return f"""## WinPython {self.winpyver2 + self.flavor}
 
-The following packages are included in WinPython-{self.architecture_bits}bit v{self.winpython_version_name} {self.release_level}.
+The following packages are included in WinPython-{self.architecture_bits}bit v{self.winpyver2 + self.flavor} {self.release_level}.
 
 <details>
 
@@ -1007,7 +1007,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             raise RuntimeError("WinPython base directory to create is undefined") 
         else:
             self.winpy_dir = str(
-                Path(self.target) / my_winpydir
+                Path(self.target_dir) / my_winpydir
             )  # Create/re-create the WinPython base directory
         self._print_action(f"Creating WinPython {my_winpydir} base directory")
         if Path(self.winpy_dir).is_dir() and remove_existing:
@@ -1111,29 +1111,26 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action_done()
 
 
-def rebuild_winpython(codedir, targetdir, architecture=64, verbose=False):
-    """Rebuild winpython package from source"""
-    
-    for name in os.listdir(targetdir):
-        if name.startswith("winpython-") and name.endswith((".exe", ".whl", ".gz")):
-            os.remove(str(Path(targetdir) / name))
-    #  utils.build_wininst is replaced per flit 2023-02-27
+def rebuild_winpython_package(source_dir: Path, target_dir: Path, architecture: int = 64, verbose: bool = False):
+    """Rebuilds the winpython package from source using flit."""
+    for filename in os.listdir(target_dir):
+        if filename.startswith("winpython-") and filename.endswith((".exe", ".whl", ".gz")):
+            os.remove(Path(target_dir) / filename)
+
     utils.buildflit_wininst(
-        codedir,
-        copy_to=targetdir,
+        str(source_dir),
+        copy_to=str(target_dir),
         verbose=verbose,
     )
 
 
-def _parse_list_argument(list_in, list_type=None):
-    """Transform a 'String or List' in List"""
-    if list_in is None:
-        list_in = ""
-    if not list_in == list(list_in):
-        list_in = list_in.split()
-    if list_type:
-        print(list_type, list_in)
-    return list_in
+def _parse_list_argument(arg_value: str | list[str]) -> list[str]:
+    """Parses a string or list argument into a list of strings."""
+    if arg_value is None:
+        return []
+    if isinstance(arg_value, str):
+        return arg_value.split()
+    return list(arg_value) # Ensure it's a list if already a list-like object
 
 
 def make_all(
@@ -1182,11 +1179,13 @@ def make_all(
     # use source_dirs as the directory to re-build Winpython wheel
     wheels_dir = source_dirs
 
-    # Rebuild Winpython in this wheel dir
-    rebuild_winpython(
-        codedir=str(Path(__file__).resolve().parent), # winpython source dir
-        targetdir=wheels_dir,
+    # Rebuild WinPython package
+    winpython_source_dir = Path(__file__).resolve().parent
+    rebuild_winpython_package(
+        source_dir=winpython_source_dir,
+        target_dir=wheels_dir,
         architecture=architecture,
+        verbose=verbose,
     )
 
     # Parse list arguments
