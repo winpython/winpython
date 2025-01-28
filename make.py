@@ -123,30 +123,43 @@ class WinPythonDistributionBuilder:
 
     def __init__(
         self,
-        build_number,
-        release_level,
+        build_number: int,
+        release_level: str,
         target,
         wheels_dir: Path,
         tools_dirs: list[Path] = None,
-        verbose=False,
-        basedir=None,
-        install_options=None,
-        flavor="",
-        docsdirs=None,
+        docs_dirs: list[Path] = None,
+        verbose: bool = False,
+        base_dir: Path = None,
+        install_options: list[str] = None,
+        flavor: str = "",
     ):
-        assert isinstance(build_number, int)
-        assert isinstance(release_level, str)
+        """
+        Initializes the WinPythonDistributionBuilder.
+
+        Args:
+            build_number: The build number (integer).
+            release_level: The release level (e.g., "beta", "").
+            target_dir: The base directory where WinPython will be created.
+            wheels_dir: Directory containing wheel files for packages.
+            tools_dirs: List of directories containing development tools to include.
+            docs_dirs: List of directories containing documentation to include.
+            verbose: Enable verbose output.
+            base_dir: Base directory for building (optional, for relative paths).
+            install_options: Additional pip install options.
+            flavor: WinPython flavor (e.g., "Barebone").
+        """
         self.build_number = build_number
         self.release_level = release_level
         self.target = target
         self.wheels_dir = Path(wheels_dir)  # Ensure Path object
         self.tools_dirs = tools_dirs or []
-        self._docsdirs = docsdirs if docsdirs is not None else []
+        self.docs_dirs = docs_dirs or []
         self.verbose = verbose
         self.winpy_dir: Path | None = None  # Will be set during build
         self.distribution = None
         self.installed_packages = []
-        self.basedir = basedir  # added to build from winpython
+        self.base_dir = base_dir  # added to build from winpython
         self.install_options = install_options
         self.flavor = flavor
 
@@ -300,12 +313,12 @@ Name | Version | Description
         return self.tools_dirs
 
     @property
-    def docsdirs(self):
+    def docs_directories(self) -> list[Path]:
         """Returns the list of documentation directories to include."""
-        if (Path(__file__).resolve().parent / "docs").is_dir():
-            return [str(Path(__file__).resolve().parent / "docs")] + self._docsdirs
-        else:
-            return self._docsdirs
+        default_docs_dir = Path(__file__).resolve().parent / "docs"
+        if default_docs_dir.is_dir():
+            return [default_docs_dir] + self.docs_dirs
+        return self.docs_dirs
 
     def get_package_fname(self, pattern):
         """Get package matching pattern in wheels_dir"""
@@ -428,7 +441,7 @@ call "%~dp0env_for_icons.bat"
 
     def _copy_tools(self):
         """Copies development tools to the WinPython 't' directory."""
-        tools_target_dir = self.winpy_dir / "t"
+        tools_target_dir = Path(self.winpy_dir) / "t"
         self._print_action(f"Copying tools to {tools_target_dir}")
         tools_target_dir.mkdir(parents=True, exist_ok=True)
         for source_dir in self.tools_directories:
@@ -448,7 +461,7 @@ call "%~dp0env_for_icons.bat"
 
         # Special handling for Node.js to move it up one level
         nodejs_current_dir = tools_target_dir / "n"
-        nodejs_target_dir = self.winpy_dir / self.NODEJS_PATH_REL
+        nodejs_target_dir = Path(self.winpy_dir) / self.NODEJS_PATH_REL
         if nodejs_current_dir != nodejs_target_dir and nodejs_current_dir.is_dir():
             try:
                 shutil.move(nodejs_current_dir, nodejs_target_dir)
@@ -458,19 +471,24 @@ call "%~dp0env_for_icons.bat"
         self._print_action_done()
 
     def _copy_documentation(self):
-        """Copy dev docs"""
-        docsdir = Path(self.winpy_dir) / "notebooks"
-        self._print_action(f"Copying Notebook docs from {self.docsdirs} to {docsdir}")
-        docsdir.mkdir(parents=True, exist_ok=True)
-        docsdir = docsdir / "docs"
-        docsdir.mkdir(parents=True, exist_ok=True)
-        for dirname in self.docsdirs:
-            for name in os.listdir(dirname):
-                path = Path(dirname) / name
-                copy = shutil.copytree if path.is_dir() else shutil.copyfile
-                copy(path, docsdir / name)
-                if self.verbose:
-                    print(f"{path} --> {docsdir / name}")
+        """Copies documentation files to the WinPython 'docs' directory."""
+        docs_target_dir = Path(self.winpy_dir) / "notebooks" / "docs"
+        self._print_action(f"Copying documentation to {docs_target_dir}")
+        docs_target_dir.mkdir(parents=True, exist_ok=True)
+        for source_dir in self.docs_directories:
+            if not source_dir.is_dir():
+                print(f"Warning: Documentation directory not found: {source_dir}")
+                continue
+            for item_name in os.listdir(source_dir):
+                source_item = source_dir / item_name
+                target_item = docs_target_dir / item_name
+                copy_func = shutil.copytree if source_item.is_dir() else shutil.copy2
+                try:
+                    copy_func(source_item, target_item)
+                    if self.verbose:
+                        print(f"  Copied: {source_item} -> {target_item}")
+                except Exception as e:
+                    print(f"Error copying {source_item} to {target_item}: {e}")
         self._print_action_done()
 
     def _create_launchers(self):
@@ -984,6 +1002,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.python_fname,
             self.python_name,
         )
+
         if my_winpydir is None:
             raise RuntimeError("WinPython base directory to create is undefined") 
         else:
@@ -1084,7 +1103,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action("Writing changelog")
         diff.write_changelog(
             self.winpyver2,
-            basedir=self.basedir,
+            basedir=self.base_dir,
             flavor=self.flavor,
             release_level=self.release_level,
             architecture=self.distribution.architecture,
@@ -1172,29 +1191,23 @@ def make_all(
 
     # Parse list arguments
     tools_dirs_list = _parse_list_argument(toolsdirs)
+    docs_dirs_list = _parse_list_argument(docsdirs)
+    install_options_list = _parse_list_argument(install_options)
+    find_links_dirs_list = _parse_list_argument(find_links)
+    requirements_files_list = [Path(f) for f in _parse_list_argument(requirements) if f] # ensure Path objects
 
-    # Optional pre-defined toolsdirs
-    print("docsdirs input", docsdirs)
-    docsdirs = _parse_list_argument(docsdirs, "docsdirs=")
-    print("docsdirs output", docsdirs)
-
-    # install_options = ['--no-index', '--pre', f'--find-links={wheels_dir)']
-    install_options = _parse_list_argument(install_options, "install_options")
-
-    find_links = _parse_list_argument(find_links, "find_links")
-
-    find_list = [f"--find-links={l}" for l in find_links + [wheels_dir]]
+    find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [wheels_dir]]
     builder = WinPythonDistributionBuilder(
         build_number,
         release_level,
         builddir,
         wheels_dir=wheels_dir,
         tools_dirs=[Path(d) for d in tools_dirs_list],
+        docs_dirs=[Path(d) for d in docs_dirs_list],
         verbose=verbose,
-        basedir=basedir,
-        install_options=install_options + find_list,
+        base_dir=basedir,
+        install_options=install_options_list + find_links_options,
         flavor=flavor,
-        docsdirs=docsdirs,
     )
     # define a pre-defined winpydir, instead of having to guess
 
@@ -1228,7 +1241,7 @@ def make_all(
 
     builder.make(
         remove_existing=remove_existing,
-        requirements=requirements,
+        requirements=requirements_files_list,
         my_winpydir=my_winpydir,
     )
     if str(create_installer).lower() != "false":
