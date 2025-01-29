@@ -500,12 +500,12 @@ call "%~dp0env_for_icons.bat"
         """Create launchers"""
         self._print_action("Creating launchers")
         # 2025-01-04: copy launchers premade per the Datalab-Python way
-        portable_dir = Path(__file__).resolve().parent / "portable" / "launchers_final"
-        for path in portable_dir.rglob('*.exe'):
-            shutil.copy2(path, self.winpy_dir)
-            print("new way !!!!!!!!!!!!!!!!!! ", path , " -> ",self.winpy_dir)
-        for path in (Path(__file__).resolve().parent / "portable").rglob('licence*.*'):
-            shutil.copy2(path, self.winpy_dir)
+        launchers_source_dir = PORTABLE_DIR / "launchers_final"
+        for item in launchers_source_dir.rglob('*.exe'):
+            shutil.copy2(item, self.winpy_dir)
+            print("new way !!!!!!!!!!!!!!!!!! ", item , " -> ",self.winpy_dir)
+        for item in launchers_source_dir.rglob('licence*.*'):
+            shutil.copy2(item, self.winpy_dir)
         self._print_action_done()
 
 
@@ -567,8 +567,8 @@ if %ERRORLEVEL% NEQ 0 (
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\\Lib\\site-packages\\PyQt5\\__init__.py" set QT_API=pyqt5
 """
-
         self.create_batch_script("env.bat", env_bat_content, replacements=batch_replacements)
+
 
         ps1_content = r"""### WinPython_PS_Prompt.ps1 ###
 $0 = $myInvocation.MyCommand.Definition
@@ -615,11 +615,10 @@ Function Set-WindowSize {
 Param([int]$x=$host.ui.rawui.windowsize.width,
       [int]$y=$host.ui.rawui.windowsize.heigth,
       [int]$buffer=$host.UI.RawUI.BufferSize.heigth)
-    
     $buffersize = new-object System.Management.Automation.Host.Size($x,$buffer)
     $host.UI.RawUI.BufferSize = $buffersize
     $size = New-Object System.Management.Automation.Host.Size($x,$y)
-    $host.ui.rawui.WindowSize = $size   
+    $host.ui.rawui.WindowSize = $size
 }
 # Windows10 yelling at us with 150 40 6000
 # Set-WindowSize 195 40 6000 
@@ -629,15 +628,14 @@ $host.ui.RawUI.BackgroundColor = "Black"
 $host.ui.RawUI.ForegroundColor = "White"
 }
 """
-
         self.create_batch_script("WinPython_PS_Prompt.ps1", ps1_content, replacements=batch_replacements)
-
 
         cmd_ps_bat_content = r"""@echo off
 call "%~dp0env_for_icons.bat"
 Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
 """
         self.create_batch_script("cmd_ps.bat", cmd_ps_bat_content, replacements=batch_replacements)
+
 
         env_for_icons_bat_content = r"""@echo off
 call "%~dp0env.bat"
@@ -675,15 +673,12 @@ rem Preventive Working Directories creation if needed
 if not "%WINPYWORKDIR%"=="" if not exist "%WINPYWORKDIR%" mkdir "%WINPYWORKDIR%"
 if not "%WINPYWORKDIR1%"=="" if not exist "%WINPYWORKDIR1%" mkdir "%WINPYWORKDIR1%"
 
-
 rem Change of directory only if we are in a launcher directory
 if  "%__CD__%scripts\"=="%~dp0"  cd/D %WINPYWORKDIR1%
 if  "%__CD__%"=="%~dp0"          cd/D %WINPYWORKDIR1%
 
-
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYVER:~0,1%"
 if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"
-
 """
         self.create_batch_script("env_for_icons.bat", env_for_icons_bat_content, replacements=batch_replacements)
 
@@ -745,12 +740,12 @@ def main():
     import sys
     args = sys.argv[1:]
     file_name = args[0] if args else "..\\settings\\winpython.ini"
-    
+
     my_lines = get_file(file_name).splitlines()
     segment = "environment"
     txt = ""
     env = os.environ.copy() # later_version: env = os.environ
-    
+
     # default directories (from .bat)
     os.makedirs(Path(env['WINPYDIRBASE']) / 'settings' / 'Appdata' / 'Roaming', exist_ok=True)
 
@@ -779,7 +774,7 @@ def main():
                 env[data[0].strip()] = translate(data[1].strip(), env)
             if segment == "debug" and data[0].strip() == "state":
                 txt += f"set WINPYDEBUG={data[1].strip()}&&"
-    
+
     print(txt)
 
     # set potential directory
@@ -812,7 +807,6 @@ if __name__ == "__main__":
 
 
         self.create_batch_script("readme.txt", """These batch files are required to run WinPython icons.
-
 These files should help the user writing his/her own
 specific batch file to call Python scripts inside WinPython.
 The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""",
@@ -991,6 +985,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     self._print_action(f"Execution failed: {e}!")
         self._print_action_done()
 
+
     def make(
         self,
         remove_existing=True,
@@ -1024,15 +1019,11 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self._extract_python_archive()
 
         self._print_action_done()
-
         self.distribution = wppm.Distribution(
             self.python_executable_dir,
             verbose=self.verbose,
             indent=True,
         )
-
-
-
 
         # Assert that WinPython version and real python version do match
         self._print_action(
@@ -1050,8 +1041,8 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self._create_standard_batch_scripts()
             self._create_launchers()
             utils.python_execmodule("ensurepip", self.distribution.target) # Ensure pip is installed for PyPy
-
             self.distribution.patch_standard_packages("pip")
+
             # Upgrade essential packages
             essential_packages = ["pip", "setuptools", "wheel", "winpython"]
             for package_name in essential_packages:
@@ -1074,6 +1065,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     print(f"piping {' '.join(actions)}")
                     self._print_action(f"piping {' '.join(actions)}")
                     self.distribution.do_pip_action(actions)
+
             self._run_complementary_batch_scripts()
             self.distribution.patch_standard_packages()
 
@@ -1094,6 +1086,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         )
         open(fname, "w", encoding='utf-8').write(self.package_index_markdown)
         # Copy to winpython/changelogs
+
         shutil.copyfile(
             fname,
             str(Path(CHANGELOGS_DIR) / Path(fname).name),
