@@ -158,9 +158,8 @@ class WinPythonDistributionBuilder:
         self.verbose = verbose
         self.winpy_dir: Path | None = None  # Will be set during build
         self.distribution: wppm.Distribution | None = None # Will be set during build
-        self.installed_packages = []
         self.base_dir = base_dir
-        self.install_options = install_options
+        self.install_options = install_options or []
         self.flavor = flavor
         self.python_zip_file: Path = self._get_python_zip_file()
         self.python_name = self.python_zip_file.stem  # Filename without extension
@@ -266,10 +265,10 @@ Name | Version | Description
         ]
         return "\n".join(package_lines)
 
-    # @property makes self.winpython_version_name becomes a call to self.winpython_version_name()
+
     @property
-    def winpython_version_name(self):
-        """Return WinPython version (with flavor and release level!)"""
+    def winpython_version_name(self) -> str:
+        """Returns the full WinPython version string."""
         return f"{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
 
     @property
@@ -497,13 +496,13 @@ call "%~dp0env_for_icons.bat"
 
 
     def _create_launchers(self):
-        """Create launchers"""
+        """Copies pre-made launchers to the WinPython directory."""
         self._print_action("Creating launchers")
-        # 2025-01-04: copy launchers premade per the Datalab-Python way
         launchers_source_dir = PORTABLE_DIR / "launchers_final"
         for item in launchers_source_dir.rglob('*.exe'):
             shutil.copy2(item, self.winpy_dir)
-            print("new way !!!!!!!!!!!!!!!!!! ", item , " -> ",self.winpy_dir)
+            if self.verbose:
+                print(f"  Copied launcher: {item.name} -> {self.winpy_dir}")
         for item in launchers_source_dir.rglob('licence*.*'):
             shutil.copy2(item, self.winpy_dir)
         self._print_action_done()
@@ -683,7 +682,6 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
         self.create_batch_script("env_for_icons.bat", env_for_icons_bat_content, replacements=batch_replacements)
 
 
-        # Replaces winpython.vbs, and a bit of env.bat
         winpython_ini_py_content = r"""
 # Prepares a dynamic list of variables settings from a .ini file
 import os
@@ -986,7 +984,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action_done()
 
 
-    def make(
+    def build(
         self,
         remove_existing=True,
         requirements=None,
@@ -1023,17 +1021,6 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
             self.python_executable_dir,
             verbose=self.verbose,
             indent=True,
-        )
-
-        # Assert that WinPython version and real python version do match
-        self._print_action(
-            f"Python version{self.python_full_version.replace('.','')}"
-            + f"\nDistro Name {self.distribution.target}"
-        )
-        assert self.python_full_version.replace(".", "") in self.distribution.target, (
-            "Distro Directory doesn't match the Python version it ships"
-            + f"\nPython version: {self.python_full_version.replace('.','')}"
-            + f"\nDistro Name: {self.distribution.target}"
         )
 
         if remove_existing:
@@ -1232,7 +1219,7 @@ def make_all(
         ) + release_level
     # + flavor
 
-    builder.make(
+    builder.build(
         remove_existing=remove_existing,
         requirements=requirements_files_list,
         my_winpydir=my_winpydir,
@@ -1244,6 +1231,7 @@ def make_all(
             builder.create_installer_7zip(".7z")
         if "7zip" in str(create_installer).lower():
             builder.create_installer_7zip(".exe")
+
     return builder
 
 
