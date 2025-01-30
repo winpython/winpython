@@ -107,7 +107,8 @@ def build_installer_7zip(
         command = f'"{output_script_path}"'
         print(f"Executing 7-Zip script: {command}")
         subprocess.run(
-            command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr #=sys.stdout
+            command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr
+            # with stdout=sys.stdout, we would not  see 7zip compressing
         )  # Use subprocess.run for better error handling
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
@@ -806,8 +807,7 @@ if __name__ == "__main__":
 
         self.create_batch_script("readme.txt", """These batch files are required to run WinPython icons.
 These files should help the user writing his/her own
-specific batch file to call Python scripts inside WinPython.
-The environment variables are set-up in 'env_.bat' and 'env_for_icons.bat'.""",
+The environment variables are set-up in 'env.bat' and 'env_for_icons.bat'.""",
         )
 
         self.create_batch_script(
@@ -984,12 +984,7 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action_done()
 
 
-    def build(
-        self,
-        remove_existing=True,
-        requirements=None,
-        my_winpydir=None,
-    ):
+    def build(self, remove_existing: bool = True, requirements=None, winpy_dirname: str = None):
         """Make WinPython distribution in target directory from the installers
         located in wheels_dir
 
@@ -999,11 +994,11 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         python_zip_filename = self.python_zip_file.name
         print(f"Building WinPython with Python archive: {python_zip_filename}")
 
-        if my_winpydir is None:
+        if winpy_dirname is None:
             raise RuntimeError("WinPython base directory to create is undefined") 
         else:
-            self.winpy_dir = self.target_dir / my_winpydir # Create/re-create the WinPython base directory
-        self._print_action(f"Creating WinPython {my_winpydir} base directory")
+            self.winpy_dir = self.target_dir / winpy_dirname # Create/re-create the WinPython base directory
+        self._print_action(f"Creating WinPython {self.winpy_dir} base directory")
         if self.winpy_dir.is_dir() and remove_existing:
             try:
                 shutil.rmtree(self.winpy_dir, onexc=utils.onerror)
@@ -1115,22 +1110,22 @@ def _parse_list_argument(arg_value: str | list[str]) -> list[str]:
 
 
 def make_all(
-    build_number,
-    release_level,
-    pyver,
-    architecture,
-    basedir,
-    verbose=False,
-    remove_existing=True,
-    create_installer=True,
+    build_number: int,
+    release_level: str,
+    pyver: str,
+    architecture: int,
+    basedir: Path,
+    verbose: bool = False,
+    remove_existing: bool = True,
+    create_installer: str = "True",
     install_options=["--no-index"],
-    flavor="",
-    requirements=None,
-    find_links=None,
-    source_dirs=None,
-    toolsdirs=None,
-    docsdirs=None,
-    python_target_release=None,  # 37101 for 3.7.10
+    flavor: str = "",
+    requirements: str | list[Path] = None,
+    find_links: str | list[Path] = None,
+    source_dirs: Path = None,
+    toolsdirs: str | list[Path] = None,
+    docsdirs: str | list[Path] = None,
+    python_target_release: str = None, # e.g. "37101" for 3.7.10
 ):
     """Make WinPython distribution, for a given base directory and
     architecture:
@@ -1197,7 +1192,7 @@ def make_all(
         my_x = my_x[:-1]
     # simplify for PyPy
     if not python_target_release == None:
-        my_winpydir = (
+        winpy_dirname = (
             "WPy"
             + f"{architecture}"
             + "-"
@@ -1207,7 +1202,7 @@ def make_all(
         ) + release_level
     # + flavor
     else:
-        my_winpydir = (
+        winpy_dirname = (
             "WPy"
             + f"{architecture}"
             + "-"
@@ -1222,7 +1217,7 @@ def make_all(
     builder.build(
         remove_existing=remove_existing,
         requirements=requirements_files_list,
-        my_winpydir=my_winpydir,
+        winpy_dirname=winpy_dirname,
     )
     if str(create_installer).lower() != "false":
         if ".zip" in str(create_installer).lower():
