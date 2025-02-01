@@ -55,7 +55,7 @@ class pipdata:
         for package in packages:
             self._process_package(package)
 
-        # On a second pass, complement distro in reverse mode with 'wanted-per':
+        # On a second pass, complement dependancies in reverse mode with 'wanted-per':
         self._populate_wanted_per()
 
     def _get_environment(self):
@@ -93,8 +93,8 @@ class pipdata:
                 "requires_dist": requires,
                 "wanted_per": [],
                 "description": meta.get("Description", ""),
-                "provides": provides,  # extras of the package: 'array' for dask because dask['array'] defines some extra 
-                "provided": provided,  # extras from other package: 'test' for pytest because dask['test'] wants pytest
+                "provides": provides, 
+                "provided": provided,  # being extras from other packages: 'test' for pytest because dask['test'] wants pytest
         }
 
     def _get_requires(self, package):
@@ -123,7 +123,8 @@ class pipdata:
         return requires
 
     def _get_provides(self, package):
-        """Get the provides of a package."""
+        """Get the extended list of dependant packages, from extra options."""
+        # 'array' is an added dependancy package of dask, if you install dask['array']
         provides = {'': None}
         if package.requires:
             for req in package.requires:
@@ -140,6 +141,7 @@ class pipdata:
         #        contains =
         #             req_key = upstream package_key
         #             req_version = downstream package version wanted
+        #             req_extra = extra option of the demanding package that wants this dependancy
         #             req_marker = marker of the downstream package requirement (if any)
         for p in self.distro:
             for r in self.distro[p]["requires_dist"]:
@@ -167,14 +169,11 @@ class pipdata:
     def _downraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
         """build a nested list of needed packages with given extra and depth"""
         envi = {"extra": extra, **self.environment}
-        p = normalize(pp)
-
-        # handles several extras, example: dask[array,diagnostics] 
-        extras = extra.split(",")
-
+        p = normalize(pp) 
+        extras = extra.split(",") #  to handle several extras, example: dask[array,diagnostics]
         ret_all = []
-        if p+"["+extra+"]" in path: # for dask[complete]->dask[array,test,..]
-            print("cycle!", "->".join(path + [p+"["+extra+"]"]))
+        if p + "[" + extra + "]" in path: # for dask[complete]->dask[array,test,..]
+            print("cycle!", "->".join(path + [p + "[" + extra + "]"]))
         elif p in self.distro and len(path) <= depth:
             for extra in extras:  # several extras request management
                 envi = {"extra": extra, **self.environment}
@@ -191,7 +190,7 @@ class pipdata:
                                 r["req_extra"],
                                 r["req_version"],
                                 depth,
-                                path + [p+"["+extra+"]"],
+                                path + [p + "[" +extra + "]"],
                                 verbose=verbose,
                             )
                 ret_all.append(ret)
@@ -219,7 +218,7 @@ class pipdata:
               return []
             ret = []
             for r in self.distro[p]["wanted_per"]:
-                up_req = (r["req_marker"].split('extra == ')+[""])[1].translate(remove_list) if "req_marker" in r else ""
+                up_req = (r.get("req_marker", "").split('extra == ')+[""])[1].translate(remove_list)
                 if r["req_key"] in self.distro and r["req_key"]+"["+up_req+"]" not in path: # avoids circular links on dask[array]
                     # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['wanted_per'] has:
                     # {'req_key': 'langchain', 'req_version': '(>=1,<2)',  'req_extra': '',  'req_marker': ' python_version < "3.12"'},
@@ -243,74 +242,59 @@ class pipdata:
                             verbose=verbose,
                         )
             if not ret == []:
-                ret_all += [ret]
+                ret_all.append(ret)
         return ret_all
 
     def down(self, pp="", extra="", depth=99, indent=5, version_req="", verbose=False):
         """print the downward requirements for the package or all packages"""
-        if not pp == ".":
-            if not extra == ".":
+        if pp != ".":
+            if extra != ".":
                 if pp in self.distro:
                     extras = [s for s in extra.split(',') if s in sorted(self.distro[pp]["provides"])]
                     if extras == []: return ''
-                rawtext = json.dumps(
-                    self._downraw(pp, extra, version_req, depth, verbose=verbose), indent=indent
-                )
+                rawtext = json.dumps(self._downraw(pp, extra, version_req, depth, verbose=verbose), indent=indent)
                 lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
                 return ("\n".join(lines).replace('"', ""))
             else:
                 if pp in self.distro:
-                    r = []
-                    for one_extra in sorted(self.distro[pp]["provides"]):
-                        s = self.down(pp, one_extra, depth, indent, version_req, verbose=verbose)
-                        if s != '': r += [s]
-                    #print(r)    
-                    return '\n'.join([i for i in r if i!= ''])   
+                    results = [self.down(pp, one_extra, depth, indent, version_req, verbose=verbose) 
+                               for one_extra in sorted(self.distro[pp]["provides"])]
+                    return '\n'.join(filter(None, results))
         else:
-            r = []
-            for one_pp in sorted(self.distro):
-                s = self.down(one_pp, extra, depth, indent, version_req, verbose=verbose)
-                if s != '': r += [s]
-            return '\n'.join([i for i in r if i!= ''])    
-
+            results = [self.down(one_pp, extra, depth, indent, version_req, verbose=verbose)
+                       for one_pp in sorted(self.distro)]
+            return '\n'.join(filter(None, results))
+        
     def up(self, pp, extra="", depth=99, indent=5, version_req="", verbose=False):
-        """print the upward needs for the package"""
+        """Print the upward needs for the package."""
         r = []
-        if not pp == ".":
-            if not extra == ".":
-                s = self._upraw(pp, extra, version_req, depth, verbose=verbose)
-                if s == []: return ''
+        if pp != ".":
+            if extra != ".":
                 rawtext = json.dumps(self._upraw(pp, extra, version_req, depth, verbose=verbose), indent=indent)
                 lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-                return ("\n".join(i for i in lines if i!= '').replace('"', "") )
+                return ('\n'.join(filter(None, lines)).replace('"', "") )
             else:
                 if pp in self.distro:
-                    r = []
-                    for one_extra in sorted(set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"]))): #direct and from-upward tags
-                        s = self.up(pp, one_extra, depth, indent, version_req, verbose=verbose)
-                        if s != '': r += [s]
-                    return '\n'.join([i for i in r if i!= ''])   
+                    # get 'extra' tags from direct and from upward packages 
+                    results = [self.up(pp, one_extra, depth, indent, version_req, verbose=verbose)
+                               for one_extra in sorted(set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"])))]
+                    return '\n'.join(filter(None, results))
         else:
-            for one_pp in sorted(self.distro):
-                s = self.up(one_pp, extra, depth, indent, version_req, verbose=verbose)
-                if s != []: r += [s]
-            if r !=[]:
-                return '\n'.join([i for i in r if i!= ''])
-            else:
-                return
+            results = [self.up(one_pp, extra, depth, indent, version_req, verbose=verbose) for one_pp in sorted(self.distro)]
+            return '\n'.join(filter(None, results))
 
     def description(self, pp):
-        "return description of the package"
+        """Return description of the package."""
         if pp in self.distro:
             return print("\n".join(self.distro[pp]["description"].split(r"\n")))
     
     def summary(self, pp):
-        "return summary of the package"
+        """Return summary of the package."""
         if pp in self.distro:
             return  self.distro[pp]["summary"]
 
     def pip_list(self, full=False, max_length=144):
-        """do like pip list"""
+        """List installed packages similar to pip list."""
         if full:
             return [(p, self.distro[p]["version"], sum_up(self.distro[p]["summary"]), max_length) for p in sorted(self.distro)]
         else:
