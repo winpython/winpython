@@ -17,32 +17,16 @@ import re
 import sys
 import subprocess
 import json
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 # Local imports
-from winpython import utils
+from winpython import utils, piptree
 
-# from former wppm separate script launcher
-import textwrap
-from argparse import ArgumentParser, HelpFormatter, RawTextHelpFormatter
 
-from winpython import piptree
-
-# import information reader
-# importlib_metadata before Python 3.8
-try:
-    from importlib import metadata as metadata  # Python-3.8
-
-    metadata = metadata.metadata
-except:
-    try:
-        from importlib_metadata import metadata  # <Python-3.8
-    except:
-        metadata = None  # nothing available
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
-
-class BasePackage(object):
+class BasePackage:
     def __init__(self, fname):
         self.fname = fname
         self.name = None
@@ -51,9 +35,7 @@ class BasePackage(object):
         self.url = None
 
     def __str__(self):
-        text = f"{self.name} {self.version}"
-        text += f"\r\n{self.description}\r\nWebsite: {self.url}"
-        return text
+        return f"{self.name} {self.version}\r\n{self.description}\r\nWebsite: {self.url}"
 
 
 class Package(BasePackage):
@@ -79,20 +61,16 @@ class Package(BasePackage):
         raise NotImplementedError(f"Not supported package type {bname}")
 
 
-class Distribution(object):
+class Distribution:
     def __init__(self, target=None, verbose=False, indent=False):
-        self.target = target
+        # if no target path given, take the current python interpreter one
+        self.target = target or os.path.dirname(sys.executable)
         self.verbose = verbose
         self.indent = indent
         self.pip = None
-
-        # if no target path given, take the current python interpreter one
-        if self.target is None:
-            self.target = os.path.dirname(sys.executable)
         self.to_be_removed = []  # list of directories to be removed later
-
         self.version, self.architecture = utils.get_python_infos(target)
-        # name of the exe (python.exe or pypy3;exe)
+        # name of the exe (python.exe or pypy3.exe)
         self.short_exe = Path(utils.get_python_executable(self.target)).name
 
     def clean_up(self):
@@ -101,10 +79,7 @@ class Distribution(object):
             try:
                 shutil.rmtree(path, onexc=utils.onerror)
             except WindowsError:
-                print(
-                    f"Directory {path} could not be removed",
-                    file=sys.stderr,
-                )
+                print(f"Directory {path} could not be removed", file=sys.stderr)
 
     def remove_directory(self, path):
         """Try to remove directory -- on WindowsError, remove it later"""
@@ -140,11 +115,7 @@ class Distribution(object):
             for fname in filenames:
                 t_fname = str(Path(dirpath) / fname)[offset:]
                 src = str(Path(srcdir) / t_fname)
-                if dirpath.endswith("_system32"):
-                    # Files that should be copied in %WINDIR%\system32
-                    dst = fname
-                else:
-                    dst = str(Path(dstdir) / t_fname)
+                dst = fname if dirpath.endswith("_system32") else str(Path(dstdir) / t_fname)
                 if self.verbose:
                     print(f"file:  {dst}")
                 full_dst = str(Path(self.target) / dst)
@@ -157,12 +128,7 @@ class Distribution(object):
                         print(f"file:  {dst}")
                     full_dst = str(Path(self.target) / dst)
                     fd = open(full_dst, "w")
-                    fd.write(
-                        """@echo off
-python "%~dpn0"""
-                        + ext
-                        + """" %*"""
-                    )
+                    fd.write(f"""@echo off\npython "%~dpn0{ext}" %*""")
                     fd.close()
                     package.files.append(dst)
 
@@ -172,7 +138,8 @@ python "%~dpn0"""
         if self.verbose:
             print(f"create:  {dst}")
         full_dst = str(Path(self.target) / dst)
-        open(full_dst, "w").write(contents)
+        with open(full_dst, "w") as fd:
+            fd.write(contents)
         package.files.append(dst)
 
     def get_installed_packages(self, update=False):
@@ -211,7 +178,6 @@ python "%~dpn0"""
     ):
         """make all python launchers relatives"""
         import glob
-        import os
 
         for ffname in glob.glob(r"%s\Scripts\*.exe" % self.target):
             size = os.path.getsize(ffname)
@@ -239,12 +205,8 @@ python "%~dpn0"""
 
     def do_pip_action(self, actions=None, install_options=None):
         """Do pip action in a distribution"""
-        my_list = install_options
-        if my_list is None:
-            my_list = []
-        my_actions = actions
-        if my_actions is None:
-            my_actions = []
+        my_list = install_options or []
+        my_actions = actions or []
         executing = str(Path(self.target).parent / "scripts" / "env.bat")
         if Path(executing).is_file():
             complement = [
@@ -311,27 +273,11 @@ python "%~dpn0"""
             the_place = site_package_place + r"pip\_vendor\distlib\scripts.py"
             print(the_place)
             if to_movable:
-                utils.patch_sourcefile(
-                    self.target + the_place,
-                    sheb_fix,
-                    sheb_mov1,
-                )
-                utils.patch_sourcefile(
-                    self.target + the_place,
-                    sheb_mov2,
-                    sheb_mov1,
-                )
+                utils.patch_sourcefile(self.target + the_place, sheb_fix, sheb_mov1)
+                utils.patch_sourcefile(self.target + the_place, sheb_mov2, sheb_mov1)
             else:
-                utils.patch_sourcefile(
-                    self.target + the_place,
-                    sheb_mov1,
-                    sheb_fix,
-                )
-                utils.patch_sourcefile(
-                    self.target + the_place,
-                    sheb_mov2,
-                    sheb_fix,
-                )
+                utils.patch_sourcefile(self.target + the_place, sheb_mov1, sheb_fix)
+                utils.patch_sourcefile(self.target + the_place, sheb_mov2, sheb_fix)
 
             # create movable launchers for previous package installations
             self.patch_all_shebang(to_movable=to_movable)
@@ -367,9 +313,7 @@ python "%~dpn0"""
         if not Path(scriptpy).is_dir():
             os.mkdir(scriptpy)
         if not list(names) == names:
-            my_list = [
-                f for f in os.listdir(scriptpy) if "." not in f and f.startswith(names)
-            ]
+            my_list = [f for f in os.listdir(scriptpy) if "." not in f and f.startswith(names)]
         else:
             my_list = names
         for name in my_list:
@@ -378,11 +322,8 @@ python "%~dpn0"""
                     not (Path(scriptpy) / (name + ".exe")).is_file()
                     and not (Path(scriptpy) / (name + ".bat")).is_file()
                 ):
-                    fd = open(
-                        str(Path(scriptpy) / (name + ".bat")),
-                        "w",
-                    )
-                    fd.write(contents)
+                    with open(Path(scriptpy) / (name + ".bat"), "w") as fd:
+                        fd.write(contents)
                     fd.close()
 
     def handle_specific_packages(self, package):
@@ -463,28 +404,13 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         self._print(package, "Uninstalling")
         if not package.name == "pip":
             # trick to get true target (if not current)
-            this_executable_path = self.target
             this_exec = utils.get_python_executable(self.target)  # PyPy !
-            subprocess.call(
-                [
-                    this_exec,
-                    "-m",
-                    "pip",
-                    "uninstall",
-                    package.name,
-                    "-y",
-                ],
-                cwd=this_executable_path,
-            )
-            # no more legacy, no package are installed by old non-pip means
+            subprocess.call([this_exec, "-m", "pip", "uninstall", package.name, "-y"], cwd=self.target)
         self._print_done()
 
     def install_bdist_direct(self, package, install_options=None):
         """Install a package directly !"""
-        self._print(
-            package,
-            f"Installing {package.fname.split('.')[-1]}",
-        )
+        self._print(package,f"Installing {package.fname.split('.')[-1]}")
         try:
             fname = utils.direct_pip_install(
                 package.fname,
