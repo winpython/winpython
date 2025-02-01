@@ -82,39 +82,10 @@ class pipdata:
         key = normalize(name)
         self.raw[key] = meta
         provided = {'': None}
-        #requires = self._get_requires(package)
-        #provides = self._get_provides(package)
+ 
+        requires = self._get_requires(package)
+        provides = self._get_provides(package)
 
-
-        requires = []
-        provides = {'':None}
-
-        replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
-        if package.requires:
-            for i in package.requires:
-                det = (i + ";").split(";")
-                # req_nameextra is "python-jose[cryptography]"
-                #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
-                # req_nameextra is "google-cloud-storage"
-                #   from "google-cloud-storage (<2.0.0,>=1.26.0)
-                req_nameextra = re.split(" |;|==|!|>|<", det[0] + ";")[0]
-                req_nameextra = normalize(req_nameextra)
-                req_key = normalize((req_nameextra + "[").split("[")[0])
-                req_key_extra = req_nameextra[len(req_key) + 1 :].split("]")[0]
-                req_version = det[0][len(req_nameextra) :].translate(replacements)
-                req_marker = det[1]
-                if 'extra == ' in req_marker:
-                    remove_list = {ord("'"):None, ord('"'):None}
-                    provides[req_marker.split('extra == ')[1].translate(remove_list)] = None
-                req_add = {
-                    "req_key": req_key,
-                    "req_version": req_version,
-                    "req_extra": req_key_extra,
-                }
-                # add the marker of the requirement, if not nothing:
-                if not req_marker == "":
-                    req_add["req_marker"] = req_marker
-                requires += [req_add]
         self.distro[key] = {
                 "name": name,
                 "version": version,
@@ -125,6 +96,42 @@ class pipdata:
                 "provides": provides,  # extras of the package: 'array' for dask because dask['array'] defines some extra 
                 "provided": provided,  # extras from other package: 'test' for pytest because dask['test'] wants pytest
         }
+
+    def _get_requires(self, package):
+        """Get the requirements of a package."""
+        requires = []
+        replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
+        if package.requires:
+            for req in package.requires:
+                # req_nameextra is "python-jose[cryptography]"
+                #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
+                # req_nameextra is "google-cloud-storage"
+                #   from "google-cloud-storage (<2.0.0,>=1.26.0)
+                req_nameextra, req_marker = (req + ";").split(";")[:2]
+                req_nameextra = normalize(re.split(" |;|==|!|>|<", req_nameextra+";")[0])
+                req_key = normalize((req_nameextra + "[").split("[")[0])
+                req_key_extra = req_nameextra[len(req_key) + 1:].split("]")[0]
+                req_version = req[len(req_nameextra):].translate(replacements)
+                req_add = {
+                    "req_key": req_key,
+                    "req_version": req_version,
+                    "req_extra": req_key_extra,
+                }
+                if not req_marker == "":
+                    req_add["req_marker"] = req_marker
+                requires.append(req_add)
+        return requires
+
+    def _get_provides(self, package):
+        """Get the provides of a package."""
+        provides = {'': None}
+        if package.requires:
+            for req in package.requires:
+                req_marker = (req + ";").split(";")[1]
+                if 'extra == ' in req_marker:
+                    remove_list = {ord("'"): None, ord('"'): None}
+                    provides[req_marker.split('extra == ')[1].translate(remove_list)] = None
+        return provides
 
     def _populate_wanted_per(self):
         """Populate the wanted_per field for each package."""
@@ -162,7 +169,7 @@ class pipdata:
         envi = {"extra": extra, **self.environment}
         p = normalize(pp)
 
-        # several extras request management: example dask[array,diagnostics] 
+        # handles several extras, example: dask[array,diagnostics] 
         extras = extra.split(",")
 
         ret_all = []
@@ -178,9 +185,7 @@ class pipdata:
                     ret = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}{summary}']
                 for r in self.distro[p]["requires_dist"]:
                     if r["req_key"] in self.distro:
-                        if "req_marker" not in r or Marker(r["req_marker"]).evaluate(
-                            environment=envi
-                        ):
+                        if "req_marker" not in r or Marker(r["req_marker"]).evaluate(environment=envi):
                             ret += self._downraw(
                                 r["req_key"],
                                 r["req_extra"],
@@ -189,7 +194,7 @@ class pipdata:
                                 path + [p+"["+extra+"]"],
                                 verbose=verbose,
                             )
-                ret_all += [ret]
+                ret_all.append(ret)
         return ret_all
 
     def _upraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
