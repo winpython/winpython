@@ -183,7 +183,7 @@ python "%~dpn0"""
         if str(Path(sys.executable).parent) == self.target:
             self.pip = piptree.pipdata()
         else:
-            self.pip = piptree.pipdata(Target=utils.get_python_executable(self.target))
+            self.pip = piptree.pipdata(utils.get_python_executable(self.target))
         pip_list = self.pip.pip_list()
 
         # create pip package list
@@ -645,17 +645,17 @@ def main(test=False):
         if args.registerWinPython and args.unregisterWinPython:
             raise RuntimeError("Incompatible arguments: --install and --uninstall")
         if args.pipdown:
-            pip = piptree.pipdata(Target=targetpython)
+            pip = piptree.pipdata(targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
             print(pip.down(pack, extra, args.levels, verbose=args.verbose))
             sys.exit()
         elif args.pipup:
-            pip = piptree.pipdata(Target=targetpython)
+            pip = piptree.pipdata(targetpython)
             pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
             print(pip.up(pack, extra, args.levels, verbose=args.verbose))
             sys.exit()
         elif args.list:
-            pip = piptree.pipdata(Target=targetpython)
+            pip = piptree.pipdata(targetpython)
             todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
             titles = [['Package', 'Version', 'Summary'],['_' * max(x, 6) for x in utils.columns_width(todo)]] 
             listed = utils.formatted_list(titles + todo, max_width=70)
@@ -663,7 +663,7 @@ def main(test=False):
                 print(*p)
             sys.exit()
         elif args.all:
-            pip = piptree.pipdata(Target=targetpython)
+            pip = piptree.pipdata(targetpython)
             todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
             for l in todo:
                 # print(pip.distro[l[0]])

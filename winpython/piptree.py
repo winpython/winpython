@@ -1,32 +1,34 @@
 # -*- coding: utf-8 -*-
 # require python 3.8+ because of importlib.metadata
-import json, sys, re, platform, os, sysconfig
+import json
+import sys
 import re
+import platform
+import os
 from collections import OrderedDict
-from pip._vendor.packaging.markers import Marker
-from importlib.metadata import Distribution , distributions
+from pip._vendor.packaging.markers import Marker, InvalidMarker
+from importlib.metadata import Distribution, distributions
 from pathlib import Path
 
-import configparser as cp
 
-def normalize(this):
-    """apply https://peps.python.org/pep-0503/#normalized-names"""
-    return re.sub(r"[-_.]+", "-", this).lower()
+def normalize(name):
+    """Normalize package name according to PEP 503."""
+    return re.sub(r"[-_.]+", "-", name).lower()
 
-def sum_up(this, max_length=144, stop_at=". "):
-    """Keep only 1 line of max_length characters at most"""
-    sumup = (this + os.linesep).splitlines()[0]
-    if len(sumup) > max_length and len(stop_at)>1:
-        sumup = (sumup + stop_at ).split(stop_at)[0]
-    if len(sumup) > max_length:
-        sumup = sumup[:max_length]
-    return sumup
+def sum_up(text, max_length=144, stop_at=". "):
+    """Summarize text to a single line of max_length characters."""
+    summary = (text + os.linesep).splitlines()[0]
+    if len(summary) > max_length and len(stop_at) > 1:
+        summary = (summary + stop_at).split(stop_at)[0]
+    if len(summary) > max_length:
+        summary = summary[:max_length]
+    return summary
 
 
 class pipdata:
     """Wrapper around Distribution.discover() or Distribution.distributions()"""
 
-    def __init__(self, Target=None):
+    def __init__(self, target=None):
 
         # create a distro{} dict of Packages
         #  key = normalised package name
@@ -36,16 +38,31 @@ class pipdata:
         #             req_extra = extra branch needed of the package_key ('all' or '')
         #             req_version = version needed
         #             req_marker = marker of the requirement (if any)
-        # on current Python, use from importlib.metadata + Distribution.Discover() for 2x speed-up
-        # on other Python, use importlib.metadata + distributions(path=[str(Path(Target).parent /'lib'/'site-packages'),])  
+
         self.distro = {}
         self.raw = {}
-        replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
-        self.environment = {
+        self.environment = self._get_environment()
+
+        target = target or sys.executable 
+
+        if sys.executable==target:
+            # self-Distro inspection case (use all packages reachable per sys.path I presume )
+            packages=Distribution.discover()
+        else:
+            # not self-Distro inspection case , look at site-packages only)
+            packages=distributions(path=[str(Path(target).parent /'lib'/'site-packages'),])  
+
+        for package in packages:
+            self._process_package(package)
+
+        # On a second pass, complement distro in reverse mode with 'wanted-per':
+        self._populate_wanted_per()
+
+    def _get_environment(self):
+        """Get the current environment details."""
+        return {
             "implementation_name": sys.implementation.name,
-            "implementation_version": "{0.major}.{0.minor}.{0.micro}".format(
-                sys.implementation.version
-            ),
+            "implementation_version": "{0.major}.{0.minor}.{0.micro}".format(sys.implementation.version),
             "os_name": os.name,
             "platform_machine": platform.machine(),
             "platform_release": platform.release(),
@@ -57,89 +74,88 @@ class pipdata:
             "sys_platform": sys.platform,
         }
 
-        if Target == None:
-            Target = sys.executable 
+    def _process_package(self, package):
+        """Process a single package and add it to the distro dictionary."""
+        meta = package.metadata
+        name = meta['Name']
+        version = package.version
+        key = normalize(name)
+        self.raw[key] = meta
+        provided = {'': None}
+        #requires = self._get_requires(package)
+        #provides = self._get_provides(package)
 
-        if sys.executable==Target:
-            # self-Distro inspection case (use all packages reachable per sys.path I presume )
-            pip_json_installed=Distribution.discover()
-        else:
-            # not self-Distro inspection case , look at site-packages only)
-            pip_json_installed=distributions(path=[str(Path(Target).parent /'lib'/'site-packages'),])  
-        for p in pip_json_installed: 
-            meta = p.metadata
-            name = p.metadata['Name']  # p.name is not ok in 3.8
-            version = p.version
-            key = normalize(name)
-            requires = []
-            provides = {'':None}
-            provided = {'':None}
-            self.raw[key] = meta
-            if p.requires:
-                for i in p.requires:
-                    det = (i + ";").split(";")
 
-                    # req_nameextra is "python-jose[cryptography]"
-                    #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
-                    # req_nameextra is "google-cloud-storage"
-                    #   from "google-cloud-storage (<2.0.0,>=1.26.0)
-                    req_nameextra = re.split(" |;|==|!|>|<", det[0] + ";")[0]
-                    req_nameextra = normalize(req_nameextra)
-                    req_key = normalize((req_nameextra + "[").split("[")[0])
-                    req_key_extra = req_nameextra[len(req_key) + 1 :].split("]")[0]
-                    req_version = det[0][len(req_nameextra) :].translate(replacements)
-                    req_marker = det[1]
-                    if 'extra == ' in req_marker:
-                        remove_list = {ord("'"):None, ord('"'):None}
-                        provides[req_marker.split('extra == ')[1].translate(remove_list)] = None
-                    req_add = {
-                        "req_key": req_key,
-                        "req_version": req_version,
-                        "req_extra": req_key_extra,
-                    }
-                    # add the marker of the requirement, if not nothing:
-                    if not req_marker == "":
-                        req_add["req_marker"] = req_marker
-                    requires += [req_add]
-            self.distro[key] = {
-                    "name": name,
-                    "version": p.version,
-                    "summary": meta["Summary"] if "Summary" in meta else "",
-                    "requires_dist": requires,
-                    "wanted_per": [],
-                    "description": meta["Description"] if "Description" in meta else "",
-                    "provides": provides,  # extras of the package: 'array' for dask because dask['array'] defines some extra 
-                    "provided": provided,  # extras from other package: 'test' for pytest because dask['test'] wants pytest
-            }
+        requires = []
+        provides = {'':None}
 
-        # On a second pass, complement distro in reverse mode with 'wanted-per':
+        replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
+        if package.requires:
+            for i in package.requires:
+                det = (i + ";").split(";")
+                # req_nameextra is "python-jose[cryptography]"
+                #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
+                # req_nameextra is "google-cloud-storage"
+                #   from "google-cloud-storage (<2.0.0,>=1.26.0)
+                req_nameextra = re.split(" |;|==|!|>|<", det[0] + ";")[0]
+                req_nameextra = normalize(req_nameextra)
+                req_key = normalize((req_nameextra + "[").split("[")[0])
+                req_key_extra = req_nameextra[len(req_key) + 1 :].split("]")[0]
+                req_version = det[0][len(req_nameextra) :].translate(replacements)
+                req_marker = det[1]
+                if 'extra == ' in req_marker:
+                    remove_list = {ord("'"):None, ord('"'):None}
+                    provides[req_marker.split('extra == ')[1].translate(remove_list)] = None
+                req_add = {
+                    "req_key": req_key,
+                    "req_version": req_version,
+                    "req_extra": req_key_extra,
+                }
+                # add the marker of the requirement, if not nothing:
+                if not req_marker == "":
+                    req_add["req_marker"] = req_marker
+                requires += [req_add]
+        self.distro[key] = {
+                "name": name,
+                "version": version,
+                "summary": meta.get("Summary", ""),
+                "requires_dist": requires,
+                "wanted_per": [],
+                "description": meta.get("Description", ""),
+                "provides": provides,  # extras of the package: 'array' for dask because dask['array'] defines some extra 
+                "provided": provided,  # extras from other package: 'test' for pytest because dask['test'] wants pytest
+        }
+
+    def _populate_wanted_per(self):
+        """Populate the wanted_per field for each package."""
         # - get all downward links in 'requires_dist' of each package
         # - feed the required packages 'wanted_per' as a reverse dict of dict
         #        contains =
         #             req_key = upstream package_key
         #             req_version = downstream package version wanted
         #             req_marker = marker of the downstream package requirement (if any)
-
         for p in self.distro:
             for r in self.distro[p]["requires_dist"]:
                 if r["req_key"] in self.distro:
                     want_add = {
-                        "req_key": p, # p is a string
+                        "req_key": p,
                         "req_version": r["req_version"],
                         "req_extra": r["req_extra"],
-                    }  # req_key_extra
-
-                    # provided = extras in upper packages that triggers the need for this package,
-                    #             like 'pandas[test]->Pytest', so 'test' in distro['pytest']['provided']['test']
-                    #             corner-cases: 'dask[dataframe]' -> dask[array]'
-                    #                           'dask-image ->dask[array]
-
+                    }
                     if "req_marker" in r:
                         want_add["req_marker"] = r["req_marker"]  # req_key_extra
+
+                        # provided = extras in upper packages that triggers the need for this package,
+                        #             like 'pandas[test]->Pytest', so 'test' in distro['pytest']['provided']['test']
+                        #             corner-cases: 'dask[dataframe]' -> dask[array]'
+                        #                           'dask-image ->dask[array]
+
                         if 'extra == ' in r["req_marker"]:
                             remove_list = {ord("'"):None, ord('"'):None}
                             self.distro[r["req_key"]]["provided"][r["req_marker"].split('extra == ')[1].translate(remove_list)] = None
-                    self.distro[r["req_key"]]["wanted_per"] += [want_add]
+                    self.distro[r["req_key"]]["wanted_per"].append(want_add)
+
+
 
     def _downraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
         """build a nested list of needed packages with given extra and depth"""
