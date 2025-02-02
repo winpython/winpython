@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # require python 3.8+ because of importlib.metadata
+# revamped via github/gpt-4o free then gemini flash 2 free
 import json
 import sys
 import re
@@ -43,20 +44,21 @@ class pipdata:
         self.raw = {}
         self.environment = self._get_environment()
 
-        target = target or sys.executable 
+        search_path = target or sys.executable 
 
-        if sys.executable==target:
+        if sys.executable==search_path:
             # self-Distro inspection case (use all packages reachable per sys.path I presume )
             packages=Distribution.discover()
         else:
             # not self-Distro inspection case , look at site-packages only)
-            packages=distributions(path=[str(Path(target).parent /'lib'/'site-packages'),])  
+            packages=distributions(path=[str(Path(search_path).parent /'lib'/'site-packages'),])  
+
 
         for package in packages:
             self._process_package(package)
 
         # On a second pass, complement dependancies in reverse mode with 'wanted-per':
-        self._populate_wanted_per()
+        self._populate_reverse_dependencies()
 
     def _get_environment(self):
         """Get the current environment details."""
@@ -141,7 +143,7 @@ class pipdata:
                     provides[req_marker.split('extra == ')[1].translate(remove_list)] = None
         return provides
 
-    def _populate_wanted_per(self):
+    def _populate_reverse_dependencies(self):
         """Populate the wanted_per field for each package."""
         # - get all downward links in 'requires_dist' of each package
         # - feed the required packages 'wanted_per' as a reverse dict of dict
@@ -171,124 +173,110 @@ class pipdata:
                             self.distro[r["req_key"]]["provided"][r["req_marker"].split('extra == ')[1].translate(remove_list)] = None
                     self.distro[r["req_key"]]["wanted_per"].append(want_add)
 
-
-
-    def _downraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
-        """build a nested list of needed packages with given extra and depth"""
-        envi = {"extra": extra, **self.environment}
-        p = normalize(pp) 
-        extras = extra.split(",") #  to handle several extras, example: dask[array,diagnostics]
+    def _get_dependency_tree(self, package_name, extra="", version_req="", depth=20, path=None, verbose=False, upward=False):
+        """Recursive function to build dependency tree."""
+        path = path or []
+        extras = extra.split(",")
+        package_key = normalize(package_name)
         ret_all = []
-        if p + "[" + extra + "]" in path: # for dask[complete]->dask[array,test,..]
-            print("cycle!", "->".join(path + [p + "[" + extra + "]"]))
-        elif p in self.distro and len(path) <= depth:
-            for extra in extras:  # several extras request management
-                envi = {"extra": extra, **self.environment}
-                summary = f'  {self.distro[p]["summary"]}' if verbose else ''
-                if extra == "":
-                    ret = [f'{p}=={self.distro[p]["version"]} {version_req}{summary}']
-                else:
-                    ret = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}{summary}']
-                for r in self.distro[p]["requires_dist"]:
-                    if r["req_key"] in self.distro:
-                        if "req_marker" not in r or Marker(r["req_marker"]).evaluate(environment=envi):
-                            ret += self._downraw(
-                                r["req_key"],
-                                r["req_extra"],
-                                r["req_version"],
-                                depth,
-                                path + [p + "[" +extra + "]"],
-                                verbose=verbose,
-                            )
+        #pe = normalize(f'{package_key}[{extras}]')
+        if package_key + "[" + extra + "]" in path:
+            print("cycle!", "->".join(path + [package_key + "[" + extra + "]"]))
+            return []  # Return empty list to avoid further recursion
+
+        package_data = self.distro.get(package_key)
+        if package_data and len(path) <= depth:
+            for extra in extras:
+                environment = {"extra": extra, **self.environment}
+                summary = f'  {package_data["summary"]}' if verbose else ''
+                base_name = f'{package_name}[{extra}]' if extra else package_name
+                ret = [f'{base_name}=={package_data["version"]} {version_req}{summary}']
+
+                dependencies = package_data["requires_dist"] if not upward else package_data["wanted_per"]
+
+                for dependency in dependencies:
+                    if dependency["req_key"] in self.distro:
+                        if not dependency.get("req_marker") or Marker(dependency["req_marker"]).evaluate(environment=environment):
+                            next_path = path + [base_name]
+                            if upward:
+                                up_req = (dependency.get("req_marker", "").split('extra == ')+[""])[1].strip("'\"")
+                                # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['wanted_per'] has:
+                                # {'req_key': 'langchain', 'req_version': '(>=1,<2)',  'req_extra': '',  'req_marker': ' python_version < "3.12"'},
+                                # {'req_key': 'langchain',  'req_version': '(>=1.26.0,<2.0.0)', 'req_extra': '', 'req_marker': ' python_version >= "3.12"'}
+                                # must be no extra dependancy, optionnal extra in the package, or provided extra per upper packages 
+                                if dependency["req_key"] in self.distro and dependency["req_key"]+"["+up_req+"]" not in path:  # avoids circular links on dask[array]
+                                 if (not dependency.get("req_marker") and extra =="") or (extra !="" and extra==up_req and dependency["req_key"]!=package_key)  or (extra !="" and "req_marker" in dependency and extra+',' in dependency["req_extra"]+',' #bingo1346 contourpy[test-no-images]
+                                    or "req_marker" in dependency and extra+',' in dependency["req_extra"]+','  and Marker(dependency["req_marker"]).evaluate(environment=environment)
+                                    ):
+                                    ret += self._get_dependency_tree(
+                                        dependency["req_key"],
+                                        up_req,  # pydask[array] going upwards will look for pydask[dataframe]
+                                        f"[requires: {package_name}"
+                                        + (
+                                            "[" + dependency["req_extra"] + "]"
+                                            if dependency["req_extra"] != ""
+                                            else ""
+                                        )
+                                        + f'{dependency["req_version"]}]',
+                                        depth,
+                                        next_path,
+                                        verbose=verbose,
+                                        upward=upward,
+                                    )
+                            else:
+                                ret += self._get_dependency_tree(
+                                    dependency["req_key"],
+                                    dependency["req_extra"],
+                                    dependency["req_version"],
+                                    depth,
+                                    next_path,
+                                    verbose=verbose,
+                                    upward=upward,
+                                )
+
                 ret_all.append(ret)
         return ret_all
 
-    def _upraw(self, pp, extra="", version_req="", depth=20, path=[], verbose=False):
-        """build a nested list of user packages with given extra and depth
-        from direct dependancies like dask-image <--dask['array']
-        or indirect like Pytest['test'] <-- pandas['test']"""
-
-        remove_list = {ord("'"):None, ord('"'):None} # to clean-up req_extra
-        envi = {"extra": extra, **self.environment}
-        p = normalize(pp)
-        pe = normalize(f'{pp}[{extra}]')
-        ret_all = []
-        if pe in path:
-            print("cycle!", "->".join(path + [pe]))
-        elif p in self.distro and len(path) <= depth:
-            summary = f'  {self.distro[p]["summary"]}' if verbose else ''
-            if extra == "":
-                ret_all = [f'{p}=={self.distro[p]["version"]} {version_req}{summary}']
-            elif extra in set(self.distro[p]["provided"]).union(set(self.distro[p]["provides"])): # so that -r pytest[test] gives
-                ret_all = [f'{p}[{extra}]=={self.distro[p]["version"]} {version_req}{summary}']
-            else:
-              return []
-            ret = []
-            for r in self.distro[p]["wanted_per"]:
-                up_req = (r.get("req_marker", "").split('extra == ')+[""])[1].translate(remove_list)
-                if r["req_key"] in self.distro and r["req_key"]+"["+up_req+"]" not in path: # avoids circular links on dask[array]
-                    # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['wanted_per'] has:
-                    # {'req_key': 'langchain', 'req_version': '(>=1,<2)',  'req_extra': '',  'req_marker': ' python_version < "3.12"'},
-                    # {'req_key': 'langchain',  'req_version': '(>=1.26.0,<2.0.0)', 'req_extra': '', 'req_marker': ' python_version >= "3.12"'}
-                    # must be no extra dependancy, optionnal extra in the package, or provided extra per upper packages 
-                    if ("req_marker" not in r and extra =="") or (extra !="" and extra==up_req and r["req_key"]!=p)  or (extra !="" and "req_marker" in r and extra+',' in r["req_extra"]+',' #bingo1346 contourpy[test-no-images]
-                        or "req_marker" in r and extra+',' in r["req_extra"]+','  and Marker(r["req_marker"]).evaluate(environment=envi)
-                        ):
-                        ret += self._upraw(
-                            r["req_key"],
-                            up_req, # pydask[array] going upwards will look for pydask[dataframe]
-                            f"[requires: {p}"
-                            + (
-                                "[" + r["req_extra"] + "]"
-                                if r["req_extra"] != ""
-                                else ""
-                            )
-                            + f'{r["req_version"]}]',
-                            depth,
-                            path + [pe],
-                            verbose=verbose,
-                        )
-            if not ret == []:
-                ret_all.append(ret)
-        return ret_all
-
-    def down(self, pp="", extra="", depth=99, indent=5, version_req="", verbose=False):
-        """print the downward requirements for the package or all packages"""
-        if pp != ".":
-            if extra != ".":
-                if pp in self.distro:
-                    extras = [s for s in extra.split(',') if s in sorted(self.distro[pp]["provides"])]
-                    if extras == []: return ''
-                rawtext = json.dumps(self._downraw(pp, extra, version_req, depth, verbose=verbose), indent=indent)
-                lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-                return ("\n".join(lines).replace('"', ""))
-            else:
-                if pp in self.distro:
-                    results = [self.down(pp, one_extra, depth, indent, version_req, verbose=verbose) 
-                               for one_extra in sorted(self.distro[pp]["provides"])]
-                    return '\n'.join(filter(None, results))
-        else:
-            results = [self.down(one_pp, extra, depth, indent, version_req, verbose=verbose)
-                       for one_pp in sorted(self.distro)]
+    def down(self, pp="", extra="", depth=20, indent=5, version_req="", verbose=False):
+        """Print the downward requirements for the package or all packages."""
+        if pp == ".":
+            results = [self.down(one_pp, extra, depth, indent, version_req, verbose=verbose) for one_pp in sorted(self.distro)]
             return '\n'.join(filter(None, results))
-        
-    def up(self, pp, extra="", depth=99, indent=5, version_req="", verbose=False):
+
+        if extra == ".":
+            if pp in self.distro:
+                results = [self.down(pp, one_extra, depth, indent, version_req, verbose=verbose)
+                           for one_extra in sorted(self.distro[pp]["provides"])]
+                return '\n'.join(filter(None, results))
+            return "" # Handle cases where extra is "." and package_name is not found.
+
+        if pp not in self.distro:
+            return "" # Handle cases where package_name is not found.
+
+        rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose), indent=indent)
+        lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
+        return "\n".join(lines).replace('"', "")
+
+    def up(self, pp, extra="", depth=20, indent=5, version_req="", verbose=False):
         """Print the upward needs for the package."""
-        r = []
-        if pp != ".":
-            if extra != ".":
-                rawtext = json.dumps(self._upraw(pp, extra, version_req, depth, verbose=verbose), indent=indent)
-                lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-                return ('\n'.join(filter(None, lines)).replace('"', "") )
-            else:
-                if pp in self.distro:
-                    # get 'extra' tags from direct and from upward packages 
-                    results = [self.up(pp, one_extra, depth, indent, version_req, verbose=verbose)
-                               for one_extra in sorted(set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"])))]
-                    return '\n'.join(filter(None, results))
-        else:
-            results = [self.up(one_pp, extra, depth, indent, version_req, verbose=verbose) for one_pp in sorted(self.distro)]
+
+        if pp == ".":
+            results = [self.up(one_pp, extra, depth, indent, version_req, verbose) for one_pp in sorted(self.distro)]
             return '\n'.join(filter(None, results))
+
+        if extra == ".":
+            if pp in self.distro:
+                extras = set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"]))
+                results = [self.up(pp, one_extra, depth, indent, version_req, verbose=verbose) for one_extra in sorted(extras)]
+                return '\n'.join(filter(None, results))
+            return ""
+
+        if pp not in self.distro:
+            return ""
+
+        rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose, upward=True), indent=indent)
+        lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
+        return '\n'.join(filter(None, lines)).replace('"', "")
 
     def description(self, pp):
         """Return description of the package."""
