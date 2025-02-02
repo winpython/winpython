@@ -100,7 +100,12 @@ class pipdata:
     def _get_requires(self, package):
         """Get the requirements of a package."""
         requires = []
-        replacements = str.maketrans({" ": "", "[": "", "]": "", "'": "", '"': ""})
+        replacements = str.maketrans({" ": " ", "[": "", "]": "", "'": "", '"': ""}) # space not ' or '
+        further_replacements=((' == ', '=='),('= ', '='), (' !=', '!='), (' ~=', '~='),
+                              (' <', '<'),('< ', '<'), (' >', '>'),  ('> ', '>'),
+                              ('; ', ';'), (' ;', ';'), ('( ', '('),
+                              (' and (',' andZZZZZ('), (' (', '('), (' andZZZZZ(',' and (' ))
+
         if package.requires:
             for req in package.requires:
                 # req_nameextra is "python-jose[cryptography]"
@@ -112,6 +117,8 @@ class pipdata:
                 req_key = normalize((req_nameextra + "[").split("[")[0])
                 req_key_extra = req_nameextra[len(req_key) + 1:].split("]")[0]
                 req_version = req[len(req_nameextra):].translate(replacements)
+                for other in further_replacements: # before we stop this cosmetic...
+                    req_version = req_version.replace(*other)
                 req_add = {
                     "req_key": req_key,
                     "req_version": req_version,
