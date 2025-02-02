@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-# require python 3.8+ because of importlib.metadata
-# revamped via github/gpt-4o free then gemini flash 2 free
+"""
+This script provides functionality to inspect and display package dependencies 
+in a Python environment, including both downward and upward dependencies.
+Requires Python 3.8+ due to importlib.metadata.
+"""
+
 import json
 import sys
 import re
@@ -16,8 +20,16 @@ def normalize(name):
     """Normalize package name according to PEP 503."""
     return re.sub(r"[-_.]+", "-", name).lower()
 
+
 def sum_up(text, max_length=144, stop_at=". "):
-    """Summarize text to a single line of max_length characters."""
+    """
+    Summarize text to fit within max_length characters, ending at the last complete sentence if possible.
+    
+    :param text: The text to summarize
+    :param max_length: Maximum length for summary
+    :param stop_at: String to stop summarization at
+    :return: Summarized text
+    """
     summary = (text + os.linesep).splitlines()[0]
     if len(summary) > max_length and len(stop_at) > 1:
         summary = (summary + stop_at).split(stop_at)[0]
@@ -25,34 +37,22 @@ def sum_up(text, max_length=144, stop_at=". "):
         summary = summary[:max_length]
     return summary
 
-
 class pipdata:
-    """Wrapper around Distribution.discover() or Distribution.distributions()"""
+    """
+    Wrapper around Distribution.discover() or Distribution.distributions() to manage package metadata.
+    """
 
     def __init__(self, target=None):
-
-        # create a distro{} dict of Packages
-        #  key = normalised package name
-        #     string_elements = 'name', 'version', 'summary'
-        #     requires =  list of dict with 1 level need downward
-        #             req_key = package_key requires
-        #             req_extra = extra branch needed of the package_key ('all' or '')
-        #             req_version = version needed
-        #             req_marker = marker of the requirement (if any)
-
         self.distro = {}
         self.raw = {}
         self.environment = self._get_environment()
 
-        search_path = target or sys.executable 
+        search_path = target or sys.executable
 
-        if sys.executable==search_path:
-            # self-Distro inspection case (use all packages reachable per sys.path I presume )
-            packages=Distribution.discover()
+        if sys.executable == search_path:
+            packages = Distribution.discover()
         else:
-            # not self-Distro inspection case , look at site-packages only)
-            packages=distributions(path=[str(Path(search_path).parent /'lib'/'site-packages'),])  
-
+            packages = distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
 
         for package in packages:
             self._process_package(package)
@@ -61,7 +61,11 @@ class pipdata:
         self._populate_reverse_dependencies()
 
     def _get_environment(self):
-        """Get the current environment details."""
+        """
+        Collect environment details for dependency evaluation.
+        
+        :return: Dictionary containing system and Python environment information
+        """
         return {
             "implementation_name": sys.implementation.name,
             "implementation_version": "{0.major}.{0.minor}.{0.micro}".format(sys.implementation.version),
@@ -77,63 +81,63 @@ class pipdata:
         }
 
     def _process_package(self, package):
-        """Process a single package and add it to the distro dictionary."""
+        """Process package metadata and store it in the distro dictionary."""
         meta = package.metadata
         name = meta['Name']
         version = package.version
         key = normalize(name)
         self.raw[key] = meta
-        provided = {'': None}
- 
-        requires = self._get_requires(package)
-        provides = self._get_provides(package)
 
         self.distro[key] = {
-                "name": name,
-                "version": version,
-                "summary": meta.get("Summary", ""),
-                "requires_dist": requires,
-                "wanted_per": [],
-                "description": meta.get("Description", ""),
-                "provides": provides, 
-                "provided": provided,  # being extras from other packages: 'test' for pytest because dask['test'] wants pytest
+            "name": name,
+            "version": version,
+            "summary": meta.get("Summary", ""),
+            "requires_dist": self._get_requires(package),
+            "reverse_dependencies": [],
+            "description": meta.get("Description", ""),
+            "provides": self._get_provides(package),
+            "provided": {'': None}  # Placeholder for extras provided by this package
         }
 
     def _get_requires(self, package):
-        """Get the requirements of a package."""
+        """Extract and normalize requirements for a package."""
+        #     requires =  list of dict with 1 level need downward
+        #             req_key = package_key requires
+        #             req_extra = extra branch needed of the package_key ('all' or '')
+        #             req_version = version needed
+        #             req_marker = marker of the requirement (if any)
         requires = []
-        replacements = str.maketrans({" ": " ", "[": "", "]": "", "'": "", '"': ""}) # space not ' or '
-        further_replacements=((' == ', '=='),('= ', '='), (' !=', '!='), (' ~=', '~='),
-                              (' <', '<'),('< ', '<'), (' >', '>'),  ('> ', '>'),
-                              ('; ', ';'), (' ;', ';'), ('( ', '('),
-                              (' and (',' andZZZZZ('), (' (', '('), (' andZZZZZ(',' and (' ))
+        replacements = str.maketrans({" ": " ", "[": "", "]": "", "'": "", '"': ""})
+        further_replacements = [
+            (' == ', '=='), ('= ', '='), (' !=', '!='), (' ~=', '~='),
+            (' <', '<'), ('< ', '<'), (' >', '>'), ('> ', '>'),
+            ('; ', ';'), (' ;', ';'), ('( ', '('),
+            (' and (', ' andZZZZZ('), (' (', '('), (' andZZZZZ(', ' and (')
+        ]
 
         if package.requires:
             for req in package.requires:
-                # req_nameextra is "python-jose[cryptography]"
-                #  from fastapi "python-jose[cryptography]<4.0.0,>=3.3.0
-                # req_nameextra is "google-cloud-storage"
-                #   from "google-cloud-storage (<2.0.0,>=1.26.0)
                 req_nameextra, req_marker = (req + ";").split(";")[:2]
-                req_nameextra = normalize(re.split(" |;|==|!|>|<", req_nameextra+";")[0])
+                req_nameextra = normalize(re.split(r" |;|==|!|>|<", req_nameextra + ";")[0])
                 req_key = normalize((req_nameextra + "[").split("[")[0])
                 req_key_extra = req_nameextra[len(req_key) + 1:].split("]")[0]
                 req_version = req[len(req_nameextra):].translate(replacements)
-                for other in further_replacements: # before we stop this cosmetic...
-                    req_version = req_version.replace(*other)
+
+                for old, new in further_replacements:
+                    req_version = req_version.replace(old, new)
+
                 req_add = {
                     "req_key": req_key,
                     "req_version": req_version,
                     "req_extra": req_key_extra,
                 }
-                if not req_marker == "":
+                if req_marker != "":
                     req_add["req_marker"] = req_marker
                 requires.append(req_add)
         return requires
 
     def _get_provides(self, package):
-        """Get the extended list of dependant packages, from extra options."""
-        # 'array' is an added dependancy package of dask, if you install dask['array']
+        """Get the list of extras provided by this package."""
         provides = {'': None}
         if package.requires:
             for req in package.requires:
@@ -144,34 +148,28 @@ class pipdata:
         return provides
 
     def _populate_reverse_dependencies(self):
-        """Populate the wanted_per field for each package."""
+        """Add reverse dependencies to each package."""
         # - get all downward links in 'requires_dist' of each package
-        # - feed the required packages 'wanted_per' as a reverse dict of dict
+        # - feed the required packages 'reverse_dependencies' as a reverse dict of dict
         #        contains =
         #             req_key = upstream package_key
         #             req_version = downstream package version wanted
         #             req_extra = extra option of the demanding package that wants this dependancy
         #             req_marker = marker of the downstream package requirement (if any)
-        for p in self.distro:
-            for r in self.distro[p]["requires_dist"]:
-                if r["req_key"] in self.distro:
+        for package in self.distro:
+            for requirement in self.distro[package]["requires_dist"]:
+                if requirement["req_key"] in self.distro:
                     want_add = {
-                        "req_key": p,
-                        "req_version": r["req_version"],
-                        "req_extra": r["req_extra"],
+                        "req_key": package,
+                        "req_version": requirement["req_version"],
+                        "req_extra": requirement["req_extra"],
                     }
-                    if "req_marker" in r:
-                        want_add["req_marker"] = r["req_marker"]  # req_key_extra
-
-                        # provided = extras in upper packages that triggers the need for this package,
-                        #             like 'pandas[test]->Pytest', so 'test' in distro['pytest']['provided']['test']
-                        #             corner-cases: 'dask[dataframe]' -> dask[array]'
-                        #                           'dask-image ->dask[array]
-
-                        if 'extra == ' in r["req_marker"]:
+                    if "req_marker" in requirement:
+                        want_add["req_marker"] = requirement["req_marker"]
+                        if 'extra == ' in requirement["req_marker"]:
                             remove_list = {ord("'"):None, ord('"'):None}
-                            self.distro[r["req_key"]]["provided"][r["req_marker"].split('extra == ')[1].translate(remove_list)] = None
-                    self.distro[r["req_key"]]["wanted_per"].append(want_add)
+                            self.distro[requirement["req_key"]]["provided"][requirement["req_marker"].split('extra == ')[1].translate(remove_list)] = None
+                    self.distro[requirement["req_key"]]["reverse_dependencies"].append(want_add)
 
     def _get_dependency_tree(self, package_name, extra="", version_req="", depth=20, path=None, verbose=False, upward=False):
         """Recursive function to build dependency tree."""
@@ -192,7 +190,7 @@ class pipdata:
                 base_name = f'{package_name}[{extra}]' if extra else package_name
                 ret = [f'{base_name}=={package_data["version"]} {version_req}{summary}']
 
-                dependencies = package_data["requires_dist"] if not upward else package_data["wanted_per"]
+                dependencies = package_data["requires_dist"] if not upward else package_data["reverse_dependencies"]
 
                 for dependency in dependencies:
                     if dependency["req_key"] in self.distro:
@@ -200,7 +198,7 @@ class pipdata:
                             next_path = path + [base_name]
                             if upward:
                                 up_req = (dependency.get("req_marker", "").split('extra == ')+[""])[1].strip("'\"")
-                                # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['wanted_per'] has:
+                                # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['reverse_dependencies'] has:
                                 # {'req_key': 'langchain', 'req_version': '(>=1,<2)',  'req_extra': '',  'req_marker': ' python_version < "3.12"'},
                                 # {'req_key': 'langchain',  'req_version': '(>=1.26.0,<2.0.0)', 'req_extra': '', 'req_marker': ' python_version >= "3.12"'}
                                 # must be no extra dependancy, optionnal extra in the package, or provided extra per upper packages 
