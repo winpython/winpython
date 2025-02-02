@@ -11,41 +11,36 @@ Created on Tue Aug 14 14:08:40 2012
 """
 
 import os
-from pathlib import Path
+import sys
+import stat
+import shutil
+import locale
+import tempfile
 import subprocess
+import configparser as cp
+from pathlib import Path
 import re
 import tarfile
 import zipfile
-import tempfile
-import shutil
 import atexit
-import sys
-import stat
-import locale
 import io
-import configparser as cp
-
-# Local imports
 import winreg
 
-def get_python_executable(path = None):
-    """return the python executable"""
-    my_path = sys.executable if path == None else path  # default = current one
-    my_path = my_path if Path(my_path).is_dir() else str(Path(my_path).parent)
-    exec_py = str(Path(my_path) / 'python.exe')
-    exec_pypy = str(Path(my_path) / 'pypy3.exe')  # PyPy !
-    # PyPy >=7.3.6 3.8 aligns to python.exe and Lib\site-packages
-    python_executable = exec_py if Path(exec_py).is_file() else exec_pypy
-    return python_executable
+def get_python_executable(path=None):
+    """Return the path to the Python executable."""
+    python_path = sys.executable if path is None else path
+    base_dir = Path(python_path).parent if not Path(python_path).is_dir() else Path(python_path)
+    python_exe = base_dir / 'python.exe'
+    pypy_exe = base_dir / 'pypy3.exe'  # For PyPy
+    return str(python_exe if python_exe.is_file() else pypy_exe)
 
-def get_site_packages_path(path = None):
-    """return the python site-packages"""
-    my_path = sys.executable if path == None else path  # default = current one
-    my_path = my_path if Path(my_path).is_dir() else str(Path(my_path).parent)
-    site_py = str(Path(my_path) / 'Lib' / 'site-packages')
-    site_pypy = str(Path(my_path) / 'site-packages')  # PyPy !!
-    site_packages_path = site_pypy if Path(site_pypy).is_dir() else site_py
-    return site_packages_path
+def get_site_packages_path(path=None):
+    """Return the path to the Python site-packages directory."""
+    python_path = sys.executable if path is None else path
+    base_dir = Path(python_path).parent if not Path(python_path).is_dir() else Path(python_path)
+    site_packages = base_dir / 'Lib' / 'site-packages'
+    pypy_site_packages = base_dir / 'site-packages'  # For PyPy
+    return str(pypy_site_packages if pypy_site_packages.is_dir() else site_packages)
 
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`.
