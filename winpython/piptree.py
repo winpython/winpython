@@ -12,17 +12,30 @@ import platform
 import os
 from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple, Union
-from pip._vendor.packaging.markers import Marker, InvalidMarker
+from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
 
 def normalize(name: str) -> str:
-    """Normalize package name according to PEP 503."""
+    """
+    Normalize package name according to PEP 503.
+
+    This function converts a package name to its canonical form by replacing
+    any sequence of dashes, underscores, or dots with a single dash and
+    converting the result to lowercase.
+
+    :param name: The package name to normalize
+    :return: The normalized package name
+    """
     return re.sub(r"[-_.]+", "-", name).lower()
 
 def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
     """
     Summarize text to fit within max_length characters, ending at the last complete sentence if possible.
+
+    This function attempts to create a summary of the given text that fits within
+    the specified maximum length. It tries to end the summary at a complete sentence
+    if possible.
 
     :param text: The text to summarize
     :param max_length: Maximum length for summary
@@ -39,19 +52,23 @@ def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
 class PipData:
     """
     Wrapper around Distribution.discover() or Distribution.distributions() to manage package metadata.
+
+    This class provides methods to inspect and display package dependencies
+    in a Python environment, including both downward and upward dependencies.
     """
 
     def __init__(self, target: Optional[str] = None):
+        """
+        Initialize the PipData instance.
+
+        :param target: Optional target path to search for packages
+        """
         self.distro: Dict[str, Dict] = {}
         self.raw: Dict[str, Dict] = {}
         self.environment = self._get_environment()
 
         search_path = target or sys.executable
-
-        if sys.executable == search_path:
-            packages = Distribution.discover()
-        else:
-            packages = distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
+        packages = self._get_packages(search_path)
 
         for package in packages:
             self._process_package(package)
@@ -62,6 +79,9 @@ class PipData:
     def _get_environment(self) -> Dict[str, str]:
         """
         Collect environment details for dependency evaluation.
+
+        This method gathers information about the system and Python environment,
+        which is used to evaluate package dependencies.
 
         :return: Dictionary containing system and Python environment information
         """
@@ -79,8 +99,33 @@ class PipData:
             "sys_platform": sys.platform,
         }
 
+    def _get_packages(self, search_path: str) -> List[Distribution]:
+        """
+        Get the list of packages based on the search path.
+
+        This method retrieves the list of installed packages in the specified
+        search path. If the search path is the current executable, it uses
+        Distribution.discover(). Otherwise, it uses distributions() with the
+        specified path.
+
+        :param search_path: Path to search for packages
+        :return: List of Distribution objects
+        """
+        if sys.executable == search_path:
+            return Distribution.discover()
+        else:
+            return distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
+
     def _process_package(self, package: Distribution) -> None:
-        """Process package metadata and store it in the distro dictionary."""
+        """
+        Process package metadata and store it in the distro dictionary.
+
+        This method extracts metadata from a Distribution object and stores it
+        in the distro dictionary. It also initializes the reverse dependencies
+        and provided extras for the package.
+
+        :param package: The Distribution object to process
+        """
         meta = package.metadata
         name = meta['Name']
         version = package.version
@@ -99,12 +144,16 @@ class PipData:
         }
 
     def _get_requires(self, package: Distribution) -> List[Dict[str, str]]:
-        """Extract and normalize requirements for a package."""
-        #     requires =  list of dict with 1 level need downward
-        #             req_key = package_key requires
-        #             req_extra = extra branch needed of the package_key ('all' or '')
-        #             req_version = version needed
-        #             req_marker = marker of the requirement (if any)
+        """
+        Extract and normalize requirements for a package.
+
+        This method parses the requirements of a package and normalizes them
+        into a list of dictionaries. Each dictionary contains the required
+        package key, version, extra, and marker (if any).
+
+        :param package: The Distribution object to extract requirements from
+        :return: List of dictionaries containing normalized requirements
+        """
         requires = []
         replacements = str.maketrans({" ": " ", "[": "", "]": "", "'": "", '"': ""})
         further_replacements = [
@@ -136,7 +185,16 @@ class PipData:
         return requires
 
     def _get_provides(self, package: Distribution) -> Dict[str, None]:
-        """Get the list of extras provided by this package."""
+        """
+        Get the list of extras provided by this package.
+
+        This method extracts the extras provided by a package from its requirements.
+        It returns a dictionary where the keys are the provided extras and the values
+        are None.
+
+        :param package: The Distribution object to extract provided extras from
+        :return: Dictionary containing provided extras
+        """
         provides = {'': None}
         if package.requires:
             for req in package.requires:
@@ -147,14 +205,13 @@ class PipData:
         return provides
 
     def _populate_reverse_dependencies(self) -> None:
-        """Add reverse dependencies to each package."""
-        # - get all downward links in 'requires_dist' of each package
-        # - feed the required packages 'reverse_dependencies' as a reverse dict of dict
-        #        contains =
-        #             req_key = upstream package_key
-        #             req_version = downstream package version wanted
-        #             req_extra = extra option of the demanding package that wants this dependancy
-        #             req_marker = marker of the downstream package requirement (if any)
+        """
+        Add reverse dependencies to each package.
+
+        This method populates the reverse dependencies for each package in the
+        distro dictionary. It iterates over the requirements of each package
+        and adds the package as a reverse dependency to the required packages.
+        """
         for package in self.distro:
             for requirement in self.distro[package]["requires_dist"]:
                 if requirement["req_key"] in self.distro:
@@ -171,12 +228,28 @@ class PipData:
                     self.distro[requirement["req_key"]]["reverse_dependencies"].append(want_add)
 
     def _get_dependency_tree(self, package_name: str, extra: str = "", version_req: str = "", depth: int = 20, path: Optional[List[str]] = None, verbose: bool = False, upward: bool = False) -> List[List[str]]:
-        """Recursive function to build dependency tree."""
+        """
+        Recursive function to build dependency tree.
+
+        This method builds a dependency tree for the specified package. It can
+        build the tree for downward dependencies (default) or upward dependencies
+        (if upward is True). The tree is built recursively up to the specified
+        depth.
+
+        :param package_name: The name of the package to build the tree for
+        :param extra: The extra to include in the dependency tree
+        :param version_req: The version requirement for the package
+        :param depth: The maximum depth of the dependency tree
+        :param path: The current path in the dependency tree (used for cycle detection)
+        :param verbose: Whether to include verbose output in the tree
+        :param upward: Whether to build the tree for upward dependencies
+        :return: List of lists containing the dependency tree
+        """
         path = path or []
         extras = extra.split(",")
         package_key = normalize(package_name)
         ret_all = []
-        #pe = normalize(f'{package_key}[{extras}]')
+
         if package_key + "[" + extra + "]" in path:
             print("cycle!", "->".join(path + [package_key + "[" + extra + "]"]))
             return []  # Return empty list to avoid further recursion
@@ -193,49 +266,60 @@ class PipData:
 
                 for dependency in dependencies:
                     if dependency["req_key"] in self.distro:
-                        if not dependency.get("req_marker") or Marker(dependency["req_marker"]).evaluate(environment=environment):
-                            next_path = path + [base_name]
-                            if upward:
-                                up_req = (dependency.get("req_marker", "").split('extra == ')+[""])[1].strip("'\"")
-                                # 2024-06-30 example of langchain <- numpy. pip.distro['numpy']['reverse_dependencies'] has:
-                                # {'req_key': 'langchain', 'req_version': '(>=1,<2)',  'req_extra': '',  'req_marker': ' python_version < "3.12"'},
-                                # {'req_key': 'langchain',  'req_version': '(>=1.26.0,<2.0.0)', 'req_extra': '', 'req_marker': ' python_version >= "3.12"'}
-                                # must be no extra dependancy, optionnal extra in the package, or provided extra per upper packages 
-                                if dependency["req_key"] in self.distro and dependency["req_key"]+"["+up_req+"]" not in path:  # avoids circular links on dask[array]
-                                 if (not dependency.get("req_marker") and extra =="") or (extra !="" and extra==up_req and dependency["req_key"]!=package_key)  or (extra !="" and "req_marker" in dependency and extra+',' in dependency["req_extra"]+',' #bingo1346 contourpy[test-no-images]
-                                    or "req_marker" in dependency and extra+',' in dependency["req_extra"]+','  and Marker(dependency["req_marker"]).evaluate(environment=environment)
-                                    ):
+                        next_path = path + [base_name]
+                        if upward:     
+                            up_req = (dependency.get("req_marker", "").split('extra == ')+[""])[1].strip("'\"")
+                            # avoids circular links on dask[array] 
+                            if dependency["req_key"] in self.distro and dependency["req_key"]+"["+up_req+"]" not in path:
+                                # upward dependancy taken if:
+                                # - if extra "" demanded, and no marker from upward package: like pandas[] ==> numpy
+                                # - if an extra "array" is demanded, and indeed in the req_extra list: array,dataframe,diagnostics,distributer 
+                                # - or the extra is in the upward package, like pandas[test] ==> pytest, for 'test' extra
+                                if (not dependency.get("req_marker") and extra ==""
+                                ) or (extra !="" and extra==up_req and dependency["req_key"]!=package_key
+                                ) or (extra !="" and "req_marker" in dependency and extra+',' in dependency["req_extra"]+',' 
+                                ) or ("req_marker" in dependency and extra+',' in dependency["req_extra"]+',' and Marker(dependency["req_marker"]).evaluate(environment=environment)):
                                     ret += self._get_dependency_tree(
                                         dependency["req_key"],
-                                        up_req,  # pydask[array] going upwards will look for pydask[dataframe]
+                                        up_req,  # dask[array] going upwards continues as dask[dataframe]
                                         f"[requires: {package_name}"
-                                        + (
-                                            "[" + dependency["req_extra"] + "]"
-                                            if dependency["req_extra"] != ""
-                                            else ""
-                                        )
+                                        + (f"[{dependency['req_extra']}]" if dependency["req_extra"] != "" else "")
                                         + f'{dependency["req_version"]}]',
                                         depth,
                                         next_path,
                                         verbose=verbose,
                                         upward=upward,
                                     )
-                            else:
-                                ret += self._get_dependency_tree(
-                                    dependency["req_key"],
-                                    dependency["req_extra"],
-                                    dependency["req_version"],
-                                    depth,
-                                    next_path,
-                                    verbose=verbose,
-                                    upward=upward,
-                                )
+                        elif not dependency.get("req_marker") or Marker(dependency["req_marker"]).evaluate(environment=environment):
+                            ret += self._get_dependency_tree(
+                                dependency["req_key"],
+                                dependency["req_extra"],
+                                dependency["req_version"],
+                                depth,
+                                next_path,
+                                verbose=verbose,
+                                upward=upward,
+                            )
 
                 ret_all.append(ret)
         return ret_all
 
     def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
-        """Print the downward requirements for the package or all packages."""
+        """
+        Print the downward requirements for the package or all packages.
+
+        This method prints the downward dependencies for the specified package
+        or all packages if pp is ".". It uses the _get_dependency_tree method
+        to build the dependency tree and formats the output as a JSON string.
+
+        :param pp: The package name or "." to print dependencies for all packages
+        :param extra: The extra to include in the dependency tree
+        :param depth: The maximum depth of the dependency tree
+        :param indent: The indentation level for the JSON output
+        :param version_req: The version requirement for the package
+        :param verbose: Whether to include verbose output in the tree
+        :return: JSON string containing the downward dependencies
+        """
         if pp == ".":
             results = [self.down(one_pp, extra, depth, indent, version_req, verbose=verbose) for one_pp in sorted(self.distro)]
             return '\n'.join(filter(None, results))
@@ -255,7 +339,21 @@ class PipData:
         return "\n".join(lines).replace('"', "")
 
     def up(self, pp: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
-        """Print the upward needs for the package."""
+        """
+        Print the upward needs for the package.
+
+        This method prints the upward dependencies for the specified package.
+        It uses the _get_dependency_tree method to build the dependency tree
+        and formats the output as a JSON string.
+
+        :param pp: The package name
+        :param extra: The extra to include in the dependency tree
+        :param depth: The maximum depth of the dependency tree
+        :param indent: The indentation level for the JSON output
+        :param version_req: The version requirement for the package
+        :param verbose: Whether to include verbose output in the tree
+        :return: JSON string containing the upward dependencies
+        """
         if pp == ".":
             results = [self.up(one_pp, extra, depth, indent, version_req, verbose) for one_pp in sorted(self.distro)]
             return '\n'.join(filter(None, results))
@@ -275,18 +373,41 @@ class PipData:
         return "\n".join(filter(None, lines)).replace('"', "")
 
     def description(self, pp: str) -> None:
-        """Return description of the package."""
+        """
+        Return description of the package.
+
+        This method prints the description of the specified package.
+
+        :param pp: The package name
+        """
         if pp in self.distro:
             return print("\n".join(self.distro[pp]["description"].split(r"\n")))
-    
-    def summary(self, pp):
-        """Return summary of the package."""
+
+    def summary(self, pp: str) -> str:
+        """
+        Return summary of the package.
+
+        This method returns the summary of the specified package.
+
+        :param pp: The package name
+        :return: The summary of the package
+        """
         if pp in self.distro:
             return self.distro[pp]["summary"]
         return ""
 
     def pip_list(self, full: bool = False, max_length: int = 144) -> List[Tuple[str, Union[str, Tuple[str, str]]]]:
-        """List installed packages similar to pip list."""
+        """
+        List installed packages similar to pip list.
+
+        This method lists the installed packages in a format similar to the
+        output of the `pip list` command. If full is True, it includes the
+        package version and summary.
+
+        :param full: Whether to include the package version and summary
+        :param max_length: The maximum length for the summary
+        :return: List of tuples containing package information
+        """
         if full:
             return [(p, self.distro[p]["version"], sum_up(self.distro[p]["summary"], max_length)) for p in sorted(self.distro)]
         else:
