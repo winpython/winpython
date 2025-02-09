@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This script provides functionality to inspect and display package dependencies 
+This script provides functionality to inspect and display package dependencies
 in a Python environment, including both downward and upward dependencies.
 Requires Python 3.8+ due to importlib.metadata.
 """
@@ -11,20 +11,19 @@ import re
 import platform
 import os
 from collections import OrderedDict
+from typing import Dict, List, Optional, Tuple, Union
 from pip._vendor.packaging.markers import Marker, InvalidMarker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
 
-
-def normalize(name):
+def normalize(name: str) -> str:
     """Normalize package name according to PEP 503."""
     return re.sub(r"[-_.]+", "-", name).lower()
 
-
-def sum_up(text, max_length=144, stop_at=". "):
+def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
     """
     Summarize text to fit within max_length characters, ending at the last complete sentence if possible.
-    
+
     :param text: The text to summarize
     :param max_length: Maximum length for summary
     :param stop_at: String to stop summarization at
@@ -37,14 +36,14 @@ def sum_up(text, max_length=144, stop_at=". "):
         summary = summary[:max_length]
     return summary
 
-class pipdata:
+class PipData:
     """
     Wrapper around Distribution.discover() or Distribution.distributions() to manage package metadata.
     """
 
-    def __init__(self, target=None):
-        self.distro = {}
-        self.raw = {}
+    def __init__(self, target: Optional[str] = None):
+        self.distro: Dict[str, Dict] = {}
+        self.raw: Dict[str, Dict] = {}
         self.environment = self._get_environment()
 
         search_path = target or sys.executable
@@ -57,18 +56,18 @@ class pipdata:
         for package in packages:
             self._process_package(package)
 
-        # On a second pass, complement dependancies in reverse mode with 'wanted-per':
+        # On a second pass, complement dependencies in reverse mode with 'wanted-per':
         self._populate_reverse_dependencies()
 
-    def _get_environment(self):
+    def _get_environment(self) -> Dict[str, str]:
         """
         Collect environment details for dependency evaluation.
-        
+
         :return: Dictionary containing system and Python environment information
         """
         return {
             "implementation_name": sys.implementation.name,
-            "implementation_version": "{0.major}.{0.minor}.{0.micro}".format(sys.implementation.version),
+            "implementation_version": f"{sys.implementation.version.major}.{sys.implementation.version.minor}.{sys.implementation.version.micro}",
             "os_name": os.name,
             "platform_machine": platform.machine(),
             "platform_release": platform.release(),
@@ -80,7 +79,7 @@ class pipdata:
             "sys_platform": sys.platform,
         }
 
-    def _process_package(self, package):
+    def _process_package(self, package: Distribution) -> None:
         """Process package metadata and store it in the distro dictionary."""
         meta = package.metadata
         name = meta['Name']
@@ -99,7 +98,7 @@ class pipdata:
             "provided": {'': None}  # Placeholder for extras provided by this package
         }
 
-    def _get_requires(self, package):
+    def _get_requires(self, package: Distribution) -> List[Dict[str, str]]:
         """Extract and normalize requirements for a package."""
         #     requires =  list of dict with 1 level need downward
         #             req_key = package_key requires
@@ -136,7 +135,7 @@ class pipdata:
                 requires.append(req_add)
         return requires
 
-    def _get_provides(self, package):
+    def _get_provides(self, package: Distribution) -> Dict[str, None]:
         """Get the list of extras provided by this package."""
         provides = {'': None}
         if package.requires:
@@ -147,7 +146,7 @@ class pipdata:
                     provides[req_marker.split('extra == ')[1].translate(remove_list)] = None
         return provides
 
-    def _populate_reverse_dependencies(self):
+    def _populate_reverse_dependencies(self) -> None:
         """Add reverse dependencies to each package."""
         # - get all downward links in 'requires_dist' of each package
         # - feed the required packages 'reverse_dependencies' as a reverse dict of dict
@@ -167,11 +166,11 @@ class pipdata:
                     if "req_marker" in requirement:
                         want_add["req_marker"] = requirement["req_marker"]
                         if 'extra == ' in requirement["req_marker"]:
-                            remove_list = {ord("'"):None, ord('"'):None}
+                            remove_list = {ord("'"): None, ord('"'): None}
                             self.distro[requirement["req_key"]]["provided"][requirement["req_marker"].split('extra == ')[1].translate(remove_list)] = None
                     self.distro[requirement["req_key"]]["reverse_dependencies"].append(want_add)
 
-    def _get_dependency_tree(self, package_name, extra="", version_req="", depth=20, path=None, verbose=False, upward=False):
+    def _get_dependency_tree(self, package_name: str, extra: str = "", version_req: str = "", depth: int = 20, path: Optional[List[str]] = None, verbose: bool = False, upward: bool = False) -> List[List[str]]:
         """Recursive function to build dependency tree."""
         path = path or []
         extras = extra.split(",")
@@ -235,7 +234,7 @@ class pipdata:
                 ret_all.append(ret)
         return ret_all
 
-    def down(self, pp="", extra="", depth=20, indent=5, version_req="", verbose=False):
+    def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
         """Print the downward requirements for the package or all packages."""
         if pp == ".":
             results = [self.down(one_pp, extra, depth, indent, version_req, verbose=verbose) for one_pp in sorted(self.distro)]
@@ -255,9 +254,8 @@ class pipdata:
         lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
         return "\n".join(lines).replace('"', "")
 
-    def up(self, pp, extra="", depth=20, indent=5, version_req="", verbose=False):
+    def up(self, pp: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
         """Print the upward needs for the package."""
-
         if pp == ".":
             results = [self.up(one_pp, extra, depth, indent, version_req, verbose) for one_pp in sorted(self.distro)]
             return '\n'.join(filter(None, results))
@@ -274,9 +272,9 @@ class pipdata:
 
         rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose, upward=True), indent=indent)
         lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-        return '\n'.join(filter(None, lines)).replace('"', "")
+        return "\n".join(filter(None, lines)).replace('"', "")
 
-    def description(self, pp):
+    def description(self, pp: str) -> None:
         """Return description of the package."""
         if pp in self.distro:
             return print("\n".join(self.distro[pp]["description"].split(r"\n")))
@@ -284,12 +282,12 @@ class pipdata:
     def summary(self, pp):
         """Return summary of the package."""
         if pp in self.distro:
-            return  self.distro[pp]["summary"]
+            return self.distro[pp]["summary"]
+        return ""
 
-    def pip_list(self, full=False, max_length=144):
+    def pip_list(self, full: bool = False, max_length: int = 144) -> List[Tuple[str, Union[str, Tuple[str, str]]]]:
         """List installed packages similar to pip list."""
         if full:
-            return [(p, self.distro[p]["version"], sum_up(self.distro[p]["summary"]), max_length) for p in sorted(self.distro)]
+            return [(p, self.distro[p]["version"], sum_up(self.distro[p]["summary"], max_length)) for p in sorted(self.distro)]
         else:
             return [(p, sum_up(self.distro[p]["version"], max_length)) for p in sorted(self.distro)]
-
