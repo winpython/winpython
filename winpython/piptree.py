@@ -273,12 +273,12 @@ class PipData:
                             if dependency["req_key"] in self.distro and dependency["req_key"]+"["+up_req+"]" not in path:
                                 # upward dependancy taken if:
                                 # - if extra "" demanded, and no marker from upward package: like pandas[] ==> numpy
-                                # - if an extra "array" is demanded, and indeed in the req_extra list: array,dataframe,diagnostics,distributer 
                                 # - or the extra is in the upward package, like pandas[test] ==> pytest, for 'test' extra
+                                # - or an extra "array" is demanded, and indeed in the req_extra list: array,dataframe,diagnostics,distributer 
                                 if (not dependency.get("req_marker") and extra ==""
-                                ) or (extra !="" and extra==up_req and dependency["req_key"]!=package_key
-                                ) or (extra !="" and "req_marker" in dependency and extra+',' in dependency["req_extra"]+',' 
-                                ) or ("req_marker" in dependency and extra+',' in dependency["req_extra"]+',' and Marker(dependency["req_marker"]).evaluate(environment=environment)):
+                                )  or ("req_marker" in dependency and extra==up_req and dependency["req_key"]!=package_key and Marker(dependency["req_marker"]).evaluate(environment=environment)
+                                )  or ("req_marker" in dependency and extra!="" and extra+',' in dependency["req_extra"]+',' and Marker(dependency["req_marker"]).evaluate(environment=environment|{"extra": up_req})   
+                                ):
                                     ret += self._get_dependency_tree(
                                         dependency["req_key"],
                                         up_req,  # dask[array] going upwards continues as dask[dataframe]
