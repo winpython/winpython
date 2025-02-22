@@ -961,29 +961,6 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
         self._print_action_done()
 
 
-    def _run_complementary_batch_scripts(self, script_name="run_complement.bat"):
-        """Runs complementary batch scripts from tools directories."""
-        print(f"Running {script_name} from tools directories...")
-        unique_tools_parent_dirs = set(str(Path(s).parent) for s in self.tools_directories)
-        for tools_parent_dir in unique_tools_parent_dirs:
-            script_path = Path(tools_parent_dir) / script_name
-            if script_path.is_file():
-                print(f'  Executing "{script_path}" for "{self.winpy_dir}"')
-                self._print_action(f'Executing "{script_path}" for "{self.winpy_dir}" !')
-                try:
-                    subprocess.run(
-                        [str(script_path), str(self.winpy_dir)],
-                        shell=True,
-                        check=True,
-                        stderr=sys.stderr,
-                        stdout=sys.stdout
-                    )
-                except subprocess.CalledProcessError as e:
-                    print(f"  Execution failed: {e}", file=sys.stderr)
-                    self._print_action(f"Execution failed: {e}!")
-        self._print_action_done()
-
-
     def build(self, remove_existing: bool = True, requirements=None, winpy_dirname: str = None):
         """Make WinPython distribution in target directory from the installers
         located in wheels_dir
@@ -1048,7 +1025,6 @@ if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
                     self._print_action(f"piping {' '.join(actions)}")
                     self.distribution.do_pip_action(actions)
 
-            self._run_complementary_batch_scripts()
             self.distribution.patch_standard_packages()
 
             self._print_action("Cleaning up distribution")
