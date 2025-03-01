@@ -1,3 +1,22 @@
+### WinPython 2025-01 release (March 1st, 2025)
+
+ MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|--------------------|-----------------------------------------------------------------
+8aef7e46e862e543d38bed851d0d6505 | fe32d81a13bfd830b5c2820eb9f545ea2dc3302d | 2bcb5bda5d6d27ffce3cccadd772599d534edcbcbca7cb59124e015b3919db68 | Winpython64-3.12.9.0dot.zip       |   38 280 444 Bytes | 9f2a468504c56bfb28fec03e47c6526b546098801f21e5137a58dd302838cc6d
+b6fdc51ec5aa7cc449e3e31ab4750899 | f623dc942a6e572a078a2cc71ddc0532d6fd7aef | bf240df0e6ba72499dbea42ba4638264bb777f4d59822df0033f421a342c5188 | Winpython64-3.12.9.0dot.7z        |   23 093 610 Bytes | db09d389d7ac6a8e2cfb5369ad910ffcf60ee673894f0ad0a94386409f1d582c
+39dcdd15299ac9a0aa068290432b6c89 | 80c48b7a91446019c1444b85be1124e8b27b9393 | bf1be605dffa97207ab108d9d8dcab2f51c597fc31bebb5e6067811c93402fd3 | Winpython64-3.12.9.0dot.exe       |   23 308 650 Bytes | b4f20a6d870c99628fed5fa070ef4bf9312fabc91be926267ec9b9919d1f2353
+e5c92eca86d5063d7c927b87ca7a979a | eabb5add549cda18e7405c8dbe64f163ab92aa05 | 13a08f3bd516558ebca224bb44cc61d763e679b821a1bf240a700a093e7d47fc | Winpython64-3.12.9.0slim.7z       |  616 678 094 Bytes | ddcb6f9118e3e2522e920049cb44d82fdcd8e48bfe5f7a30faf1706742971951
+688a2be695eda8f59d0cc690326d1299 | d9e9ddaea543964d9e9743aec86ee7b342f5480f | 02936d96bb488d111136dce11b08afa189b51f57f59d8d0e7068bea2a5fa67c0 | Winpython64-3.12.9.0slim.exe      |  616 892 419 Bytes | bcb6fdccc898a2d70d0f8ba7f80d9a056062fcc5d4cc78845dc979ee46e9292e
+6a8d945c058d9fb08b78235bbf8d7ae6 | bcbf848ed72de9b4595ee44faeec15a084408c06 | 0f984ca5dfc195a265a8b547be43891caed9a8770ba8a13b6f87b45990f12704 | Winpython64-3.13.2.0dot.zip       |   39 737 933 Bytes | 10008fb4a9193332a1cf5a0d180e503d3860a708a3add9a021c1b23c72ac767a
+51617e557c70a78f70153b92c784ea69 | 217e21a9292ede8ddc50f4628a0a031c2320be3b | 069f4a9a32b713f27d5a8f8ffccf2658580eeea7df7120b414b3fd74e7fc099e | Winpython64-3.13.2.0dot.7z        |   24 777 973 Bytes | b2e6ae219ea69c5f212534cd8a52e0c2bf0506b272b643be5884a52251da4125
+7f509cb8aba38aa748b35014ef7d8c1c | a37826beb8474d678e6dac8d263c3062055e1050 | ecba739bd41459656b632306f316da73980bae84e62b540f14c03affb8ac2d93 | Winpython64-3.13.2.0dot.exe       |   24 993 013 Bytes | 4f51cba5d6533bbe59367f925649da08c008cf40aaa564a1ee9134799311b83e
+6486a208002d34492af762d33e51c058 | bd1af3dbd687ed1797ac61a85df74f25efb1578b | dcdcb0608d74333bfb987219150f418b0c9637328703a5c12786ad1e24d5485b | Winpython64-3.13.2.0slim.7z       |  621 789 094 Bytes | 112a12e15435b200c22055407553879554e3487bed5118468ee2cd6a3c56fff2
+04b8e6e1dc61e2871b5cf522c76ab471 | 7d66dd128689ae80dbfdb589604572bdf204fc9b | 865c54d31aec95f3138b934a4c0a4ff440ac7a27d82b1a9667c61a80ec4d764f | Winpython64-3.13.2.0slim.exe      |  622 004 549 Bytes | fd1ad38146a6323be31c7a35aa39c31dd26b6c3d9328da97b71c6a3dcea622f9
+99a59eda2bf37dfab76bcffcae9cd3a7 | 77df69ec8875a7733c60ce2f0d78ced356d7b4c9 | fc66c242a6fe975dd85c764bd1068ad944440684a2bdc8599c2e5a13b5ca29cd | Winpython64-3.14.0.0dota5b.zip    |   40 495 265 Bytes | 8344a7e9a40d15d12fe6e3682b86a72ff512136d4cdc65ebca321cd3283c088e
+a0a66a0d00aeefcc185327999fd044c8 | 501888e481f95f824ca7e3160ea117f4f302385e | 92a9a6da1faef872ade0905cf01471831da54ff628b722a4e1d5b4d2a9338f8c | Winpython64-3.14.0.0dota5b.7z     |   25 110 864 Bytes | 38275cae601dbbd83fba9591930c893e71b7ea7a8333b2acc0a5a2bde85001bb
+91d3e6ebb32677e6ed9674f5e91fc538 | 931baf8ea70e052e4d87d7dc89d8cdb9c3c277e2 | e4933634b52e0b4ae498ddd1302ecf2ccb8b3de95df8af5120f9f298c2b64d3d | Winpython64-3.14.0.0dota5b.exe    |   25 325 904 Bytes | fe50cdcb5328813d783cf92b0b2bb16ef6330d7f45d6888fab1f0fcc208c1b16
+
+
 ### WinPython 2024-05 release (January 3rd, 2025)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
