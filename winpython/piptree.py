@@ -10,6 +10,7 @@ import sys
 import re
 import platform
 import os
+import logging
 from functools import lru_cache
 from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple, Union
@@ -17,16 +18,21 @@ from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class PipDataError(Exception):
+    """Custom exception for PipData related errors."""
+    pass
 
 def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
     """Summarize text to fit within max_length, ending at last complete sentence."""
     summary = (text + os.linesep).splitlines()[0]
     if len(summary) <= max_length:
-            return summary
+        return summary
     if stop_at and stop_at in summary[:max_length]:
         return summary[:summary.rfind(stop_at, 0, max_length)] + stop_at.rstrip()
     return summary[:max_length].rstrip()
-
 
 class PipData:
     """Manages package metadata and dependency relationships in a Python environment."""
@@ -40,21 +46,19 @@ class PipData:
         self.distro: Dict[str, Dict] = {}
         self.raw: Dict[str, Dict] = {}
         self.environment = self._get_environment()
-
         try:
             packages = self._get_packages(target or sys.executable)
             self._process_packages(packages)
             self._populate_reverse_dependencies()
         except Exception as e:
-            raise RuntimeError(f"Failed to initialize package data: {str(e)}") from e
-
+            raise PipDataError(f"Failed to initialize package data: {str(e)}") from e
 
     @staticmethod
     @lru_cache(maxsize=None)
     def normalize(name: str) -> str:
         """Normalize package name per PEP 503."""
         return re.sub(r"[-_.]+", "-", name).lower()
-    
+
     def _get_environment(self) -> Dict[str, str]:
         """Collect system and Python environment details."""
         return {
@@ -99,20 +103,10 @@ class PipData:
                     "provided": {'': None}   # Placeholder for extras provided by this package
                 }
             except Exception as e:
-                print(f"Warning: Failed to process package {name}: {str(e)}", file=sys.stderr)
-
+                logger.warning(f"Failed to process package {name}: {str(e)}", exc_info=True)
 
     def _get_requires(self, package: Distribution) -> List[Dict[str, str]]:
-        """
-        Extract and normalize requirements for a package.
-
-        This method parses the requirements of a package and normalizes them
-        into a list of dictionaries. Each dictionary contains the required
-        package key, version, extra, and marker (if any).
-
-        :param package: The Distribution object to extract requirements from
-        :return: List of dictionaries containing normalized requirements
-        """
+        """Extract and normalize requirements for a package."""
         requires = []
         replacements = str.maketrans({" ": " ", "[": "", "]": "", "'": "", '"': ""})
         further_replacements = [
@@ -155,11 +149,7 @@ class PipData:
         return provides
 
     def _populate_reverse_dependencies(self) -> None:
-        """Populate reverse dependencies.
-        
-        It iterates over the requirements of each package
-        and adds the package as a reverse dependency to the required packages.
-        """
+        """Populate reverse dependencies."""
         for pkg_key, pkg_data in self.distro.items():
             for req in pkg_data["requires_dist"]:
                 target_key = req["req_key"]
@@ -173,23 +163,7 @@ class PipData:
                     self.distro[target_key]["reverse_dependencies"].append(rev_dep)
 
     def _get_dependency_tree(self, package_name: str, extra: str = "", version_req: str = "", depth: int = 20, path: Optional[List[str]] = None, verbose: bool = False, upward: bool = False) -> List[List[str]]:
-        """
-        Recursive function to build dependency tree.
-
-        This method builds a dependency tree for the specified package. It can
-        build the tree for downward dependencies (default) or upward dependencies
-        (if upward is True). The tree is built recursively up to the specified
-        depth.
-
-        :param package_name: The name of the package to build the tree for
-        :param extra: The extra to include in the dependency tree
-        :param version_req: The version requirement for the package
-        :param depth: The maximum depth of the dependency tree
-        :param path: The current path in the dependency tree (used for cycle detection)
-        :param verbose: Whether to include verbose output in the tree
-        :param upward: Whether to build the tree for upward dependencies
-        :return: List of lists containing the dependency tree
-        """
+        """Recursive function to build dependency tree."""
         path = path or []
         extras = extra.split(",")
         pkg_key = self.normalize(package_name)
@@ -197,8 +171,8 @@ class PipData:
 
         full_name = f"{package_name}[{extra}]" if extra else package_name
         if full_name in path:
-            print(f"Cycle detected: {' -> '.join(path + [full_name])}")
-            return []  # Return empty list to avoid further recursion
+            logger.warning(f"Cycle detected: {' -> '.join(path + [full_name])}")
+            return []
 
         pkg_data = self.distro[pkg_key]
         if pkg_data and len(path) <= depth:
@@ -215,19 +189,22 @@ class PipData:
                         next_path = path + [base_name]
                         if upward:     
                             up_req = (dependency.get("req_marker", "").split('extra == ')+[""])[1].strip("'\"")
-                            # avoids circular links on dask[array] 
                             if dependency["req_key"] in self.distro and dependency["req_key"]+"["+up_req+"]" not in path:
                                 # upward dependancy taken if:
                                 # - if extra "" demanded, and no marker from upward package: like pandas[] ==> numpy
                                 # - or the extra is in the upward package, like pandas[test] ==> pytest, for 'test' extra
                                 # - or an extra "array" is demanded, and indeed in the req_extra list: array,dataframe,diagnostics,distributer 
-                                if (not dependency.get("req_marker") and extra ==""
-                                )  or ("req_marker" in dependency and extra==up_req and dependency["req_key"]!=pkg_key and Marker(dependency["req_marker"]).evaluate(environment=environment)
-                                )  or ("req_marker" in dependency and extra!="" and extra+',' in dependency["req_extra"]+',' and Marker(dependency["req_marker"]).evaluate(environment=environment|{"extra": up_req})   
-                                ):
+                                if (not dependency.get("req_marker") and extra == "") or \
+                                   ("req_marker" in dependency and extra == up_req and \
+                                    dependency["req_key"] != pkg_key and \
+                                    Marker(dependency["req_marker"]).evaluate(environment=environment)) or \
+                                   ("req_marker" in dependency and extra != "" and \
+                                    extra + ',' in dependency["req_extra"] + ',' and \
+                                    Marker(dependency["req_marker"]).evaluate(environment=environment | {"extra": up_req})):
+                                    # IA risk error: # dask[array] go upwards as dask[dataframe], so {"extra": up_req} , not {"extra": extra}
                                     ret += self._get_dependency_tree(
                                         dependency["req_key"],
-                                        up_req,  # dask[array] going upwards continues as dask[dataframe]
+                                        up_req,
                                         f"[requires: {package_name}"
                                         + (f"[{dependency['req_extra']}]" if dependency["req_extra"] != "" else "")
                                         + f'{dependency["req_version"]}]',
@@ -251,16 +228,7 @@ class PipData:
         return ret_all
 
     def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
-        """
-        Generate downward dependency tree as formatted string.
-
-        :param pp: The package name or "." to print dependencies for all packages
-        :param extra: The extra to include in the dependency tree
-        :param depth: The maximum depth of the dependency tree
-        :param indent: The indentation level for the JSON output
-        :param version_req: The version requirement for the package
-        :param verbose: Whether to include verbose output in the tree
-        """
+        """Generate downward dependency tree as formatted string."""
         if pp == ".":
             results = [self.down(p, extra, depth, indent, version_req, verbose=verbose) for p in sorted(self.distro)]
             return '\n'.join(filter(None, results))
@@ -270,27 +238,17 @@ class PipData:
                 results = [self.down(pp, one_extra, depth, indent, version_req, verbose=verbose)
                            for one_extra in sorted(self.distro[pp]["provides"])]
                 return '\n'.join(filter(None, results))
-            return "" # Handle cases where extra is "." and package_name is not found.
+            return ""
 
         if pp not in self.distro:
-            return "" # Handle cases where package_name is not found.
+            return ""
 
         rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose), indent=indent)
         lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
         return "\n".join(lines).replace('"', "")
 
-    def up(self, pp: str, extra: str = "", depth: int = 20, indent: int = 5,
-           version_req: str = "", verbose: bool = False) -> str:
-        """
-        Generate upward dependency tree as formatted string.
-
-        :param pp: The package name
-        :param extra: The extra to include in the dependency tree
-        :param depth: The maximum depth of the dependency tree
-        :param indent: The indentation level for the JSON output
-        :param version_req: The version requirement for the package
-        :param verbose: Whether to include verbose output in the tree
-        """
+    def up(self, pp: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
+        """Generate upward dependency tree as formatted string."""
         if pp == ".":
             results = [self.up(p, extra, depth, indent, version_req, verbose) for p in sorted(self.distro)]
             return '\n'.join(filter(None, results))
