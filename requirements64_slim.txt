@@ -1,0 +1,510 @@
+# 313
+# ortool 290MO UNCOMPRESSED
+# re-add pandoc … 618Mo?
+# 698 Mo after remoal of moviepy/imageio-ffmpeg
+# 714 Mo after removal of maturin and WASM Klein 
+# 725Mo before removal of: maturin 7 Mo, WASM KLEIN example
+#2024-09-22: swifter removed
+
+#2024-12-28 add pydantic_ai
+
+# the essential
+wheel
+pywin32
+build
+
+
+# compilers
+cython
+pycparser
+cffi
+
+# numeric stones
+numpy
+
+scipy
+sympy
+Pillow
+matplotlib
+
+pandas
+
+# sql - data
+
+pyodbc
+
+
+SQLAlchemy
+sqlparse
+sqlite_bro
+baresql
+mysql_connector_python
+pg8000
+ipython_sql
+
+XlsxWriter
+
+pymongo
+redis
+
+# high numeric
+#numexpr 2024-12-25: not worth it
+
+#h5py 2024-12-25: not worth it
+
+cytoolz
+#netCDF4 2024-12-25: not worth it
+xarray
+
+#Pulp 2024-12-25: not worth it
+
+scikit_learn
+scikit_image
+
+
+
+# gui
+jupyter
+ipython
+
+spyder
+
+# seaborn wants patsy and statsmodels for linear modeling
+seaborn
+patsy
+statsmodels
+
+holoviews
+mpld3
+
+# web
+beautifulsoup4
+
+lxml
+html5lib
+requests
+
+
+simplejson
+
+flask
+
+# dev complements
+
+pytest
+jedi
+pep8
+pyflakes
+
+pylint
+
+numpydoc
+
+twine
+
+# other
+networkx
+nltk
+
+# PyAudio  2024-12-25: not worth it, no visibility of source
+sounddevice
+
+pyserial
+
+#pdf
+
+reportlab
+
+
+# Pierre Raybaut Stack (PyQt5 only for now)
+plotpy
+PythonQwt
+guidata
+
+# for dask
+
+lmfit
+
+# Qt
+
+pyqtgraph
+
+
+# yet other
+julia
+
+# remember me why
+certifi
+click
+
+
+
+sphinx_rtd_theme
+Sphinx
+greenlet
+rx
+
+# wheelhouse-uploader apache-libcloud (is heavy)
+
+Markdown
+
+prompt-toolkit
+ptpython
+
+geopy
+
+wordcloud
+
+
+
+pycodestyle
+
+altair
+nbconvert
+pypandoc
+
+
+
+
+fuzzywuzzy
+#scikit_fuzzy
+imageio
+
+#xlwings 2024-12-25 not worth it
+
+# parallelize (and replace celery)
+joblib
+#dask[complete] contains irrelevant pyarrow-hotfix
+dask[array,dataframe,distributed,diagnostics]
+
+# dask 'bag' and 'delayed'
+cloudpickle
+toolz
+partd
+
+brotli
+
+
+pybind11
+
+#SLIM_2024 pygame
+plotnine
+
+mpl_scatter_density
+
+
+
+
+#SLIM_2024 moviepy
+
+
+streamz
+
+
+# Tensorflow_world
+###edward
+###Keras
+###keras_vis
+###Tensorflow_cpu
+###tensorflow_probability
+
+##keras-tuner
+
+# pytorch eco-system
+#Torch
+#torchvision
+#torchaudio
+#botorch
+#lightning
+#kornia
+#transformers[torch]
+#accelerate
+#fidle (tensorboard-2.15.1 wants still protobuf<4.24 , problem with ortools)
+## waiting for torch:
+##fastai
+##spacy
+
+# if we drop torch: jaxlib ml-dtypes numpy scipy jax opt-einsum
+#jax[cpu]
+
+terminado
+
+# pywinpty added due link removed from terminado for PyPy3
+pywinpty
+
+Send2Trash
+
+vega_datasets
+
+regex
+
+#loky
+
+hvplot
+
+#clrmagic 2024-12-25 not Worth it
+#pythonnet 2024-12-25 not Worth it
+
+cvxopt
+
+numba
+##pyarrow
+
+
+cvxpy
+mypy
+
+datashader
+
+mlxtend
+
+##jupyterlab_rise
+
+simpy
+
+
+trio
+
+imbalanced-learn
+
+tzlocal
+astropy
+
+panel
+
+hypothesis
+geopandas
+
+mercantile
+
+#rasterio 2024-12-25  not jangmin and maxsecure
+
+quantecon
+
+kiwisolver
+
+# automate notebooks 2019-04-26
+papermill
+
+autopep8
+black
+
+## winrt not yet
+
+
+# python_language_server no more
+python_lsp_server
+pexpect
+
+
+#swagger flask (still no asyncio choice)
+#flask_accepts
+#flaskerize
+# flask_RESTplus ... shall be now flask-restx
+quart
+datasette
+hypercorn
+
+#complementing asgi stack
+#2023-03-19 no more with sqlalchemy2.0
+##databases[sqlite]
+
+## ibis-framework no big life
+
+folium
+plotly
+
+
+umap-learn
+#SLIM_2024 virtualenv
+pympler
+## pipdeptree replaced par wppm
+
+##nlopt
+
+#2025-02-15 flask-sqlalchemy
+#2025-02-15 flask-session
+#2025-02-15 flask-Mail
+python-dotenv
+httpie
+asgiref
+
+#SLIM_2024 importlib_metadata
+
+
+##jupyterlab things
+jupyterlab
+widgetsnbextension
+
+##jupyterlab_launcher
+jupyter_bokeh
+#2023-05-21 too fragile: dask_labextension
+#SLIM_2024 pydeck
+
+## jupyterlab3 only
+jupyterlab-widgets
+
+## 2020-09-27 jupyterlab2 only
+ipympl
+ipyleaflet
+
+ipycanvas
+
+#SLIM_2024 wasmer
+#SLIM_2024 wasmer_compiler_cranelift
+#SLIM_2024 wasmer_compiler_singlepass
+
+fastapi
+
+
+datasette_graphql
+sqlite_utils
+aiosqlite
+
+
+## onnxruntime
+
+##sklearn-contrib-lightning
+openpyxl
+zstandard
+
+
+pynndescent
+
+
+flit
+## 2023-10-15 (too constraining) poetry
+## so moves to hatch 
+## buth hatch wants now uv.. a bit too much
+hatchling
+
+#ecos 2024-12-25
+
+##csvs_to_sqlite
+datasette_graphql
+sqlite_utils
+
+maturin
+
+orjson
+
+
+#2023-08-22 fuzz replacements
+rapidfuzz
+
+## waiting pyarrow on 3.11 oct 23th
+streamlit
+
+## 2024-09-08 until plotly at least updates its lumnio thing https://github.com/plotly/plotly.py/pull/4685
+# dash
+alembic
+
+
+#webapps example needs
+Django
+#channels
+
+
+## badly formed uvicorn[standard]
+uvicorn
+python-multipart
+deap
+
+polars
+
+##timseries bis
+
+
+# for SSRS
+requests_ntlm
+missingno
+
+##xgboost
+# lightgbm ?
+duckdb
+
+
+# for flask
+waitress
+
+#2023-10-08 soon:jupyterlab-lsp
+
+array-api-compat
+
+
+mpmath
+
+openai
+
+
+#azure
+azure-identity
+azure-cosmos
+azure-core
+
+## build
+
+# write & read QRcode
+python-barcode
+qrcode
+opencv-python
+
+#llm follow-up
+# llm
+#risk llm_gpt4all
+# llm_llama_cpp
+# llm_markov
+# llm-python
+huggingface_hub
+
+
+#course of langchain https://learn.deeplearning.ai/langchain-chat-with-your-data
+pypdf
+yt_dlp
+pydub
+
+
+# new friends of panel (load psygnal, a qt-like signaling)
+anywidget
+
+keras
+
+
+
+# pyomo becomes a frequent wrapper nowodays
+
+langchain
+pyomo
+#NUMPY2_WAIT highspy
+#pymoo 2024-12-25 not well maintained
+
+clarabel
+#SLIM_2024 ortools
+
+#waiting cvxpy
+scs
+optuna
+
+
+#pyarrow complement
+adbc_driver_manager
+#adbc_driver_sqlite
+#backport optional importlib_resources
+
+#cartopy 2024-12-26 use geopandas more popular (that include gdal via pyogrio)
+
+#2024-12-26 agent ai things
+pydantic_ai
+#skrub replaces dirty_cat, seems needing torch
+termcolor
+tiktoken
+
+# from Microsoft own distro
+thefuzz
+tabulate
+squarify
+PyWavelets
+prince
+faker
+
+pyusb
