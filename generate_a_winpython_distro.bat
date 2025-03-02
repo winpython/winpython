@@ -27,7 +27,12 @@ rem 3.0 Generate Changelog and binaries
 
 rem "my_release_level" is optionaly set per the calling program *********************************************
 rem set my_release_level=
-if "%my_release_level%"=="" set my_release_level=b1
+
+rem ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! =
+
+if "%my_release_level%"=="" set my_release_level=
+
+rem ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! = ! =
 
 rem "my_create_installer" is optionaly set per the calling program
 if "%my_create_installer%"=="" set my_create_installer=True
@@ -85,12 +90,16 @@ if %my_python_target%==311 (
 )
 
 if %my_python_target%==312 (
-   set my_python_target_release=3128
-   set my_release=0
+   set my_python_target_release=3129
+   set my_release=1
 )
 
 if %my_python_target%==313 (
-   set my_python_target_release=3131
+   set my_python_target_release=3132
+   set my_release=1
+)
+if %my_python_target%==314 (
+   set my_python_target_release=3140
    set my_release=0
 )
 
@@ -227,18 +236,6 @@ set path=%my_original_path%
 
 call %my_WINPYDIRBASE%\scripts\env.bat
 set
-
-
-echo ----------------------------------------
-echo 2.3 (%date% %time%) add mandatory packages for build 'msvc_runtime'.. still necessary ? 2024-12-22 dropped
-echo ----------------------------------------
-echo ---------------------------------------- >>%my_archive_log%
-echo 2.3 (%date% %time%) add mandatory packages for build 'msvc_runtime'.. still necessary ? 2024-12-22 dropped>>%my_archive_log%
-echo ---------------------------------------- >>%my_archive_log%
-
-rem echo python -m pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
-rem echo python -m pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade>>%my_archive_log%
-rem python -m pip install msvc_runtime --pre  --no-index --trusted-host=None  --find-links=%my_find_links%  --upgrade
 
 
 echo ----------------------------------------

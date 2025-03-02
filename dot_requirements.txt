@@ -1,5 +1,9 @@
 # the essential
 sqlite_bro
-#idlex
+setuptools
 wheel
+build
+##msvc_runtime
 # end of requirements.txt
+
+
