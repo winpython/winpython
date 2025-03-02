@@ -26,40 +26,27 @@ from winpython import utils, piptree
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
-class BasePackage:
-    def __init__(self, fname):
+class Package:
+    "standardize a Package from filename or pip list"
+    def __init__(self, fname,  suggested_summary=None):
         self.fname = fname
+        self.description = piptree.sum_up(suggested_summary)  if suggested_summary else ""
         self.name = None
         self.version = None
-        self.description = ""
+        if fname.endswith((".zip", ".tar.gz", ".whl")):
+            bname = Path(self.fname).name #wheel style name like "sqlite_bro-1.0.0..."
+            infos = utils.get_source_package_infos(bname) # get name, version
+            if infos is not None:
+                self.name, self.version = infos
+                self.name = utils.normalize(self.name)
         self.url = None
+        self.files = []
+
+        setattr(self,'url',"https://pypi.org/project/" + self.name)
 
     def __str__(self):
         return f"{self.name} {self.version}\r\n{self.description}\r\nWebsite: {self.url}"
-
-
-class Package(BasePackage):
-    def __init__(self, fname, update=False, suggested_summary=None):
-        BasePackage.__init__(self, fname)
-        self.files = []
-        self.extract_infos()
-        if suggested_summary:
-            setattr(self, 'description',
-                    piptree.sum_up(suggested_summary ))
-        bname = fname.split("-")[0]
-        setattr(self,'url',"https://pypi.org/project/" + bname)
-
-    def extract_infos(self):
-        "Extract package (name, version) from filename (installer basename)"
-        bname = Path(self.fname).name
-        if bname.endswith((".zip", ".tar.gz", ".whl")):
-            # distutils sdist
-            infos = utils.get_source_package_infos(bname)
-            if infos is not None:
-                self.name, self.version = infos
-                return
-        raise NotImplementedError(f"Not supported package type {bname}")
-
+        
 
 class Distribution:
     def __init__(self, target=None, verbose=False, indent=False):
@@ -156,8 +143,7 @@ class Distribution:
         # create pip package list
         wppm = [
             Package(
-                f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl",
-                update=update,
+                f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl", #faking wheel
                 suggested_summary=self.pip.summary(i[0]) if self.pip else None
             )
             for i in pip_list
