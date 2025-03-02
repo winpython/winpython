@@ -260,16 +260,6 @@ def exec_run_cmd(args, path=None):
         return  process.stdout
 
 
-def get_r_version(path):
-    """Return version of the R installed in *path*"""
-    return exec_shell_cmd(r"dir ..\README.R*", path).splitlines()[-3].split("-")[-1]
-
-
-def get_julia_version(path):
-    """Return version of the Julia installed in *path*"""
-    return exec_shell_cmd("julia.exe -v", path).splitlines()[0].split(" ")[-1]
-
-
 def get_nodejs_version(path):
     """Return version of the Nodejs installed in *path*"""
     return exec_shell_cmd("node -v", path).splitlines()[0]
