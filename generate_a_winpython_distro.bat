@@ -9,6 +9,7 @@ rem 2021-04-22 : path PyPy3 (as we don't try to copy PyPy3.exe to Python.exe)
 rem 2023-08-21a: add a pre_step with my_requirements_pre.txt + my_find_links_pre
 rem 2024-05-12a: use python -m pip instead of pip , and remove --upgrade %new_resolver%
 rem 2024-09-15a: compactify for lisiblity
+rem 2025-03-02 : remove step 2.3 (pre-build), and 2.8 (post-patch) as we simplify to only wheels
 rem *****************************
 
 rem algorithm:
@@ -18,10 +19,8 @@ rem 2 a Pre-clear of previous build infrastructure
 rem 2.0 Create a new build
 rem   2.1 Create basic build infrastructure 
 rem   2.2 check infrastructure is in place
-rem   2.3 add mandatory packages for build
 rem   2.4 add packages pre_requirements (if any)
 rem   2.5 add requirement packages
-rem   2.8 post-build (if specific workarounds)
 rem   2.9 archive success
 rem 3.0 Generate Changelog and binaries
 
@@ -272,17 +271,6 @@ echo python -m pip install -r %my_requirements% -c %my_constraints% --pre  --no-
 echo if pip doesn't work, check the path of %my_WINPYDIRBASE%
 
 python -m pip install -r %my_requirements% -c %my_constraints% --pre  --no-index --trusted-host=None --find-links=%my_find_links%  >>%my_archive_log%
-
-
-echo ----------------------------------------
-echo   2.8 (%date% %time%) post-build (if specific workarounds)
-echo ----------------------------------------
-echo ---------------------------------------- >>%my_archive_log%
-echo   2.8 (%date% %time%) post-build (if specific workarounds)>>%my_archive_log%
-echo ---------------------------------------- >>%my_archive_log%
-
-@echo on
-call  %my_basedir%\run_complement_newbuild.bat %my_WINPYDIRBASE%
 
 
 echo ----------------------------------------
