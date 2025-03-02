@@ -119,7 +119,6 @@ class WinPythonDistributionBuilder:
     Builds a WinPython distribution.
     """
 
-    JULIA_PATH_REL = r"\t\Julia\bin"  # Relative path within WinPython dir
     NODEJS_PATH_REL = r"\n"  # Relative path within WinPython dir
 
     def __init__(
@@ -226,11 +225,6 @@ Name | Version | Description
             path = self.winpy_dir / rel_path if self.winpy_dir else None
             return path if path and (path.is_file() or path.is_dir()) else None
 
-        julia_path = get_tool_path(self.JULIA_PATH_REL)
-        if julia_path:
-            julia_version = utils.get_julia_version(str(julia_path))
-            installed_tools.append(("Julia", julia_version))
-
         nodejs_path = get_tool_path(self.NODEJS_PATH_REL)
         if nodejs_path:
             node_version = utils.get_nodejs_version(str(nodejs_path))
@@ -309,7 +303,6 @@ Name | Version | Description
             "DLLs",
             "Scripts",
             r"..\t",
-            r".." + self.JULIA_PATH_REL,
             r".." + self.NODEJS_PATH_REL,
         ]
 
