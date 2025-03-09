@@ -551,11 +551,15 @@ set JUPYTER_DATA_DIR=%HOME%
 set JUPYTER_CONFIG_DIR=%WINPYDIR%\\etc\\jupyter
 set JUPYTER_CONFIG_PATH=%WINPYDIR%\\etc\\jupyter
 set FINDDIR=%WINDIR%\\system32
-echo ";%PATH%;" | %FINDDIR%\\find.exe /C /I ";%WINPYDIR%\\;" >nul
+
+rem Remove all double quotes
+set PATH_CLEANED=%PATH:"=%
+echo ";%PATH_CLEANED%;" | %FINDDIR%\\find.exe /C /I ";%WINPYDIR%\\;" >nul
 if %ERRORLEVEL% NEQ 0 (
    set "PATH={full_path_env_var}"
    cd .
 )
+set PATH_CLEANED=
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\\Lib\\site-packages\\PyQt5\\__init__.py" set QT_API=pyqt5
