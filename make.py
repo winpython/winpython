@@ -495,7 +495,7 @@ call "%~dp0env_for_icons.bat"
         destination = self.winpy_dir / "scripts"
         _copy_items([origin], destination, self.verbose)
         self._print_action_done()
-
+    
     def _create_initial_batch_scripts(self):
         """Creates initial batch scripts, including environment setup."""
         self._print_action("Creating initial batch scripts")
@@ -515,112 +515,14 @@ call "%~dp0env_for_icons.bat"
         if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
             batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
 
-
-        env_bat_content = f"""@echo off
-set WINPYDIRBASE=%~dp0..
-
-rem get a normalized path
-set WINPYDIRBASETMP=%~dp0..
-pushd %WINPYDIRBASETMP%
-set WINPYDIRBASE=%__CD__%
-if "%WINPYDIRBASE:~-1%"=="\\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
-set WINPYDIRBASETMP=
-popd
-
-set WINPYDIR=%WINPYDIRBASE%\\{self.python_dir_name}
-rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%\\python.exe
-set PYTHON=%WINPYDIR%\\python.exe
-set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\\Lib;%WINPYDIR%\\DLLs
-set WINPYVER={self.winpython_version_name}
-
-rem 2023-02-12 utf-8 on console to avoid pip crash
-rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
-set PYTHONIOENCODING=utf-8
-rem set PYTHONUTF8=1 creates issues in "movable" patching
-
-set HOME=%WINPYDIRBASE%\\settings
-rem see https://github.com/winpython/winpython/issues/839
-rem set USERPROFILE=%HOME%
-set JUPYTER_DATA_DIR=%HOME%
-set JUPYTER_CONFIG_DIR=%WINPYDIR%\\etc\\jupyter
-set JUPYTER_CONFIG_PATH=%WINPYDIR%\\etc\\jupyter
-set FINDDIR=%WINDIR%\\system32
-
-rem Remove all double quotes
-set PATH_CLEANED=%PATH:"=%
-echo ";%PATH_CLEANED%;" | %FINDDIR%\\find.exe /C /I ";%WINPYDIR%\\;" >nul
-if %ERRORLEVEL% NEQ 0 (
-   set "PATH={full_path_env_var}"
-   cd .
-)
-set PATH_CLEANED=
-
-rem force default pyqt5 kit for Spyder if PyQt5 module is there
-if exist "%WINPYDIR%\\Lib\\site-packages\\PyQt5\\__init__.py" set QT_API=pyqt5
-"""
-        self.create_batch_script("env.bat", env_bat_content, replacements=batch_replacements)
-
-
-        ps1_content = r"""### WinPython_PS_Prompt.ps1 ###
-$0 = $myInvocation.MyCommand.Definition
-$dp0 = [System.IO.Path]::GetDirectoryName($0)
-# $env:PYTHONUTF8 = 1 would create issues in "movable" patching
-$env:WINPYDIRBASE = "$dp0\.."
-# get a normalize path
-# http://stackoverflow.com/questions/1645843/resolve-absolute-path-from-relative-path-and-or-file-name
-$env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
-
-# avoid double_init (will only resize screen)
-if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+""" + '"\\' + self.python_dir_name + '"' + r""")) ) {
-$env:WINPYDIR = $env:WINPYDIRBASE+""" + '"\\' + self.python_dir_name + '"' + r"""
-# 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
-$env:PYTHON = "%WINPYDIR%\python.exe"
-$env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs"
-
-$env:WINPYVER = '""" + self.winpython_version_name + r"""'
-# rem 2023-02-12 try utf-8 on console
-# rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
-$env:PYTHONIOENCODING = "utf-8"
-
-$env:HOME = "$env:WINPYDIRBASE\settings"
-
-# rem read https://github.com/winpython/winpython/issues/839
-# $env:USERPROFILE = "$env:HOME"
-
-$env:WINPYDIRBASE = ""
-$env:JUPYTER_DATA_DIR = "$env:HOME"
-
-if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
- $env:PATH = """ + '"' + full_path_ps_env_var + '"' + r""" }
-
-#rem force default pyqt5 kit for Spyder if PyQt5 module is there
-if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
-
-# PyQt5 qt.conf creation and winpython.ini creation done via Winpythonini.py (called per env_for_icons.bat for now)
-# Start-Process -FilePath $env:PYTHON -ArgumentList ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
-
-
-### Set-WindowSize
-
-Function Set-WindowSize {
-Param([int]$x=$host.ui.rawui.windowsize.width,
-      [int]$y=$host.ui.rawui.windowsize.heigth,
-      [int]$buffer=$host.UI.RawUI.BufferSize.heigth)
-    $buffersize = new-object System.Management.Automation.Host.Size($x,$buffer)
-    $host.UI.RawUI.BufferSize = $buffersize
-    $size = New-Object System.Management.Automation.Host.Size($x,$y)
-    $host.ui.rawui.WindowSize = $size
-}
-# Windows10 yelling at us with 150 40 6000
-# Set-WindowSize 195 40 6000 
-
-### Colorize to distinguish
-$host.ui.RawUI.BackgroundColor = "Black"
-$host.ui.RawUI.ForegroundColor = "White"
-}
-"""
-        self.create_batch_script("WinPython_PS_Prompt.ps1", ps1_content, replacements=batch_replacements)
-
+        destination = self.winpy_dir / "scripts"
+        for specials in ('env.bat', 'WinPython_PS_Prompt.ps1'):
+            destspe=str(destination / specials)
+            print('destspe:', destspe)
+            utils.patch_sourcefile(destspe,'{self.python_dir_name}', self.python_dir_name)
+            utils.patch_sourcefile(destspe,'{self.winpython_version_name}', self.winpython_version_name)
+            utils.patch_sourcefile(destspe,'{full_path_env_var}', full_path_env_var)
+            utils.patch_sourcefile(destspe,'{full_path_ps_env_var}', full_path_ps_env_var)
         self._print_action_done()
 
 
@@ -635,11 +537,6 @@ $host.ui.RawUI.ForegroundColor = "White"
         ]
         if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
             batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
-
-        self.create_batch_script("readme.txt", """These batch files are required to run WinPython icons.
-These files should help the user writing his/her own
-The environment variables are set-up in 'env.bat' and 'env_for_icons.bat'.""",
-        )
 
         for ini_patch_script in [
             ("make_working_directory_be_not_winpython.bat", "[active_environment", "[inactive_environment", "[inactive_environment_per_user]", "[active_environment_per_user]"),
@@ -692,8 +589,8 @@ The environment variables are set-up in 'env.bat' and 'env_for_icons.bat'.""",
         )
 
         if remove_existing:
-            self._create_initial_batch_scripts()
             self._copy_default_scripts()
+            self._create_initial_batch_scripts()
             self._create_standard_batch_scripts()
             self._copy_launchers()
 
