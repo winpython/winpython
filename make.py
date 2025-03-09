@@ -113,6 +113,30 @@ def build_installer_7zip(
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
+def _copy_items(source_dirs: list[Path], target_dir: Path, verbose: bool = False):
+    """
+    Copies items from source directories to the target directory.
+
+    Args:
+        source_dirs: List of source directories to copy items from.
+        target_dir: Target directory to copy items to.
+        verbose: Enable verbose output.
+    """
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for source_dir in source_dirs:
+        if not source_dir.is_dir():
+            print(f"Warning: Source directory not found: {source_dir}")
+            continue
+        for item_name in os.listdir(source_dir):
+            source_item = source_dir / item_name
+            target_item = target_dir / item_name
+            copy_func = shutil.copytree if source_item.is_dir() else shutil.copy2
+            try:
+                copy_func(source_item, target_item)
+                if verbose:
+                    print(f"  Copied: {source_item} -> {target_item}")
+            except Exception as e:
+                print(f"Error copying {source_item} to {target_item}: {e}")
 
 class WinPythonDistributionBuilder:
     """
@@ -434,26 +458,11 @@ call "%~dp0env_for_icons.bat"
         if self.python_dir_name != self.python_name and not python_target_dir.is_dir():
             os.rename(self.winpy_dir / self.python_name, python_target_dir)
 
-
     def _copy_tools(self):
         """Copies development tools to the WinPython 't' directory."""
         tools_target_dir = self.winpy_dir / "t"
         self._print_action(f"Copying tools to {tools_target_dir}")
-        tools_target_dir.mkdir(parents=True, exist_ok=True)
-        for source_dir in self.tools_directories:
-            if not source_dir.is_dir():
-                print(f"Warning: Tools directory not found: {source_dir}")
-                continue
-            for item_name in os.listdir(source_dir):
-                source_item = source_dir / item_name
-                target_item = tools_target_dir / item_name
-                copy_func = shutil.copytree if source_item.is_dir() else shutil.copy2
-                try:
-                    copy_func(source_item, target_item)
-                    if self.verbose:
-                        print(f"  Copied: {source_item} -> {target_item}")
-                except Exception as e:
-                    print(f"Error copying {source_item} to {target_item}: {e}")
+        _copy_items(self.tools_directories, tools_target_dir, self.verbose)
 
         # Special handling for Node.js to move it up one level
         nodejs_current_dir = tools_target_dir / "n"
@@ -463,42 +472,20 @@ call "%~dp0env_for_icons.bat"
                 shutil.move(nodejs_current_dir, nodejs_target_dir)
             except Exception as e:
                 print(f"Error moving Node.js directory: {e}")
-
         self._print_action_done()
-
 
     def _copy_documentation(self):
         """Copies documentation files to the WinPython 'docs' directory."""
         docs_target_dir = self.winpy_dir / "notebooks" / "docs"
         self._print_action(f"Copying documentation to {docs_target_dir}")
-        docs_target_dir.mkdir(parents=True, exist_ok=True)
-        for source_dir in self.docs_directories:
-            if not source_dir.is_dir():
-                print(f"Warning: Documentation directory not found: {source_dir}")
-                continue
-            for item_name in os.listdir(source_dir):
-                source_item = source_dir / item_name
-                target_item = docs_target_dir / item_name
-                copy_func = shutil.copytree if source_item.is_dir() else shutil.copy2
-                try:
-                    copy_func(source_item, target_item)
-                    if self.verbose:
-                        print(f"  Copied: {source_item} -> {target_item}")
-                except Exception as e:
-                    print(f"Error copying {source_item} to {target_item}: {e}")
+        _copy_items(self.docs_directories, docs_target_dir, self.verbose)
         self._print_action_done()
-
 
     def _copy_launchers(self):
         """Copies pre-made launchers to the WinPython directory."""
         self._print_action("Creating launchers")
         launchers_source_dir = PORTABLE_DIR / "launchers_final"
-        for item in launchers_source_dir.rglob('*.exe'):
-            shutil.copy2(item, self.winpy_dir)
-            if self.verbose:
-                print(f"  Copied launcher: {item.name} -> {self.winpy_dir}")
-        for item in launchers_source_dir.rglob('licence*.*'):
-            shutil.copy2(item, self.winpy_dir)
+        _copy_items([launchers_source_dir], self.winpy_dir, self.verbose)
         self._print_action_done()
 
     def _copy_default_scripts(self):
@@ -506,10 +493,8 @@ call "%~dp0env_for_icons.bat"
         self._print_action("copying pre-made scripts")
         origin = PORTABLE_DIR / "scripts"
         destination = self.winpy_dir / "scripts"
-        for item in origin.rglob('*.*'):
-            shutil.copy2(item, destination)
-            if self.verbose:
-                print(f"  Copied : {item.name} -> {destination}")
+        _copy_items([origin], destination, self.verbose)
+        self._print_action_done()
 
     def _create_initial_batch_scripts(self):
         """Creates initial batch scripts, including environment setup."""
