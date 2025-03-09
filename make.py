@@ -636,12 +636,6 @@ $host.ui.RawUI.ForegroundColor = "White"
 """
         self.create_batch_script("WinPython_PS_Prompt.ps1", ps1_content, replacements=batch_replacements)
 
-        cmd_ps_bat_content = r"""@echo off
-call "%~dp0env_for_icons.bat"
-Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
-"""
-        self.create_batch_script("cmd_ps.bat", cmd_ps_bat_content, replacements=batch_replacements)
-
 
         env_for_icons_bat_content = r"""@echo off
 call "%~dp0env.bat"
@@ -703,32 +697,9 @@ if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks
         if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
             batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
 
-
         self.create_batch_script("readme.txt", """These batch files are required to run WinPython icons.
 These files should help the user writing his/her own
 The environment variables are set-up in 'env.bat' and 'env_for_icons.bat'.""",
-        )
-
-        self.create_batch_script(
-            "make_winpython_movable.bat",
-            r"""@echo off
-call "%~dp0env.bat"
-echo patch pip and current launchers for move
-
-"%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
-pause""",
-            replacements=batch_replacements
-        )
-
-        self.create_batch_script(
-            "make_winpython_fix.bat",
-            r"""@echo off
-call "%~dp0env.bat"
-echo patch pip and current launchers for non-move
-
-"%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=False)"
-pause""",
-            replacements=batch_replacements
         )
 
         for ini_patch_script in [
@@ -743,119 +714,6 @@ pause""",
             if patch2:
                 content += f""""%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '{patch2[0]}', '{patch2[1]}' )" """
             self.create_batch_script(name, content)
-
-
-        self.create_batch_script("cmd.bat", r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cmd.exe /k""", replacements=batch_replacements)
-
-        self.create_batch_script("WinPython_Terminal.bat", r"""@echo off
-Powershell.exe -Command "& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy RemoteSigned -noexit -File ""%~dp0WinPython_PS_Prompt.ps1""'}"
-exit""", replacements=batch_replacements)
-
-        self.create_batch_script("python.bat", r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\python.exe"  %*""", replacements=batch_replacements)
-
-        self.create_batch_script(
-            "winpython.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-rem backward compatibility for non-ptpython users
-if exist "%WINPYDIR%\scripts\ptpython.exe" (
-    "%WINPYDIR%\scripts\ptpython.exe" %*
-) else (
-    "%WINPYDIR%\python.exe"  %*
-)""",
-            replacements=batch_replacements
-        )
-
-        self.create_batch_script(
-            "winidle.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\idlelib\idle.pyw" %*""",
-            replacements=batch_replacements
-        )
-
-        self.create_batch_script(
-            "winspyder.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%" """,
-        )
-
-        self.create_batch_script(
-            "spyder_reset.bat",
-            r"""@echo off
-call "%~dp0env_for_icons.bat"
-"%WINPYDIR%\scripts\spyder.exe" --reset %*""",
-        )
-
-        for jupyter_script in [
-            ("winipython_notebook.bat", "jupyter-notebook.exe"),
-            ("winjupyter_lab.bat", "jupyter-lab.exe"),
-            ("winqtconsole.bat", "jupyter-qtconsole.exe"),
-            ]:
-            name, exe = jupyter_script
-            self.create_batch_script(name, f"""@echo off
-call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\\scripts\\{exe}" %*""")
-
-
-        self.create_python_launcher_batch(
-            "register_python.bat",
-            r'"%WINPYDIR%\Lib\site-packages\winpython\register_python.py"',
-            working_dir=r'"%WINPYDIR%\Scripts"',
-        )
-
-        self.create_python_launcher_batch(
-            "unregister_python.bat",
-            r'"%WINPYDIR%\Lib\site-packages\winpython\unregister_python.py"',
-            working_dir=r'"%WINPYDIR%\Scripts"',
-        )
-
-        for register_all_script in [
-            ("register_python_for_all.bat", "register_python.bat"),
-            ("unregister_python_for_all.bat", "unregister_python.bat"),
-            ]:
-            name, base_script = register_all_script
-            self.create_batch_script(name, f"""@echo off
-call "%~dp0env.bat"
-call "%~dp0{base_script}" --all""")
-
-
-        self.create_batch_script("wpcp.bat", r"""@echo off
-call "%~dp0env_for_icons.bat" %*
-cmd.exe /k "echo wppm & wppm" """, replacements=batch_replacements)
-
-        self.create_batch_script(
-            "upgrade_pip.bat",
-            r"""@echo off
-call "%~dp0env.bat"
-echo this will upgrade pip with latest version, then patch it for WinPython portability ok ?
-pause
-"%WINPYDIR%\python.exe" -m pip install --upgrade pip
-"%WINPYDIR%\python.exe" -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
-pause""",
-            replacements=batch_replacements
-        )
-
-        self.create_batch_script("activate.bat", r"""@echo off
-call "%~dp0env.bat"  %*""", replacements=batch_replacements)
-
-
-        vscode_bat_content = r"""@echo off
-call "%~dp0env_for_icons.bat"
-if exist "%WINPYDIR%\..\t\vscode\code.exe" (
-    "%WINPYDIR%\..\t\vscode\code.exe" %*
-) else (
-if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
-    "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe"  %*
-) else (
-    "code.exe" %*
-))"""
-        self.create_batch_script("winvscode.bat", vscode_bat_content)
 
         self._print_action_done()
 
