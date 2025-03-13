@@ -29,9 +29,7 @@ assert PORTABLE_DIR.is_dir(), f"Portable directory not found: {PORTABLE_DIR}"
 
 
 def find_7zip_executable() -> str:
-    """
-    Locates the 7-Zip executable (7z.exe) in common installation directories.
-    """
+    "Locates the 7-Zip executable (7z.exe)"
     program_files_dirs = [
         Path(r"C:\Program Files"),
         Path(r"C:\Program Files (x86)"),
@@ -107,10 +105,10 @@ def build_installer_7zip(
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
+
 def _copy_items(source_dirs: list[Path], target_dir: Path, verbose: bool = False):
-    """
-    Copies items from source directories to the target directory.
-    """
+    "Copies items from source directories to the target directory."
+
     target_dir.mkdir(parents=True, exist_ok=True)
     for source_dir in source_dirs:
         if not source_dir.is_dir():
@@ -128,9 +126,7 @@ def _copy_items(source_dirs: list[Path], target_dir: Path, verbose: bool = False
                 print(f"Error copying {source_item} to {target_item}: {e}")
 
 class WinPythonDistributionBuilder:
-    """
-    Builds a WinPython distribution.
-    """
+    "Builds a WinPython distribution."
 
     NODEJS_PATH_REL = r"\n"  # Relative path within WinPython dir
 
@@ -179,14 +175,7 @@ class WinPythonDistributionBuilder:
         self.python_dir_name = "python"  # Standardized Python directory name
 
     def _get_python_zip_file(self) -> Path:
-        """
-        Finds the Python zip file in the wheels directory.
-
-        Returns:
-            Path: Path to the Python zip file.
-        Raises:
-            RuntimeError: if no python zip file is found
-        """
+        "Finds the Python .zip file in the wheels directory."
         patterns = [
             r"(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip",  # PyPy pattern
             r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)",  # Standard Python pattern
@@ -739,27 +728,9 @@ def make_all(
         my_x = my_x[:-1]
     # simplify for PyPy
     if not python_target_release == None:
-        winpy_dirname = (
-            "WPy"
-            + f"{architecture}"
-            + "-"
-            + python_target_release
-            + ""
-            + f"{build_number}"
-        ) + release_level
-    # + flavor
+        winpy_dirname = f"WPy{architecture}-{python_target_release}{build_number}{release_level}"
     else:
-        winpy_dirname = (
-            "WPy"
-            + f"{architecture}"
-            + "-"
-            + pyver.replace(".", "")
-            + ""
-            + my_x
-            + ""
-            + f"{build_number}"
-        ) + release_level
-    # + flavor
+        winpy_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{my_x}{build_number}{release_level}"
 
     builder.build(
         remove_existing=remove_existing,
