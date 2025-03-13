@@ -31,12 +31,6 @@ assert PORTABLE_DIR.is_dir(), f"Portable directory not found: {PORTABLE_DIR}"
 def find_7zip_executable() -> str:
     """
     Locates the 7-Zip executable (7z.exe) in common installation directories.
-
-    Raises:
-        RuntimeError: If 7-Zip executable is not found.
-
-    Returns:
-        str: Path to the 7-Zip executable.
     """
     program_files_dirs = [
         Path(r"C:\Program Files"),
@@ -116,11 +110,6 @@ def build_installer_7zip(
 def _copy_items(source_dirs: list[Path], target_dir: Path, verbose: bool = False):
     """
     Copies items from source directories to the target directory.
-
-    Args:
-        source_dirs: List of source directories to copy items from.
-        target_dir: Target directory to copy items to.
-        verbose: Enable verbose output.
     """
     target_dir.mkdir(parents=True, exist_ok=True)
     for source_dir in source_dirs:
@@ -537,19 +526,6 @@ call "%~dp0env_for_icons.bat"
         ]
         if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
             batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
-
-        for ini_patch_script in [
-            ("make_working_directory_be_not_winpython.bat", "[active_environment", "[inactive_environment", "[inactive_environment_per_user]", "[active_environment_per_user]"),
-            ("make_working_directory_be_winpython.bat", "[active_environment", "[inactive_environment"),
-            ("make_working_directory_and_userprofile_be_winpython.bat", "[active_environment", "[inactive_environment", "[inactive_environment_common]", "[active_environment_common]")
-            ]:
-            name, patch1_start, patch1_end, *patch2 = ini_patch_script
-            content = f"""call "%~dp0env_for_icons.bat"
-"%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '{patch1_start}', '{patch1_end}' )"
-"""
-            if patch2:
-                content += f""""%PYTHON%" -c "from winpython.utils import patch_sourcefile;patch_sourcefile(r'%~dp0..\\settings\winpython.ini', '{patch2[0]}', '{patch2[1]}' )" """
-            self.create_batch_script(name, content)
 
         self._print_action_done()
 
