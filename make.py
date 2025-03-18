@@ -309,11 +309,6 @@ Name | Version | Description
         ]
 
     @property
-    def post_path_entries(self) -> list[str]:
-        """Returns a list of PATH entries to append to the environment."""
-        return []
-
-    @property
     def tools_directories(self) -> list[Path]:
         """Returns the list of tools directories to include."""
         return self.tools_dirs
@@ -464,10 +459,10 @@ call "%~dp0env_for_icons.bat"
         self._print_action("Creating initial batch scripts")
 
         path_entries_str = ";".join([rf"%WINPYDIR%\{pth}" for pth in self.pre_path_entries])
-        full_path_env_var = f"{path_entries_str};%PATH%;" + ";".join([rf"%WINPYDIR%\{pth}" for pth in self.post_path_entries])
+        full_path_env_var = f"{path_entries_str};%PATH%"
 
         path_entries_ps_str = ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.pre_path_entries])
-        full_path_ps_env_var = f"{path_entries_ps_str};$env:path;" + ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.post_path_entries])
+        full_path_ps_env_var = f"{path_entries_ps_str};$env:path"
 
         # Replacements for batch scripts (PyPy compatibility)
         exe_name = self.distribution.short_exe if self.distribution else "python.exe" # default to python.exe if distribution is not yet set
