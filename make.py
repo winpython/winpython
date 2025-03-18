@@ -686,13 +686,12 @@ def make_all(
         requirements=requirements_files_list,
         winpy_dirname=winpy_dirname,
     )
-    if str(create_installer).lower() != "false":
-        if ".zip" in str(create_installer).lower():
-            builder.create_installer_7zip(".zip")
-        if ".7z" in str(create_installer).lower():
-            builder.create_installer_7zip(".7z")
-        if "7zip" in str(create_installer).lower():
-            builder.create_installer_7zip(".exe")
+    if ".zip" in str(create_installer).lower():
+        builder.create_installer_7zip(".zip")
+    if ".7z" in str(create_installer).lower():
+        builder.create_installer_7zip(".7z")
+    if "7zip" in str(create_installer).lower():
+        builder.create_installer_7zip(".exe")
 
 
 if __name__ == "__main__":
