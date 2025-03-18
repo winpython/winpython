@@ -7,7 +7,6 @@
 
 """
 WinPython build script
-Created on Sun Aug 12 11:17:50 2012
 """
 
 import os
@@ -277,7 +276,6 @@ Name | Version | Description
         if self.distribution is None:
             return "0.0.0" # Placeholder before initialization
         return utils.get_python_long_version(self.distribution.target)
-
 
     @property
     def python_executable_dir(self) -> str:
@@ -557,21 +555,11 @@ call "%~dp0env_for_icons.bat"
         self._print_action("Writing package index")
         # winpyver2 = the version without build part but with self.distribution.architecture
         self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
-        fname = str(
-            self.winpy_dir.parent
-            / (
-                f"WinPython{self.flavor}-"
-                + f"{self.distribution.architecture}bit-"
-                + f"{self.winpyver2}.md"
-            )
-        )
+        fname = str(self.winpy_dir.parent / f"WinPython{self.flavor}-{self.distribution.architecture}bit-{self.winpyver2}.md")
         open(fname, "w", encoding='utf-8').write(self.package_index_markdown)
-        # Copy to winpython/changelogs
 
-        shutil.copyfile(
-            fname,
-            str(Path(CHANGELOGS_DIR) / Path(fname).name),
-        )
+        # Copy to winpython/changelogs
+        shutil.copyfile(fname, str(Path(CHANGELOGS_DIR) / Path(fname).name))
 
         # Writing changelog
         self._print_action("Writing changelog")
@@ -705,8 +693,6 @@ def make_all(
             builder.create_installer_7zip(".7z")
         if "7zip" in str(create_installer).lower():
             builder.create_installer_7zip(".exe")
-
-    return builder
 
 
 if __name__ == "__main__":
