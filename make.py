@@ -309,11 +309,6 @@ Name | Version | Description
         ]
 
     @property
-    def post_path_entries(self) -> list[str]:
-        """Returns a list of PATH entries to append to the environment."""
-        return []
-
-    @property
     def tools_directories(self) -> list[Path]:
         """Returns the list of tools directories to include."""
         return self.tools_dirs
@@ -381,8 +376,7 @@ call "%~dp0env_for_icons.bat"
         """
         Creates a WinPython installer using 7-Zip.
 
-        Args:
-            installer_type: Type of installer to create (".exe", ".7z", ".zip").
+        Args: installer_type: Type of installer to create (".exe", ".7z", ".zip").
         """
         self._print_action(f"Creating WinPython installer ({installer_type})")
         template_name = "installer_7zip.bat"
@@ -408,7 +402,6 @@ call "%~dp0env_for_icons.bat"
             PORTABLE_DIR / output_name,
             replacements
         )
-        self._print_action_done()
 
 
     def _print_action(self, text: str):
@@ -418,11 +411,6 @@ call "%~dp0env_for_icons.bat"
         else:
             print(f"{text}... ", end="", flush=True)
 
-    def _print_action_done(self):
-        """Prints "OK" to indicate action completion."""
-        if not self.verbose:
-            print("OK")
-
     def _extract_python_archive(self):
         """Extracts the Python zip archive to create the base Python environment."""
         self._print_action("Extracting Python archive")
@@ -430,7 +418,6 @@ call "%~dp0env_for_icons.bat"
             str(self.python_zip_file),
             targetdir=str(self.winpy_dir), # Extract directly to winpy_dir
         )
-        self._print_action_done()
         # Relocate to /python subfolder if needed (for newer structure) #2024-12-22 to /python
         python_target_dir = self.winpy_dir / self.python_dir_name
         if self.python_dir_name != self.python_name and not python_target_dir.is_dir():
@@ -450,48 +437,35 @@ call "%~dp0env_for_icons.bat"
                 shutil.move(nodejs_current_dir, nodejs_target_dir)
             except Exception as e:
                 print(f"Error moving Node.js directory: {e}")
-        self._print_action_done()
 
     def _copy_documentation(self):
         """Copies documentation files to the WinPython 'docs' directory."""
         docs_target_dir = self.winpy_dir / "notebooks" / "docs"
         self._print_action(f"Copying documentation to {docs_target_dir}")
         _copy_items(self.docs_directories, docs_target_dir, self.verbose)
-        self._print_action_done()
-
+ 
     def _copy_launchers(self):
         """Copies pre-made launchers to the WinPython directory."""
         self._print_action("Creating launchers")
-        launchers_source_dir = PORTABLE_DIR / "launchers_final"
-        _copy_items([launchers_source_dir], self.winpy_dir, self.verbose)
-        self._print_action_done()
+        _copy_items([PORTABLE_DIR / "launchers_final"], self.winpy_dir, self.verbose)
 
     def _copy_default_scripts(self):
         """Copies launchers and defeult scripts."""
         self._print_action("copying pre-made scripts")
-        origin = PORTABLE_DIR / "scripts"
-        destination = self.winpy_dir / "scripts"
-        _copy_items([origin], destination, self.verbose)
-        self._print_action_done()
+        _copy_items([PORTABLE_DIR / "scripts"], self.winpy_dir / "scripts", self.verbose)
     
     def _create_initial_batch_scripts(self):
         """Creates initial batch scripts, including environment setup."""
         self._print_action("Creating initial batch scripts")
 
         path_entries_str = ";".join([rf"%WINPYDIR%\{pth}" for pth in self.pre_path_entries])
-        full_path_env_var = f"{path_entries_str};%PATH%;" + ";".join([rf"%WINPYDIR%\{pth}" for pth in self.post_path_entries])
+        full_path_env_var = f"{path_entries_str};%PATH%"
 
         path_entries_ps_str = ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.pre_path_entries])
-        full_path_ps_env_var = f"{path_entries_ps_str};$env:path;" + ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.post_path_entries])
+        full_path_ps_env_var = f"{path_entries_ps_str};$env:path"
 
         # Replacements for batch scripts (PyPy compatibility)
         exe_name = self.distribution.short_exe if self.distribution else "python.exe" # default to python.exe if distribution is not yet set
-        batch_replacements = [
-            (r"DIR%\\python.exe", rf"DIR%\\{exe_name}"),
-            (r"DIR%\\PYTHON.EXE", rf"DIR%\\{exe_name}"),
-        ]
-        if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
-            batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
 
         destination = self.winpy_dir / "scripts"
         for specials in ('env.bat', 'WinPython_PS_Prompt.ps1'):
@@ -501,7 +475,6 @@ call "%~dp0env_for_icons.bat"
             utils.patch_sourcefile(destspe,'{self.winpython_version_name}', self.winpython_version_name)
             utils.patch_sourcefile(destspe,'{full_path_env_var}', full_path_env_var)
             utils.patch_sourcefile(destspe,'{full_path_ps_env_var}', full_path_ps_env_var)
-        self._print_action_done()
 
 
     def _create_standard_batch_scripts(self):
@@ -509,14 +482,6 @@ call "%~dp0env_for_icons.bat"
         self._print_action("Creating standard batch scripts")
 
         exe_name = self.distribution.short_exe if self.distribution else "python.exe"
-        batch_replacements = [
-            (r"DIR%\\python.exe", rf"DIR%\\{exe_name}"),
-            (r"DIR%\\PYTHON.EXE", rf"DIR%\\{exe_name}"),
-        ]
-        if self.distribution and (Path(self.distribution.target) / r"lib-python\3\idlelib").is_dir():
-            batch_replacements.append((r"\Lib\idlelib", r"\lib-python\3\idlelib"))
-
-        self._print_action_done()
 
 
     def build(self, remove_existing: bool = True, requirements=None, winpy_dirname: str = None):
@@ -546,7 +511,6 @@ call "%~dp0env_for_icons.bat"
             (self.winpy_dir / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True) # Ensure settings dir exists
             self._extract_python_archive()
 
-        self._print_action_done()
         self.distribution = wppm.Distribution(
             self.python_executable_dir,
             verbose=self.verbose,
@@ -589,7 +553,6 @@ call "%~dp0env_for_icons.bat"
 
             self._print_action("Cleaning up distribution")
             self.distribution.clean_up()
-            self._print_action_done()
         # Writing package index
         self._print_action("Writing package index")
         # winpyver2 = the version without build part but with self.distribution.architecture
@@ -609,7 +572,6 @@ call "%~dp0env_for_icons.bat"
             fname,
             str(Path(CHANGELOGS_DIR) / Path(fname).name),
         )
-        self._print_action_done()
 
         # Writing changelog
         self._print_action("Writing changelog")
@@ -620,7 +582,6 @@ call "%~dp0env_for_icons.bat"
             release_level=self.release_level,
             architecture=self.distribution.architecture,
         )
-        self._print_action_done()
 
 
 def rebuild_winpython_package(source_dir: Path, target_dir: Path, architecture: int = 64, verbose: bool = False):
