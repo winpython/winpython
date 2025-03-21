@@ -387,10 +387,7 @@ call "%~dp0env_for_icons.bat"
             ("DISTDIR", str(self.winpy_dir)),
             ("ARCH", str(self.architecture_bits)),
             ("VERSION", f"{self.python_full_version}.{self.build_number}{self.flavor}"),
-            (
-                "VERSION_INSTALL",
-                f'{self.python_full_version.replace(".", "")}{self.build_number}',
-            ),
+            ("VERSION_INSTALL", f'{self.python_full_version.replace(".", "")}{self.build_number}'),
             ("RELEASELEVEL", self.release_level),
             ("INSTALLER_OPTION", installer_type), # Pass installer type as option to bat script
         ]
@@ -482,12 +479,12 @@ call "%~dp0env_for_icons.bat"
         exe_name = self.distribution.short_exe if self.distribution else "python.exe"
 
 
-    def build(self, remove_existing: bool = True, requirements=None, winpy_dirname: str = None):
+    def build(self, rebuild: bool = True, requirements=None, winpy_dirname: str = None):
         """Make WinPython distribution in target directory from the installers
         located in wheels_dir
 
-        remove_existing=True: (default) install all from scratch
-        remove_existing=False: for complementary purposes (create installers)
+        rebuild=True: (default) install all from scratch
+        rebuild=False: for complementary purposes (create installers)
         requirements=file(s) of requirements (separated by space if several)"""
         python_zip_filename = self.python_zip_file.name
         print(f"Building WinPython with Python archive: {python_zip_filename}")
@@ -497,13 +494,13 @@ call "%~dp0env_for_icons.bat"
         else:
             self.winpy_dir = self.target_dir / winpy_dirname # Create/re-create the WinPython base directory
         self._print_action(f"Creating WinPython {self.winpy_dir} base directory")
-        if self.winpy_dir.is_dir() and remove_existing:
+        if self.winpy_dir.is_dir() and rebuild:
             try:
                 shutil.rmtree(self.winpy_dir, onexc=utils.onerror)
             except TypeError: # before 3.12
                 shutil.rmtree(self.winpy_dir, onerror=utils.onerror)    
         os.makedirs(self.winpy_dir, exist_ok=True)    
-        if remove_existing:
+        if rebuild:
             # preventive re-Creation of settings directory
             # (necessary if user is starting an application with a batch)
             (self.winpy_dir / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True) # Ensure settings dir exists
@@ -515,7 +512,7 @@ call "%~dp0env_for_icons.bat"
             indent=True,
         )
 
-        if remove_existing:
+        if rebuild:
             self._copy_default_scripts()
             self._create_initial_batch_scripts()
             self._create_standard_batch_scripts()
@@ -538,7 +535,7 @@ call "%~dp0env_for_icons.bat"
 
             if requirements:
                 if not list(requirements) == requirements:
-                    requirements = requirements.split()
+                    requirements = requirements.split(",")
                 for req in requirements:
                     actions = ["install", "-r", req]
                     if self.install_options is not None:
@@ -586,12 +583,12 @@ def rebuild_winpython_package(source_dir: Path, target_dir: Path, architecture: 
 
 
 def _parse_list_argument(arg_value: str | list[str]) -> list[str]:
-    """Parses a string or list argument into a list of strings."""
+    """Parses a string or comma separated list argument into a list of strings."""
     if arg_value is None:
         return []
     if isinstance(arg_value, str):
-        return arg_value.split()
-    return list(arg_value) # Ensure it's a list if already a list-like object
+        return arg_value.split(",")
+    return list(arg_value) 
 
 
 def make_all(
@@ -601,7 +598,7 @@ def make_all(
     architecture: int,
     basedir: Path,
     verbose: bool = False,
-    remove_existing: bool = True,
+    rebuild: bool = True,
     create_installer: str = "True",
     install_options=["--no-index"],
     flavor: str = "",
@@ -682,7 +679,7 @@ def make_all(
         winpy_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{my_x}{build_number}{release_level}"
 
     builder.build(
-        remove_existing=remove_existing,
+        rebuild=rebuild,
         requirements=requirements_files_list,
         winpy_dirname=winpy_dirname,
     )

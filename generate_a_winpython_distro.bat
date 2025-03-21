@@ -2,7 +2,7 @@ rem  generate_a_winpython_distro.bat: to be launched from a winpython directory,
 @echo on
 
 REM Initialize variables
-if "%my_release_level%"=="" set my_release_level=b1
+if "%my_release_level%"=="" set my_release_level=b2
 if "%my_create_installer%"=="" set my_create_installer=True
 
 rem Set archive directory and log file
@@ -111,7 +111,7 @@ echo "(%date% %time%) Generate changelog and binaries">>%my_archive_log%
 set path=%my_original_path%
 cd /D %~dp0
 call %my_buildenv%\scripts\env.bat
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', remove_existing=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
 
 echo -------------------------------------- >>%my_archive_log%
 echo "(%date% %time%) END OF CREATION">>%my_archive_log%
