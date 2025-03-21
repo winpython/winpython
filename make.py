@@ -472,13 +472,6 @@ call "%~dp0env_for_icons.bat"
             utils.patch_sourcefile(destspe,'{full_path_ps_env_var}', full_path_ps_env_var)
 
 
-    def _create_standard_batch_scripts(self):
-        """Creates standard WinPython batch scripts for various actions."""
-        self._print_action("Creating standard batch scripts")
-
-        exe_name = self.distribution.short_exe if self.distribution else "python.exe"
-
-
     def build(self, rebuild: bool = True, requirements=None, winpy_dirname: str = None):
         """Make WinPython distribution in target directory from the installers
         located in wheels_dir
@@ -515,8 +508,9 @@ call "%~dp0env_for_icons.bat"
         if rebuild:
             self._copy_default_scripts()
             self._create_initial_batch_scripts()
-            self._create_standard_batch_scripts()
             self._copy_launchers()
+            self._copy_tools()
+            self._copy_documentation()
 
             utils.python_execmodule("ensurepip", self.distribution.target) # Ensure pip is installed for PyPy
             self.distribution.patch_standard_packages("pip")
@@ -529,9 +523,6 @@ call "%~dp0env_for_icons.bat"
                 self._print_action(f"Piping: {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(package_name)
-
-            self._copy_tools()
-            self._copy_documentation()
 
             if requirements:
                 if not list(requirements) == requirements:
@@ -574,20 +565,15 @@ def rebuild_winpython_package(source_dir: Path, target_dir: Path, architecture: 
     for filename in os.listdir(target_dir):
         if filename.startswith("winpython-") and filename.endswith((".exe", ".whl", ".gz")):
             os.remove(Path(target_dir) / filename)
-
-    utils.buildflit_wininst(
-        str(source_dir),
-        copy_to=str(target_dir),
-        verbose=verbose,
-    )
+    utils.buildflit_wininst(source_dir, copy_to=target_dir, verbose=verbose)
 
 
-def _parse_list_argument(arg_value: str | list[str]) -> list[str]:
-    """Parses a string or comma separated list argument into a list of strings."""
+def _parse_list_argument(arg_value: str | list[str], separator=" ") -> list[str]:
+    """Parse  a separated list argument into a list of strings."""
     if arg_value is None:
         return []
     if isinstance(arg_value, str):
-        return arg_value.split(",")
+        return arg_value.split(separator)
     return list(arg_value) 
 
 
@@ -626,39 +612,29 @@ def make_all(
 
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
-    utils.print_box(
-        f"Making WinPython {architecture}bits"
-        + f" at {Path(basedir) / ('bu' + flavor)}"
-    )
-
-    # Create Build director, where Winpython will be constructed
-    builddir = str(Path(basedir) / ("bu" + flavor))
-    os.makedirs(Path(builddir), exist_ok=True)    
-    # use source_dirs as the directory to re-build Winpython wheel
-    wheels_dir = source_dirs
-
-    # Rebuild WinPython package
-    winpython_source_dir = Path(__file__).resolve().parent
-    rebuild_winpython_package(
-        source_dir=winpython_source_dir,
-        target_dir=wheels_dir,
-        architecture=architecture,
-        verbose=verbose,
-    )
 
     # Parse list arguments
-    tools_dirs_list = _parse_list_argument(toolsdirs)
-    docs_dirs_list = _parse_list_argument(docsdirs)
-    install_options_list = _parse_list_argument(install_options)
-    find_links_dirs_list = _parse_list_argument(find_links)
-    requirements_files_list = [Path(f) for f in _parse_list_argument(requirements) if f] # ensure Path objects
+    tools_dirs_list = _parse_list_argument(toolsdirs, ",")
+    docs_dirs_list = _parse_list_argument(docsdirs, ",")
+    install_options_list = _parse_list_argument(install_options, " ")
+    find_links_dirs_list = _parse_list_argument(find_links, ",")
+    requirements_files_list = [Path(f) for f in _parse_list_argument(requirements, ",") if f] # ensure Path objects
+    find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
+    builddir = str(Path(basedir) / ("bu" + flavor))
 
-    find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [wheels_dir]]
+    if rebuild:
+        # Rebuild Winpython Wheel Package
+        utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
+        os.makedirs(Path(builddir), exist_ok=True)    
+        # use source_dirs as the directory to re-build Winpython wheel
+        winpython_source_dir = Path(__file__).resolve().parent
+        rebuild_winpython_package(winpython_source_dir, source_dirs, architecture, verbose)
+
     builder = WinPythonDistributionBuilder(
         build_number,
         release_level,
         builddir,
-        wheels_dir=wheels_dir,
+        wheels_dir=source_dirs,
         tools_dirs=[Path(d) for d in tools_dirs_list],
         docs_dirs=[Path(d) for d in docs_dirs_list],
         verbose=verbose,
@@ -666,9 +642,7 @@ def make_all(
         install_options=install_options_list + find_links_options,
         flavor=flavor,
     )
-    # define a pre-defined winpydir, instead of having to guess
-
-    # extract the python subversion to get WPy64-3671b1
+    # define the directory where to create the distro
     my_x = "".join(builder.python_name.replace(".amd64", "").split(".")[-2:-1])
     while not my_x.isdigit() and len(my_x) > 0:
         my_x = my_x[:-1]
