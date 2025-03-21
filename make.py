@@ -124,6 +124,16 @@ def _copy_items(source_dirs: list[Path], target_dir: Path, verbose: bool = False
             except Exception as e:
                 print(f"Error copying {source_item} to {target_item}: {e}")
 
+
+def _parse_list_argument(arg_value: str | list[str], separator=" ") -> list[str]:
+    """Parse  a separated list argument into a list of strings."""
+    if arg_value is None:
+        return []
+    if isinstance(arg_value, str):
+        return arg_value.split(separator)
+    return list(arg_value) 
+
+
 class WinPythonDistributionBuilder:
     "Builds a WinPython distribution."
 
@@ -342,33 +352,6 @@ Name | Version | Description
             f.write(final_contents)
         print(f"Created batch script: {script_path}")
 
-    def create_python_launcher_batch(
-        self,
-        name: str,
-        script_name: str,
-        working_dir: str = None,
-        options: str = None,
-        command: str = None,
-    ):
-        """
-        Creates a batch file to launch a Python script within the WinPython environment.
-
-        Args:
-            name: The name of the batch file.
-            script_name: The name of the Python script to execute.
-            working_dir: Optional working directory for the script.
-            options: Optional command-line options for the script.
-            command: Optional command to execute python, defaults to python.exe or pythonw.exe
-        """
-        options_str = f" {options}" if options else ""
-        if command is None:
-            command = '"%WINPYDIR%\\pythonw.exe"' if script_name.endswith(".pyw") else '"%WINPYDIR%\\python.exe"'
-        change_dir_cmd = f"cd /D {working_dir}\n" if working_dir else ""
-        script_name_str = f" {script_name}" if script_name else ""
-        batch_content = f"""@echo off
-call "%~dp0env_for_icons.bat"
-{change_dir_cmd}{command}{script_name_str}{options_str} %*"""
-        self.create_batch_script(name, batch_content)
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """
@@ -566,15 +549,6 @@ def rebuild_winpython_package(source_dir: Path, target_dir: Path, architecture: 
         if filename.startswith("winpython-") and filename.endswith((".exe", ".whl", ".gz")):
             os.remove(Path(target_dir) / filename)
     utils.buildflit_wininst(source_dir, copy_to=target_dir, verbose=verbose)
-
-
-def _parse_list_argument(arg_value: str | list[str], separator=" ") -> list[str]:
-    """Parse  a separated list argument into a list of strings."""
-    if arg_value is None:
-        return []
-    if isinstance(arg_value, str):
-        return arg_value.split(separator)
-    return list(arg_value) 
 
 
 def make_all(
