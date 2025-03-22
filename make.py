@@ -189,7 +189,7 @@ class WinPythonDistributionBuilder:
         self.flavor = flavor
         self.python_zip_file: Path = self._get_python_zip_file()
         self.python_name = self.python_zip_file.stem  # Filename without extension
-        self.python_dir_name = "python"  # Standardized Python directory name
+        self.python_directory_name = "python"  # Standardized Python directory name
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
@@ -241,8 +241,8 @@ Name | Version | Description
         """Generates Markdown for installed tools section in package index."""
         installed_tools = []
 
-        def get_tool_path(rel_path):
-            path = self.winpython_directory / rel_path if self.winpython_directory else None
+        def get_tool_path(relative_path):
+            path = self.winpython_directory / relative_path if self.winpython_directory else None
             return path if path and (path.is_file() or path.is_dir()) else None
 
         nodejs_path = get_tool_path(self.NODEJS_RELATIVE_PATH)
@@ -272,7 +272,7 @@ Name | Version | Description
     def _get_installed_packages_markdown(self) -> str:
         """Generates Markdown for installed packages section in package index."""
         if self.distribution is None:
-            return "" # Distribution not initialized yet.
+            return ""  # Distribution not initialized yet.
         self.installed_packages = self.distribution.get_installed_packages(update=True)
         package_lines = [
             f"[{pkg.name}]({pkg.url}) | {pkg.version} | {pkg.description}"
@@ -296,14 +296,14 @@ Name | Version | Description
         return utils.get_python_long_version(self.distribution.target)
 
     @property
-    def python_executable_dir(self) -> str:
+    def python_executable_directory(self) -> str:
         """Returns the directory containing the Python executable."""
-        python_path_dir = self.winpython_directory / self.python_dir_name if self.winpython_directory else None
-        if python_path_dir and python_path_dir.is_dir():
-            return str(python_path_dir)
+        python_path_directory = self.winpython_directory / self.python_directory_name if self.winpython_directory else None
+        if python_path_directory and python_path_directory.is_dir():
+            return str(python_path_directory)
         else:
-            python_path_exe = self.winpython_directory / self.python_name if self.winpython_directory else None # Fallback for older structure
-            return str(python_path_exe) if python_path_exe else ""
+            python_path_executable = self.winpython_directory / self.python_name if self.winpython_directory else None  # Fallback for older structure
+            return str(python_path_executable) if python_path_executable else ""
 
     @property
     def architecture_bits(self) -> int:
@@ -325,11 +325,11 @@ Name | Version | Description
         ]
 
     @property
-    def docs_directories(self) -> list[Path]:
+    def documentation_directories_list(self) -> list[Path]:
         """Returns the list of documentation directories to include."""
-        default_docs_dir = Path(__file__).resolve().parent / "docs"
-        if default_docs_dir.is_dir():
-            return [default_docs_dir] + self.documentation_directories
+        default_docs_directory = Path(__file__).resolve().parent / "docs"
+        if default_docs_directory.is_dir():
+            return [default_docs_directory] + self.documentation_directories
         return self.documentation_directories
 
     def create_batch_script(self, name: str, contents: str, replacements: list[tuple[str, str]] = None):
@@ -341,20 +341,19 @@ Name | Version | Description
             contents: The contents of the batch script.
             replacements: A list of tuples for text replacements in the content.
         """
-        script_dir = self.winpython_directory / "scripts" if self.winpython_directory else None
-        if not script_dir:
+        script_directory = self.winpython_directory / "scripts" if self.winpython_directory else None
+        if not script_directory:
             print("Warning: WinPython directory not set, cannot create batch script.")
             return
-        script_dir.mkdir(parents=True, exist_ok=True)
+        script_directory.mkdir(parents=True, exist_ok=True)
         final_contents = contents
         if replacements:
             for old_text, new_text in replacements:
                 final_contents = final_contents.replace(old_text, new_text)
-        script_path = script_dir / name
+        script_path = script_directory / name
         with open(script_path, "w") as f:
             f.write(final_contents)
         print(f"Created batch script: {script_path}")
-
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """
@@ -399,71 +398,61 @@ Name | Version | Description
             targetdir=str(self.winpython_directory),  # Extract directly to winpython_directory
         )
         # Relocate to /python subfolder if needed (for newer structure) #2024-12-22 to /python
-        python_target_dir = self.winpython_directory / self.python_dir_name
-        if self.python_dir_name != self.python_name and not python_target_dir.is_dir():
-            os.rename(self.winpython_directory / self.python_name, python_target_dir)
+        expected_python_directory = self.winpython_directory / self.python_directory_name
+        if self.python_directory_name != self.python_name and not expected_python_directory.is_dir():
+            os.rename(self.winpython_directory / self.python_name, expected_python_directory)
+ 
+    def _copy_essential_files(self):
+        """Copies pre-made objects"""
+        self._print_action("Copying default scripts")
+        _copy_items([PORTABLE_DIRECTORY / "scripts"], self.winpython_directory / "scripts", self.verbose)
 
-    def _copy_tools(self):
-        """Copies development tools to the WinPython 't' directory."""
-        tools_target_dir = self.winpython_directory / "t"
-        self._print_action(f"Copying tools to {tools_target_dir}")
-        _copy_items(self.tools_directories, tools_target_dir, self.verbose)
+        self._print_action("Copying launchers")
+        _copy_items([PORTABLE_DIRECTORY / "launchers_final"], self.winpython_directory, self.verbose)
+
+        docs_target_directory = self.winpython_directory / "notebooks" / "docs"
+        self._print_action(f"Copying documentation to {docs_target_directory}")
+        _copy_items(self.documentation_directories_list, docs_target_directory, self.verbose)
+
+        tools_target_directory = self.winpython_directory / "t"
+        self._print_action(f"Copying tools to {tools_target_directory}")
+        _copy_items(self.tools_directories, self.winpython_directory / "t", self.verbose)
 
         # Special handling for Node.js to move it up one level
-        nodejs_current_dir = tools_target_dir / "n"
-        nodejs_target_dir = self.winpython_directory / self.NODEJS_RELATIVE_PATH
-        if nodejs_current_dir != nodejs_target_dir and nodejs_current_dir.is_dir():
+        nodejs_current_directory = tools_target_directory / "n"
+        nodejs_target_directory = self.winpython_directory / self.NODEJS_RELATIVE_PATH
+        if nodejs_current_directory != nodejs_target_directory and nodejs_current_directory.is_dir():
             try:
-                shutil.move(nodejs_current_dir, nodejs_target_dir)
+                shutil.move(nodejs_current_directory, nodejs_target_directory)
             except Exception as e:
                 print(f"Error moving Node.js directory: {e}")
 
-    def _copy_documentation(self):
-        """Copies documentation files to the WinPython 'docs' directory."""
-        docs_target_dir = self.winpython_directory / "notebooks" / "docs"
-        self._print_action(f"Copying documentation to {docs_target_dir}")
-        _copy_items(self.docs_directories, docs_target_dir, self.verbose)
- 
-    def _copy_launchers(self):
-        """Copies pre-made launchers to the WinPython directory."""
-        self._print_action("Creating launchers")
-        _copy_items([PORTABLE_DIRECTORY / "launchers_final"], self.winpython_directory, self.verbose)
-
-    def _copy_default_scripts(self):
-        """Copies launchers and defeult scripts."""
-        self._print_action("copying pre-made scripts")
-        _copy_items([PORTABLE_DIRECTORY / "scripts"], self.winpython_directory / "scripts", self.verbose)
-    
     def _create_initial_batch_scripts(self):
         """Creates initial batch scripts, including environment setup."""
         self._print_action("Creating initial batch scripts")
 
-        path_entries_str = ";".join([rf"%WINPYDIR%\{pth}" for pth in self.pre_path_entries])
-        full_path_env_var = f"{path_entries_str};%PATH%"
+        path_entries_string = ";".join([rf"%WINPYDIR%\{path}" for path in self.pre_path_entries])
+        full_path_environment_variable = f"{path_entries_string};%PATH%"
 
-        path_entries_ps_str = ";".join([rf"$env:WINPYDIR\\{pth}" for pth in self.pre_path_entries])
-        full_path_ps_env_var = f"{path_entries_ps_str};$env:path"
+        path_entries_powershell_string = ";".join([rf"$env:WINPYDIR\\{path}" for path in self.pre_path_entries])
+        full_path_powershell_environment_variable = f"{path_entries_powershell_string};$env:path"
 
         # Replacements for batch scripts (PyPy compatibility)
-        exe_name = self.distribution.short_exe if self.distribution else "python.exe" # default to python.exe if distribution is not yet set
+        executable_name = self.distribution.short_exe if self.distribution else "python.exe"  # default to python.exe if distribution is not yet set
 
         destination = self.winpython_directory / "scripts"
-        for specials in ('env.bat', 'WinPython_PS_Prompt.ps1'):
-            destspe=str(destination / specials)
-            print('destspe:', destspe)
-            utils.patch_sourcefile(destspe,'{self.python_dir_name}', self.python_dir_name)
-            utils.patch_sourcefile(destspe,'{self.winpython_version_name}', self.winpython_version_name)
-            utils.patch_sourcefile(destspe,'{full_path_env_var}', full_path_env_var)
-            utils.patch_sourcefile(destspe,'{full_path_ps_env_var}', full_path_ps_env_var)
+        for script_name in ('env.bat', 'WinPython_PS_Prompt.ps1'):
+            destination_script_path = str(destination / script_name)
+            print('destination_script_path:', destination_script_path)
+            utils.patch_sourcefile(destination_script_path, 'python.exe', executable_name)
+            utils.patch_sourcefile(destination_script_path, '{self.python_dir_name}', self.python_directory_name)
+            utils.patch_sourcefile(destination_script_path, '{self.winpython_version_name}', self.winpython_version_name)
+            utils.patch_sourcefile(destination_script_path, '{full_path_env_var}', full_path_environment_variable)
+            utils.patch_sourcefile(destination_script_path,'{full_path_ps_env_var}', full_path_powershell_environment_variable)
 
-
-    def build(self, rebuild: bool = True, requirements=None, winpy_dirname: str = None):
-        """Make WinPython distribution in target directory from the installers
-        located in wheels_directory
-
-        rebuild=True: (default) install all from scratch
-        rebuild=False: for complementary purposes (create installers)
-        requirements=file(s) of requirements (separated by space if several)"""
+    def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
+        """Make or finalise WinPython distribution in the target directory"""
+        
         python_zip_filename = self.python_zip_file.name
         print(f"Building WinPython with Python archive: {python_zip_filename}")
 
@@ -471,31 +460,23 @@ Name | Version | Description
             raise RuntimeError("WinPython base directory to create is undefined")
         else:
             self.winpython_directory = self.target_directory / winpy_dirname  # Create/re-create the WinPython base directory
-        self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
-        if self.winpython_directory.is_dir() and rebuild:
-            try:
-                shutil.rmtree(self.winpython_directory, onexc=utils.onerror)
-            except TypeError:  # before 3.12
-                shutil.rmtree(self.winpython_directory, onerror=utils.onerror)
-        os.makedirs(self.winpython_directory, exist_ok=True)
         if rebuild:
+            self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
+            if self.winpython_directory.is_dir():
+                try:
+                    shutil.rmtree(self.winpython_directory, onexc=utils.onerror)
+                except TypeError:  # before 3.12
+                    shutil.rmtree(self.winpython_directory, onerror=utils.onerror)
+            os.makedirs(self.winpython_directory, exist_ok=True)
             # preventive re-Creation of settings directory
-            # (necessary if user is starting an application with a batch)
-            (self.winpython_directory / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True)  # Ensure settings dir exists
+            (self.winpython_directory / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True)
             self._extract_python_archive()
 
-        self.distribution = wppm.Distribution(
-            self.python_executable_dir,
-            verbose=self.verbose,
-            indent=True,
-        )
+        self.distribution = wppm.Distribution(self.python_executable_directory, verbose=self.verbose)
 
         if rebuild:
-            self._copy_default_scripts()
+            self._copy_essential_files()
             self._create_initial_batch_scripts()
-            self._copy_launchers()
-            self._copy_tools()
-            self._copy_documentation()
 
             utils.python_execmodule("ensurepip", self.distribution.target)  # Ensure pip is installed for PyPy
             self.distribution.patch_standard_packages("pip")
@@ -504,53 +485,40 @@ Name | Version | Description
             essential_packages = ["pip", "setuptools", "wheel", "winpython"]
             for package_name in essential_packages:
                 actions = ["install", "--upgrade", "--pre", package_name] + self.install_options
-                print(f"Piping: {' '.join(actions)}")
                 self._print_action(f"Piping: {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(package_name)
 
-            if requirements:
-                if not isinstance(requirements, list):
-                    requirements = requirements.split(",")
-                for req in requirements:
-                    actions = ["install", "-r", req]
-                    if self.install_options is not None:
-                        actions += self.install_options
-                    print(f"piping {' '.join(actions)}")
-                    self._print_action(f"piping {' '.join(actions)}")
-                    self.distribution.do_pip_action(actions)
-
+        if requirements_files_list:
+            for req in requirements_files_list:
+                actions = ["install", "-r", req]
+                if self.install_options is not None:
+                    actions += self.install_options
+                self._print_action(f"piping {' '.join(actions)}")
+                self.distribution.do_pip_action(actions)
             self.distribution.patch_standard_packages()
 
-            self._print_action("Cleaning up distribution")
-            self.distribution.clean_up()
+        self._print_action("Cleaning up distribution")
+        self.distribution.clean_up()  # still usefull ?
         # Writing package index
         self._print_action("Writing package index")
         # winpyver2 = the version without build part but with self.distribution.architecture
         self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
-        fname = str(self.winpython_directory.parent / f"WinPython{self.flavor}-{self.distribution.architecture}bit-{self.winpyver2}.md")
-        open(fname, "w", encoding='utf-8').write(self.package_index_markdown)
-
-        # Copy to winpython/changelogs
-        shutil.copyfile(fname, str(Path(CHANGELOGS_DIRECTORY) / Path(fname).name))
+        output_markdown_filename = str(self.winpython_directory.parent / f"WinPython{self.flavor}-{self.distribution.architecture}bit-{self.winpyver2}.md")
+        open(output_markdown_filename, "w", encoding='utf-8').write(self.package_index_markdown)
 
         # Writing changelog
         self._print_action("Writing changelog")
-        diff.write_changelog(
-            self.winpyver2,
-            basedir=self.base_directory,
-            flavor=self.flavor,
-            release_level=self.release_level,
-            architecture=self.distribution.architecture,
-        )
+        shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
+        diff.write_changelog(self.winpyver2, None, self.base_directory, self.flavor, self.release_level, self.distribution.architecture)
 
 
-def rebuild_winpython_package(source_dir: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
+def rebuild_winpython_package(source_directory: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
     """Rebuilds the winpython package from source using flit."""
     for filename in os.listdir(target_directory):
         if filename.startswith("winpython-") and filename.endswith((".exe", ".whl", ".gz")):
             os.remove(Path(target_directory) / filename)
-    utils.buildflit_wininst(source_dir, copy_to=target_directory, verbose=verbose)
+    utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=verbose)
 
 
 def make_all(
@@ -594,14 +562,14 @@ def make_all(
     docs_dirs_list = _parse_list_argument(docsdirs, ",")
     install_options_list = _parse_list_argument(install_options, " ")
     find_links_dirs_list = _parse_list_argument(find_links, ",")
-    requirements_files_list = [Path(f) for f in _parse_list_argument(requirements, ",") if f] # ensure Path objects
+    requirements_files_list = [Path(f) for f in _parse_list_argument(requirements, ",") if f]  # ensure Path objects
     find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
-    builddir = str(Path(basedir) / ("bu" + flavor))
+    build_directory = str(Path(basedir) / ("bu" + flavor))
 
     if rebuild:
         # Rebuild Winpython Wheel Package
         utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
-        os.makedirs(Path(builddir), exist_ok=True)    
+        os.makedirs(Path(build_directory), exist_ok=True)    
         # use source_dirs as the directory to re-build Winpython wheel
         winpython_source_dir = Path(__file__).resolve().parent
         rebuild_winpython_package(winpython_source_dir, source_dirs, architecture, verbose)
@@ -609,7 +577,7 @@ def make_all(
     builder = WinPythonDistributionBuilder(
         build_number,
         release_level,
-        builddir,
+        build_directory,
         wheels_directory=source_dirs,
         tools_directories=[Path(d) for d in tools_dirs_list],
         documentation_directories=[Path(d) for d in docs_dirs_list],
@@ -619,19 +587,19 @@ def make_all(
         flavor=flavor,
     )
     # define the directory where to create the distro
-    my_x = "".join(builder.python_name.replace(".amd64", "").split(".")[-2:-1])
-    while not my_x.isdigit() and len(my_x) > 0:
-        my_x = my_x[:-1]
+    python_minor_version_str = "".join(builder.python_name.replace(".amd64", "").split(".")[-2:-1])
+    while not python_minor_version_str.isdigit() and len(python_minor_version_str) > 0:
+        python_minor_version_str = python_minor_version_str[:-1]
     # simplify for PyPy
-    if not python_target_release == None:
-        winpy_dirname = f"WPy{architecture}-{python_target_release}{build_number}{release_level}"
+    if python_target_release is not None:
+        winpython_dirname = f"WPy{architecture}-{python_target_release}{build_number}{release_level}"
     else:
-        winpy_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{my_x}{build_number}{release_level}"
+        winpython_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{python_minor_version_str}{build_number}{release_level}"
 
     builder.build(
         rebuild=rebuild,
-        requirements=requirements_files_list,
-        winpy_dirname=winpy_dirname,
+        requirements_files_list=requirements_files_list,
+        winpy_dirname=winpython_dirname,
     )
     if ".zip" in str(create_installer).lower():
         builder.create_installer_7zip(".zip")

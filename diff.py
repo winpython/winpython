@@ -259,7 +259,6 @@ def write_changelog(
     version1=None,
     basedir=None,
     flavor="",
-    release_level="",
     architecture=64,
 ):
     """Write changelog between version1 and version2 of WinPython"""
