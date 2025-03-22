@@ -332,29 +332,6 @@ Name | Version | Description
             return [default_docs_directory] + self.documentation_directories
         return self.documentation_directories
 
-    def create_batch_script(self, name: str, contents: str, replacements: list[tuple[str, str]] = None):
-        """
-        Creates a batch script in the WinPython scripts directory.
-
-        Args:
-            name: The name of the batch script file.
-            contents: The contents of the batch script.
-            replacements: A list of tuples for text replacements in the content.
-        """
-        script_directory = self.winpython_directory / "scripts" if self.winpython_directory else None
-        if not script_directory:
-            print("Warning: WinPython directory not set, cannot create batch script.")
-            return
-        script_directory.mkdir(parents=True, exist_ok=True)
-        final_contents = contents
-        if replacements:
-            for old_text, new_text in replacements:
-                final_contents = final_contents.replace(old_text, new_text)
-        script_path = script_directory / name
-        with open(script_path, "w") as f:
-            f.write(final_contents)
-        print(f"Created batch script: {script_path}")
-
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """
         Creates a WinPython installer using 7-Zip.
@@ -510,7 +487,7 @@ Name | Version | Description
         # Writing changelog
         self._print_action("Writing changelog")
         shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
-        diff.write_changelog(self.winpyver2, None, self.base_directory, self.flavor, self.release_level, self.distribution.architecture)
+        diff.write_changelog(self.winpyver2, None, self.base_directory, self.flavor, self.distribution.architecture)
 
 
 def rebuild_winpython_package(source_directory: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
