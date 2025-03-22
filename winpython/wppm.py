@@ -49,11 +49,10 @@ class Package:
         
 
 class Distribution:
-    def __init__(self, target=None, verbose=False, indent=False):
+    def __init__(self, target=None, verbose=False):
         # if no target path given, take the current python interpreter one
         self.target = target or os.path.dirname(sys.executable)
         self.verbose = verbose
-        self.indent = indent
         self.pip = None
         self.to_be_removed = []  # list of directories to be removed later
         self.version, self.architecture = utils.get_python_infos(target)
@@ -376,9 +375,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         if self.verbose:
             utils.print_box(text)
         else:
-            if self.indent:
-                text = (" " * 4) + text
-            print(text + "...", end=" ")
+            print("    " + text + "...", end=" ")
 
     def _print_done(self):
         """Print OK at the end of a process"""
