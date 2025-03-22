@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+# WinPython build script
 # Copyright © 2012 Pierre Raybaut
 # Copyright © 2014-2024+  The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
-
-"""
-WinPython build script
-"""
 
 import os
 import re
@@ -66,7 +63,7 @@ def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
     for index, line in enumerate(lines):
         for prefix, new_text in replacements:
             start_prefix = prefix
-            if prefix not in ("Icon", "OutFile") and not prefix.startswith("!"):
+            if not prefix.startswith("!"):
                 start_prefix = "set " + prefix
             if line.startswith(start_prefix + "="):
                 updated_lines[index] = f"{start_prefix}={new_text}\n"
@@ -90,13 +87,12 @@ def build_installer_7zip(
         output_script_path: Path to save the generated 7-Zip script.
         replacements: A list of tuples for text replacements (prefix, new_text).
     """
-    sevenzip_executable = find_7zip_executable()
     shutil.copy(script_template_path, output_script_path)
 
     # Standard replacements for all 7zip scripts
     data_to_replace = [
         ("PORTABLE_DIR", str(PORTABLE_DIRECTORY)),
-        ("SEVENZIP_EXE", sevenzip_executable),
+        ("SEVENZIP_EXE", find_7zip_executable()),
     ] + replacements
 
     replace_lines_in_file(output_script_path, data_to_replace)
@@ -108,7 +104,7 @@ def build_installer_7zip(
         subprocess.run(
             command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr
             # with stdout=sys.stdout, we would not  see 7zip compressing
-        )  # Use subprocess.run for better error handling
+        )
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
@@ -516,19 +512,17 @@ def make_all(
     docsdirs: str | list[Path] = None,
     python_target_release: str = None, # e.g. "37101" for 3.7.10
 ):
-    """Make WinPython distribution, for a given base directory and
-    architecture:
+    """Make a WinPython distribution for a given set of parameters:
     `build_number`: build number [int]
     `release_level`: release level (e.g. 'beta1', '') [str]
     `pyver`: python version ('3.4' or 3.5')
     `architecture`: [int] (32 or 64)
-    `basedir`: where will be created tmp_wheel and Winpython build
-              r'D:\Winpython\basedir34'.
-    `requirements`: the package list for pip r'D:\requirements.txt',
-    `install_options`: pip options r'--no-index --pre --trusted-host=None',
-    `find_links`: package directories r'D:\Winpython\packages.srcreq',
-    `source_dirs`: the python.zip + rebuilt winpython wheel package directory,
-    `toolsdirs`: r'D:\WinPython\basedir34\t.Slim',
+    `basedir`: where to create the build (r'D:\Winpython\basedir34')
+    `requirements`: package lists for pip (r'D:\requirements.txt')
+    `install_options`: pip options (r'--no-index --pre --trusted-host=None')
+    `find_links`: package directories (r'D:\Winpython\packages.srcreq')
+    `source_dirs`: the python.zip + rebuilt winpython wheel package directory
+    `toolsdirs`: r'D:\WinPython\basedir34\t.Slim'
     `docsdirs`: r'D:\WinPython\basedir34\docs.Slim'"""
 
     assert basedir is not None, "The *basedir* directory must be specified"
@@ -587,9 +581,7 @@ def make_all(
 
 
 if __name__ == "__main__":
-    # DO create only one version at a time
-    # You may have to manually delete previous build\winpython-.. directory
-
+    # DO create only one Winpython distribution at a time
     make_all(
         build_number=1,
         release_level="build3",
