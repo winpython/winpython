@@ -30,7 +30,7 @@ def find_7zip_executable() -> str:
     possible_program_files = [
         Path(r"C:\Program Files"),
         Path(r"C:\Program Files (x86)"),
-        Path(sys.prefix).parent / "t" ,
+        Path(sys.prefix).parent / "t",
     ]
     for base_dir in possible_program_files:
         if (executable_path := base_dir / "7-Zip" / "7z.exe").is_file():
@@ -291,13 +291,6 @@ Name | Version | Description
             r".." + self.NODEJS_RELATIVE_PATH,
         ]
 
-    @property
-    def documentation_directories_list(self) -> list[Path]:
-        """Returns the list of documentation directories to include."""
-        if (default_docs_directory := Path(__file__).parent / "docs").is_dir():
-            return [default_docs_directory] + self.documentation_directories
-        return self.documentation_directories
-
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
@@ -347,7 +340,7 @@ Name | Version | Description
 
         docs_target_directory = self.winpython_directory / "notebooks" / "docs"
         self._print_action(f"Copying documentation to {docs_target_directory}")
-        _copy_items(self.documentation_directories_list, docs_target_directory, self.verbose)
+        _copy_items(self.documentation_directories, docs_target_directory, self.verbose)
 
         tools_target_directory = self.winpython_directory / "t"
         self._print_action(f"Copying tools to {tools_target_directory}")
