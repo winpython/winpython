@@ -127,19 +127,9 @@ class WinPythonDistributionBuilder:
 
     NODEJS_RELATIVE_PATH = r"\n"  # Relative path within WinPython dir
 
-    def __init__(
-        self,
-        build_number: int,
-        release_level: str,
-        target_directory: Path,
-        wheels_directory: Path,
-        tools_directories: list[Path] = None,
-        documentation_directories: list[Path] = None,
-        verbose: bool = False,
-        base_directory: Path = None,
-        install_options: list[str] = None,
-        flavor: str = "",
-    ):
+    def __init__(self, build_number: int, release_level: str, target_directory: Path, wheels_directory: Path,
+                 tools_directories: list[Path] = None, documentation_directories: list[Path] = None, verbose: bool = False,
+                 base_directory: Path = None, install_options: list[str] = None, flavor: str = ""):
         """
         Initializes the WinPythonDistributionBuilder.
 
@@ -269,7 +259,7 @@ Name | Version | Description
         if python_path_directory and python_path_directory.is_dir():
             return str(python_path_directory)
         else:
-            python_path_executable = self.winpython_directory / self.python_name if self.winpython_directory else None  # Fallback for older structure
+            python_path_executable = self.winpython_directory / self.python_name if self.winpython_directory else None
             return str(python_path_executable) if python_path_executable else ""
 
     @property
@@ -321,15 +311,12 @@ Name | Version | Description
     def _extract_python_archive(self):
         """Extracts the Python zip archive to create the base Python environment."""
         self._print_action("Extracting Python archive")
-        utils.extract_archive(
-            str(self.python_zip_file),
-            targetdir=str(self.winpython_directory),  # Extract directly to winpython_directory
-        )
+        utils.extract_archive(self.python_zip_file, self.winpython_directory)
         # Relocate to /python subfolder if needed (for newer structure) #2024-12-22 to /python
         expected_python_directory = self.winpython_directory / self.python_directory_name
         if self.python_directory_name != self.python_name and not expected_python_directory.is_dir():
             os.rename(self.winpython_directory / self.python_name, expected_python_directory)
- 
+
     def _copy_essential_files(self):
         """Copies pre-made objects"""
         self._print_action("Copying default scripts")
@@ -347,11 +334,9 @@ Name | Version | Description
         _copy_items(self.tools_directories, tools_target_directory, self.verbose)
 
         # Special handling for Node.js to move it up one level
-        nodejs_current_directory = tools_target_directory / "n"
-        nodejs_target_directory = self.winpython_directory / self.NODEJS_RELATIVE_PATH
-        if nodejs_current_directory != nodejs_target_directory and nodejs_current_directory.is_dir():
+        if (nodejs_current_directory := tools_target_directory / "n").is_dir():
             try:
-                shutil.move(nodejs_current_directory, nodejs_target_directory)
+                shutil.move(nodejs_current_directory, self.winpython_directory / self.NODEJS_RELATIVE_PATH)
             except Exception as e:
                 print(f"Error moving Node.js directory: {e}")
 
@@ -380,14 +365,13 @@ Name | Version | Description
 
     def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
         """Make or finalise WinPython distribution in the target directory"""
-        
-        python_zip_filename = self.python_zip_file.name
-        print(f"Building WinPython with Python archive: {python_zip_filename}")
+        print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
 
         if winpy_dirname is None:
             raise RuntimeError("WinPython base directory to create is undefined")
         else:
             self.winpython_directory = self.target_directory / winpy_dirname  # Create/re-create the WinPython base directory
+
         if rebuild:
             self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
             if self.winpython_directory.is_dir():
@@ -448,37 +432,32 @@ def rebuild_winpython_package(source_directory: Path, target_directory: Path, ar
     utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=verbose)
 
 
-def make_all(
-    build_number: int,
-    release_level: str,
-    pyver: str,
-    architecture: int,
-    basedir: Path,
-    verbose: bool = False,
-    rebuild: bool = True,
-    create_installer: str = "True",
-    install_options=["--no-index"],
-    flavor: str = "",
-    requirements: str | list[Path] = None,
-    find_links: str | list[Path] = None,
-    source_dirs: Path = None,
-    toolsdirs: str | list[Path] = None,
-    docsdirs: str | list[Path] = None,
-    python_target_release: str = None, # e.g. "37101" for 3.7.10
+def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
+             verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
+             flavor: str = "", requirements: str | list[Path] = None, find_links: str | list[Path] = None,
+             source_dirs: Path = None, toolsdirs: str | list[Path] = None, docsdirs: str | list[Path] = None,
+             python_target_release: str = None, # e.g. "37101" for 3.7.10
 ):
-    """Make a WinPython distribution for a given set of parameters:
-    `build_number`: build number [int]
-    `release_level`: release level (e.g. 'beta1', '') [str]
-    `pyver`: python version ('3.4' or 3.5')
-    `architecture`: [int] (32 or 64)
-    `basedir`: where to create the build (r'D:\Winpython\basedir34')
-    `requirements`: package lists for pip (r'D:\requirements.txt')
-    `install_options`: pip options (r'--no-index --pre --trusted-host=None')
-    `find_links`: package directories (r'D:\Winpython\packages.srcreq')
-    `source_dirs`: the python.zip + rebuilt winpython wheel package directory
-    `toolsdirs`: r'D:\WinPython\basedir34\t.Slim'
-    `docsdirs`: r'D:\WinPython\basedir34\docs.Slim'"""
-
+    """
+    Make a WinPython distribution for a given set of parameters:
+    Args:
+        build_number: build number [int]
+        release_level: release level (e.g. 'beta1', '') [str]
+        pyver: python version ('3.4' or 3.5')
+        architecture: [int] (32 or 64)
+        basedir: where to create the build (r'D:\Winpython\basedir34')
+        verbose: Enable verbose output (bool).
+        rebuild: Whether to rebuild the distribution (bool).
+        create_installer: Type of installer to create (str).
+        install_options: pip options (r'--no-index --pre --trusted-host=None')
+        flavor: WinPython flavor (str).
+        requirements: package lists for pip (r'D:\requirements.txt')
+        find_links: package directories (r'D:\Winpython\packages.srcreq')
+        source_dirs: the python.zip + rebuilt winpython wheel package directory
+        toolsdirs: Directory with development tools r'D:\WinPython\basedir34\t.Slim'
+        docsdirs: Directory with documentation r'D:\WinPython\basedir34\docs.Slim'
+        python_target_release: Target Python release (str).
+    """
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
 
@@ -492,7 +471,6 @@ def make_all(
     build_directory = str(Path(basedir) / ("bu" + flavor))
 
     if rebuild:
-        # Rebuild Winpython Wheel Package
         utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
         os.makedirs(Path(build_directory), exist_ok=True)    
         # use source_dirs as the directory to re-build Winpython wheel
@@ -500,16 +478,12 @@ def make_all(
         rebuild_winpython_package(winpython_source_dir, source_dirs, architecture, verbose)
 
     builder = WinPythonDistributionBuilder(
-        build_number,
-        release_level,
-        build_directory,
-        wheels_directory=source_dirs,
+        build_number, release_level, build_directory, wheels_directory=source_dirs,
         tools_directories=[Path(d) for d in tools_dirs_list],
         documentation_directories=[Path(d) for d in docs_dirs_list],
-        verbose=verbose,
-        base_directory=basedir,
+        verbose=verbose, base_directory=basedir,
         install_options=install_options_list + find_links_options,
-        flavor=flavor,
+        flavor=flavor
     )
     # define the directory where to create the distro
     python_minor_version_str = "".join(builder.python_name.replace(".amd64", "").split(".")[-2:-1])
