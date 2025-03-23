@@ -31,13 +31,12 @@ def find_7zip_executable() -> str:
     possible_program_files = [
         Path(r"C:\Program Files"),
         Path(r"C:\Program Files (x86)"),
-        Path(sys.prefix).parent.parent / "7-Zip",
+        Path(sys.prefix).parent / "t" ,
     ]
     for base_dir in possible_program_files:
-        for subdir in [".", "App"]:
-            executable_path = base_dir / subdir / "7-Zip" / "7z.exe"
-            if executable_path.is_file():
-                return str(executable_path)
+        executable_path = base_dir / "7-Zip" / "7z.exe"
+        if executable_path.is_file():
+            return str(executable_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
 
 
@@ -58,13 +57,11 @@ def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
         print(f"Error: File not found: {filepath}")
         return
 
-    updated_lines = list(lines)  # Create a mutable copy
+    updated_lines = lines.copy()  # Create a mutable copy of lines
 
     for index, line in enumerate(lines):
         for prefix, new_text in replacements:
-            start_prefix = prefix
-            if not prefix.startswith("!"):
-                start_prefix = "set " + prefix
+            start_prefix = "set " + prefix if not prefix.startswith("!") else prefix
             if line.startswith(start_prefix + "="):
                 updated_lines[index] = f"{start_prefix}={new_text}\n"
 
@@ -75,10 +72,7 @@ def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
     except Exception as e:
         print(f"Error writing to file {filepath}: {e}")
 
-
-def build_installer_7zip(
-    script_template_path: Path, output_script_path: Path, replacements: list[tuple[str, str]]
-):
+def build_installer_7zip(script_template_path: Path, output_script_path: Path, replacements: list[tuple[str, str]]):
     """
     Creates a 7-Zip installer script by copying a template and applying text replacements.
 
@@ -98,13 +92,10 @@ def build_installer_7zip(
     replace_lines_in_file(output_script_path, data_to_replace)
 
     try:
-        # Execute the generated 7-Zip script
+        # Execute the generated 7-Zip script, with stdout=sys.stderr to see 7zip compressing
         command = f'"{output_script_path}"'
         print(f"Executing 7-Zip script: {command}")
-        subprocess.run(
-            command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr
-            # with stdout=sys.stdout, we would not  see 7zip compressing
-        )
+        subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
@@ -124,7 +115,7 @@ def _copy_items(source_directories: list[Path], target_directory: Path, verbose:
             try:
                 copy_function(source_item, target_item)
                 if verbose:
-                    print(f"  Copied: {source_item} -> {target_item}")
+                    print(f"Copied: {source_item} -> {target_item}")
             except Exception as e:
                 print(f"Error copying {source_item} to {target_item}: {e}")
 
@@ -189,24 +180,15 @@ class WinPythonDistributionBuilder:
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
-        patterns = [
-            r"(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip",  # PyPy pattern
-            r"python-([0-9\.rcba]*)((\.|\-)amd64)?\.(zip|zip)",  # Standard Python pattern
-        ]
-        for pattern in patterns:
-            for filename in os.listdir(self.wheels_directory):
-                if re.match(pattern, filename):
+        pattern = r"(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip"
+        for filename in os.listdir(self.wheels_directory):
+            if re.match(pattern, filename):
                     return self.wheels_directory / filename
         raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
 
     @property
     def package_index_markdown(self) -> str:
-        """
-        Generates a Markdown formatted package index page.
-
-        Returns:
-            str: Markdown content for the package index.
-        """
+        """Generates a Markdown formatted package index page."""
         installed_tools_markdown = self._get_installed_tools_markdown()
         installed_packages_markdown = self._get_installed_packages_markdown()
         python_description = "Python programming language with standard library"
@@ -421,7 +403,7 @@ Name | Version | Description
             utils.patch_sourcefile(destination_script_path, '{self.python_dir_name}', self.python_directory_name)
             utils.patch_sourcefile(destination_script_path, '{self.winpython_version_name}', self.winpython_version_name)
             utils.patch_sourcefile(destination_script_path, '{full_path_env_var}', full_path_environment_variable)
-            utils.patch_sourcefile(destination_script_path,'{full_path_ps_env_var}', full_path_powershell_environment_variable)
+            utils.patch_sourcefile(destination_script_path, '{full_path_ps_env_var}', full_path_powershell_environment_variable)
 
     def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
         """Make or finalise WinPython distribution in the target directory"""
@@ -450,8 +432,7 @@ Name | Version | Description
         if rebuild:
             self._copy_essential_files()
             self._create_initial_batch_scripts()
-
-            utils.python_execmodule("ensurepip", self.distribution.target)  # Ensure pip is installed for PyPy
+            utils.python_execmodule("ensurepip", self.distribution.target)
             self.distribution.patch_standard_packages("pip")
 
             # Upgrade essential packages
@@ -567,18 +548,14 @@ def make_all(
     else:
         winpython_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{python_minor_version_str}{build_number}{release_level}"
 
-    builder.build(
-        rebuild=rebuild,
-        requirements_files_list=requirements_files_list,
-        winpy_dirname=winpython_dirname,
-    )
+    builder.build(rebuild=rebuild, requirements_files_list=requirements_files_list, winpy_dirname=winpython_dirname)
+
     if ".zip" in str(create_installer).lower():
         builder.create_installer_7zip(".zip")
     if ".7z" in str(create_installer).lower():
         builder.create_installer_7zip(".7z")
     if "7zip" in str(create_installer).lower():
         builder.create_installer_7zip(".exe")
-
 
 if __name__ == "__main__":
     # DO create only one Winpython distribution at a time
