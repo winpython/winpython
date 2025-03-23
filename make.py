@@ -25,7 +25,6 @@ PORTABLE_DIRECTORY = Path(__file__).parent / "portable"
 assert CHANGELOGS_DIRECTORY.is_dir(), f"Changelogs directory not found: {CHANGELOGS_DIRECTORY}"
 assert PORTABLE_DIRECTORY.is_dir(), f"Portable directory not found: {PORTABLE_DIRECTORY}"
 
-
 def find_7zip_executable() -> str:
     """Locates the 7-Zip executable (7z.exe)."""
     possible_program_files = [
@@ -37,7 +36,6 @@ def find_7zip_executable() -> str:
         if (executable_path := base_dir / "7-Zip" / "7z.exe").is_file():
             return str(executable_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
-
 
 def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
     """
@@ -98,10 +96,8 @@ def build_installer_7zip(script_template_path: Path, output_script_path: Path, r
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
-
 def _copy_items(source_directories: list[Path], target_directory: Path, verbose: bool = False):
     """Copies items from source directories to the target directory."""
-
     target_directory.mkdir(parents=True, exist_ok=True)
     for source_dir in source_directories:
         if not source_dir.is_dir():
@@ -118,7 +114,6 @@ def _copy_items(source_directories: list[Path], target_directory: Path, verbose:
             except Exception as e:
                 print(f"Error copying {source_item} to {target_item}: {e}")
 
-
 def _parse_list_argument(argument_value: str | list[str], separator=" ") -> list[str]:
     """Parse a separated list argument into a list of strings."""
     if argument_value is None:
@@ -126,7 +121,6 @@ def _parse_list_argument(argument_value: str | list[str], separator=" ") -> list
     if isinstance(argument_value, str):
         return argument_value.split(separator)
     return list(argument_value)
-
 
 class WinPythonDistributionBuilder:
     """Builds a WinPython distribution."""
@@ -163,19 +157,19 @@ class WinPythonDistributionBuilder:
         """
         self.build_number = build_number
         self.release_level = release_level
-        self.target_directory = Path(target_directory)  # Ensure Path object
-        self.wheels_directory = Path(wheels_directory)  # Ensure Path object
+        self.target_directory = Path(target_directory)
+        self.wheels_directory = Path(wheels_directory)
         self.tools_directories = tools_directories or []
         self.documentation_directories = documentation_directories or []
         self.verbose = verbose
-        self.winpython_directory: Path | None = None  # Will be set during build
-        self.distribution: wppm.Distribution | None = None  # Will be set during build
+        self.winpython_directory: Path | None = None
+        self.distribution: wppm.Distribution | None = None
         self.base_directory = base_directory
         self.install_options = install_options or []
         self.flavor = flavor
         self.python_zip_file: Path = self._get_python_zip_file()
-        self.python_name = self.python_zip_file.stem  # Filename without extension
-        self.python_directory_name = "python"  # Standardized Python directory name
+        self.python_name = self.python_zip_file.stem
+        self.python_directory_name = "python"
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
@@ -263,10 +257,7 @@ Name | Version | Description
 
     @property
     def python_full_version(self) -> str:
-        """
-        Retrieves the Python full version string from the distribution.
-        Will be set after _extract_python is called and distribution is initialized.
-        """
+        """Retrieves the Python full version string from the distribution."""
         if self.distribution is None:
             return "0.0.0"  # Placeholder before initialization
         return utils.get_python_long_version(self.distribution.target)
@@ -286,7 +277,7 @@ Name | Version | Description
         """Returns the architecture (32 or 64 bits) of the distribution."""
         if self.distribution:
             return self.distribution.architecture
-        return 64  # Default to 64 if distribution is not initialized yet
+        return 64
 
     @property
     def pre_path_entries(self) -> list[str]:
@@ -308,14 +299,10 @@ Name | Version | Description
         return self.documentation_directories
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
-        """
-        Creates a WinPython installer using 7-Zip.
-
-        Args: installer_type: Type of installer to create (".exe", ".7z", ".zip").
-        """
+        """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
         template_name = "installer_7zip.bat"
-        output_name = "installer_7zip-tmp.bat"  # temp file to avoid overwriting template
+        output_name = "installer_7zip-tmp.bat"
         if installer_type not in [".exe", ".7z", ".zip"]:
             print(f"Warning: Unsupported installer type '{installer_type}'. Defaulting to .exe")
             installer_type = ".exe"
@@ -326,14 +313,10 @@ Name | Version | Description
             ("VERSION", f"{self.python_full_version}.{self.build_number}{self.flavor}"),
             ("VERSION_INSTALL", f'{self.python_full_version.replace(".", "")}{self.build_number}'),
             ("RELEASELEVEL", self.release_level),
-            ("INSTALLER_OPTION", installer_type),  # Pass installer type as option to bat script
+            ("INSTALLER_OPTION", installer_type),
         ]
 
-        build_installer_7zip(
-            PORTABLE_DIRECTORY / template_name,
-            PORTABLE_DIRECTORY / output_name,
-            replacements
-        )
+        build_installer_7zip(PORTABLE_DIRECTORY / template_name, PORTABLE_DIRECTORY / output_name, replacements)
 
     def _print_action(self, text: str):
         """Prints an action message with progress indicator."""
