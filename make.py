@@ -2,7 +2,7 @@
 #
 # WinPython build script
 # Copyright © 2012 Pierre Raybaut
-# Copyright © 2014-2024+  The Winpython development team https://github.com/winpython/
+# Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
 
@@ -12,9 +12,8 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-
 from winpython import wppm, utils
-# Local imports
+# Local import
 import diff
 
 # Define constant paths for clarity
@@ -27,33 +26,23 @@ assert PORTABLE_DIRECTORY.is_dir(), f"Portable directory not found: {PORTABLE_DI
 
 def find_7zip_executable() -> str:
     """Locates the 7-Zip executable (7z.exe)."""
-    possible_program_files = [
-        Path(r"C:\Program Files"),
-        Path(r"C:\Program Files (x86)"),
-        Path(sys.prefix).parent / "t",
-    ]
+    possible_program_files = [r"C:\Program Files", r"C:\Program Files (x86)", Path(sys.prefix).parent / "t"]
     for base_dir in possible_program_files:
-        if (executable_path := base_dir / "7-Zip" / "7z.exe").is_file():
+        if (executable_path := Path(base_dir) / "7-Zip" / "7z.exe").is_file():
             return str(executable_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
 
 def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
     """
     Replaces lines in a file that start with a given prefix.
-
     Args:
         filepath: Path to the file to modify.
         replacements: A list of tuples, where each tuple contains:
             - The prefix of the line to replace (str).
             - The new text for the line (str).
     """
-    try:
-        with open(filepath, "r") as f:
-            lines = f.readlines()
-    except FileNotFoundError:
-        print(f"Error: File not found: {filepath}")
-        return
-
+    with open(filepath, "r") as f:
+        lines = f.readlines()
     updated_lines = lines.copy()  # Create a mutable copy of lines
 
     for index, line in enumerate(lines):
@@ -62,12 +51,9 @@ def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
             if line.startswith(start_prefix + "="):
                 updated_lines[index] = f"{start_prefix}={new_text}\n"
 
-    try:
-        with open(filepath, "w") as f:
+    with open(filepath, "w") as f:
             f.writelines(updated_lines)
-        print(f"Updated 7-zip script: {filepath}")
-    except Exception as e:
-        print(f"Error writing to file {filepath}: {e}")
+    print(f"Updated 7-zip script: {filepath}")
 
 def build_installer_7zip(script_template_path: Path, output_script_path: Path, replacements: list[tuple[str, str]]):
     """
@@ -96,7 +82,7 @@ def build_installer_7zip(script_template_path: Path, output_script_path: Path, r
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
-def _copy_items(source_directories: list[Path], target_directory: Path, verbose: bool = False):
+def copy_items(source_directories: list[Path], target_directory: Path, verbose: bool = False):
     """Copies items from source directories to the target directory."""
     target_directory.mkdir(parents=True, exist_ok=True)
     for source_dir in source_directories:
@@ -114,7 +100,7 @@ def _copy_items(source_directories: list[Path], target_directory: Path, verbose:
             except Exception as e:
                 print(f"Error copying {source_item} to {target_item}: {e}")
 
-def _parse_list_argument(argument_value: str | list[str], separator=" ") -> list[str]:
+def parse_list_argument(argument_value: str | list[str], separator=" ") -> list[str]:
     """Parse a separated list argument into a list of strings."""
     if argument_value is None:
         return []
@@ -125,7 +111,7 @@ def _parse_list_argument(argument_value: str | list[str], separator=" ") -> list
 class WinPythonDistributionBuilder:
     """Builds a WinPython distribution."""
 
-    NODEJS_RELATIVE_PATH = r"\n"  # Relative path within WinPython dir
+    NODEJS_RELATIVE_PATH = "n"  # Relative path within WinPython dir
 
     def __init__(self, build_number: int, release_level: str, target_directory: Path, wheels_directory: Path,
                  tools_directories: list[Path] = None, documentation_directories: list[Path] = None, verbose: bool = False,
@@ -205,20 +191,16 @@ Name | Version | Description
             path = self.winpython_directory / relative_path if self.winpython_directory else None
             return path if path and (path.is_file() or path.is_dir()) else None
 
-        nodejs_path = get_tool_path(self.NODEJS_RELATIVE_PATH)
-        if nodejs_path:
-            node_version = utils.get_nodejs_version(str(nodejs_path))
-            installed_tools.append(("Nodejs", node_version))
-            npm_version = utils.get_npmjs_version(str(nodejs_path))
-            installed_tools.append(("npmjs", npm_version))
-
-        pandoc_executable = get_tool_path(r"\t\pandoc.exe")
-        if pandoc_executable:
+        if  nodejs_path := get_tool_path(self.NODEJS_RELATIVE_PATH):
+            node_version = utils.get_nodejs_version(nodejs_path)
+            npm_version = utils.get_npmjs_version(nodejs_path)
+            installed_tools += [("Nodejs", node_version), ("npmjs", npm_version)]
+        
+        if pandoc_executable := get_tool_path("t/pandoc.exe"):
             pandoc_version = utils.get_pandoc_version(str(pandoc_executable.parent))
             installed_tools.append(("Pandoc", pandoc_version))
-
-        vscode_executable = get_tool_path(r"\t\VSCode\Code.exe")
-        if vscode_executable:
+        
+        if vscode_executable := get_tool_path("t/VSCode/Code.exe"):
             vscode_version = utils.getFileProperties(str(vscode_executable))["FileVersion"]
             installed_tools.append(("VSCode", vscode_version))
 
@@ -278,7 +260,7 @@ Name | Version | Description
             "DLLs",
             "Scripts",
             r"..\t",
-            r".." + self.NODEJS_RELATIVE_PATH,
+            "..\\" + self.NODEJS_RELATIVE_PATH,
         ]
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
@@ -320,23 +302,23 @@ Name | Version | Description
     def _copy_essential_files(self):
         """Copies pre-made objects"""
         self._print_action("Copying default scripts")
-        _copy_items([PORTABLE_DIRECTORY / "scripts"], self.winpython_directory / "scripts", self.verbose)
+        copy_items([PORTABLE_DIRECTORY / "scripts"], self.winpython_directory / "scripts", self.verbose)
 
         self._print_action("Copying launchers")
-        _copy_items([PORTABLE_DIRECTORY / "launchers_final"], self.winpython_directory, self.verbose)
+        copy_items([PORTABLE_DIRECTORY / "launchers_final"], self.winpython_directory, self.verbose)
 
         docs_target_directory = self.winpython_directory / "notebooks" / "docs"
         self._print_action(f"Copying documentation to {docs_target_directory}")
-        _copy_items(self.documentation_directories, docs_target_directory, self.verbose)
+        copy_items(self.documentation_directories, docs_target_directory, self.verbose)
 
         tools_target_directory = self.winpython_directory / "t"
         self._print_action(f"Copying tools to {tools_target_directory}")
-        _copy_items(self.tools_directories, tools_target_directory, self.verbose)
+        copy_items(self.tools_directories, tools_target_directory, self.verbose)
 
-        # Special handling for Node.js to move it up one level
         if (nodejs_current_directory := tools_target_directory / "n").is_dir():
+            self._print_action(f"moving tools from {nodejs_current_directory} to {tools_target_directory.parent / self.NODEJS_RELATIVE_PATH} ")
             try:
-                shutil.move(nodejs_current_directory, self.winpython_directory / self.NODEJS_RELATIVE_PATH)
+                shutil.move(nodejs_current_directory, tools_target_directory.parent / self.NODEJS_RELATIVE_PATH)
             except Exception as e:
                 print(f"Error moving Node.js directory: {e}")
 
@@ -366,7 +348,6 @@ Name | Version | Description
     def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
         """Make or finalise WinPython distribution in the target directory"""
         print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
-
         if winpy_dirname is None:
             raise RuntimeError("WinPython base directory to create is undefined")
         else:
@@ -392,7 +373,6 @@ Name | Version | Description
             utils.python_execmodule("ensurepip", self.distribution.target)
             self.distribution.patch_standard_packages("pip")
 
-            # Upgrade essential packages
             essential_packages = ["pip", "setuptools", "wheel", "winpython"]
             for package_name in essential_packages:
                 actions = ["install", "--upgrade", "--pre", package_name] + self.install_options
@@ -405,24 +385,21 @@ Name | Version | Description
                 actions = ["install", "-r", req]
                 if self.install_options is not None:
                     actions += self.install_options
-                self._print_action(f"piping {' '.join(actions)}")
+                self._print_action(f"Piping: {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
             self.distribution.patch_standard_packages()
 
         self._print_action("Cleaning up distribution")
         self.distribution.clean_up()  # still usefull ?
-        # Writing package index
         self._print_action("Writing package index")
-        # winpyver2 = the version without build part but with self.distribution.architecture
         self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
         output_markdown_filename = str(self.winpython_directory.parent / f"WinPython{self.flavor}-{self.distribution.architecture}bit-{self.winpyver2}.md")
-        open(output_markdown_filename, "w", encoding='utf-8').write(self.package_index_markdown)
+        with open(output_markdown_filename, "w", encoding='utf-8') as f:
+            f.write(self.package_index_markdown)
 
-        # Writing changelog
         self._print_action("Writing changelog")
         shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
         diff.write_changelog(self.winpyver2, None, self.base_directory, self.flavor, self.distribution.architecture)
-
 
 def rebuild_winpython_package(source_directory: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
     """Rebuilds the winpython package from source using flit."""
@@ -430,7 +407,6 @@ def rebuild_winpython_package(source_directory: Path, target_directory: Path, ar
         if filename.startswith("winpython-") and filename.endswith((".exe", ".whl", ".gz")):
             os.remove(Path(target_directory) / filename)
     utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=verbose)
-
 
 def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
@@ -461,18 +437,17 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
 
-    # Parse list arguments
-    tools_dirs_list = _parse_list_argument(toolsdirs, ",")
-    docs_dirs_list = _parse_list_argument(docsdirs, ",")
-    install_options_list = _parse_list_argument(install_options, " ")
-    find_links_dirs_list = _parse_list_argument(find_links, ",")
-    requirements_files_list = [Path(f) for f in _parse_list_argument(requirements, ",") if f]  # ensure Path objects
+    tools_dirs_list = parse_list_argument(toolsdirs, ",")
+    docs_dirs_list = parse_list_argument(docsdirs, ",")
+    install_options_list = parse_list_argument(install_options, " ")
+    find_links_dirs_list = parse_list_argument(find_links, ",")
+    requirements_files_list = [Path(f) for f in parse_list_argument(requirements, ",") if f]
     find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
     build_directory = str(Path(basedir) / ("bu" + flavor))
 
     if rebuild:
         utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
-        os.makedirs(Path(build_directory), exist_ok=True)    
+        os.makedirs(Path(build_directory), exist_ok=True)
         # use source_dirs as the directory to re-build Winpython wheel
         winpython_source_dir = Path(__file__).resolve().parent
         rebuild_winpython_package(winpython_source_dir, source_dirs, architecture, verbose)
