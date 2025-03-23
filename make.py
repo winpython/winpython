@@ -89,9 +89,8 @@ def copy_items(source_directories: list[Path], target_directory: Path, verbose: 
         if not source_dir.is_dir():
             print(f"Warning: Source directory not found: {source_dir}")
             continue
-        for item_name in os.listdir(source_dir):
-            source_item = source_dir / item_name
-            target_item = target_directory / item_name
+        for source_item in source_dir.iterdir():
+            target_item = target_directory / source_item.name
             copy_function = shutil.copytree if source_item.is_dir() else shutil.copy2
             try:
                 copy_function(source_item, target_item)
@@ -149,9 +148,9 @@ class WinPythonDistributionBuilder:
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
-        for filename in os.listdir(self.wheels_directory):
-            if re.match("(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip", filename):
-                    return self.wheels_directory / filename
+        for source_item in self.wheels_directory.iterdir():    
+            if re.match("(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip", source_item.name):
+                    return source_item
         raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
 
     @property
