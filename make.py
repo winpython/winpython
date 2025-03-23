@@ -34,8 +34,7 @@ def find_7zip_executable() -> str:
         Path(sys.prefix).parent / "t" ,
     ]
     for base_dir in possible_program_files:
-        executable_path = base_dir / "7-Zip" / "7z.exe"
-        if executable_path.is_file():
+        if (executable_path := base_dir / "7-Zip" / "7z.exe").is_file():
             return str(executable_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
 
@@ -180,9 +179,8 @@ class WinPythonDistributionBuilder:
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
-        pattern = r"(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip"
         for filename in os.listdir(self.wheels_directory):
-            if re.match(pattern, filename):
+            if re.match("(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip", filename):
                     return self.wheels_directory / filename
         raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
 
@@ -305,8 +303,7 @@ Name | Version | Description
     @property
     def documentation_directories_list(self) -> list[Path]:
         """Returns the list of documentation directories to include."""
-        default_docs_directory = Path(__file__).resolve().parent / "docs"
-        if default_docs_directory.is_dir():
+        if (default_docs_directory := Path(__file__).parent / "docs").is_dir():
             return [default_docs_directory] + self.documentation_directories
         return self.documentation_directories
 
@@ -371,7 +368,7 @@ Name | Version | Description
 
         tools_target_directory = self.winpython_directory / "t"
         self._print_action(f"Copying tools to {tools_target_directory}")
-        _copy_items(self.tools_directories, self.winpython_directory / "t", self.verbose)
+        _copy_items(self.tools_directories, tools_target_directory, self.verbose)
 
         # Special handling for Node.js to move it up one level
         nodejs_current_directory = tools_target_directory / "n"
