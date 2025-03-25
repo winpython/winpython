@@ -47,9 +47,9 @@ def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
 
     for index, line in enumerate(lines):
         for prefix, new_text in replacements:
-            start_prefix = "set " + prefix if not prefix.startswith("!") else prefix
-            if line.startswith(start_prefix + "="):
-                updated_lines[index] = f"{start_prefix}={new_text}\n"
+            start_prefix = f"set {prefix}=" if not prefix.startswith("!") else prefix
+            if line.startswith(start_prefix):
+                updated_lines[index] = f"{start_prefix}{new_text}\n"
 
     with open(filepath, "w") as f:
             f.writelines(updated_lines)
@@ -148,9 +148,9 @@ class WinPythonDistributionBuilder:
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
-        for source_item in self.wheels_directory.iterdir():    
+        for source_item in self.wheels_directory.iterdir():
             if re.match("(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip", source_item.name):
-                    return source_item
+                return source_item
         raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
 
     @property
@@ -190,15 +190,15 @@ Name | Version | Description
             path = self.winpython_directory / relative_path if self.winpython_directory else None
             return path if path and (path.is_file() or path.is_dir()) else None
 
-        if  nodejs_path := get_tool_path(self.NODEJS_RELATIVE_PATH):
+        if nodejs_path := get_tool_path(self.NODEJS_RELATIVE_PATH):
             node_version = utils.get_nodejs_version(nodejs_path)
             npm_version = utils.get_npmjs_version(nodejs_path)
             installed_tools += [("Nodejs", node_version), ("npmjs", npm_version)]
-        
+
         if pandoc_executable := get_tool_path("t/pandoc.exe"):
             pandoc_version = utils.get_pandoc_version(str(pandoc_executable.parent))
             installed_tools.append(("Pandoc", pandoc_version))
-        
+
         if vscode_executable := get_tool_path("t/VSCode/Code.exe"):
             vscode_version = utils.getFileProperties(str(vscode_executable))["FileVersion"]
             installed_tools.append(("VSCode", vscode_version))
@@ -239,9 +239,8 @@ Name | Version | Description
         python_path_directory = self.winpython_directory / self.python_directory_name if self.winpython_directory else None
         if python_path_directory and python_path_directory.is_dir():
             return str(python_path_directory)
-        else:
-            python_path_executable = self.winpython_directory / self.python_name if self.winpython_directory else None
-            return str(python_path_executable) if python_path_executable else ""
+        python_path_executable = self.winpython_directory / self.python_name if self.winpython_directory else None
+        return str(python_path_executable) if python_path_executable else ""
 
     @property
     def architecture_bits(self) -> int:
@@ -259,7 +258,7 @@ Name | Version | Description
             "DLLs",
             "Scripts",
             r"..\t",
-            "..\\" + self.NODEJS_RELATIVE_PATH,
+            rf"..\{self.NODEJS_RELATIVE_PATH}",
         ]
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
@@ -349,8 +348,7 @@ Name | Version | Description
         print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
         if winpy_dirname is None:
             raise RuntimeError("WinPython base directory to create is undefined")
-        else:
-            self.winpython_directory = self.target_directory / winpy_dirname  # Create/re-create the WinPython base directory
+        self.winpython_directory = self.target_directory / winpy_dirname
 
         if rebuild:
             self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
