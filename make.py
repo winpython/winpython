@@ -249,18 +249,6 @@ Name | Version | Description
             return self.distribution.architecture
         return 64
 
-    @property
-    def pre_path_entries(self) -> list[str]:
-        """Returns a list of PATH entries to prepend to the environment."""
-        return [
-            r"Lib\site-packages\PyQt5",
-            "",  # Python root directory
-            "DLLs",
-            "Scripts",
-            r"..\t",
-            rf"..\{self.NODEJS_RELATIVE_PATH}",
-        ]
-
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
@@ -324,24 +312,12 @@ Name | Version | Description
         """Creates initial batch scripts, including environment setup."""
         self._print_action("Creating initial batch scripts")
 
-        path_entries_string = ";".join([rf"%WINPYDIR%\{path}" for path in self.pre_path_entries])
-        full_path_environment_variable = f"{path_entries_string};%PATH%"
-
-        path_entries_powershell_string = ";".join([rf"$env:WINPYDIR\\{path}" for path in self.pre_path_entries])
-        full_path_powershell_environment_variable = f"{path_entries_powershell_string};$env:path"
-
         # Replacements for batch scripts (PyPy compatibility)
         executable_name = self.distribution.short_exe if self.distribution else "python.exe"  # default to python.exe if distribution is not yet set
 
-        destination = self.winpython_directory / "scripts"
-        for script_name in ('env.bat', 'WinPython_PS_Prompt.ps1'):
-            destination_script_path = str(destination / script_name)
-            print('destination_script_path:', destination_script_path)
-            utils.patch_sourcefile(destination_script_path, 'python.exe', executable_name)
-            utils.patch_sourcefile(destination_script_path, '{self.python_dir_name}', self.python_directory_name)
-            utils.patch_sourcefile(destination_script_path, '{self.winpython_version_name}', self.winpython_version_name)
-            utils.patch_sourcefile(destination_script_path, '{full_path_env_var}', full_path_environment_variable)
-            utils.patch_sourcefile(destination_script_path, '{full_path_ps_env_var}', full_path_powershell_environment_variable)
+        init_variables = [('WINPYthon_exe', executable_name), ('WINPYthon_subdirectory_name', self.python_directory_name), ('WINPYVER', self.winpython_version_name)]
+        with open(self.winpython_directory / "scripts" / "env.ini", "w") as f:
+            f.writelines([f'{a}={b}\n' for a , b in init_variables])
 
     def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
         """Make or finalise WinPython distribution in the target directory"""
