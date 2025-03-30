@@ -1,4 +1,11 @@
 @echo off
+
+rem default if init fails
+set WINPYthon_subdirectory_name=python
+set WINPYthon_exe=python.exe
+rem read init variables
+FOR /F "usebackq tokens=1,2 delims==" %%G IN ("%~dp0env.ini") DO (set %%G=%%H) 
+
 set WINPYDIRBASE=%~dp0..
 
 rem get a normalized path
@@ -9,11 +16,11 @@ if "%WINPYDIRBASE:~-1%"=="\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
 set WINPYDIRBASETMP=
 popd
 
-set WINPYDIR=%WINPYDIRBASE%\{self.python_dir_name}
+set WINPYDIR=%WINPYDIRBASE%\%WINpython_subdirectory_name%
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%\python.exe
-set PYTHON=%WINPYDIR%\python.exe
+set PYTHON=%WINPYDIR%\%WINpython_exe%
 set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
-set WINPYVER={self.winpython_version_name}
+set WINPYVER=%WINPYVER%
 
 rem 2023-02-12 utf-8 on console to avoid pip crash
 rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
@@ -32,7 +39,7 @@ rem Remove all double quotes
 set PATH_CLEANED=%PATH:"=%
 echo ";%PATH_CLEANED%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
 if %ERRORLEVEL% NEQ 0 (
-   set "PATH={full_path_env_var}"
+   set "PATH=%WINPYDIR%\Lib\site-packages\PyQt5;%WINPYDIR%\;%WINPYDIR%\DLLs;%WINPYDIR%\Scripts;%WINPYDIR%\..\t;%WINPYDIR%\..\n;%PATH%"
    cd .
 )
 set PATH_CLEANED=
