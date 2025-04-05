@@ -359,7 +359,6 @@ def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
 
 def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
     """Changes shebang line in '.py' file to relative or absolue path"""
-    """Changes shebang line in '.py' file to relative or absolue path"""
     import fileinput
     import re
     import sys
@@ -417,63 +416,6 @@ def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
                 )
             with io.open(fname, 'wt', encoding=the_encoding) as fh:
                 fh.write(new_content)
-
-
-def patch_sourcelines(
-    fname,
-    in_line_start,
-    out_line,
-    endline="\n",
-    silent_mode=False,
-):
-    """Replace the middle of lines between in_line_start and endline"""
-    import io
-
-    if Path(fname).is_file():
-        the_encoding = guess_encoding(fname)[0]
-        with io.open(fname, "r", encoding=the_encoding) as fh:
-            contents = fh.readlines()
-            content = "".join(contents)
-            for l in range(len(contents)):
-                if contents[l].startswith(in_line_start):
-                    begining, middle = (
-                        in_line_start,
-                        contents[l][len(in_line_start) :],
-                    )
-                    ending = ""
-                    if middle.find(endline) > 0:
-                        ending = endline + endline.join(middle.split(endline)[1:])
-                        middle = middle.split(endline)[0]
-                    middle = out_line
-                    new_line = begining + middle + ending
-                    if not new_line == contents[l]:
-                        if not silent_mode:
-                            print(
-                                "patching ",
-                                fname,
-                                " from\n",
-                                contents[l],
-                                "\nto\n",
-                                new_line,
-                            )
-                    contents[l] = new_line
-            new_content = "".join(contents)
-        if not new_content == content:
-            # if not silent_mode:
-            #    print("patching ", fname, "from", content, "to", new_content)
-
-            with io.open(fname, "wt", encoding=the_encoding) as fh:
-                try:
-                    fh.write(new_content)
-                except:
-                    print(
-                        "impossible to patch",
-                        fname,
-                        "from",
-                        content,
-                        "to",
-                        new_content,
-                    )
 
 
 def _create_temp_dir():
