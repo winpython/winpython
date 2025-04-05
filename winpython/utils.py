@@ -394,29 +394,31 @@ def guess_encoding(csv_file):
         except:
             return [locale.getdefaultlocale()[1], "utf-8"]
             
+def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedest: Path = None, verbose=False):
+    """
+    Replaces strings in a file
+    Args:
+        filepath: Path to the file to modify.
+        replacements: A list of tuples of ('old string 'new string')
+        filedest: optional output file, otherwise will be filepath
+    """
+    the_encoding = guess_encoding(filepath)[0]
+    with open(filepath, "r", encoding=the_encoding) as f:
+        content = f.read()
+        new_content = content
+    for old_text, new_text in replacements:
+            new_content = new_content.replace(old_text, new_text)
+    outfile = filedest if filedest else filepath
+    if new_content != content or str(outfile) != str(filepath):
+        with open(outfile, "w", encoding=the_encoding) as f:
+            f.write(new_content)
+        if verbose:
+            print(f"patched {filepath} into {outfile} !")
 
 def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
     """Replace a string in a source file"""
-    import io
-
     if Path(fname).is_file() and not in_text == out_text:
-        the_encoding = guess_encoding(fname)[0]
-        with io.open(fname, 'r', encoding=the_encoding) as fh:
-            content = fh.read()
-        new_content = content.replace(in_text, out_text)
-        if not new_content == content:
-            if not silent_mode:
-                print(
-                    "patching ",
-                    fname,
-                    "from",
-                    in_text,
-                    "to",
-                    out_text,
-                )
-            with io.open(fname, 'wt', encoding=the_encoding) as fh:
-                fh.write(new_content)
-
+        replace_in_file(Path(fname), [(in_text , out_text)], verbose=True)
 
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
@@ -480,8 +482,7 @@ def buildflit_wininst(
     copy_to=None,
     verbose=False,
 ):
-    """Build Wheel from Python package located in *root*
-    with flit"""
+    """Build Wheel from Python package located in *root*with flit"""
     if python_exe is None:
         python_exe = sys.executable
     assert Path(python_exe).is_file()
@@ -531,16 +532,7 @@ def buildflit_wininst(
         dst_fname = str(Path(copy_to) / distname)
         shutil.move(src_fname, dst_fname)
         if verbose:
-            print(
-                (
-                    f"Move: {src_fname} --> {dst_fname}"
-                )
-            )
-            # remove tempo dir 'root' no more needed
-            #try:
-            #    shutil.rmtree(root, onexc=onerror)
-            #except TypeError: # before 3.12
-            #    shutil.rmtree(root, onerror=onerror)
+            print(f"Move: {src_fname} --> {dst_fname}")
         return dst_fname
 
 
