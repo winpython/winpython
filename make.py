@@ -267,7 +267,7 @@ Name | Version | Description
             ("INSTALLER_OPTION", installer_type),
         ]
 
-        build_installer_7zip(PORTABLE_DIRECTORY / template_name, PORTABLE_DIRECTORY / output_name, replacements)
+        build_installer_7zip(PORTABLE_DIRECTORY / template_name, self.target_directory  / output_name, replacements)
 
     def _print_action(self, text: str):
         """Prints an action message with progress indicator."""
