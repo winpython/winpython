@@ -32,29 +32,6 @@ def find_7zip_executable() -> str:
             return str(executable_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
 
-def replace_lines_in_file(filepath: Path, replacements: list[tuple[str, str]]):
-    """
-    Replaces lines in a file that start with a given prefix.
-    Args:
-        filepath: Path to the file to modify.
-        replacements: A list of tuples, where each tuple contains:
-            - The prefix of the line to replace (str).
-            - The new text for the line (str).
-    """
-    with open(filepath, "r") as f:
-        lines = f.readlines()
-    updated_lines = lines.copy()  # Create a mutable copy of lines
-
-    for index, line in enumerate(lines):
-        for prefix, new_text in replacements:
-            start_prefix = f"set {prefix}=" if not prefix.startswith("!") else prefix
-            if line.startswith(start_prefix):
-                updated_lines[index] = f"{start_prefix}{new_text}\n"
-
-    with open(filepath, "w") as f:
-            f.writelines(updated_lines)
-    print(f"Updated 7-zip script: {filepath}")
-
 def build_installer_7zip(script_template_path: Path, output_script_path: Path, replacements: list[tuple[str, str]]):
     """
     Creates a 7-Zip installer script by copying a template and applying text replacements.
@@ -64,15 +41,13 @@ def build_installer_7zip(script_template_path: Path, output_script_path: Path, r
         output_script_path: Path to save the generated 7-Zip script.
         replacements: A list of tuples for text replacements (prefix, new_text).
     """
-    shutil.copy(script_template_path, output_script_path)
-
     # Standard replacements for all 7zip scripts
     data_to_replace = [
-        ("PORTABLE_DIR", str(PORTABLE_DIRECTORY)),
-        ("SEVENZIP_EXE", find_7zip_executable()),
-    ] + replacements
-
-    replace_lines_in_file(output_script_path, data_to_replace)
+        ("PORTABLE_DIR=", f"PORTABLE_DIR={PORTABLE_DIRECTORY}& rem "),
+        ("SEVENZIP_EXE=", f"SEVENZIP_EXE={find_7zip_executable()}& rem "),
+    ] + [(f"{a}=", f"{a}={b}& rem ") for a, b in replacements]
+    
+    utils.replace_in_file(script_template_path, data_to_replace, output_script_path)
 
     try:
         # Execute the generated 7-Zip script, with stdout=sys.stderr to see 7zip compressing
