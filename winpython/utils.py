@@ -413,12 +413,14 @@ def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedes
         with open(outfile, "w", encoding=the_encoding) as f:
             f.write(new_content)
         if verbose:
-            print(f"patched {filepath} into {outfile} !")
+            print(f"patched from {Path(filepath).name} into {outfile} !")
 
 def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
     """Replace a string in a source file"""
+    if not silent_mode:
+                print(f"patching {fname} from {in_text} to {out_text}")
     if Path(fname).is_file() and not in_text == out_text:
-        replace_in_file(Path(fname), [(in_text , out_text)], verbose=True)
+        replace_in_file(Path(fname), [(in_text , out_text)])
 
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
@@ -429,26 +431,18 @@ def _create_temp_dir():
     )
     return tmpdir
 
-
 def extract_archive(fname, targetdir=None, verbose=False):
     """Extract .zip, .exe (considered to be a zip archive) or .tar.gz archive
     to a temporary directory (if targetdir is None).
     Return the temporary directory path"""
-    if targetdir is None:
-        targetdir = _create_temp_dir()
-    else:
-        try:
-            Path(targetdir).mkdir(parents=True, exist_ok=True)
-        except:
-            pass
+    targetdir = targetdir or create_temp_dir()
+    Path(targetdir).mkdir(parents=True, exist_ok=True)
     if Path(fname).suffix in ('.zip', '.exe'):
         obj = zipfile.ZipFile(fname, mode="r")
     elif fname.endswith('.tar.gz'):
         obj = tarfile.open(fname, mode='r:gz')
     else:
-        raise RuntimeError(
-            f"Unsupported archive filename {fname}"
-        )
+        raise RuntimeError(f"Unsupported archive filename {fname}")
     obj.extractall(path=targetdir)
     return targetdir
 
@@ -468,13 +462,11 @@ WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]
 
 
 def get_source_package_infos(fname):
-    """Return a tuple (name, version) of the Python source package"""
-    if fname[-4:] == '.whl':
+    """Return a tuple (name, version) of the Python source package."""
+    if fname.endswith('.whl'):
         return Path(fname).name.split("-")[:2]
     match = re.match(SOURCE_PATTERN, Path(fname).name)
-    if match is not None:
-        return match.groups()[:2]
-
+    return match.groups()[:2] if match else None
 
 def buildflit_wininst(
     root,
@@ -522,9 +514,8 @@ def buildflit_wininst(
         if match is not None:
             break
     else:
-        raise RuntimeError(
-            f"Build failed: not a pure Python package? {distdir}"
-        )
+        raise RuntimeError(f"Build failed: not a pure Python package? {distdir}")
+    
     src_fname = str(Path(distdir) / distname)
     if copy_to is None:
         return src_fname
@@ -583,16 +574,9 @@ def direct_pip_install(
         return src_fname
 
 
-def do_script(
-    this_script,
-    python_exe=None,
-    copy_to=None,
-    verbose=False,
-    install_options=None,
-):
-    """Execute a script (get-pip typically)"""
-    if python_exe is None:
-        python_exe = sys.executable
+def do_script(this_script, python_exe=None, copy_to=None, verbose=False, install_options=None):
+    """Execute a script (get-pip typically)."""
+    python_exe = python_exe or sys.executable
     myroot = os.path.dirname(python_exe)
 
     # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
@@ -618,49 +602,36 @@ def do_script(
         p.stdout.close()
         p.stderr.close()
     if verbose:
-        print("Executed " , cmd)
+        print("Executed ", cmd)
     return 'ok'
 
 def columns_width(list_of_lists):
-        """return the maximum string length of each column of a list of list"""
-        if not isinstance(list_of_lists, list):
-            return [0]
- 
-        # Transpose the list of lists using zip
-        transposed_lists = list(zip(*list_of_lists))
-        # Calculate the maximum width for each column
-        column_widths = [max(len(str(item)) for item in sublist) for sublist in transposed_lists]
-        return column_widths
+    """Return the maximum string length of each column of a list of lists."""
+    if not isinstance(list_of_lists, list):
+        return [0]
+    return [max(len(str(item)) for item in sublist) for sublist in zip(*list_of_lists)] 
 
 def formatted_list(list_of_list, full=False, max_width=70):
-        """format a list_of_list to fix length columns"""
-        columns_size = columns_width(list_of_list)
-        nb_columns = len(columns_size)
-
-        # normalize each columns to columns_size[col] width, in the limit of max_width
-        
-        zz = [
-            list(
-                line[col].ljust(columns_size[col])[:max_width] for col in range(nb_columns)
-            )
-            for line in list_of_list
-        ]
-        return zz
+    """Format a list_of_list to fixed length columns."""
+    columns_size = columns_width(list_of_list)
+    columns = range(len(columns_size))
+    return [list(line[col].ljust(columns_size[col])[:max_width] for col in columns) for line in list_of_list]
 
 def normalize(this):
-    """apply https://peps.python.org/pep-0503/#normalized-names"""
+    """Apply PEP 503 normalization to the string."""
     return re.sub(r"[-_.]+", "-", this).lower()
 
 def get_package_metadata(database, name):
-    """Extract infos (description, url) from the local database"""
-    DATA_PATH = str(Path(sys.modules['winpython'].__file__).parent /'data')
+    """Extract infos (description, url) from the local database."""
+    DATA_PATH = str(Path(sys.modules['winpython'].__file__).parent / 'data')
     db = cp.ConfigParser()
     filepath = Path(database) if Path(database).is_absolute() else Path(DATA_PATH) / database
-    db.read_file(open(str(filepath), encoding = guess_encoding(filepath)[0]))
-    my_metadata = dict(
-        description="",
-        url="https://pypi.org/project/" + name,
-    )
+    db.read_file(open(str(filepath), encoding=guess_encoding(filepath)[0]))
+    
+    my_metadata = {
+        "description": "",
+        "url": f"https://pypi.org/project/{name}",
+    }
     for key in my_metadata:
         # wheel replace '-' per '_' in key
         for name2 in (name, normalize(name)):
@@ -672,23 +643,11 @@ def get_package_metadata(database, name):
 
     return my_metadata
 
-
 if __name__ == '__main__':
-
     print_box("Test")
     dname = sys.prefix
     print((dname + ':', '\n', get_python_infos(dname)))
-    # dname = r'E:\winpython\sandbox\python-2.7.3'
-    # print dname+':', '\n', get_python_infos(dname)
 
     tmpdir = r'D:\Tests\winpython_tests'
-    Path(tmpdir).mkdir(parents=True, exist_ok=True)    
-    print(
-        (
-            extract_archive(
-                str(Path(r'D:\WinP\bd37') / 'packages.win-amd64' /
-                    'python-3.7.3.amd64.zip'),        
-                tmpdir,
-            )    
-        )
-    )
+    Path(tmpdir).mkdir(parents=True, exist_ok=True)
+    print(extract_archive(str(Path(r'D:\WinP\bd37') / 'packages.win-amd64' / 'python-3.7.3.amd64.zip'), tmpdir))
