@@ -132,6 +132,7 @@ def create_winpython_start_menu_folder(current=True):
 def create_shortcut(path, description, filename, arguments="", workdir="", iconpath="", iconindex=0, verbose=True):
     """Create Windows shortcut (.lnk file)."""
     import pythoncom
+    from win32com.shell import shel
     ilink = pythoncom.CoCreateInstance(shell.CLSID_ShellLink, None, pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
     ilink.SetPath(path)
     ilink.SetDescription(description)
@@ -243,7 +244,6 @@ def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
 def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
     """Changes shebang line in '.py' file to relative or absolue path"""
     import fileinput
-
     if to_movable:
         exec_path = r'#!.\python.exe'
         if 'pypy3' in sys.executable:  # PyPy !
@@ -251,17 +251,14 @@ def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
     else:
         exec_path = '#!' + sys.executable
     for line in fileinput.input(fname, inplace=True):
-        if re.match(r'^#\!.*python\.exe$', line) is not None:
+        if re.match(r'^#\!.*python\.exe$', line) or re.match(r'^#\!.*pypy3\.exe$', line):
             print(exec_path)
-        elif re.match(r'^#\!.*pypy3\.exe$', line) is not None:# PyPy !
-            print(exec_path)          
         else:
             print(line, end='')
 
 def guess_encoding(csv_file):
     """guess the encoding of the given file"""
     # UTF_8_BOM = "\xEF\xBB\xBF"
-    # Python behavior on UTF-16 not great on write, so we drop it
     with io.open(csv_file, "rb") as f:
         data = f.read(5)
     if data.startswith(b"\xEF\xBB\xBF"):  # UTF-8 with a "BOM" (normally no BOM in utf-8)
@@ -273,7 +270,7 @@ def guess_encoding(csv_file):
                 return ["utf-8"]
         except:
             return [locale.getdefaultlocale()[1], "utf-8"]
-            
+
 def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedest: Path = None, verbose=False):
     """
     Replaces strings in a file
@@ -285,7 +282,7 @@ def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedes
     the_encoding = guess_encoding(filepath)[0]
     with open(filepath, "r", encoding=the_encoding) as f:
         content = f.read()
-        new_content = content
+    new_content = content
     for old_text, new_text in replacements:
         new_content = new_content.replace(old_text, new_text)
     outfile = filedest if filedest else filepath
@@ -305,15 +302,11 @@ def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
     tmpdir = tempfile.mkdtemp(prefix='wppm_')
-    atexit.register(
-        lambda path: shutil.rmtree(path, onexc=onerror),
-        tmpdir,
-    )
+    atexit.register(lambda path: shutil.rmtree(path, onexc=onerror), tmpdir)
     return tmpdir
 
 def extract_archive(fname, targetdir=None, verbose=False):
-    """Extract .zip, .exe (considered to be a zip archive) or .tar.gz archive
-    to a temporary directory (if targetdir is None).
+    """Extract .zip, .exe or .tar.gz archive to a temporary directory.
     Return the temporary directory path"""
     targetdir = targetdir or create_temp_dir()
     Path(targetdir).mkdir(parents=True, exist_ok=True)
@@ -336,24 +329,19 @@ def get_source_package_infos(fname):
 def buildflit_wininst(root, python_exe=None, copy_to=None, verbose=False):
     """Build Wheel from Python package located in *root* with flit."""
     python_exe = python_exe or sys.executable
-    assert Path(python_exe).is_file()
     cmd = [python_exe, '-m' ,'flit', 'build']
-
-    # root = a tmp dir in windows\tmp,
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
-        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p.communicate()
-        p.stdout.close()
-        p.stderr.close()
+        process = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.communicate()
+        process.stdout.close()
+        process.stderr.close()
     distdir = str(Path(root) / 'dist')
     if not Path(distdir).is_dir():
         raise RuntimeError(
-            "Build failed: see package README file for further"
-            " details regarding installation requirements.\n\n"
-            "For more concrete debugging infos, please try to build "
-            "the package from the command line:\n"
+            "Build failed: see package README file for further details regarding installation requirements.\n\n"
+            "For more concrete debugging infos, please try to build the package from the command line:\n"
             "1. Open a WinPython command prompt\n"
             "2. Change working directory to the appropriate folder\n"
             "3. Type `python -m filt build`"
@@ -366,75 +354,48 @@ def buildflit_wininst(root, python_exe=None, copy_to=None, verbose=False):
         raise RuntimeError(f"Build failed: not a pure Python package? {distdir}")
     
     src_fname = str(Path(distdir) / distname)
-    if copy_to is None:
-        return src_fname
-    else:
+    if copy_to:
         dst_fname = str(Path(copy_to) / distname)
         shutil.move(src_fname, dst_fname)
         if verbose:
             print(f"Move: {src_fname} --> {dst_fname}")
         return dst_fname
+    return src_fname
 
 def direct_pip_install(fname, python_exe=None, verbose=False, install_options=None):
     """Direct install via python -m pip !"""
-    copy_to = str(Path(fname).parent)
-
-    if python_exe is None:
-        python_exe = sys.executable
-    assert Path(python_exe).is_file()
+    python_exe = python_exe or sys.executable
     myroot = str(Path(python_exe).parent)
 
-    cmd = [python_exe, "-m", "pip", "install"]
-    if install_options:
-        cmd += install_options  # typically ['--no-deps']
-        print("python -m pip install_options", install_options)
-    cmd += [fname]
-
-    if verbose:
-        subprocess.call(cmd, cwd=myroot)
-    else:
-        p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        the_log = f"{stdout}" + f"\n {stderr}"
-
+    cmd = [python_exe, "-m", "pip", "install"] + (install_options or []) +[fname]
+    if not verbose:
+        process = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        the_log = f"{stdout}\n {stderr}"
         if " not find " in the_log or " not found " in the_log:
-            print(f"Failed to Install: \n {fname} \n")
-            print(f"msg: {the_log}")
+            print(f"Failed to Install: \n {fname} \n msg: {the_log}")
             raise RuntimeError
-        p.stdout.close()
-        p.stderr.close()
-    src_fname = fname
-    if copy_to is None:
-        return src_fname
+        process.stdout.close()
+        process.stderr.close()
     else:
-        if verbose:
-            print(f"Installed {src_fname}")
-        return src_fname
-
+        subprocess.call(cmd, cwd=myroot)
+        print(f"Installed {fname} via {' '.join(cmd)}")
+    return fname
 
 def do_script(this_script, python_exe=None, copy_to=None, verbose=False, install_options=None):
     """Execute a script (get-pip typically)."""
     python_exe = python_exe or sys.executable
     myroot = os.path.dirname(python_exe)
-
     # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
-    cmd = [python_exe]
-    if install_options:
-        cmd += install_options  # typically ['--no-deps']
-        print('script install_options', install_options)
-    if this_script:
-        cmd += [this_script]
-    # print('build_wheel', myroot, cmd)
+    cmd = [python_exe] + (install_options or []) + ([this_script] if this_script else [])
     print("Executing ", cmd)
-
-    if verbose:
-        subprocess.call(cmd, cwd=myroot)
+    if not verbose:
+        process = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.communicate()
+        process.stdout.close()
+        process.stderr.close()
     else:
-        p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p.communicate()
-        p.stdout.close()
-        p.stderr.close()
-    if verbose:
+        subprocess.call(cmd, cwd=myroot)
         print("Executed ", cmd)
     return 'ok'
 
@@ -442,7 +403,7 @@ def columns_width(list_of_lists):
     """Return the maximum string length of each column of a list of lists."""
     if not isinstance(list_of_lists, list):
         return [0]
-    return [max(len(str(item)) for item in sublist) for sublist in zip(*list_of_lists)] 
+    return [max(len(str(item)) for item in sublist) for sublist in zip(*list_of_lists)]
 
 def formatted_list(list_of_list, full=False, max_width=70):
     """Format a list_of_list to fixed length columns."""
@@ -466,7 +427,6 @@ def get_package_metadata(database, name):
         "url": f"https://pypi.org/project/{name}",
     }
     for key in my_metadata:
-        # wheel replace '-' per '_' in key
         for name2 in (name, normalize(name)):
             try:
                 my_metadata[key] = db.get(name2, key)
