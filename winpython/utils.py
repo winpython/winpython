@@ -59,38 +59,31 @@ def onerror(function, path, excinfo):
 def getFileProperties(fname):
     """Read all properties of the given file return them as a dictionary."""
     import win32api
-    propNames = (
+    prop_names = (
         'Comments', 'InternalName', 'ProductName', 'CompanyName', 'LegalCopyright',
         'ProductVersion', 'FileDescription', 'LegalTrademarks', 'PrivateBuild',
         'FileVersion', 'OriginalFilename', 'SpecialBuild'
-        )
+    )
     props = {'FixedFileInfo': None, 'StringFileInfo': None, 'FileVersion': None}
 
     try:
-        fixedInfo = win32api.GetFileVersionInfo(fname, '\\')
-        props['FixedFileInfo'] = fixedInfo
-        props['FileVersion'] = "%d.%d.%d.%d" % (fixedInfo['FileVersionMS'] / 65536,
-                fixedInfo['FileVersionMS'] % 65536, fixedInfo['FileVersionLS'] / 65536,
-                fixedInfo['FileVersionLS'] % 65536)
-
-        # \VarFileInfo\Translation returns list of available (language, codepage)
-        # pairs that can be used to retreive string info. We are using only the first pair.
+        fixed_info = win32api.GetFileVersionInfo(fname, '\\')
+        props['FixedFileInfo'] = fixed_info
+        props['FileVersion'] = "{}.{}.{}.{}".format(
+            fixed_info['FileVersionMS'] // 65536,
+            fixed_info['FileVersionMS'] % 65536,
+            fixed_info['FileVersionLS'] // 65536,
+            fixed_info['FileVersionLS'] % 65536
+        )
         lang, codepage = win32api.GetFileVersionInfo(fname, '\\VarFileInfo\\Translation')[0]
-
-        # any other must be of the form \StringfileInfo\%04X%04X\parm_name, middle
-        # two are language/codepage pair returned from above
-        strInfo = {}
-        for propName in propNames:
-            strInfoPath = u'\\StringFileInfo\\%04X%04X\\%s' % (lang, codepage, propName)
-            ## print str_info
-            strInfo[propName] = win32api.GetFileVersionInfo(fname, strInfoPath)
-
-        props['StringFileInfo'] = strInfo
+        props['StringFileInfo'] = {
+            prop_name: win32api.GetFileVersionInfo(fname, f'\\StringFileInfo\\{lang:04X}{codepage:04X}\\{prop_name}')
+            for prop_name in prop_names
+        }
     except:
         pass
 
     return props
-
 
 def get_special_folder_path(path_name):
     """Return special folder path."""
@@ -104,21 +97,16 @@ def get_special_folder_path(path_name):
         if maybe == path_name:
             csidl = getattr(shellcon, maybe)
             return shell.SHGetSpecialFolderPath(0, csidl, False)
-    raise ValueError(
-        f"{path_name} is an unknown path ID"
-    )
-
+    raise ValueError(f"{path_name} is an unknown path ID")
 
 def get_winpython_start_menu_folder(current=True):
-    """Return WinPython Start menu shortcuts folder"""
-    if current:
-        # non-admin install - always goes in this user's start menu.
-        folder = get_special_folder_path("CSIDL_PROGRAMS")
-    else:
+    """Return WinPython Start menu shortcuts folder."""
+    folder = get_special_folder_path("CSIDL_PROGRAMS")
+    if not current:
         try:
             folder = get_special_folder_path("CSIDL_COMMON_PROGRAMS")
         except OSError:
-            folder = get_special_folder_path("CSIDL_PROGRAMS")
+            pass
     return str(Path(folder) / 'WinPython')
 
 def remove_winpython_start_menu_folder(current=True):
@@ -140,7 +128,6 @@ def create_winpython_start_menu_folder(current=True):
             print(f"Directory {path} could not be removed", file=sys.stderr)
     Path(path).mkdir(parents=True, exist_ok=True)
     return path
-
 
 def create_shortcut(path, description, filename, arguments="", workdir="", iconpath="", iconindex=0, verbose=True):
     """Create Windows shortcut (.lnk file)."""
@@ -178,7 +165,7 @@ def is_python_distribution(path):
     return has_exec and has_site
 
 def decode_fs_string(string):
-    """Convert string from file system charset to unicode"""
+    """Convert string from file system charset to unicode."""
     charset = sys.getfilesystemencoding() or locale.getpreferredencoding()
     return string.decode(charset)
 
@@ -197,11 +184,11 @@ def get_nodejs_version(path):
     return exec_shell_cmd("node -v", path).splitlines()[0]
 
 def get_npmjs_version(path):
-    """Return version of the Nodejs installed in *path*"""
+    """Return version of the Nodejs installed in *path*."""
     return exec_shell_cmd("npm -v", path).splitlines()[0]
 
 def get_pandoc_version(path):
-    """Return version of the Pandoc executable in *path*"""
+    """Return version of the Pandoc executable in *path*."""
     return exec_shell_cmd("pandoc -v", path).splitlines()[0].split(" ")[-1]
 
 def python_query(cmd, path):
@@ -215,40 +202,20 @@ def python_execmodule(cmd, path):
     exec_shell_cmd(f'{the_exe} -m {cmd}', path)
 
 def get_python_infos(path):
-    """Return (version, architecture) for the Python distribution located in
-    *path*. The version number is limited to MAJOR.MINOR, the architecture is
-    an integer: 32 or 64"""
+    """Return (version, architecture) for the Python distribution located in *path*."""
     is_64 = python_query("import sys; print(sys.maxsize > 2**32)", path)
     arch = {"True": 64, "False": 32}.get(is_64, None)
     ver = python_query("import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')", path)
-    if re.match(r"([0-9]*)\.([0-9]*)", ver) is None:
-        ver = None
     return ver, arch
 
-
 def get_python_long_version(path):
-    """Return long version (X.Y.Z) for the Python distribution located in
-    *path*"""
-    ver = python_query(
-        "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')",
-        path,
-    )
-    if re.match(r"([0-9]*)\.([0-9]*)\.([0-9]*)", ver) is None:
-        ver = None
-    return ver
-
+    """Return long version (X.Y.Z) for the Python distribution located in *path*."""
+    ver = python_query("import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')", path)
+    return ver if re.match(r"([0-9]*)\.([0-9]*)\.([0-9]*)", ver) else None
 
 def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
-    """Remove absolute path to python.exe in shebang lines in binary files, or re-add it"""
-
-    import re
-    import sys
-    import os
-
-    target_dir = targetdir  # movable option
-    if to_movable == False:
-        target_dir = os.path.abspath(os.path.dirname(fname))
-        target_dir = os.path.abspath(os.path.join(target_dir, r"..")) + "\\"
+    """Remove absolute path to python.exe in shebang lines in binary files, or re-add it."""
+    target_dir = targetdir if to_movable else os.path.abspath(os.path.join(os.path.dirname(fname), r"..")) + "\\"
     executable = sys.executable
 
     shebang_line = re.compile(rb"""(#!.*pythonw?\.exe)"?""")  # Python3+
@@ -258,8 +225,6 @@ def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
 
     with open(fname, "rb") as fh:
         initial_content = fh.read()
-        fh.close
-        fh = None
     content = shebang_line.split(initial_content, maxsplit=1)
     if len(content) != 3:
         return
@@ -271,18 +236,13 @@ def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
     try:
         with open(fname, "wb") as fo:
             fo.write(final_content)
-            fo.close
-            fo = None
             print("patched", fname)
     except Exception:
         print("failed to patch", fname)
 
-
 def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
     """Changes shebang line in '.py' file to relative or absolue path"""
     import fileinput
-    import re
-    import sys
 
     if to_movable:
         exec_path = r'#!.\python.exe'
@@ -297,7 +257,6 @@ def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
             print(exec_path)          
         else:
             print(line, end='')
-
 
 def guess_encoding(csv_file):
     """guess the encoding of the given file"""
@@ -328,7 +287,7 @@ def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedes
         content = f.read()
         new_content = content
     for old_text, new_text in replacements:
-            new_content = new_content.replace(old_text, new_text)
+        new_content = new_content.replace(old_text, new_text)
     outfile = filedest if filedest else filepath
     if new_content != content or str(outfile) != str(filepath):
         with open(outfile, "w", encoding=the_encoding) as f:
@@ -337,7 +296,7 @@ def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedes
             print(f"patched from {Path(filepath).name} into {outfile} !")
 
 def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
-    """Replace a string in a source file"""
+    """Replace a string in a source file."""
     if not silent_mode:
                 print(f"patching {fname} from {in_text} to {out_text}")
     if Path(fname).is_file() and not in_text == out_text:
@@ -367,7 +326,6 @@ def extract_archive(fname, targetdir=None, verbose=False):
     obj.extractall(path=targetdir)
     return targetdir
 
-
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package."""
     if fname.endswith('.whl'):
@@ -375,15 +333,9 @@ def get_source_package_infos(fname):
     match = re.match(SOURCE_PATTERN, Path(fname).name)
     return match.groups()[:2] if match else None
 
-def buildflit_wininst(
-    root,
-    python_exe=None,
-    copy_to=None,
-    verbose=False,
-):
-    """Build Wheel from Python package located in *root*with flit"""
-    if python_exe is None:
-        python_exe = sys.executable
+def buildflit_wininst(root, python_exe=None, copy_to=None, verbose=False):
+    """Build Wheel from Python package located in *root* with flit."""
+    python_exe = python_exe or sys.executable
     assert Path(python_exe).is_file()
     cmd = [python_exe, '-m' ,'flit', 'build']
 
@@ -391,12 +343,7 @@ def buildflit_wininst(
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
-        p = subprocess.Popen(
-            cmd,
-            cwd=root,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        p = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
         p.stdout.close()
         p.stderr.close()
@@ -428,7 +375,6 @@ def buildflit_wininst(
             print(f"Move: {src_fname} --> {dst_fname}")
         return dst_fname
 
-
 def direct_pip_install(fname, python_exe=None, verbose=False, install_options=None):
     """Direct install via python -m pip !"""
     copy_to = str(Path(fname).parent)
@@ -447,12 +393,7 @@ def direct_pip_install(fname, python_exe=None, verbose=False, install_options=No
     if verbose:
         subprocess.call(cmd, cwd=myroot)
     else:
-        p = subprocess.Popen(
-            cmd,
-            cwd=myroot,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         the_log = f"{stdout}" + f"\n {stderr}"
 
@@ -489,12 +430,7 @@ def do_script(this_script, python_exe=None, copy_to=None, verbose=False, install
     if verbose:
         subprocess.call(cmd, cwd=myroot)
     else:
-        p = subprocess.Popen(
-            cmd,
-            cwd=myroot,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        p = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p.communicate()
         p.stdout.close()
         p.stderr.close()
