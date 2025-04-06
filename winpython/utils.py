@@ -132,7 +132,7 @@ def create_winpython_start_menu_folder(current=True):
 def create_shortcut(path, description, filename, arguments="", workdir="", iconpath="", iconindex=0, verbose=True):
     """Create Windows shortcut (.lnk file)."""
     import pythoncom
-    from win32com.shell import shel
+    from win32com.shell import shell
     ilink = pythoncom.CoCreateInstance(shell.CLSID_ShellLink, None, pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
     ilink.SetPath(path)
     ilink.SetDescription(description)
