@@ -26,6 +26,12 @@ import atexit
 import io
 import winreg
 
+# SOURCE_PATTERN defines what an acceptable source package name is
+SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[\-]?[0-9]*)(\.zip|\.tar\.gz|\-(py[2-7]*|py[2-7]*\.py[2-7]*)\-none\-any\.whl)'
+
+# WHEELBIN_PATTERN defines what an acceptable binary wheel package is
+WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]*)\-[0-9|c|o|n|e|p|m]*\-(win32|win\_amd64)\.whl'
+
 def get_python_executable(path=None):
     """Return the path to the Python executable."""
     python_path = sys.executable if path is None else path
@@ -43,36 +49,24 @@ def get_site_packages_path(path=None):
     return str(pypy_site_packages if pypy_site_packages.is_dir() else site_packages)
 
 def onerror(function, path, excinfo):
-    """Error handler for `shutil.rmtree`.
-
-    If the error is due to an access error (read-only file), it
-    attempts to add write permission and then retries.
-    If the error is for another reason, it re-raises the error.
-
-    Usage: `shutil.rmtree(path, onexc=onerror)"""
+    """Error handler for `shutil.rmtree`."""
     if not os.access(path, os.W_OK):
-        # Is the error an access error?
         os.chmod(path, stat.S_IWUSR)
         function(path)
     else:
         raise
 
-
 def getFileProperties(fname):
-    """
-    Read all properties of the given file return them as a dictionary.
-    """
-    # from https://stackoverflow.com/questions/580924/how-to-access-a-files-properties-on-windows
+    """Read all properties of the given file return them as a dictionary."""
     import win32api
-    propNames = ('Comments', 'InternalName', 'ProductName',
-        'CompanyName', 'LegalCopyright', 'ProductVersion',
-        'FileDescription', 'LegalTrademarks', 'PrivateBuild',
-        'FileVersion', 'OriginalFilename', 'SpecialBuild')
-
+    propNames = (
+        'Comments', 'InternalName', 'ProductName', 'CompanyName', 'LegalCopyright',
+        'ProductVersion', 'FileDescription', 'LegalTrademarks', 'PrivateBuild',
+        'FileVersion', 'OriginalFilename', 'SpecialBuild'
+        )
     props = {'FixedFileInfo': None, 'StringFileInfo': None, 'FileVersion': None}
 
     try:
-        # backslash as parm returns dictionary of numeric info corresponding to VS_FIXEDFILEINFO struc
         fixedInfo = win32api.GetFileVersionInfo(fname, '\\')
         props['FixedFileInfo'] = fixedInfo
         props['FileVersion'] = "%d.%d.%d.%d" % (fixedInfo['FileVersionMS'] / 65536,
@@ -85,7 +79,6 @@ def getFileProperties(fname):
 
         # any other must be of the form \StringfileInfo\%04X%04X\parm_name, middle
         # two are language/codepage pair returned from above
-
         strInfo = {}
         for propName in propNames:
             strInfoPath = u'\\StringFileInfo\\%04X%04X\\%s' % (lang, codepage, propName)
@@ -100,9 +93,8 @@ def getFileProperties(fname):
 
 
 def get_special_folder_path(path_name):
-    """Return special folder path"""
+    """Return special folder path."""
     from win32com.shell import shell, shellcon
-
     for maybe in """
        CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
        CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
@@ -111,9 +103,7 @@ def get_special_folder_path(path_name):
        CSIDL_PROGRAM_FILES CSIDL_FONTS""".split():
         if maybe == path_name:
             csidl = getattr(shellcon, maybe)
-            return shell.SHGetSpecialFolderPath(
-                0, csidl, False
-            )
+            return shell.SHGetSpecialFolderPath(0, csidl, False)
     raise ValueError(
         f"{path_name} is an unknown path ID"
     )
@@ -126,14 +116,9 @@ def get_winpython_start_menu_folder(current=True):
         folder = get_special_folder_path("CSIDL_PROGRAMS")
     else:
         try:
-            folder = get_special_folder_path(
-                "CSIDL_COMMON_PROGRAMS"
-            )
+            folder = get_special_folder_path("CSIDL_COMMON_PROGRAMS")
         except OSError:
-            # No CSIDL_COMMON_PROGRAMS on this platform
-            folder = get_special_folder_path(
-                "CSIDL_PROGRAMS"
-            )
+            folder = get_special_folder_path("CSIDL_PROGRAMS")
     return str(Path(folder) / 'WinPython')
 
 def remove_winpython_start_menu_folder(current=True):
@@ -143,47 +128,24 @@ def remove_winpython_start_menu_folder(current=True):
         try:
             shutil.rmtree(path, onexc=onerror)
         except WindowsError:
-            print(
-                f"Directory {path} could not be removed",
-                file=sys.stderr,
-            )
+            print(f"Directory {path} could not be removed", file=sys.stderr)
 
 def create_winpython_start_menu_folder(current=True):
-    """Create WinPython Start menu folder -- remove it if it already exists"""
+    """Create WinPython Start menu folder."""
     path = get_winpython_start_menu_folder(current=current)
     if Path(path).is_dir():
         try:
             shutil.rmtree(path, onexc=onerror)
         except WindowsError:
-            print(
-                f"Directory {path} could not be removed",
-                file=sys.stderr,
-            )
-    # create, or re-create !
+            print(f"Directory {path} could not be removed", file=sys.stderr)
     Path(path).mkdir(parents=True, exist_ok=True)
     return path
 
 
-def create_shortcut(
-    path,
-    description,
-    filename,
-    arguments="",
-    workdir="",
-    iconpath="",
-    iconindex=0,
-    verbose=True,
-):
-    """Create Windows shortcut (.lnk file)"""
+def create_shortcut(path, description, filename, arguments="", workdir="", iconpath="", iconindex=0, verbose=True):
+    """Create Windows shortcut (.lnk file)."""
     import pythoncom
-    from win32com.shell import shell
-
-    ilink = pythoncom.CoCreateInstance(
-        shell.CLSID_ShellLink,
-        None,
-        pythoncom.CLSCTX_INPROC_SERVER,
-        shell.IID_IShellLink,
-    )
+    ilink = pythoncom.CoCreateInstance(shell.CLSID_ShellLink, None, pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
     ilink.SetPath(path)
     ilink.SetDescription(description)
     if arguments:
@@ -201,94 +163,56 @@ def create_shortcut(
     try:
         ipf.Save(filename, 0)
     except:
-        print ("a fail !")
-        pass
-
+        print("a fail !")
 
 def print_box(text):
     """Print text in a box"""
     line0 = "+" + ("-" * (len(text) + 2)) + "+"
     line1 = "| " + text + " |"
-    print(
-        ("\n\n" + "\n".join([line0, line1, line0]) + "\n")
-    )
-
+    print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
 
 def is_python_distribution(path):
-    """Return True if path is a Python distribution"""
-    # XXX: This test could be improved but it seems to be sufficient
+    """Return True if path is a Python distribution."""
     has_exec = Path(get_python_executable(path)).is_file()
-    has_site = Path(get_site_packages_path(path)).is_dir()    
+    has_site = Path(get_site_packages_path(path)).is_dir()
     return has_exec and has_site
-
 
 def decode_fs_string(string):
     """Convert string from file system charset to unicode"""
-    charset = sys.getfilesystemencoding()
-    if charset is None:
-        charset = locale.getpreferredencoding()
+    charset = sys.getfilesystemencoding() or locale.getpreferredencoding()
     return string.decode(charset)
 
-
 def exec_shell_cmd(args, path):
-    """Execute shell command (*args* is a list of arguments) in *path*"""
-    # print " ".join(args)
-    process = subprocess.Popen(
-        args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=path,
-        shell=True
-    )
+    """Execute shell command (*args* is a list of arguments) in *path*."""
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path, shell=True)
     return decode_fs_string(process.stdout.read())
 
 def exec_run_cmd(args, path=None):
-    """run a single command (*args* is a list of arguments) in optional *path*"""
-    # only applicable to Python-3.5+
-    # python-3.7+ allows to replace "stdout and stderr ", per "capture_output=True"
-    if path:
-        process = subprocess.run(args,
-                                capture_output=True,
-                                cwd=path, text=True)
-        #return  decode_fs_string(process.stdout)
-        return  process.stdout
-    else:
-        process = subprocess.run(args,
-                                capture_output=True,
-                                cwd=path, text=True)
-        #return  decode_fs_string(process.stdout)
-        return  process.stdout
-
+    """Run a single command (*args* is a list of arguments) in optional *path*."""
+    process = subprocess.run(args, capture_output=True, cwd=path, text=True)
+    return process.stdout
 
 def get_nodejs_version(path):
-    """Return version of the Nodejs installed in *path*"""
+    """Return version of the Nodejs installed in *path*."""
     return exec_shell_cmd("node -v", path).splitlines()[0]
-
 
 def get_npmjs_version(path):
     """Return version of the Nodejs installed in *path*"""
     return exec_shell_cmd("npm -v", path).splitlines()[0]
 
-
 def get_pandoc_version(path):
     """Return version of the Pandoc executable in *path*"""
     return exec_shell_cmd("pandoc -v", path).splitlines()[0].split(" ")[-1]
 
-
 def python_query(cmd, path):
-    """Execute Python command using the Python interpreter located in *path*"""
+    """Execute Python command using the Python interpreter located in *path*."""
     the_exe = get_python_executable(path)
-    # debug2021-09-12
-    # print(f'"{the_exe}" -c "{cmd}"', ' * ',  path)
-
     return exec_shell_cmd(f'"{the_exe}" -c "{cmd}"', path).splitlines()[0]
 
-
 def python_execmodule(cmd, path):
-    """Execute Python command using the Python interpreter located in *path*"""
+    """Execute Python command using the Python interpreter located in *path*."""
     the_exe = get_python_executable(path)
     exec_shell_cmd(f'{the_exe} -m {cmd}', path)
-
 
 def get_python_infos(path):
     """Return (version, architecture) for the Python distribution located in
@@ -296,10 +220,7 @@ def get_python_infos(path):
     an integer: 32 or 64"""
     is_64 = python_query("import sys; print(sys.maxsize > 2**32)", path)
     arch = {"True": 64, "False": 32}.get(is_64, None)
-    ver = python_query(
-        "import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')",
-        path,
-    )
+    ver = python_query("import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')", path)
     if re.match(r"([0-9]*)\.([0-9]*)", ver) is None:
         ver = None
     return ver, arch
@@ -446,20 +367,6 @@ def extract_archive(fname, targetdir=None, verbose=False):
     obj.extractall(path=targetdir)
     return targetdir
 
-# SOURCE_PATTERN defines what an acceptable source package name is
-# As of 2014-09-08 :
-#    - the wheel package format is accepte in source directory
-#    - the tricky regexp is tuned also to support the odd jolib naming :
-#         . joblib-0.8.3_r1-py2.py3-none-any.whl,
-#         . joblib-0.8.3-r1.tar.gz
-
-SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[\-]?[0-9]*)(\.zip|\.tar\.gz|\-(py[2-7]*|py[2-7]*\.py[2-7]*)\-none\-any\.whl)'
-
-# WHEELBIN_PATTERN defines what an acceptable binary wheel package is
-# "cp([0-9]*)" to replace per cp(34) for python3.4
-# "win32|win\_amd64" to replace per "win\_amd64" for 64bit
-WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]*)\-[0-9|c|o|n|e|p|m]*\-(win32|win\_amd64)\.whl'
-
 
 def get_source_package_infos(fname):
     """Return a tuple (name, version) of the Python source package."""
@@ -506,12 +413,7 @@ def buildflit_wininst(
         )
 
     for distname in os.listdir(distdir):
-        # for wheels (winpython here)
-        match = re.match(SOURCE_PATTERN, distname)
-        if match is not None:
-            break
-        match = re.match(WHEELBIN_PATTERN, distname)
-        if match is not None:
+        if re.match(SOURCE_PATTERN, distname) or re.match(WHEELBIN_PATTERN, distname):
             break
     else:
         raise RuntimeError(f"Build failed: not a pure Python package? {distdir}")
@@ -527,12 +429,7 @@ def buildflit_wininst(
         return dst_fname
 
 
-def direct_pip_install(
-    fname,
-    python_exe=None,
-    verbose=False,
-    install_options=None,
-):
+def direct_pip_install(fname, python_exe=None, verbose=False, install_options=None):
     """Direct install via python -m pip !"""
     copy_to = str(Path(fname).parent)
 
