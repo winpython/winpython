@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+# WinPython Package Manager
 # Copyright © 2012 Pierre Raybaut
+# Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
-
-"""
-WinPython Package Manager
-
-Created on Fri Aug 03 14:32:26 2012
-"""
 
 import os
 from pathlib import Path
@@ -22,15 +18,14 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 # Local imports
 from winpython import utils, piptree
 
-
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
 class Package:
     "standardize a Package from filename or pip list"
-    def __init__(self, fname,  suggested_summary=None):
+    def __init__(self, fname, suggested_summary=None):
         self.fname = fname
-        self.description = piptree.sum_up(suggested_summary)  if suggested_summary else ""
+        self.description = piptree.sum_up(suggested_summary) if suggested_summary else ""
         self.name = None
         self.version = None
         if fname.endswith((".zip", ".tar.gz", ".whl")):
@@ -39,14 +34,12 @@ class Package:
             if infos is not None:
                 self.name, self.version = infos
                 self.name = utils.normalize(self.name)
-        self.url = None
+        self.url = f"https://pypi.org/project/{self.name}"
         self.files = []
-
-        setattr(self,'url',"https://pypi.org/project/" + self.name)
 
     def __str__(self):
         return f"{self.name} {self.version}\r\n{self.description}\r\nWebsite: {self.url}"
-        
+
 
 class Distribution:
     def __init__(self, target=None, verbose=False):
