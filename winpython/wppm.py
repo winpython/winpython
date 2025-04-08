@@ -26,14 +26,12 @@ class Package:
     def __init__(self, fname, suggested_summary=None):
         self.fname = fname
         self.description = piptree.sum_up(suggested_summary) if suggested_summary else ""
-        self.name = None
-        self.version = None
+        self.name, self.version = None, None
         if fname.endswith((".zip", ".tar.gz", ".whl")):
             bname = Path(self.fname).name #wheel style name like "sqlite_bro-1.0.0..."
             infos = utils.get_source_package_infos(bname) # get name, version
-            if infos is not None:
-                self.name, self.version = infos
-                self.name = utils.normalize(self.name)
+            if infos:
+                self.name, self.version = utils.normalize(infos[0]), infos[1]
         self.url = f"https://pypi.org/project/{self.name}"
         self.files = []
 
@@ -67,14 +65,7 @@ class Distribution:
         except WindowsError:
             self.to_be_removed.append(path)
 
-    def copy_files(
-        self,
-        package,
-        targetdir,
-        srcdir,
-        dstdir,
-        create_bat_files=False,
-    ):
+    def copy_files(self, package, targetdir, srcdir, dstdir, create_bat_files=False):
         """Add copy task"""
         srcdir = str(Path(targetdir) / srcdir)
         if not Path(srcdir).is_dir():
@@ -148,29 +139,16 @@ class Distribution:
             if utils.normalize(pack.name) == utils.normalize(name):
                 return pack
 
-    def patch_all_shebang(
-        self,
-        to_movable=True,
-        max_exe_size=999999,
-        targetdir="",
-    ):
+    def patch_all_shebang(self, to_movable=True, max_exe_size=999999, targetdir=""):
         """make all python launchers relatives"""
         import glob
 
         for ffname in glob.glob(r"%s\Scripts\*.exe" % self.target):
             size = os.path.getsize(ffname)
             if size <= max_exe_size:
-                utils.patch_shebang_line(
-                    ffname,
-                    to_movable=to_movable,
-                    targetdir=targetdir,
-                )
+                utils.patch_shebang_line(ffname, to_movable=to_movable, targetdir=targetdir)
         for ffname in glob.glob(r"%s\Scripts\*.py" % self.target):
-            utils.patch_shebang_line_py(
-                ffname,
-                to_movable=to_movable,
-                targetdir=targetdir,
-            )
+            utils.patch_shebang_line_py(ffname, to_movable=to_movable, targetdir=targetdir)
 
     def install(self, package, install_options=None):
         """Install package in distribution"""
@@ -187,27 +165,12 @@ class Distribution:
         my_actions = actions or []
         executing = str(Path(self.target).parent / "scripts" / "env.bat")
         if Path(executing).is_file():
-            complement = [
-                r"&&",
-                "cd",
-                "/D",
-                self.target,
-                r"&&",
-                utils.get_python_executable(self.target),
-                # Before PyPy: osp.join(self.target, 'python.exe')
-            ]
-            complement += ["-m", "pip"]
+            complement = [r"&&", "cd", "/D", self.target, r"&&", utils.get_python_executable(self.target)]
         else:
             executing = utils.get_python_executable(self.target)
-            # Before PyPy: osp.join(self.target, 'python.exe')
-            complement = ["-m", "pip"]
+        complement = ["-m", "pip"]
         try:
-            fname = utils.do_script(
-                this_script=None,
-                python_exe=executing,
-                verbose=self.verbose,
-                install_options=complement + my_actions + my_list,
-            )
+            fname = utils.do_script(this_script=None, python_exe=executing, verbose=self.verbose, install_options=complement + my_actions + my_list)
         except RuntimeError:
             if not self.verbose:
                 print("Failed!")
@@ -306,31 +269,14 @@ class Distribution:
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
-        if package.name.lower() in (
-            "pyqt4",
-            "pyqt5",
-            "pyside2",
-        ):
+        if package.name.lower() in ("pyqt4", "pyqt5", "pyside2"):
             # Qt configuration file (where to find Qt)
             name = "qt.conf"
             contents = """[Paths]
 Prefix = .
 Binaries = ."""
-            self.create_file(
-                package,
-                name,
-                str(Path("Lib") / "site-packages" / package.name),
-                contents,
-            )
-            self.create_file(
-                package,
-                name,
-                ".",
-                contents.replace(
-                    ".",
-                    f"./Lib/site-packages/{package.name}",
-                ),
-            )
+            self.create_file(package, name, str(Path("Lib") / "site-packages" / package.name), contents)
+            self.create_file(package, name, ".", contents.replace(".", f"./Lib/site-packages/{package.name}"))
             # pyuic script
             if package.name.lower() == "pyqt5":
                 # see http://code.activestate.com/lists/python-list/666469/
@@ -344,27 +290,15 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             # PyPy adaption: python.exe or pypy3.exe
             my_exec = Path(utils.get_python_executable(self.target)).name
             tmp_string = tmp_string.replace("python.exe", my_exec)
-
-            self.create_file(
-                package,
-                f"pyuic{package.name[-1]}.bat",
-                "Scripts",
-                tmp_string.replace("package.name", package.name),
-            )
+            self.create_file(package, f"pyuic{package.name[-1]}.bat", "Scripts", tmp_string.replace("package.name", package.name))
             # Adding missing __init__.py files (fixes Issue 8)
             uic_path = str(Path("Lib") / "site-packages" / package.name / "uic")
             for dirname in ("Loader", "port_v2", "port_v3"):
-                self.create_file(
-                    package,
-                    "__init__.py",
-                    str(Path(uic_path) / dirname),
-                    "",
-                )
+                self.create_file(package, "__init__.py", str(Path(uic_path) / dirname), "")
 
     def _print(self, package, action):
-        """Print package-related action text (e.g. 'Installing')
-        indicating progress"""
-        text = " ".join([action, package.name, package.version])
+        """Print package-related action text (e.g. 'Installing')"""
+        text = f"{action} {package.name} {package.version}"
         if self.verbose:
             utils.print_box(text)
         else:
@@ -572,7 +506,7 @@ def main(test=False):
                 title = f"**  Package: {l[0]}  **"
                 print("\n"+"*"*len(title), f"\n{title}", "\n"+"*"*len(title) )
                 for key, value in pip.raw[l[0]].items():
-                    rawtext=json.dumps(value, indent=2, ensure_ascii=False)
+                    rawtext = json.dumps(value, indent=2, ensure_ascii=False)
                     lines = [l for l in rawtext.split(r"\n") if len(l.strip()) > 2]
                     if key.lower() != 'description' or args.verbose==True:
                         print(f"{key}: ", "\n".join(lines).replace('"', ""))
