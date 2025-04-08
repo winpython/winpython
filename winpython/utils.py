@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+# WinPython utilities
 # Copyright © 2012 Pierre Raybaut
+# Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
-
-"""
-WinPython utilities
-
-Created on Tue Aug 14 14:08:40 2012
-"""
 
 import os
 import sys
@@ -23,7 +19,6 @@ import re
 import tarfile
 import zipfile
 import atexit
-import io
 import winreg
 
 # SOURCE_PATTERN defines what an acceptable source package name is
@@ -259,13 +254,13 @@ def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
 def guess_encoding(csv_file):
     """guess the encoding of the given file"""
     # UTF_8_BOM = "\xEF\xBB\xBF"
-    with io.open(csv_file, "rb") as f:
+    with open(csv_file, "rb") as f:
         data = f.read(5)
     if data.startswith(b"\xEF\xBB\xBF"):  # UTF-8 with a "BOM" (normally no BOM in utf-8)
         return ["utf-8-sig"]
     else:  # in Windows, guessing utf-8 doesn't work, so we have to try
         try:
-            with io.open(csv_file, encoding="utf-8") as f:
+            with open(csv_file, encoding="utf-8") as f:
                 preview = f.read(222222)
                 return ["utf-8"]
         except:
