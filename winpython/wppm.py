@@ -22,8 +22,8 @@ from winpython import utils, piptree
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
 class Package:
-    "standardize a Package from filename or pip list"
-    def __init__(self, fname, suggested_summary=None):
+    """Standardize a Package from filename or pip list."""
+    def __init__(self, fname: str, suggested_summary: str = None):
         self.fname = fname
         self.description = piptree.sum_up(suggested_summary) if suggested_summary else ""
         self.name, self.version = None, None
@@ -40,33 +40,32 @@ class Package:
 
 
 class Distribution:
-    def __init__(self, target=None, verbose=False):
-        # if no target path given, take the current python interpreter one
-        self.target = target or os.path.dirname(sys.executable)
+    """Handles operations on a WinPython distribution."""
+    def __init__(self, target: str = None, verbose: bool = False):
+        self.target = target or os.path.dirname(sys.executable) # Default target more explicit
         self.verbose = verbose
         self.pip = None
-        self.to_be_removed = []  # list of directories to be removed later
-        self.version, self.architecture = utils.get_python_infos(target)
-        # name of the exe (python.exe or pypy3.exe)
+        self.to_be_removed = []
+        self.version, self.architecture = utils.get_python_infos(self.target)
         self.short_exe = Path(utils.get_python_executable(self.target)).name
 
     def clean_up(self):
-        """Remove directories which couldn't be removed when building"""
+        """Remove directories that were marked for removal."""
         for path in self.to_be_removed:
             try:
                 shutil.rmtree(path, onexc=utils.onerror)
-            except WindowsError:
-                print(f"Directory {path} could not be removed", file=sys.stderr)
+            except OSError as e:
+                print(f"Error: Could not remove directory {path}: {e}", file=sys.stderr)
 
-    def remove_directory(self, path):
-        """Try to remove directory -- on WindowsError, remove it later"""
+    def remove_directory(self, path: str):
+        """Try to remove a directory, add to removal list on failure."""
         try:
             shutil.rmtree(path)
-        except WindowsError:
+        except OSError:
             self.to_be_removed.append(path)
 
-    def copy_files(self, package, targetdir, srcdir, dstdir, create_bat_files=False):
-        """Add copy task"""
+    def copy_files(self, package: Package, targetdir: str, srcdir: str, dstdir: str, create_bat_files: bool = False):
+        """Copy files from srcdir to dstdir within the target distribution."""
         srcdir = str(Path(targetdir) / srcdir)
         if not Path(srcdir).is_dir():
             return
@@ -112,8 +111,8 @@ class Distribution:
             fd.write(contents)
         package.files.append(dst)
 
-    def get_installed_packages(self, update=False):
-        """Return installed packages"""
+    def get_installed_packages(self, update: bool = False) -> list[Package]:
+        """Return installed packages."""
 
         # Include package installed via pip (not via WPPM)
         wppm = []
@@ -133,14 +132,14 @@ class Distribution:
         ]
         return sorted(wppm, key=lambda tup: tup.name.lower())
 
-    def find_package(self, name):
-        """Find installed package"""
+    def find_package(self, name: str) -> Package | None:
+        """Find installed package by name."""
         for pack in self.get_installed_packages():
             if utils.normalize(pack.name) == utils.normalize(name):
                 return pack
 
-    def patch_all_shebang(self, to_movable=True, max_exe_size=999999, targetdir=""):
-        """make all python launchers relatives"""
+    def patch_all_shebang(self, to_movable: bool = True, max_exe_size: int = 999999, targetdir: str = ""):
+        """Make all python launchers relative."""
         import glob
 
         for ffname in glob.glob(r"%s\Scripts\*.exe" % self.target):
@@ -150,10 +149,9 @@ class Distribution:
         for ffname in glob.glob(r"%s\Scripts\*.py" % self.target):
             utils.patch_shebang_line_py(ffname, to_movable=to_movable, targetdir=targetdir)
 
-    def install(self, package, install_options=None):
-        """Install package in distribution"""
-        # wheel addition
-        if package.fname.endswith((".whl", ".tar.gz", ".zip")):
+    def install(self, package: Package, install_options: list[str] = None): # Type hint install_options
+        """Install package in distribution."""
+        if package.fname.endswith((".whl", ".tar.gz", ".zip")): # Check extension with tuple
             self.install_bdist_direct(package, install_options=install_options)
         self.handle_specific_packages(package)
         # minimal post-install actions
@@ -206,9 +204,7 @@ class Distribution:
             # sheb_mov2 = tried  way, but doesn't work for pip (at least)
             sheb_fix = " executable = get_executable()"
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
-            sheb_mov2 = (
-                " executable = os.path.join('..',os.path.basename(get_executable()))"
-            )
+            sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
 
             # Adpating to PyPy
             the_place = site_package_place + r"pip\_vendor\distlib\scripts.py"
@@ -240,30 +236,25 @@ class Distribution:
         else:
             self.create_pybat(package_name.lower())
 
-    def create_pybat(
-        self,
-        names="",
-        contents=r"""@echo off
+
+    def create_pybat(self, names="", contents=r"""@echo off
 ..\python "%~dpn0" %*""",
     ):
         """Create launcher batch script when missing"""
 
-        scriptpy = str(Path(self.target) / "Scripts")  # std Scripts of python
-
-        # PyPy has no initial Scipts directory
-        if not Path(scriptpy).is_dir():
-            os.mkdir(scriptpy)
+        scriptpy = Path(self.target) / "Scripts" # std Scripts of python
+        os.makedirs(scriptpy, exist_ok=True)
         if not list(names) == names:
             my_list = [f for f in os.listdir(scriptpy) if "." not in f and f.startswith(names)]
         else:
             my_list = names
         for name in my_list:
-            if Path(scriptpy).is_dir() and (Path(scriptpy) / name).is_file():
+            if scriptpy.is_dir() and (scriptpy / name).is_file():
                 if (
-                    not (Path(scriptpy) / (name + ".exe")).is_file()
-                    and not (Path(scriptpy) / (name + ".bat")).is_file()
+                    not (scriptpy / (name + ".exe")).is_file()
+                    and not (scriptpy / (name + ".bat")).is_file()
                 ):
-                    with open(Path(scriptpy) / (name + ".bat"), "w") as fd:
+                    with open(scriptpy / (name + ".bat"), "w") as fd:
                         fd.write(contents)
                     fd.close()
 
@@ -272,9 +263,7 @@ class Distribution:
         if package.name.lower() in ("pyqt4", "pyqt5", "pyside2"):
             # Qt configuration file (where to find Qt)
             name = "qt.conf"
-            contents = """[Paths]
-Prefix = .
-Binaries = ."""
+            contents = """[Paths]\nPrefix = .\nBinaries = ."""
             self.create_file(package, name, str(Path("Lib") / "site-packages" / package.name), contents)
             self.create_file(package, name, ".", contents.replace(".", f"./Lib/site-packages/{package.name}"))
             # pyuic script
@@ -296,13 +285,14 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             for dirname in ("Loader", "port_v2", "port_v3"):
                 self.create_file(package, "__init__.py", str(Path(uic_path) / dirname), "")
 
-    def _print(self, package, action):
-        """Print package-related action text (e.g. 'Installing')"""
+
+    def _print(self, package: Package, action: str):
+        """Print package-related action text."""
         text = f"{action} {package.name} {package.version}"
         if self.verbose:
             utils.print_box(text)
         else:
-            print("    " + text + "...", end=" ")
+            print(f"    {text}...", end=" ")
 
     def _print_done(self):
         """Print OK at the end of a process"""
@@ -317,6 +307,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             this_exec = utils.get_python_executable(self.target)  # PyPy !
             subprocess.call([this_exec, "-m", "pip", "uninstall", package.name, "-y"], cwd=self.target)
         self._print_done()
+
 
     def install_bdist_direct(self, package, install_options=None):
         """Install a package directly !"""
@@ -335,7 +326,9 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         package = Package(fname)
         self._print_done()
 
-    def install_script(self, script, install_options=None):
+
+    def install_script(self, script: str, install_options: list[str] = None): # Type hint install_options
+        """Install a script using pip."""
         try:
             fname = utils.do_script(
                 script,
@@ -343,10 +336,12 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 verbose=self.verbose,
                 install_options=install_options,
             )
-        except RuntimeError:
+        except RuntimeError as e: # Catch specific RuntimeError
             if not self.verbose:
                 print("Failed!")
-                raise
+                raise # Re-raise if not verbose
+            else:
+                print(f"Script installation failed: {e}") # Print error if verbose
 
 
 def main(test=False):
@@ -415,7 +410,7 @@ def main(test=False):
             const=True,
             default=False,
             help=f"list packages matching the given [optionnal] package expression: wppm -ls, wppm -ls pand",
-        )   
+        )
         parser.add_argument(
             "-p",
             dest="pipdown",
@@ -473,9 +468,8 @@ def main(test=False):
         )
         args = parser.parse_args()
         targetpython = None
-        if args.target and not args.target==sys.prefix:
-            targetpython = args.target if args.target[-4:] == '.exe' else str(Path(args.target) / 'python.exe')
-            # print(targetpython.resolve() to check)
+        if args.target and args.target != sys.prefix:
+            targetpython = args.target if args.target.lower().endswith('.exe') else str(Path(args.target) / 'python.exe')
         if args.install and args.uninstall:
             raise RuntimeError("Incompatible arguments: --install and --uninstall")
         if args.registerWinPython and args.unregisterWinPython:
@@ -492,37 +486,36 @@ def main(test=False):
             sys.exit()
         elif args.list:
             pip = piptree.PipData(targetpython)
-            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
-            titles = [['Package', 'Version', 'Summary'],['_' * max(x, 6) for x in utils.columns_width(todo)]] 
+            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0]))]
+            titles = [['Package', 'Version', 'Summary'], ['_' * max(x, 6) for x in utils.columns_width(todo)]]
             listed = utils.formatted_list(titles + todo, max_width=70)
             for p in listed:
                 print(*p)
             sys.exit()
         elif args.all:
             pip = piptree.PipData(targetpython)
-            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0])) ]
+            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0]))]
             for l in todo:
                 # print(pip.distro[l[0]])
                 title = f"**  Package: {l[0]}  **"
-                print("\n"+"*"*len(title), f"\n{title}", "\n"+"*"*len(title) )
+                print("\n" + "*" * len(title), f"\n{title}", "\n" + "*" * len(title))
                 for key, value in pip.raw[l[0]].items():
                     rawtext = json.dumps(value, indent=2, ensure_ascii=False)
                     lines = [l for l in rawtext.split(r"\n") if len(l.strip()) > 2]
-                    if key.lower() != 'description' or args.verbose==True:
+                    if key.lower() != 'description' or args.verbose:
                         print(f"{key}: ", "\n".join(lines).replace('"', ""))
-            sys.exit()            
+            sys.exit()
         if args.registerWinPython:
             print(registerWinPythonHelp)
             if utils.is_python_distribution(args.target):
                 dist = Distribution(args.target)
             else:
-                raise WindowsError(f"Invalid Python distribution {args.target}")
+                raise OSError(f"Invalid Python distribution {args.target}")
             print(f"registering {args.target}")
             print("continue ? Y/N")
             theAnswer = input()
             if theAnswer == "Y":
                 from winpython import associate
-
                 associate.register(dist.target, verbose=args.verbose)
                 sys.exit()
         if args.unregisterWinPython:
@@ -530,13 +523,12 @@ def main(test=False):
             if utils.is_python_distribution(args.target):
                 dist = Distribution(args.target)
             else:
-                raise WindowsError(f"Invalid Python distribution {args.target}")
+                raise OSError(f"Invalid Python distribution {args.target}")
             print(f"unregistering {args.target}")
             print("continue ? Y/N")
             theAnswer = input()
             if theAnswer == "Y":
                 from winpython import associate
-
                 associate.unregister(dist.target, verbose=args.verbose)
                 sys.exit()
         elif not args.install and not args.uninstall:
@@ -546,7 +538,7 @@ def main(test=False):
                 parser.print_help()
                 sys.exit()
             else:
-                raise IOError(f"File not found: {args.fname}")
+                raise FileNotFoundError(f"File not found: {args.fname}")
         if utils.is_python_distribution(args.target):
             dist = Distribution(args.target, verbose=True)
             try:
@@ -560,7 +552,7 @@ def main(test=False):
             except NotImplementedError:
                 raise RuntimeError("Package is not (yet) supported by WPPM")
         else:
-            raise WindowsError(f"Invalid Python distribution {args.target}")
+            raise OSError(f"Invalid Python distribution {args.target}")
 
 
 if __name__ == "__main__":
