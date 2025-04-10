@@ -64,43 +64,6 @@ class Distribution:
         except OSError:
             self.to_be_removed.append(path)
 
-    def copy_files(self, package: Package, targetdir: str, srcdir: str, dstdir: str, create_bat_files: bool = False):
-        """Copy files from srcdir to dstdir within the target distribution."""
-        srcdir = str(Path(targetdir) / srcdir)
-        if not Path(srcdir).is_dir():
-            return
-        offset = len(srcdir) + len(os.pathsep)
-        for dirpath, dirnames, filenames in os.walk(srcdir):
-            for dname in dirnames:
-                t_dname = str(Path(dirpath) / dname)[offset:]
-                src = str(Path(srcdir) / t_dname)
-                dst = str(Path(dstdir) / t_dname)
-                if self.verbose:
-                    print(f"mkdir: {dst}")
-                full_dst = str(Path(self.target) / dst)
-                if not Path(full_dst).exists():
-                    os.mkdir(full_dst)
-                package.files.append(dst)
-            for fname in filenames:
-                t_fname = str(Path(dirpath) / fname)[offset:]
-                src = str(Path(srcdir) / t_fname)
-                dst = fname if dirpath.endswith("_system32") else str(Path(dstdir) / t_fname)
-                if self.verbose:
-                    print(f"file:  {dst}")
-                full_dst = str(Path(self.target) / dst)
-                shutil.move(src, full_dst)
-                package.files.append(dst)
-                name, ext = Path(dst).stem, Path(dst).suffix
-                if create_bat_files and ext in ("", ".py"):
-                    dst = name + ".bat"
-                    if self.verbose:
-                        print(f"file:  {dst}")
-                    full_dst = str(Path(self.target) / dst)
-                    fd = open(full_dst, "w")
-                    fd.write(f"""@echo off\npython "%~dpn0{ext}" %*""")
-                    fd.close()
-                    package.files.append(dst)
-
     def create_file(self, package, name, dstdir, contents):
         """Generate data file -- path is relative to distribution root dir"""
         dst = str(Path(dstdir) / name)
@@ -157,8 +120,8 @@ class Distribution:
         # minimal post-install actions
         self.patch_standard_packages(package.name)
 
-    def do_pip_action(self, actions=None, install_options=None):
-        """Do pip action in a distribution"""
+    def do_pip_action(self, actions: list[str] = None, install_options: list[str] = None):
+        """Execute pip action in the distribution."""
         my_list = install_options or []
         my_actions = actions or []
         executing = str(Path(self.target).parent / "scripts" / "env.bat")
@@ -169,10 +132,12 @@ class Distribution:
         complement = ["-m", "pip"]
         try:
             fname = utils.do_script(this_script=None, python_exe=executing, verbose=self.verbose, install_options=complement + my_actions + my_list)
-        except RuntimeError:
+        except RuntimeError as e:
             if not self.verbose:
                 print("Failed!")
                 raise
+            else:
+                print(f"Pip action failed with error: {e}") # Print error if verbose
 
     def patch_standard_packages(self, package_name="", to_movable=True):
         """patch Winpython packages in need"""
@@ -256,7 +221,6 @@ class Distribution:
                 ):
                     with open(scriptpy / (name + ".bat"), "w") as fd:
                         fd.write(contents)
-                    fd.close()
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
@@ -302,7 +266,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
     def uninstall(self, package):
         """Uninstall package from distribution"""
         self._print(package, "Uninstalling")
-        if not package.name == "pip":
+        if package.name != "pip":
             # trick to get true target (if not current)
             this_exec = utils.get_python_executable(self.target)  # PyPy !
             subprocess.call([this_exec, "-m", "pip", "uninstall", package.name, "-y"], cwd=self.target)
@@ -325,23 +289,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 raise
         package = Package(fname)
         self._print_done()
-
-
-    def install_script(self, script: str, install_options: list[str] = None): # Type hint install_options
-        """Install a script using pip."""
-        try:
-            fname = utils.do_script(
-                script,
-                python_exe=utils.get_python_executable(self.target),  # PyPy3 !
-                verbose=self.verbose,
-                install_options=install_options,
-            )
-        except RuntimeError as e: # Catch specific RuntimeError
-            if not self.verbose:
-                print("Failed!")
-                raise # Re-raise if not verbose
-            else:
-                print(f"Script installation failed: {e}") # Print error if verbose
 
 
 def main(test=False):
