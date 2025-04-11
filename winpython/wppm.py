@@ -126,10 +126,10 @@ class Distribution:
         my_actions = actions or []
         executing = str(Path(self.target).parent / "scripts" / "env.bat")
         if Path(executing).is_file():
-            complement = [r"&&", "cd", "/D", self.target, r"&&", utils.get_python_executable(self.target)]
+            complement = [r"&&", "cd", "/D", self.target, r"&&", utils.get_python_executable(self.target), "-m", "pip"]
         else:
             executing = utils.get_python_executable(self.target)
-        complement = ["-m", "pip"]
+            complement = ["-m", "pip"]
         try:
             fname = utils.do_script(this_script=None, python_exe=executing, verbose=self.verbose, install_options=complement + my_actions + my_list)
         except RuntimeError as e:
@@ -195,32 +195,7 @@ class Distribution:
                 "'check_updates_on_startup': True,",
                 "'check_updates_on_startup': False,",
             )
-        # workaround bad installers
-        if package_name.lower() == "numba":
-            self.create_pybat(["numba"])
-        else:
-            self.create_pybat(package_name.lower())
 
-
-    def create_pybat(self, names="", contents=r"""@echo off
-..\python "%~dpn0" %*""",
-    ):
-        """Create launcher batch script when missing"""
-
-        scriptpy = Path(self.target) / "Scripts" # std Scripts of python
-        os.makedirs(scriptpy, exist_ok=True)
-        if not list(names) == names:
-            my_list = [f for f in os.listdir(scriptpy) if "." not in f and f.startswith(names)]
-        else:
-            my_list = names
-        for name in my_list:
-            if scriptpy.is_dir() and (scriptpy / name).is_file():
-                if (
-                    not (scriptpy / (name + ".exe")).is_file()
-                    and not (scriptpy / (name + ".bat")).is_file()
-                ):
-                    with open(scriptpy / (name + ".bat"), "w") as fd:
-                        fd.write(contents)
 
     def handle_specific_packages(self, package):
         """Packages requiring additional configuration"""
