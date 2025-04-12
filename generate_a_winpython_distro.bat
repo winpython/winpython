@@ -26,8 +26,8 @@ if "%target_python_exe%"=="" set target_python_exe=python.exe
 
 rem Set Python target release based on my_python_target
 if %my_python_target%==311 set my_python_target_release=3119& set my_release=1
-if %my_python_target%==312 set my_python_target_release=3129& set my_release=1
-if %my_python_target%==313 set my_python_target_release=3132& set my_release=1
+if %my_python_target%==312 set my_python_target_release=31210& set my_release=0
+if %my_python_target%==313 set my_python_target_release=3133& set my_release=0
 if %my_python_target%==314 set my_python_target_release=3140& set my_release=0
 
 echo -------------------------------------- >>%my_archive_log%
