@@ -143,23 +143,14 @@ class Distribution:
         """patch Winpython packages in need"""
         import filecmp
 
-        # Adpating to PyPy
-        if "pypy3" in Path(utils.get_python_executable(self.target)).name:
-            site_package_place = "\\site-packages\\"
-        else:
-            site_package_place = "\\Lib\\site-packages\\"
         # 'pywin32' minimal post-install (pywin32_postinstall.py do too much)
         if package_name.lower() == "pywin32" or package_name == "":
-            origin = self.target + site_package_place + "pywin32_system32"
-
-            destin = self.target
-            if Path(origin).is_dir():
+            origin = Path(self.target) / "site-packages" / "pywin32_system32"
+            destin = Path(self.target)
+            if origin.is_dir():
                 for name in os.listdir(origin):
-                    here, there = (
-                        str(Path(origin) / name),
-                        str(Path(destin) / name),
-                    )
-                    if not Path(there).exists() or not filecmp.cmp(here, there):
+                    here, there = (origin / name), (destin / name)
+                    if not there.exists() or not filecmp.cmp(here, there):
                         shutil.copyfile(here, there)
         # 'pip' to do movable launchers (around line 100) !!!!
         # rational: https://github.com/pypa/pip/issues/2328
@@ -171,27 +162,21 @@ class Distribution:
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
             sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
 
-            # Adpating to PyPy
-            the_place = site_package_place + r"pip\_vendor\distlib\scripts.py"
+            the_place = Path(self.target ) / "lib" / "site-packages" / "pip" / "_vendor" / "distlib" / "scripts.py"
             print(the_place)
             if to_movable:
-                utils.patch_sourcefile(self.target + the_place, sheb_fix, sheb_mov1)
-                utils.patch_sourcefile(self.target + the_place, sheb_mov2, sheb_mov1)
+                utils.patch_sourcefile(the_place, sheb_fix, sheb_mov1)
+                utils.patch_sourcefile(the_place, sheb_mov2, sheb_mov1)
             else:
-                utils.patch_sourcefile(self.target + the_place, sheb_mov1, sheb_fix)
-                utils.patch_sourcefile(self.target + the_place, sheb_mov2, sheb_fix)
+                utils.patch_sourcefile(the_place, sheb_mov1, sheb_fix)
+                utils.patch_sourcefile(the_place, sheb_mov2, sheb_fix)
 
             # create movable launchers for previous package installations
             self.patch_all_shebang(to_movable=to_movable)
         if package_name.lower() == "spyder" or package_name == "":
             # spyder don't goes on internet without I ask
             utils.patch_sourcefile(
-                self.target + (site_package_place + r"spyderlib\config\main.py"),
-                "'check_updates_on_startup': True,",
-                "'check_updates_on_startup': False,",
-            )
-            utils.patch_sourcefile(
-                self.target + (site_package_place + r"spyder\config\main.py"),
+                Path(self.target) / "lib" / "site-packages" / "spyder" / "config" /"main.py",
                 "'check_updates_on_startup': True,",
                 "'check_updates_on_startup': False,",
             )

@@ -2,7 +2,7 @@ rem  generate_a_winpython_distro.bat: to be launched from a winpython directory,
 @echo on
 
 REM Initialize variables
-if "%my_release_level%"=="" set my_release_level=b2
+if "%my_release_level%"=="" set my_release_level=b3
 if "%my_create_installer%"=="" set my_create_installer=True
 
 rem Set archive directory and log file
@@ -99,6 +99,7 @@ echo -------------------------------------- >>%my_archive_log%
 echo "(%date% %time%) Add requirement packages">>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
 python -m pip install -r %my_requirements% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
+python -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('spyder', to_movable=True)"
 
 REM Archive success
 echo -------------------------------------- >>%my_archive_log%
