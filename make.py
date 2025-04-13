@@ -46,14 +46,13 @@ def build_installer_7zip(script_template_path: Path, output_script_path: Path, r
         ("PORTABLE_DIR=", f"PORTABLE_DIR={PORTABLE_DIRECTORY}& rem "),
         ("SEVENZIP_EXE=", f"SEVENZIP_EXE={find_7zip_executable()}& rem "),
     ] + [(f"{a}=", f"{a}={b}& rem ") for a, b in replacements]
-    
+
     utils.replace_in_file(script_template_path, data_to_replace, output_script_path)
 
     try:
         # Execute the generated 7-Zip script, with stdout=sys.stderr to see 7zip compressing
-        command = f'"{output_script_path}"'
-        print(f"Executing 7-Zip script: {command}")
-        subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
+        print(f'Executing 7-Zip script: "{output_script_path}"')
+        subprocess.run(f'"{output_script_path}"', shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
     except subprocess.CalledProcessError as e:
         print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
@@ -76,11 +75,9 @@ def copy_items(source_directories: list[Path], target_directory: Path, verbose: 
 
 def parse_list_argument(argument_value: str | list[str], separator=" ") -> list[str]:
     """Parse a separated list argument into a list of strings."""
-    if argument_value is None:
+    if not argument_value:
         return []
-    if isinstance(argument_value, str):
-        return argument_value.split(separator)
-    return list(argument_value)
+    return argument_value.split(separator) if isinstance(argument_value, str) else list(argument_value)
 
 class WinPythonDistributionBuilder:
     """Builds a WinPython distribution."""
@@ -163,20 +160,17 @@ Name | Version | Description
 
         def get_tool_path(relative_path):
             path = self.winpython_directory / relative_path if self.winpython_directory else None
-            return path if path and (path.is_file() or path.is_dir()) else None
+            return path if path and path.exists() else None
 
         if nodejs_path := get_tool_path(self.NODEJS_RELATIVE_PATH):
-            node_version = utils.get_nodejs_version(nodejs_path)
-            npm_version = utils.get_npmjs_version(nodejs_path)
-            installed_tools += [("Nodejs", node_version), ("npmjs", npm_version)]
+            installed_tools.append(("Nodejs", utils.get_nodejs_version(nodejs_path)))
+            installed_tools.append(("npmjs", utils.get_npmjs_version(nodejs_path)))
 
-        if pandoc_executable := get_tool_path("t/pandoc.exe"):
-            pandoc_version = utils.get_pandoc_version(str(pandoc_executable.parent))
-            installed_tools.append(("Pandoc", pandoc_version))
+        if pandoc_exe := get_tool_path("t/pandoc.exe"):
+            installed_tools.append(("Pandoc", utils.get_pandoc_version(str(pandoc_exe.parent))))
 
-        if vscode_executable := get_tool_path("t/VSCode/Code.exe"):
-            vscode_version = utils.getFileProperties(str(vscode_executable))["FileVersion"]
-            installed_tools.append(("VSCode", vscode_version))
+        if vscode_exe := get_tool_path("t/VSCode/Code.exe"):
+            installed_tools.append(("VSCode", utils.getFileProperties(str(vscode_exe))["FileVersion"]))
 
         tool_lines = []
         for name, version in installed_tools:
@@ -187,7 +181,7 @@ Name | Version | Description
 
     def _get_installed_packages_markdown(self) -> str:
         """Generates Markdown for installed packages section in package index."""
-        if self.distribution is None:
+        if not self.distribution:
             return ""  # Distribution not initialized yet.
         self.installed_packages = self.distribution.get_installed_packages(update=True)
         package_lines = [
@@ -204,25 +198,20 @@ Name | Version | Description
     @property
     def python_full_version(self) -> str:
         """Retrieves the Python full version string from the distribution."""
-        if self.distribution is None:
-            return "0.0.0"  # Placeholder before initialization
-        return utils.get_python_long_version(self.distribution.target)
+        return utils.get_python_long_version(self.distribution.target) if self.distribution else "0.0.0"
 
     @property
     def python_executable_directory(self) -> str:
         """Returns the directory containing the Python executable."""
-        python_path_directory = self.winpython_directory / self.python_directory_name if self.winpython_directory else None
-        if python_path_directory and python_path_directory.is_dir():
-            return str(python_path_directory)
-        python_path_executable = self.winpython_directory / self.python_name if self.winpython_directory else None
-        return str(python_path_executable) if python_path_executable else ""
+        if self.winpython_directory:
+            python_path_directory = self.winpython_directory / self.python_directory_name
+            return str(python_path_directory) if python_path_directory.is_dir() else str(self.winpython_directory / self.python_name)
+        return ""
 
     @property
     def architecture_bits(self) -> int:
         """Returns the architecture (32 or 64 bits) of the distribution."""
-        if self.distribution:
-            return self.distribution.architecture
-        return 64
+        return self.distribution.architecture if self.distribution else 64
 
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
@@ -241,7 +230,6 @@ Name | Version | Description
             ("RELEASELEVEL", self.release_level),
             ("INSTALLER_OPTION", installer_type),
         ]
-
         build_installer_7zip(PORTABLE_DIRECTORY / template_name, self.target_directory  / output_name, replacements)
 
     def _print_action(self, text: str):
@@ -351,9 +339,9 @@ Name | Version | Description
 
 def rebuild_winpython_package(source_directory: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
     """Rebuilds the winpython package from source using flit."""
-    for filename in os.listdir(target_directory):
-        if filename.startswith("winpython-") and filename.endswith((".exe", ".whl", ".gz")):
-            os.remove(Path(target_directory) / filename)
+    for file in target_directory.glob("winpython-*"):
+        if file.suffix in (".exe", ".whl", ".gz"):
+            file.unlink()
     utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=verbose)
 
 def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
@@ -391,14 +379,14 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     find_links_dirs_list = parse_list_argument(find_links, ",")
     requirements_files_list = [Path(f) for f in parse_list_argument(requirements, ",") if f]
     find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
-    build_directory = str(Path(basedir) / ("bu" + flavor))
+    build_directory = Path(basedir) / ("bu" + flavor)
 
     if rebuild:
         utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
-        os.makedirs(Path(build_directory), exist_ok=True)
+        os.makedirs(build_directory, exist_ok=True)
         # use source_dirs as the directory to re-build Winpython wheel
         winpython_source_dir = Path(__file__).resolve().parent
-        rebuild_winpython_package(winpython_source_dir, source_dirs, architecture, verbose)
+        rebuild_winpython_package(winpython_source_dir, Path(source_dirs), architecture, verbose)
 
     builder = WinPythonDistributionBuilder(
         build_number, release_level, build_directory, wheels_directory=source_dirs,
@@ -420,11 +408,11 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
 
     builder.build(rebuild=rebuild, requirements_files_list=requirements_files_list, winpy_dirname=winpython_dirname)
 
-    if ".zip" in str(create_installer).lower():
+    if ".zip" in create_installer.lower():
         builder.create_installer_7zip(".zip")
-    if ".7z" in str(create_installer).lower():
+    if ".7z" in create_installer.lower():
         builder.create_installer_7zip(".7z")
-    if "7zip" in str(create_installer).lower():
+    if "7zip" in create_installer.lower():
         builder.create_installer_7zip(".exe")
 
 if __name__ == "__main__":
