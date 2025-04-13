@@ -213,7 +213,6 @@ def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
     """Remove absolute path to python.exe in shebang lines in binary files, or re-add it."""
     target_dir = targetdir if to_movable else os.path.abspath(os.path.join(os.path.dirname(fname), r"..")) + "\\"
     executable = sys.executable
-
     shebang_line = re.compile(rb"""(#!.*pythonw?\.exe)"?""")  # Python3+
     if "pypy3" in sys.executable:
         shebang_line = re.compile(rb"""(#!.*pypy3w?\.exe)"?""")  # Pypy3+
@@ -239,12 +238,9 @@ def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
 def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
     """Changes shebang line in '.py' file to relative or absolue path"""
     import fileinput
-    if to_movable:
-        exec_path = r'#!.\python.exe'
-        if 'pypy3' in sys.executable:  # PyPy !
-            exec_path = r'#!.\pypy3.exe'
-    else:
-        exec_path = '#!' + sys.executable
+    exec_path = r'#!.\python.exe' if to_movable else '#!' + sys.executable
+    if 'pypy3' in sys.executable:
+        exec_path = r'#!.\pypy3.exe' if to_movable else exec_path
     for line in fileinput.input(fname, inplace=True):
         if re.match(r'^#\!.*python\.exe$', line) or re.match(r'^#\!.*pypy3\.exe$', line):
             print(exec_path)
@@ -253,18 +249,16 @@ def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
 
 def guess_encoding(csv_file):
     """guess the encoding of the given file"""
-    # UTF_8_BOM = "\xEF\xBB\xBF"
     with open(csv_file, "rb") as f:
         data = f.read(5)
     if data.startswith(b"\xEF\xBB\xBF"):  # UTF-8 with a "BOM" (normally no BOM in utf-8)
         return ["utf-8-sig"]
-    else:  # in Windows, guessing utf-8 doesn't work, so we have to try
-        try:
-            with open(csv_file, encoding="utf-8") as f:
-                preview = f.read(222222)
-                return ["utf-8"]
-        except:
-            return [locale.getdefaultlocale()[1], "utf-8"]
+    try:
+        with open(csv_file, encoding="utf-8") as f:
+            preview = f.read(222222)
+            return ["utf-8"]
+    except:
+        return [locale.getdefaultlocale()[1], "utf-8"]
 
 def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedest: Path = None, verbose=False):
     """
@@ -290,9 +284,9 @@ def replace_in_file(filepath: Path, replacements: list[tuple[str, str]], filedes
 def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
     """Replace a string in a source file."""
     if not silent_mode:
-                print(f"patching {fname} from {in_text} to {out_text}")
-    if Path(fname).is_file() and not in_text == out_text:
-        replace_in_file(Path(fname), [(in_text , out_text)])
+        print(f"patching {fname} from {in_text} to {out_text}")
+    if Path(fname).is_file() and in_text != out_text:
+        replace_in_file(Path(fname), [(in_text, out_text)])
 
 def _create_temp_dir():
     """Create a temporary directory and remove it at exit"""
@@ -324,7 +318,7 @@ def get_source_package_infos(fname):
 def buildflit_wininst(root, python_exe=None, copy_to=None, verbose=False):
     """Build Wheel from Python package located in *root* with flit."""
     python_exe = python_exe or sys.executable
-    cmd = [python_exe, '-m' ,'flit', 'build']
+    cmd = [python_exe, '-m', 'flit', 'build']
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
@@ -362,7 +356,7 @@ def direct_pip_install(fname, python_exe=None, verbose=False, install_options=No
     python_exe = python_exe or sys.executable
     myroot = str(Path(python_exe).parent)
 
-    cmd = [python_exe, "-m", "pip", "install"] + (install_options or []) +[fname]
+    cmd = [python_exe, "-m", "pip", "install"] + (install_options or []) + [fname]
     if not verbose:
         process = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
@@ -416,7 +410,7 @@ def get_package_metadata(database, name):
     db = cp.ConfigParser()
     filepath = Path(database) if Path(database).is_absolute() else Path(DATA_PATH) / database
     db.read_file(open(str(filepath), encoding=guess_encoding(filepath)[0]))
-    
+
     my_metadata = {
         "description": "",
         "url": f"https://pypi.org/project/{name}",
