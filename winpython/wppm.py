@@ -144,12 +144,12 @@ class Distribution:
         import filecmp
 
         # 'pywin32' minimal post-install (pywin32_postinstall.py do too much)
-        if package_name.lower() == "pywin32" or package_name == "":
+        if package_name.lower() in ("", "pywin32"):
             origin = Path(self.target) / "site-packages" / "pywin32_system32"
             destin = Path(self.target)
             if origin.is_dir():
                 for name in os.listdir(origin):
-                    here, there = (origin / name), (destin / name)
+                    here, there = origin / name, destin / name
                     if not there.exists() or not filecmp.cmp(here, there):
                         shutil.copyfile(here, there)
         # 'pip' to do movable launchers (around line 100) !!!!
@@ -162,7 +162,7 @@ class Distribution:
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
             sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
 
-            the_place = Path(self.target ) / "lib" / "site-packages" / "pip" / "_vendor" / "distlib" / "scripts.py"
+            the_place = Path(self.target) / "lib" / "site-packages" / "pip" / "_vendor" / "distlib" / "scripts.py"
             print(the_place)
             if to_movable:
                 utils.patch_sourcefile(the_place, sheb_fix, sheb_mov1)
@@ -173,7 +173,7 @@ class Distribution:
 
             # create movable launchers for previous package installations
             self.patch_all_shebang(to_movable=to_movable)
-        if package_name.lower() == "spyder" or package_name == "":
+        if package_name.lower() in ("", "spyder"):
             # spyder don't goes on internet without I ask
             utils.patch_sourcefile(
                 Path(self.target) / "lib" / "site-packages" / "spyder" / "config" /"main.py",
@@ -202,13 +202,12 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9"""
             # PyPy adaption: python.exe or pypy3.exe
             my_exec = Path(utils.get_python_executable(self.target)).name
-            tmp_string = tmp_string.replace("python.exe", my_exec)
-            self.create_file(package, f"pyuic{package.name[-1]}.bat", "Scripts", tmp_string.replace("package.name", package.name))
+            tmp_string = tmp_string.replace("python.exe", my_exec).replace("package.name", package.name)
+            self.create_file(package, f"pyuic{package.name[-1]}.bat", "Scripts", tmp_string)
             # Adding missing __init__.py files (fixes Issue 8)
             uic_path = str(Path("Lib") / "site-packages" / package.name / "uic")
             for dirname in ("Loader", "port_v2", "port_v3"):
                 self.create_file(package, "__init__.py", str(Path(uic_path) / dirname), "")
-
 
     def _print(self, package: Package, action: str):
         """Print package-related action text."""
@@ -232,7 +231,6 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
             subprocess.call([this_exec, "-m", "pip", "uninstall", package.name, "-y"], cwd=self.target)
         self._print_done()
 
-
     def install_bdist_direct(self, package, install_options=None):
         """Install a package directly !"""
         self._print(package,f"Installing {package.fname.split('.')[-1]}")
@@ -250,22 +248,17 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         package = Package(fname)
         self._print_done()
 
-
 def main(test=False):
     if test:
-        sbdir = str(Path(__file__).parents[0].parent.parent.parent / "sandbox")
-        tmpdir = str(Path(sbdir) / "tobedeleted")
-
-        fname = str(Path(sbdir) / "VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe")
-        print(Package(fname))
+        sbdir = Path(__file__).parents[0].parent.parent.parent / "sandbox"
+        tmpdir = sbdir / "tobedeleted"
+        fname = sbdir / "VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe")
+        print(Package(str(fname)))
         sys.exit()
-        target = str(
-            Path(utils.BASE_DIR) / "build" / "winpython-2.7.3" / "python-2.7.3"
-        )
-        fname = str(Path(utils.BASE_DIR) / "packages.src" / "docutils-0.9.1.tar.gz")
-
-        dist = Distribution(target, verbose=True)
-        pack = Package(fname)
+        target = Path(utils.BASE_DIR) / "build" / "winpython-2.7.3" / "python-2.7.3"
+        fname = Path(utils.BASE_DIR) / "packages.src" / "docutils-0.9.1.tar.gz"
+        dist = Distribution(str(target), verbose=True)
+        pack = Package(str(fname))
         print(pack.description)
         # dist.install(pack)
         # dist.uninstall(pack)
