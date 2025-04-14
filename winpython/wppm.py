@@ -252,7 +252,7 @@ def main(test=False):
     if test:
         sbdir = Path(__file__).parents[0].parent.parent.parent / "sandbox"
         tmpdir = sbdir / "tobedeleted"
-        fname = sbdir / "VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe")
+        fname = sbdir / "VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe"
         print(Package(str(fname)))
         sys.exit()
         target = Path(utils.BASE_DIR) / "build" / "winpython-2.7.3" / "python-2.7.3"
