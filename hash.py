@@ -22,13 +22,9 @@ def give_hashblake(file_in, with_this):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print(
-            "Usage: "
-            + sys.argv[0]
-            + " github-user [github-project]"
-        )
+        print( "Usage: hash.py files_to_copte_hash" )
         exit(1)
-    file = sys.argv[1]
+    files = [str(i)  for i in  sys.argv[1:]  if str(i)[-3:].lower() != ".py"]
 
     header = (
         " MD5"
@@ -53,7 +49,8 @@ if __name__ == '__main__':
     print(header)
     print(line)
 
-    print(""+
+    for file in files:
+        print(""+
         f"{give_hash(file, hashlib.md5)} | " +
         f"{give_hash(file, hashlib.sha1)} | " +
         f"{give_hash(file, hashlib.sha256)} | " +
