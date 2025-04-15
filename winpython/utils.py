@@ -29,16 +29,16 @@ WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]
 
 def get_python_executable(path=None):
     """Return the path to the Python executable."""
-    python_path = sys.executable if path is None else path
-    base_dir = Path(python_path).parent if not Path(python_path).is_dir() else Path(python_path)
+    python_path = Path(path) if path else Path(sys.executable)
+    base_dir = python_path if python_path.is_dir() else python_path.parent
     python_exe = base_dir / 'python.exe'
     pypy_exe = base_dir / 'pypy3.exe'  # For PyPy
     return str(python_exe if python_exe.is_file() else pypy_exe)
 
 def get_site_packages_path(path=None):
     """Return the path to the Python site-packages directory."""
-    python_path = sys.executable if path is None else path
-    base_dir = Path(python_path).parent if not Path(python_path).is_dir() else Path(python_path)
+    python_path = Path(path) if path else Path(sys.executable)
+    base_dir = python_path if python_path.is_dir() else python_path.parent
     site_packages = base_dir / 'Lib' / 'site-packages'
     pypy_site_packages = base_dir / 'site-packages'  # For PyPy
     return str(pypy_site_packages if pypy_site_packages.is_dir() else site_packages)
@@ -322,40 +322,33 @@ def buildflit_wininst(root, python_exe=None, copy_to=None, verbose=False):
     if verbose:
         subprocess.call(cmd, cwd=root)
     else:
-        process = subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        process.communicate()
-        process.stdout.close()
-        process.stderr.close()
-    distdir = str(Path(root) / 'dist')
-    if not Path(distdir).is_dir():
+        subprocess.Popen(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    distdir = Path(root) / 'dist'
+    if not distdir.is_dir():
         raise RuntimeError(
             "Build failed: see package README file for further details regarding installation requirements.\n\n"
             "For more concrete debugging infos, please try to build the package from the command line:\n"
             "1. Open a WinPython command prompt\n"
             "2. Change working directory to the appropriate folder\n"
-            "3. Type `python -m filt build`"
+            "3. Type `python -m flit build`"
         )
-
     for distname in os.listdir(distdir):
         if re.match(SOURCE_PATTERN, distname) or re.match(WHEELBIN_PATTERN, distname):
             break
     else:
         raise RuntimeError(f"Build failed: not a pure Python package? {distdir}")
     
-    src_fname = str(Path(distdir) / distname)
+    src_fname = distdir / distname
     if copy_to:
-        dst_fname = str(Path(copy_to) / distname)
+        dst_fname = Path(copy_to) / distname
         shutil.move(src_fname, dst_fname)
         if verbose:
             print(f"Move: {src_fname} --> {dst_fname}")
-        return dst_fname
-    return src_fname
 
 def direct_pip_install(fname, python_exe=None, verbose=False, install_options=None):
     """Direct install via python -m pip !"""
     python_exe = python_exe or sys.executable
-    myroot = str(Path(python_exe).parent)
-
+    myroot = Path(python_exe).parent
     cmd = [python_exe, "-m", "pip", "install"] + (install_options or []) + [fname]
     if not verbose:
         process = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -374,15 +367,12 @@ def direct_pip_install(fname, python_exe=None, verbose=False, install_options=No
 def do_script(this_script, python_exe=None, copy_to=None, verbose=False, install_options=None):
     """Execute a script (get-pip typically)."""
     python_exe = python_exe or sys.executable
-    myroot = os.path.dirname(python_exe)
+    myroot = Path(python_exe).parent
     # cmd = [python_exe, myroot + r'\Scripts\pip-script.py', 'install']
     cmd = [python_exe] + (install_options or []) + ([this_script] if this_script else [])
     print("Executing ", cmd)
     if not verbose:
-        process = subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        process.communicate()
-        process.stdout.close()
-        process.stderr.close()
+        subprocess.Popen(cmd, cwd=myroot, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     else:
         subprocess.call(cmd, cwd=myroot)
         print("Executed ", cmd)
@@ -406,9 +396,9 @@ def normalize(this):
 
 def get_package_metadata(database, name):
     """Extract infos (description, url) from the local database."""
-    DATA_PATH = str(Path(sys.modules['winpython'].__file__).parent / 'data')
+    DATA_PATH = Path(sys.modules['winpython'].__file__).parent / 'data'
     db = cp.ConfigParser()
-    filepath = Path(database) if Path(database).is_absolute() else Path(DATA_PATH) / database
+    filepath = Path(database) if Path(database).is_absolute() else DATA_PATH / database
     db.read_file(open(str(filepath), encoding=guess_encoding(filepath)[0]))
 
     my_metadata = {
