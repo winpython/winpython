@@ -83,7 +83,7 @@ class Distribution:
         pip_list = self.pip.pip_list()
 
         # return a list of package objects
-        return [Package(f"{utils.normalize(i[0])}-{i[1]}-py3-none-any.whl") for i in pip_list]
+        return [Package(f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl") for i in pip_list]
 
     def find_package(self, name: str) -> Package | None:
         """Find installed package by name."""
