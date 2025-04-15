@@ -7,15 +7,13 @@
 # (see winpython/__init__.py for details)
 
 import os
-from pathlib import Path
-import shutil
 import re
 import sys
+import shutil
 import subprocess
 import json
+from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
-
-# Local imports
 from winpython import utils, piptree
 
 # Workaround for installing PyVISA on Windows from source:
@@ -66,34 +64,26 @@ class Distribution:
 
     def create_file(self, package, name, dstdir, contents):
         """Generate data file -- path is relative to distribution root dir"""
-        dst = str(Path(dstdir) / name)
+        dst = Path(dstdir) / name
         if self.verbose:
             print(f"create:  {dst}")
-        full_dst = str(Path(self.target) / dst)
+        full_dst = Path(self.target) / dst
         with open(full_dst, "w") as fd:
             fd.write(contents)
-        package.files.append(dst)
+        package.files.append(str(dst))
 
     def get_installed_packages(self, update: bool = False) -> list[Package]:
         """Return installed packages."""
 
         # Include package installed via pip (not via WPPM)
-        wppm = []
         if str(Path(sys.executable).parent) == self.target:
             self.pip = piptree.PipData()
         else:
             self.pip = piptree.PipData(utils.get_python_executable(self.target))
         pip_list = self.pip.pip_list()
 
-        # create pip package list
-        wppm = [
-            Package(
-                f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl", #faking wheel
-                suggested_summary=self.pip.summary(i[0]) if self.pip else None
-            )
-            for i in pip_list
-        ]
-        return sorted(wppm, key=lambda tup: tup.name.lower())
+        # return a list of package objects
+        return [Package(f"{utils.normalize(i[0])}-{i[1]}-py3-none-any.whl") for i in pip_list]
 
     def find_package(self, name: str) -> Package | None:
         """Find installed package by name."""
@@ -103,16 +93,13 @@ class Distribution:
 
     def patch_all_shebang(self, to_movable: bool = True, max_exe_size: int = 999999, targetdir: str = ""):
         """Make all python launchers relative."""
-        import glob
-
-        for ffname in glob.glob(r"%s\Scripts\*.exe" % self.target):
-            size = os.path.getsize(ffname)
-            if size <= max_exe_size:
+        for ffname in Path(self.target).glob("Scripts/*.exe"):
+            if ffname.stat().st_size <= max_exe_size:
                 utils.patch_shebang_line(ffname, to_movable=to_movable, targetdir=targetdir)
-        for ffname in glob.glob(r"%s\Scripts\*.py" % self.target):
+        for ffname in Path(self.target).glob("Scripts/*.py"):
             utils.patch_shebang_line_py(ffname, to_movable=to_movable, targetdir=targetdir)
 
-    def install(self, package: Package, install_options: list[str] = None): # Type hint install_options
+    def install(self, package: Package, install_options: list[str] = None):
         """Install package in distribution."""
         if package.fname.endswith((".whl", ".tar.gz", ".zip")): # Check extension with tuple
             self.install_bdist_direct(package, install_options=install_options)
@@ -158,12 +145,10 @@ class Distribution:
             # ensure pip will create movable launchers
             # sheb_mov1 = classic way up to WinPython 2016-01
             # sheb_mov2 = tried  way, but doesn't work for pip (at least)
+            the_place = Path(self.target) / "lib" / "site-packages" / "pip" / "_vendor" / "distlib" / "scripts.py"
             sheb_fix = " executable = get_executable()"
             sheb_mov1 = " executable = os.path.join(os.path.basename(get_executable()))"
             sheb_mov2 = " executable = os.path.join('..',os.path.basename(get_executable()))"
-
-            the_place = Path(self.target) / "lib" / "site-packages" / "pip" / "_vendor" / "distlib" / "scripts.py"
-            print(the_place)
             if to_movable:
                 utils.patch_sourcefile(the_place, sheb_fix, sheb_mov1)
                 utils.patch_sourcefile(the_place, sheb_mov2, sheb_mov1)
@@ -176,7 +161,7 @@ class Distribution:
         if package_name.lower() in ("", "spyder"):
             # spyder don't goes on internet without I ask
             utils.patch_sourcefile(
-                Path(self.target) / "lib" / "site-packages" / "spyder" / "config" /"main.py",
+                Path(self.target) / "lib" / "site-packages" / "spyder" / "config" / "main.py",
                 "'check_updates_on_startup': True,",
                 "'check_updates_on_startup': False,",
             )
@@ -250,7 +235,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 
 def main(test=False):
     if test:
-        sbdir = Path(__file__).parents[0].parent.parent.parent / "sandbox"
+        sbdir = Path(__file__).parents[3] / "sandbox"
         tmpdir = sbdir / "tobedeleted"
         fname = sbdir / "VTK-5.10.0-Qt-4.7.4.win32-py2.7.exe"
         print(Package(str(fname)))
