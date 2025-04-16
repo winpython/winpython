@@ -279,12 +279,6 @@ def patch_sourcefile(fname, in_text, out_text, silent_mode=False):
     if Path(fname).is_file() and in_text != out_text:
         replace_in_file(Path(fname), [(in_text, out_text)])
 
-def _create_temp_dir():
-    """Create a temporary directory and remove it at exit"""
-    tmpdir = tempfile.mkdtemp(prefix='wppm_')
-    atexit.register(lambda path: shutil.rmtree(path, onexc=onerror), tmpdir)
-    return tmpdir
-
 def extract_archive(fname, targetdir=None, verbose=False):
     """Extract .zip, .exe or .tar.gz archive to a temporary directory.
     Return the temporary directory path"""
