@@ -32,30 +32,6 @@ def find_7zip_executable() -> str:
             return str(executable_path)
     raise RuntimeError("7ZIP is not installed on this computer.")
 
-def build_installer_7zip(script_template_path: Path, output_script_path: Path, replacements: list[tuple[str, str]]):
-    """
-    Creates a 7-Zip installer script by copying a template and applying text replacements.
-
-    Args:
-        script_template_path: Path to the template 7-Zip script (.bat file).
-        output_script_path: Path to save the generated 7-Zip script.
-        replacements: A list of tuples for text replacements (prefix, new_text).
-    """
-    # Standard replacements for all 7zip scripts
-    data_to_replace = [
-        ("PORTABLE_DIR=", f"PORTABLE_DIR={PORTABLE_DIRECTORY}& rem "),
-        ("SEVENZIP_EXE=", f"SEVENZIP_EXE={find_7zip_executable()}& rem "),
-    ] + [(f"{a}=", f"{a}={b}& rem ") for a, b in replacements]
-
-    utils.replace_in_file(script_template_path, data_to_replace, output_script_path)
-
-    try:
-        # Execute the generated 7-Zip script, with stdout=sys.stderr to see 7zip compressing
-        print(f'Executing 7-Zip script: "{output_script_path}"')
-        subprocess.run(f'"{output_script_path}"', shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
-
 def copy_items(source_directories: list[Path], target_directory: Path, verbose: bool = False):
     """Copies items from source directories to the target directory."""
     target_directory.mkdir(parents=True, exist_ok=True)
@@ -216,21 +192,23 @@ Name | Version | Description
     def create_installer_7zip(self, installer_type: str = ".exe"):
         """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
-        template_name = "installer_7zip.bat"
-        output_name = "installer_7zip-tmp.bat"
         if installer_type not in [".exe", ".7z", ".zip"]:
             print(f"Warning: Unsupported installer type '{installer_type}'. Defaulting to .exe")
             installer_type = ".exe"
-
-        replacements = [
-            ("DISTDIR", str(self.winpython_directory)),
-            ("ARCH", str(self.architecture_bits)),
-            ("VERSION", f"{self.python_full_version}.{self.build_number}{self.flavor}"),
-            ("VERSION_INSTALL", f'{self.python_full_version.replace(".", "")}{self.build_number}'),
-            ("RELEASELEVEL", self.release_level),
-            ("INSTALLER_OPTION", installer_type),
-        ]
-        build_installer_7zip(PORTABLE_DIRECTORY / template_name, self.target_directory  / output_name, replacements)
+        DISTDIR = self.winpython_directory
+        filname_stemp = f"Winpython{str(self.architecture_bits)}-{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
+        fullfilename = DISTDIR.parent / (filname_stemp + installer_type)
+        if installer_type == ".zip":
+            other = f'"{find_7zip_executable()}" -tzip -mx5 a "{fullfilename}" "{DISTDIR}" '
+        if installer_type == ".7z":
+            other = f'"{find_7zip_executable()}" -mx5 a "{fullfilename}" "{DISTDIR}" '
+        if installer_type == ".exe":
+            other = f'"{find_7zip_executable()}" -mx5 a "{fullfilename}" "{DISTDIR}" -sfx7z.sfx'
+        print(f'Executing 7-Zip script: "{other}"')
+        try:
+            subprocess.run(other, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
     def _print_action(self, text: str):
         """Prints an action message with progress indicator."""
