@@ -54,11 +54,7 @@ def onerror(function, path, excinfo):
 def getFileProperties(fname):
     """Read all properties of the given file return them as a dictionary."""
     import win32api
-    prop_names = (
-        'Comments', 'InternalName', 'ProductName', 'CompanyName', 'LegalCopyright',
-        'ProductVersion', 'FileDescription', 'LegalTrademarks', 'PrivateBuild',
-        'FileVersion', 'OriginalFilename', 'SpecialBuild'
-    )
+    prop_names = ('ProductName', 'ProductVersion', 'FileDescription', 'FileVersion')
     props = {'FixedFileInfo': None, 'StringFileInfo': None, 'FileVersion': None}
 
     try:
@@ -83,16 +79,11 @@ def getFileProperties(fname):
 def get_special_folder_path(path_name):
     """Return special folder path."""
     from win32com.shell import shell, shellcon
-    for maybe in """
-       CSIDL_COMMON_STARTMENU CSIDL_STARTMENU CSIDL_COMMON_APPDATA
-       CSIDL_LOCAL_APPDATA CSIDL_APPDATA CSIDL_COMMON_DESKTOPDIRECTORY
-       CSIDL_DESKTOPDIRECTORY CSIDL_COMMON_STARTUP CSIDL_STARTUP
-       CSIDL_COMMON_PROGRAMS CSIDL_PROGRAMS CSIDL_PROGRAM_FILES_COMMON
-       CSIDL_PROGRAM_FILES CSIDL_FONTS""".split():
-        if maybe == path_name:
-            csidl = getattr(shellcon, maybe)
-            return shell.SHGetSpecialFolderPath(0, csidl, False)
-    raise ValueError(f"{path_name} is an unknown path ID")
+    try:
+        csidl = getattr(shellcon, path_name)
+        return shell.SHGetSpecialFolderPath(0, csidl, False)
+    except OSError:
+        print(f"{path_name} is an unknown path ID")
 
 def get_winpython_start_menu_folder(current=True):
     """Return WinPython Start menu shortcuts folder."""
@@ -337,7 +328,7 @@ def buildflit_wininst(root, python_exe=None, copy_to=None, verbose=False):
             break
     else:
         raise RuntimeError(f"Build failed: not a pure Python package? {distdir}")
-    
+
     src_fname = distdir / distname
     if copy_to:
         dst_fname = Path(copy_to) / distname
