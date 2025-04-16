@@ -1,63 +1,45 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jun 23 21:30:06 2015
+#
+# WinPython hash.py script
+# Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
+# Licensed under the terms of the MIT License
+# (see winpython/__init__.py for details)
 
-@author: famille
-"""
-
-import io
-import os
+from pathlib import Path
 import sys
 import hashlib
 
+def compute_hash(file_path, hash_function, digest_size=None):
+    """Compute the hash of a file using the specified hash function."""
+    try:
+        with open(file_path, 'rb') as file:
+            if digest_size:
+                return hash_function(file.read(), digest_size=digest_size).hexdigest()
+            return hash_function(file.read()).hexdigest()
+    except IOError as e:
+        print(f"Error reading file {file_path}: {e}")
+        return None
 
-def give_hash(file_in, with_this):
-    with io.open(file_in, 'rb') as f:
-        return with_this(f.read()).hexdigest()
-
-def give_hashblake(file_in, with_this):
-    with io.open(file_in, 'rb') as f:
-        return with_this(f.read(),digest_size=32).hexdigest()
-
-
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print( "Usage: hash.py files_to_copte_hash" )
-        exit(1)
-    files = [str(i)  for i in  sys.argv[1:]  if str(i)[-3:].lower() != ".py"]
-
-    header = (
-        " MD5"
-        + " " * (32 - 4)
-        + " | SHA-1"
-        + " " * (40 - 5)
-        + " | SHA-256"
-        + " " * (64 - 7)
-        + " | Binary"
-        + " " * (33 - 5)
-        + "| Size"
-        + " " * (20 - 6)
-        #+ " | SHA3-256"
-        #+ " " * (64 - 8)
-        + " | blake2b-256"
-        + " " * (64 - 11)
-   )
-    line = "|".join(
-        ["-" * len(i) for i in header.split("|")]
-    )
+def print_hashes(files):
+    """Print the hashes of the given files."""
+    header = f"{'MD5':<32} | {'SHA-1':<40} | {'SHA-256':<64} | {'Binary':<33} | {'Size':<20} | {'blake2b-256':<64}"
+    line = "|".join(["-" * len(part) for part in header.split("|")])
 
     print(header)
     print(line)
 
     for file in files:
-        print(""+
-        f"{give_hash(file, hashlib.md5)} | " +
-        f"{give_hash(file, hashlib.sha1)} | " +
-        f"{give_hash(file, hashlib.sha256)} | " +
-        f"{os.path.basename(file):33} |"+
-		f"{os.path.getsize(file):13,}".replace(",", " ") +  ' Bytes | '   +
-        # f" | {give_hash(file, hashlib.sha3_256)}"
-        f"{give_hashblake(file, hashlib.blake2b)}")
+        md5 = compute_hash(file, hashlib.md5)
+        sha1 = compute_hash(file, hashlib.sha1)
+        sha256 = compute_hash(file, hashlib.sha256)
+        name = Path(file).name.ljust(33)
+        size = f"{Path(file).stat().st_size:,} Bytes".replace(",", " ").ljust(20)
+        blake2b = compute_hash(file, hashlib.blake2b, digest_size=32)
+        print(f"{md5} | {sha1} | {sha256} | {name} | {size} | {blake2b}")
         
-         
-
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: hash.py files_to_compute_hash")
+        sys.exit(1)
+    files = [file for file in sys.argv[1:] if file[-3:].lower() != ".py"]
+    print_hashes(files)
