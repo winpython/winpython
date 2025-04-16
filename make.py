@@ -19,6 +19,7 @@ import diff
 # Define constant paths for clarity
 CHANGELOGS_DIRECTORY = Path(__file__).parent / "changelogs"
 PORTABLE_DIRECTORY = Path(__file__).parent / "portable"
+NODEJS_RELATIVE_PATH = "n"  # Relative path within WinPython dir
 
 # Ensure necessary directories exist at the start
 assert CHANGELOGS_DIRECTORY.is_dir(), f"Changelogs directory not found: {CHANGELOGS_DIRECTORY}"
@@ -58,14 +59,11 @@ def parse_list_argument(argument_value: str | list[str], separator=" ") -> list[
 class WinPythonDistributionBuilder:
     """Builds a WinPython distribution."""
 
-    NODEJS_RELATIVE_PATH = "n"  # Relative path within WinPython dir
-
     def __init__(self, build_number: int, release_level: str, target_directory: Path, wheels_directory: Path,
                  tools_directories: list[Path] = None, documentation_directories: list[Path] = None, verbose: bool = False,
                  base_directory: Path = None, install_options: list[str] = None, flavor: str = ""):
         """
         Initializes the WinPythonDistributionBuilder.
-
         Args:
             build_number: The build number (integer).
             release_level: The release level (e.g., "beta", "").
@@ -97,7 +95,7 @@ class WinPythonDistributionBuilder:
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
         for source_item in self.wheels_directory.iterdir():
-            if re.match("(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip", source_item.name):
+            if re.match(r"(pypy3|python-)([0-9]|[a-zA-Z]|.)*.zip", source_item.name):
                 return source_item
         raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
 
@@ -138,7 +136,7 @@ Name | Version | Description
             path = self.winpython_directory / relative_path if self.winpython_directory else None
             return path if path and path.exists() else None
 
-        if nodejs_path := get_tool_path(self.NODEJS_RELATIVE_PATH):
+        if nodejs_path := get_tool_path(NODEJS_RELATIVE_PATH):
             installed_tools.append(("Nodejs", utils.get_nodejs_version(nodejs_path)))
             installed_tools.append(("npmjs", utils.get_npmjs_version(nodejs_path)))
 
@@ -151,8 +149,7 @@ Name | Version | Description
         tool_lines = []
         for name, version in installed_tools:
             metadata = utils.get_package_metadata("tools.ini", name)
-            url, description = metadata["url"], metadata["description"]
-            tool_lines.append(f"[{name}]({url}) | {version} | {description}")
+            tool_lines.append(f"[{name}]({metadata['url']}) | {version} | {metadata['description']}")
         return "\n".join(tool_lines)
 
     def _get_installed_packages_markdown(self) -> str:
@@ -193,20 +190,16 @@ Name | Version | Description
         """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
         if installer_type not in [".exe", ".7z", ".zip"]:
-            print(f"Warning: Unsupported installer type '{installer_type}'. Defaulting to .exe")
-            installer_type = ".exe"
+            raise RuntimeError("installer_type {installer_type} is undefined")
         DISTDIR = self.winpython_directory
-        filname_stemp = f"Winpython{str(self.architecture_bits)}-{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
-        fullfilename = DISTDIR.parent / (filname_stemp + installer_type)
-        if installer_type == ".zip":
-            other = f'"{find_7zip_executable()}" -tzip -mx5 a "{fullfilename}" "{DISTDIR}" '
-        if installer_type == ".7z":
-            other = f'"{find_7zip_executable()}" -mx5 a "{fullfilename}" "{DISTDIR}" '
-        if installer_type == ".exe":
-            other = f'"{find_7zip_executable()}" -mx5 a "{fullfilename}" "{DISTDIR}" -sfx7z.sfx'
-        print(f'Executing 7-Zip script: "{other}"')
+        filename_stem = f"Winpython{self.architecture_bits}-{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
+        fullfilename = DISTDIR.parent / (filename_stem + installer_type)
+        sfx_option = "-sfx7z.sfx" if installer_type == ".exe" else ""
+        zip_option = "-tzip" if installer_type == ".zip" else ""
+        command = f'"{find_7zip_executable()}" {zip_option} -mx5 a "{fullfilename}" "{DISTDIR}" {sfx_option}'
+        print(f'Executing 7-Zip script: "{command}"')
         try:
-            subprocess.run(other, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
+            subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
         except subprocess.CalledProcessError as e:
             print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
 
@@ -243,22 +236,20 @@ Name | Version | Description
         copy_items(self.tools_directories, tools_target_directory, self.verbose)
 
         if (nodejs_current_directory := tools_target_directory / "n").is_dir():
-            self._print_action(f"moving tools from {nodejs_current_directory} to {tools_target_directory.parent / self.NODEJS_RELATIVE_PATH} ")
+            self._print_action(f"Moving tools from {nodejs_current_directory} to {tools_target_directory.parent / NODEJS_RELATIVE_PATH}")
             try:
-                shutil.move(nodejs_current_directory, tools_target_directory.parent / self.NODEJS_RELATIVE_PATH)
+                shutil.move(nodejs_current_directory, tools_target_directory.parent / NODEJS_RELATIVE_PATH)
             except Exception as e:
                 print(f"Error moving Node.js directory: {e}")
 
     def _create_initial_batch_scripts(self):
         """Creates initial batch scripts, including environment setup."""
         self._print_action("Creating initial batch scripts")
-
         # Replacements for batch scripts (PyPy compatibility)
         executable_name = self.distribution.short_exe if self.distribution else "python.exe"  # default to python.exe if distribution is not yet set
-
         init_variables = [('WINPYthon_exe', executable_name), ('WINPYthon_subdirectory_name', self.python_directory_name), ('WINPYVER', self.winpython_version_name)]
         with open(self.winpython_directory / "scripts" / "env.ini", "w") as f:
-            f.writelines([f'{a}={b}\n' for a , b in init_variables])
+            f.writelines([f'{a}={b}\n' for a, b in init_variables])
 
     def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
         """Make or finalise WinPython distribution in the target directory"""
@@ -296,9 +287,7 @@ Name | Version | Description
 
         if requirements_files_list:
             for req in requirements_files_list:
-                actions = ["install", "-r", req]
-                if self.install_options is not None:
-                    actions += self.install_options
+                actions = ["install", "-r", req] + (self.install_options or [])
                 self._print_action(f"Piping: {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
             self.distribution.patch_standard_packages()
@@ -386,12 +375,9 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
 
     builder.build(rebuild=rebuild, requirements_files_list=requirements_files_list, winpy_dirname=winpython_dirname)
 
-    if ".zip" in create_installer.lower():
-        builder.create_installer_7zip(".zip")
-    if ".7z" in create_installer.lower():
-        builder.create_installer_7zip(".7z")
-    if "7zip" in create_installer.lower():
-        builder.create_installer_7zip(".exe")
+    for installer_type in [".zip", ".7z", ".exe"]:
+        if installer_type in create_installer.lower().replace("7zip",".exe"):
+            builder.create_installer_7zip(installer_type)
 
 if __name__ == "__main__":
     # DO create only one Winpython distribution at a time
