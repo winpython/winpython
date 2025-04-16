@@ -33,7 +33,7 @@ def print_hashes(files):
         sha1 = compute_hash(file, hashlib.sha1)
         sha256 = compute_hash(file, hashlib.sha256)
         name = Path(file).name.ljust(33)
-        size = f"{Path(file).stat().st_size:,} Bytes".replace(",", " ").ljust(20)
+        size = f"{Path(file).stat().st_size:,} Bytes".replace(",", " ").rjust(20)
         blake2b = compute_hash(file, hashlib.blake2b, digest_size=32)
         print(f"{md5} | {sha1} | {sha256} | {name} | {size} | {blake2b}")
         
