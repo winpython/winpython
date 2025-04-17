@@ -166,18 +166,6 @@ def exec_run_cmd(args, path=None):
     process = subprocess.run(args, capture_output=True, cwd=path, text=True)
     return process.stdout
 
-def get_nodejs_version(path):
-    """Return version of the Nodejs installed in *path*."""
-    return exec_shell_cmd("node -v", path).splitlines()[0]
-
-def get_npmjs_version(path):
-    """Return version of the Nodejs installed in *path*."""
-    return exec_shell_cmd("npm -v", path).splitlines()[0]
-
-def get_pandoc_version(path):
-    """Return version of the Pandoc executable in *path*."""
-    return exec_shell_cmd("pandoc -v", path).splitlines()[0].split(" ")[-1]
-
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*."""
     the_exe = get_python_executable(path)

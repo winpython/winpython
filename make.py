@@ -133,13 +133,13 @@ Name | Version | Description
         tool_lines = []
 
         if (nodejs_path := self.winpython_directory / NODEJS_RELATIVE_PATH).exists():
-            version = utils.get_nodejs_version(nodejs_path)
-            tool_lines.append(f"[Nodejs](https://nodejs.org) | {version} | a JavaScript runtime built on Chrome's V8 JavaScript engine")
-            version = utils.get_npmjs_version(nodejs_path)
+            version = utils.exec_shell_cmd("node -v", nodejs_path).splitlines()[0]
+            tool_lines.append(f"[Nodejs](https://nodejs.org) | {version} | xa JavaScript runtime built on Chrome's V8 JavaScript engine")
+            version = utils.exec_shell_cmd("npm -v", nodejs_path).splitlines()[0]
             tool_lines.append(f"[npmjs](https://www.npmjs.com) | {version} | a package manager for JavaScript")
 
         if (pandoc_exe := self.winpython_directory / "t" / "pandoc.exe").exists():
-            version = utils.get_pandoc_version(str(pandoc_exe.parent))
+            version = utils.exec_shell_cmd("pandoc -v", pandoc_exe.parent).splitlines()[0].split(" ")[-1]
             tool_lines.append(f"[Pandoc](https://pandoc.org) | {version} | an universal document converter")
 
         if vscode_exe := (self.winpython_directory / "t" / "VSCode" / "Code.exe").exists():
