@@ -25,8 +25,8 @@ class Package:
         self.fname = fname
         self.description = piptree.sum_up(suggested_summary) if suggested_summary else ""
         self.name, self.version = None, None
-        if fname.endswith((".zip", ".tar.gz", ".whl")):
-            bname = Path(self.fname).name #wheel style name like "sqlite_bro-1.0.0..."
+        if fname.lower().endswith((".zip", ".tar.gz", ".whl")):
+            bname = Path(self.fname).name # e.g., "sqlite_bro-1.0.0..."
             infos = utils.get_source_package_infos(bname) # get name, version
             if infos:
                 self.name, self.version = utils.normalize(infos[0]), infos[1]
@@ -40,7 +40,7 @@ class Package:
 class Distribution:
     """Handles operations on a WinPython distribution."""
     def __init__(self, target: str = None, verbose: bool = False):
-        self.target = target or os.path.dirname(sys.executable) # Default target more explicit
+        self.target = target or str(Path(sys.executable).parent) # Default target more explicit
         self.verbose = verbose
         self.pip = None
         self.to_be_removed = []
@@ -265,90 +265,62 @@ def main(test=False):
         parser.add_argument(
             "--register",
             dest="registerWinPython",
-            action="store_const",
-            const=True,
-            default=False,
+            action="store_true", # Store True when flag is present
             help=registerWinPythonHelp,
         )
         parser.add_argument(
             "--unregister",
             dest="unregisterWinPython",
-            action="store_const",
-            const=True,
-            default=False,
+            action="store_true",
             help=unregisterWinPythonHelp,
         )
         parser.add_argument(
-            "-v",
-            "--verbose",
-            dest="verbose",
-            action="store_const",
-            const=True,
-            default=False,
+            "-v", "--verbose",
+            action="store_true",
             help="show more details on packages and actions",
         )
         parser.add_argument(
-            "-ls",
-            "--list",
-            dest="list",
-            action="store_const",
-            const=True,
-            default=False,
-            help=f"list packages matching the given [optionnal] package expression: wppm -ls, wppm -ls pand",
+            "-ls", "--list",
+            action="store_true",
+            help="list installed packages matching the given [optional] package expression: wppm -ls, wppm -ls pand",
         )
         parser.add_argument(
             "-p",
             dest="pipdown",
-            action="store_const",
-            const=True,
-            default=False,
-            help=f"show Package dependancies of the given package[option]: wppm -p pandas[test]",
+            action="store_true",
+            help="show Package dependencies of the given package[option]: wppm -p pandas[test]",
         )
         parser.add_argument(
             "-r",
             dest="pipup",
-            action="store_const",
-            const=True,
-            default=False,
+            action="store_true",
             help=f"show Reverse dependancies of the given package[option]: wppm -r pytest[test]",
         )
         parser.add_argument(
-            "-l",
-            dest="levels",
+            "-l", "--levels",
             type=int,
             default=2,
-            help=f"show 'LEVELS' levels of dependancies of the package, default is 2: wppm -p pandas -l1",
+            help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1",
         )
         parser.add_argument(
             "-lsa",
             dest="all",
-            action="store_const",
-            const=True,
-            default=False,
+            action="store_true",
             help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1",
         )
         parser.add_argument(
-            "-t",
-            dest="target",
+            "-t", "--target",
             default=sys.prefix,
             help=f'path to target Python distribution (default: "{sys.prefix}")',
         )
         parser.add_argument(
-            "-i",
-            "--install",
-            dest="install",
-            action="store_const",
-            const=True,
-            default=False,
+            "-i", "--install",
+            action="store_true",
             help="install a given package wheel (use pip for more features)",
         )
         parser.add_argument(
-            "-u",
-            "--uninstall",
-            dest="uninstall",
-            action="store_const",
-            const=True,
-            default=False,
+            "-u", "--uninstall",
+            action="store_true", # Store True when flag is present
             help="uninstall package  (use pip for more features)",
         )
         args = parser.parse_args()
