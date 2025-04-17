@@ -130,26 +130,22 @@ Name | Version | Description
 
     def _get_installed_tools_markdown(self) -> str:
         """Generates Markdown for installed tools section in package index."""
-        installed_tools = []
-
-        def get_tool_path(relative_path):
-            path = self.winpython_directory / relative_path if self.winpython_directory else None
-            return path if path and path.exists() else None
-
-        if nodejs_path := get_tool_path(NODEJS_RELATIVE_PATH):
-            installed_tools.append(("Nodejs", utils.get_nodejs_version(nodejs_path)))
-            installed_tools.append(("npmjs", utils.get_npmjs_version(nodejs_path)))
-
-        if pandoc_exe := get_tool_path("t/pandoc.exe"):
-            installed_tools.append(("Pandoc", utils.get_pandoc_version(str(pandoc_exe.parent))))
-
-        if vscode_exe := get_tool_path("t/VSCode/Code.exe"):
-            installed_tools.append(("VSCode", utils.getFileProperties(str(vscode_exe))["FileVersion"]))
-
         tool_lines = []
-        for name, version in installed_tools:
-            metadata = utils.get_package_metadata("tools.ini", name)
-            tool_lines.append(f"[{name}]({metadata['url']}) | {version} | {metadata['description']}")
+
+        if (nodejs_path := self.winpython_directory / NODEJS_RELATIVE_PATH).exists():
+            version = utils.get_nodejs_version(nodejs_path)
+            tool_lines.append(f"[Nodejs](https://nodejs.org) | {version} | a JavaScript runtime built on Chrome's V8 JavaScript engine")
+            version = utils.get_npmjs_version(nodejs_path)
+            tool_lines.append(f"[npmjs](https://www.npmjs.com) | {version} | a package manager for JavaScript")
+
+        if (pandoc_exe := self.winpython_directory / "t" / "pandoc.exe").exists():
+            version = utils.get_pandoc_version(str(pandoc_exe.parent))
+            tool_lines.append(f"[Pandoc](https://pandoc.org) | {version} | an universal document converter")
+
+        if vscode_exe := (self.winpython_directory / "t" / "VSCode" / "Code.exe").exists():
+            version = utils.getFileProperties(str(vscode_exe))["FileVersion"]
+            tool_lines.append(f"[VSCode](https://code.visualstudio.com) | {version} | a source-code editor developed by Microsoft")
+
         return "\n".join(tool_lines)
 
     def _get_installed_packages_markdown(self) -> str:

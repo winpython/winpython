@@ -379,27 +379,6 @@ def normalize(this):
     """Apply PEP 503 normalization to the string."""
     return re.sub(r"[-_.]+", "-", this).lower()
 
-def get_package_metadata(database, name):
-    """Extract infos (description, url) from the local database."""
-    DATA_PATH = Path(sys.modules['winpython'].__file__).parent / 'data'
-    db = cp.ConfigParser()
-    filepath = Path(database) if Path(database).is_absolute() else DATA_PATH / database
-    db.read_file(open(str(filepath), encoding=guess_encoding(filepath)[0]))
-
-    my_metadata = {
-        "description": "",
-        "url": f"https://pypi.org/project/{name}",
-    }
-    for key in my_metadata:
-        for name2 in (name, normalize(name)):
-            try:
-                my_metadata[key] = db.get(name2, key)
-                break
-            except (cp.NoSectionError, cp.NoOptionError):
-                pass
-
-    return my_metadata
-
 if __name__ == '__main__':
     print_box("Test")
     dname = sys.prefix
