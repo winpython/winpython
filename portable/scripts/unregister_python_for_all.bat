@@ -1,3 +1,3 @@
 @echo off
 call "%~dp0env.bat"
-call "%~dp0unregister_python.bat" --all
+"%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\winpython\associate.py" --unregister --all
