@@ -130,7 +130,7 @@ def register(target, current=True, verbose=True):
     spyder = str((Path(target).parent / "Spyder.exe").resolve())
 
     if not Path(spyder).is_file():
-        spyder = f'{pythonw}" "{target}\Scripts\spyder'
+        spyder = rf'{pythonw}" "{target}\Scripts\spyder'
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C2 % ("", "open")),
         "",
@@ -157,14 +157,14 @@ def register(target, current=True, verbose=True):
         "",
         0,
         winreg.REG_SZ,
-        '"%s" "%s\Lib\idlelib\idle.pyw" -n -e "%%1"' % (pythonw, target),
+        rf'"{pythonw}" "{target}\Lib\idlelib\idle.pyw" -n -e "%1"',
     )
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C2 % ("NoCon", EWI)),
         "",
         0,
         winreg.REG_SZ,
-        '"%s" "%s\Lib\idlelib\idle.pyw" -n -e "%%1"' % (pythonw, target),
+        rf'"{pythonw}" "{target}\Lib\idlelib\idle.pyw" -n -e "%1"',
     )
     winreg.SetValueEx(
         winreg.CreateKey(root, KEY_C2 % ("", EWS)),
@@ -338,9 +338,9 @@ def register(target, current=True, verbose=True):
 
     # Create start menu entries for all WinPython launchers
     spec = importlib.util.find_spec('pythoncom')
-    if verbose and spec is None:
-        print(f"Can't create WinPython menu as pywin32 package is not installed")
-    if verbose and spec is not None:
+    if spec is None:
+        print(f"Registered WinPython, but not start menu as pywin32 package is needed")
+    if spec is not None:
         print(f'Creating WinPython menu for all icons in {target}')
     for path, desc, fname in _get_shortcut_data(target, current=current):
         utils.create_shortcut(path, desc, fname, verbose=verbose)
@@ -414,8 +414,8 @@ def unregister(target, current=True, verbose=True):
             )
     # remove menu shortcuts
     spec = importlib.util.find_spec('pythoncom')
-    if verbose and spec is None:
-        print(f"Can't remove WinPython menu as pywin32 package is not installed")
+    if spec is None:
+        print(f"un-Registered WinPython, but not start menu as pywin32 package is needed")
     if verbose and spec is not None:
         print(f'Removing WinPython menu for all icons in {target}')
     _remove_start_menu_folder(target, current=current)
