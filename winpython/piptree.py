@@ -119,7 +119,7 @@ class PipData:
         if package.requires:
             for req in package.requires:
                 req_nameextra, req_marker = (req + ";").split(";")[:2]
-                req_nameextra = self.normalize(re.split(r" |;|==|!|>|<", req_nameextra + ";")[0])
+                req_nameextra = self.normalize(re.split(r" |;|==|!|>|<|~=", req_nameextra + ";")[0])
                 req_key = self.normalize((req_nameextra + "[").split("[")[0])
                 req_key_extra = req_nameextra[len(req_key) + 1:].split("]")[0]
                 req_version = req[len(req_nameextra):].translate(replacements)
