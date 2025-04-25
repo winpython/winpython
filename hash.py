@@ -28,7 +28,7 @@ def print_hashes(files):
     print(header)
     print(line)
 
-    for file in files:
+    for file in sorted(files):
         md5 = compute_hash(file, hashlib.md5)
         sha1 = compute_hash(file, hashlib.sha1)
         sha256 = compute_hash(file, hashlib.sha256)
