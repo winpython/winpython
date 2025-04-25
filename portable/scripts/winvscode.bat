@@ -6,5 +6,5 @@ if exist "%WINPYDIR%\..\t\vscode\code.exe" (
 if exist "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe" (
     "%LOCALAPPDATA%\Programs\Microsoft VS Code\code.exe"  %*
 ) else (
-    "code.exe" %*
+    code %*
 ))
