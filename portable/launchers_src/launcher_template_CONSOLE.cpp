@@ -21,8 +21,23 @@ int main() {
 
     // Get command line string
     LPWSTR commandLine = GetCommandLineW();
-    // Find first space to skip the current executable name
-    LPWSTR args = wcschr(commandLine, L' ');
+    // Skip the current executable path and name
+    std::wstring args;
+    if (commandLine) {
+        // If path is double quoted, skip the entire double quote
+        if (commandLine[0] == L'"') {
+            LPWSTR closingQuote = wcschr(commandLine + 1, L'"');
+            if (closingQuote) {
+                args = closingQuote + 1; // Skip closing quote and space
+            }
+        // Otherwise skip to first space
+        } else {
+            LPWSTR spacePos = wcschr(commandLine, L' ');
+            if (spacePos) {
+                args = spacePos + 1; // Skip space
+            }
+        }
+    }
 
     // Define the path to the "scripts" directory
     std::wstring scriptsDir = exeDir + L"\\scripts";
@@ -47,8 +62,7 @@ int main() {
 
     // Append arguments if present
     if (args) {
-        target += L" ";
-        target += args;
+        target += L" " + args;
     }
 
     // Configure the process startup info
