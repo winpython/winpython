@@ -28,13 +28,13 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
         if (commandLine[0] == L'"') {
             LPWSTR closingQuote = wcschr(commandLine + 1, L'"');
             if (closingQuote) {
-                args = closingQuote + 2; // Skip closing quote and space
+                args = closingQuote + 1; // Skip closing quote and space
             }
         // Otherwise skip to first space
         } else {
             LPWSTR spacePos = wcschr(commandLine, L' ');
             if (spacePos) {
-                args = spacePos + 2; // GetCommandLineW puts 2 spaces when path isn't double quoted
+                args = spacePos + 1; // GetCommandLineW puts 2 spaces when path isn't double quoted
             }
         }
     }
@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
 
     // Append arguments if present
     if (!args.empty()) {
-        target += L" " + args;
+        target += args;
     }
 
     // Configure the process startup info
