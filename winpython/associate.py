@@ -123,7 +123,7 @@ def register_in_registery(target, current=True, reg_type=winreg.REG_SZ, verbose=
 
     # --- Shell commands ---
     for ext, ftype in ext_map.items():
-        dynamic_entries.append((f"Software\\Classes\\{ftype}\\shell\\open\\command", None, f'"{pythonw_exe if ftype=='Python.NoConFile' else python_exe} if " "%1" %*'))
+        dynamic_entries.append((f"Software\\Classes\\{ftype}\\shell\\open\\command", None, f'''"{pythonw_exe if ftype=='Python.NoConFile' else python_exe}" "%1" %*'''))
         lost_entries.append((f"Software\\Classes\\{ftype}\\shell\\open", None, None))
         lost_entries.append((f"Software\\Classes\\{ftype}\\shell", None, None))
 

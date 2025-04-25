@@ -104,7 +104,6 @@ class WinPythonDistributionBuilder:
         """Generates a Markdown formatted package index page."""
         installed_tools_markdown = self._get_installed_tools_markdown()
         installed_packages_markdown = self._get_installed_packages_markdown()
-        python_description = "Python programming language with standard library"
 
         return f"""## WinPython {self.winpyver2 + self.flavor}
 
@@ -122,7 +121,7 @@ Name | Version | Description
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | {self.python_full_version} | {python_description}
+[Python](http://www.python.org/) | {self.python_full_version} | Python programming language with standard library
 {installed_packages_markdown}
 
 </details>

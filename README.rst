@@ -3,7 +3,7 @@ WinPython tools
 
 Copyright @ 2012-2013 Pierre Raybaut
 
-Copyright @ 2014-2024+ The Winpython development team https://github.com/winpython/
+Copyright @ 2014-2025+ The Winpython development team https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see winpython/__init__.py for details)
@@ -29,7 +29,7 @@ WinPython build toolchain
 Dependencies
 ------------   
 
-* Python3 >= 3.8
+* Python3 >= 3.9
 
 
 Requirements
