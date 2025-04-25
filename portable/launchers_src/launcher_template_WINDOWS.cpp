@@ -19,6 +19,26 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
     std::wstring exeDir = exePath;
     exeDir = exeDir.substr(0, exeDir.find_last_of(L"\\/"));
 
+    // Get command line string
+    LPWSTR commandLine = GetCommandLineW();
+    // Skip the current executable path and name
+    std::wstring args;
+    if (commandLine) {
+        // If path is double quoted, skip the entire double quote
+        if (commandLine[0] == L'"') {
+            LPWSTR closingQuote = wcschr(commandLine + 1, L'"');
+            if (closingQuote) {
+                args = closingQuote + 1; // Skip closing quote and space
+            }
+        // Otherwise skip to first space
+        } else {
+            LPWSTR spacePos = wcschr(commandLine, L' ');
+            if (spacePos) {
+                args = spacePos + 1; // Skip space
+            }
+        }
+    }
+
     // Define the path to the "scripts" directory
     std::wstring scriptsDir = exeDir + L"\\scripts";
 
@@ -39,6 +59,11 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
 
     // Define the command to run
     std::wstring target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
+
+    // Append arguments if present
+    if (!args.empty()) {
+        target += L" " + args;
+    }
 
     // Configure the process startup info
     STARTUPINFO si = { sizeof(si) };
