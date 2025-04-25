@@ -19,6 +19,11 @@ int main() {
     std::wstring exeDir = exePath;
     exeDir = exeDir.substr(0, exeDir.find_last_of(L"\\/"));
 
+    // Get command line string
+    LPWSTR commandLine = GetCommandLineW();
+    // Find first space to skip the current executable name
+    LPWSTR args = wcschr(commandLine, L' ');
+
     // Define the path to the "scripts" directory
     std::wstring scriptsDir = exeDir + L"\\scripts";
 
@@ -39,6 +44,12 @@ int main() {
 
     // Define the command to run
     std::wstring target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
+
+    // Append arguments if present
+    if (args) {
+        target += L" ";
+        target += args;
+    }
 
     // Configure the process startup info
     STARTUPINFO si = { sizeof(si) };
