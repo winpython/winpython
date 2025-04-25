@@ -46,3 +46,7 @@ set PATH_CLEANED=
 
 rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if exist "%WINPYDIR%\Lib\site-packages\PyQt5\__init__.py" set QT_API=pyqt5
+
+rem modern Pandoc wheel need this
+if exist "%WINPYDIRBASE%\t\pandoc.exe" set PYPANDOC_PANDOC=%WINPYDIRBASE%\t\pandoc.exe
+
