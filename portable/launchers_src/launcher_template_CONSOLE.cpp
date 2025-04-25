@@ -61,7 +61,7 @@ int main() {
     std::wstring target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
 
     // Append arguments if present
-    if (args) {
+    if (!args.empty()) {
         target += L" " + args;
     }
 
