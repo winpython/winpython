@@ -57,12 +57,12 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
         return 1;
     }
 
-    // Define the command to run
-    std::wstring target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
-
-    // Append arguments if present
+    // Define the command to run and append arguments if present
+    std::wstring target;
     if (!args.empty()) {
-        target += args;
+        target = L"cmd.exe /c \"\"" LAUNCH_TARGET L"\"" + args + L"\"";
+    } else {
+        target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
     }
 
     // Configure the process startup info
