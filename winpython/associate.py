@@ -92,10 +92,10 @@ def register_in_registery(target, current=True, reg_type=winreg.REG_SZ, verbose=
     python_exe = str(target_path / "python.exe")
     pythonw_exe = str(target_path / "pythonw.exe")
     spyder_exe = str(target_path.parent / "Spyder.exe")
-    icon_py = str(target / "DLLs" / "py.ico")
-    icon_pyc = str(target / "DLLs" / "pyc.ico")
-    idle_path = str(target / "Lib" / "idlelib" / "idle.pyw")
-    doc_path = str(target / "Doc" / "html" / "index.html")
+    icon_py = str(target_path / "DLLs" / "py.ico")
+    icon_pyc = str(target_path / "DLLs" / "pyc.ico")
+    idle_path = str(target_path / "Lib" / "idlelib" / "idle.pyw")
+    doc_path = str(target_path / "Doc" / "html" / "index.html")
     python_infos = utils.get_python_infos(target)  # ('3.11', 64)
     short_version = python_infos[0]  # e.g., '3.11'
     version = utils.get_python_long_version(target) # e.g., '3.11.5'
