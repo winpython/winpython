@@ -1,3 +1,21 @@
+### WinPython 2025-02 release (May 4th, 2025)
+
+MD5                              | SHA-1                                    | SHA-256                                                          | Binary                            | Size                 | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|----------------------|-----------------------------------------------------------------
+b5a3814f26dade2f6ee9acf983427a8e | b3826baea1606868628128bab5527e3600342fbf | 517eff0673658da3f2da64a28afbd7733fb91807f7d074d3a9e9e6c0eb1dd523 | Winpython64-3.12.10.0dot.7z       |     23 076 535 Bytes | e3e4b8b944e79cf20dea5e7691c24485a5b68bb70d34df6edfb181fd499b0335
+6f354778174e04fdb4c4c28c7a543f31 | 5d1bd5bd76dcb0e61df1a268e4ce47f56acbfe6f | b6d196d72ce443ccfbdb5a640f5645a7ade742092fddde65d73755c4eba89a1d | Winpython64-3.12.10.0dot.exe      |     23 291 575 Bytes | 785f61ee3821d772bdbff037f86a4229d707c97d97f2508e8cdd03f81c1a8436
+431e37ef366ebe9ae30fa7fb162bb314 | 32965a55a8bc119b96875c542d9a08c6f4ed9b75 | bcb2a87ef210076ff4507a4a644bfb82daa0c2361e7945e5cb7de161450460f6 | Winpython64-3.12.10.0dot.zip      |     38 334 544 Bytes | ab0b83f09299291a36298754a445429964f610f507b18e484f6bdf572880acbe
+6e7131129ff75dd4e8832f7be131dcc3 | 4d6c5b10d4b3044b9a70597fcd4fd34cd5e2b2a8 | 294c287c4a9918c730d26188e2dc34e97a92431c83515165f04c2ea8d33f0c1d | Winpython64-3.12.10.0slim.7z      |    624 548 662 Bytes | f0b952a2fe29837783b69dcb4259369ee5c1d40a3220ad0b4dd82b1668322973
+3cefa92f927471aeef6c1fa3b7911166 | 1699db6b9c44b605c9f2031201bb58a46a260f0e | 3ea3368ca0e9182c03e8e0bc38b65c5398dd4f8aee7ccf5ab38d5a9226af6b9a | Winpython64-3.12.10.0slim.exe     |    624 763 614 Bytes | 8584e33e01025ce04d0e429f2c08c7fe94576901aabf030341b21e0837ed5966
+95c7326579dbd4a16cb2f5b56a141673 | f28906c1e3e4ba073f0363a4e35326f9e8090ce1 | 13abddd4cc2702be56b672c868d0d1bc085e80748dc7d7e9315ab4080f157f3b | Winpython64-3.13.3.0dot.7z        |     24 839 744 Bytes | 1cb42e1ea66116bc0e7804fb44bb519140d5a5acc9bb63c650ef38dc138ca0bb
+bccca9b3e79dfbc13d14837e3ba85c9b | 41c805812b778ccaf3781701264b23e6c9908069 | a6b1882b8eff8a44782bfeec7e5228826ebd38c4234e10ba38a52a85860c41d0 | Winpython64-3.13.3.0dot.exe       |     25 054 784 Bytes | eea4a48f72d3ca7e784e86883ef2b46cd48a75fd68321c1088e9ed8c11ad47bd
+06a5eb8fa4f7447ad63b7e214b126fd7 | 80ab8340798a318c09ffe07a77a920d5d1eda2b7 | f7ef5a6cfe23b7f39f87c128594fc6c7f73f42f9516a0b828dac0da187af68ec | Winpython64-3.13.3.0dot.zip       |     39 870 933 Bytes | a4f9a910f55c5efdbb843874384d5295ff3b3a45d27cab63f74d2f215f9d798c
+40e207597ddecd78f60e8474d8dc3c81 | 5e4df5e04424a754b33e4a63f4ae31d0a65eb0a5 | 0ee4eaa17ed86fbcb9e861989e08c85dcf13ca1ef067c52f4fc8b68dd7836c46 | Winpython64-3.13.3.0slim.7z       |    629 049 097 Bytes | f275d41a374ff5f3b75decbe65cd52a54c1ac8157edeb62f377dfa2278201ccb
+312a8e7fa70b5b58e44f69c1066687a8 | 12e992d1e40fb04c0e7fe367a983dc27ef88b151 | 9abfd2a54ba314dfe573792a573ad31a43e63765f7b77c2002849086a1a47c5e | Winpython64-3.13.3.0slim.exe      |    629 265 120 Bytes | 87fc9b086fae8a07b234fcced8b428cd0c3367a9ff068cd3c28b661813c94cab
+588e3a1a7ddc461f528270a302a3b667 | a77e443c86c1d21c9a177193e69847efa6346373 | 060046dc83030a639d50396f403a28556ebbd87495bb14045b21118e6cff4c4b | requirement_hash.WinPython64-3.12.10..0slim.txt |         78 133 Bytes | 54d3902407c7c935d83681796585e24d80478f68d22d62ff500d4072ab0385b0
+fb5edb31a3f1e0e7f43eb810f5dd4032 | c6c043e8ec9c7af50eb2d297a91c1b87d3bc7074 | 225500ba0b3aea779b24f7b17bece53250b24380390685bac5ae6c5804f68367 | requirement_hash.WinPython64-3.13.3.0slim.txt |         78 125 Bytes | 1b3d8ff70b049c368ae848d69331faf2ceb19ddc6821ec3549e5511ecac7f393
+
+
 ### WinPython 2025-01 release (March 1st, 2025)
 
  MD5                             | SHA-1                                    | SHA-256                                                          | Binary                            | Size               | blake2b-256                                                     
