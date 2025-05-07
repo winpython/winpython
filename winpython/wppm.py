@@ -74,16 +74,20 @@ class Distribution:
 
     def get_installed_packages(self, update: bool = False) -> list[Package]:
         """Return installed packages."""
-
-        # Include package installed via pip (not via WPPM)
         if str(Path(sys.executable).parent) == self.target:
             self.pip = piptree.PipData()
         else:
             self.pip = piptree.PipData(utils.get_python_executable(self.target))
         pip_list = self.pip.pip_list(full=True)
-
-        # return a list of package objects
         return [Package(f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl", suggested_summary=i[2]) for i in pip_list]
+
+    def get_installed_packages_markdown(self) -> str:
+        """Generates Markdown for installed packages section in package index."""
+        package_lines = [
+            f"[{pkg.name}]({pkg.url}) | {pkg.version} | {pkg.description}"
+            for pkg in sorted(self.get_installed_packages(), key=lambda p: p.name.lower())
+        ]
+        return "\n".join(package_lines)
 
     def find_package(self, name: str) -> Package | None:
         """Find installed package by name."""
