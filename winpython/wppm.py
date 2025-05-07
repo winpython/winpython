@@ -80,10 +80,10 @@ class Distribution:
             self.pip = piptree.PipData()
         else:
             self.pip = piptree.PipData(utils.get_python_executable(self.target))
-        pip_list = self.pip.pip_list()
+        pip_list = self.pip.pip_list(full=True)
 
         # return a list of package objects
-        return [Package(f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl") for i in pip_list]
+        return [Package(f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl", suggested_summary=i[2]) for i in pip_list]
 
     def find_package(self, name: str) -> Package | None:
         """Find installed package by name."""
