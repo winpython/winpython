@@ -102,9 +102,6 @@ class WinPythonDistributionBuilder:
     @property
     def package_index_markdown(self) -> str:
         """Generates a Markdown formatted package index page."""
-        installed_tools_markdown = self._get_installed_tools_markdown()
-        installed_packages_markdown = self._get_installed_packages_markdown()
-
         return f"""## WinPython {self.winpyver2 + self.flavor}
 
 The following packages are included in WinPython-{self.architecture_bits}bit v{self.winpyver2 + self.flavor} {self.release_level}.
@@ -115,48 +112,16 @@ The following packages are included in WinPython-{self.architecture_bits}bit v{s
 
 Name | Version | Description
 -----|---------|------------
-{installed_tools_markdown}
+{utils.get_installed_tools_markdown(utils.get_python_executable(self.python_executable_directory))}
 
 ### Python packages
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | {self.python_full_version} | Python programming language with standard library
-{installed_packages_markdown}
+{self.distribution.get_installed_packages_markdown()}
 
 </details>
 """
-
-    def _get_installed_tools_markdown(self) -> str:
-        """Generates Markdown for installed tools section in package index."""
-        tool_lines = []
-
-        if (nodejs_path := self.winpython_directory / NODEJS_RELATIVE_PATH).exists():
-            version = utils.exec_shell_cmd("node -v", nodejs_path).splitlines()[0]
-            tool_lines.append(f"[Nodejs](https://nodejs.org) | {version} | xa JavaScript runtime built on Chrome's V8 JavaScript engine")
-            version = utils.exec_shell_cmd("npm -v", nodejs_path).splitlines()[0]
-            tool_lines.append(f"[npmjs](https://www.npmjs.com) | {version} | a package manager for JavaScript")
-
-        if (pandoc_exe := self.winpython_directory / "t" / "pandoc.exe").exists():
-            version = utils.exec_shell_cmd("pandoc -v", pandoc_exe.parent).splitlines()[0].split(" ")[-1]
-            tool_lines.append(f"[Pandoc](https://pandoc.org) | {version} | an universal document converter")
-
-        if vscode_exe := (self.winpython_directory / "t" / "VSCode" / "Code.exe").exists():
-            version = utils.getFileProperties(str(vscode_exe))["FileVersion"]
-            tool_lines.append(f"[VSCode](https://code.visualstudio.com) | {version} | a source-code editor developed by Microsoft")
-
-        return "\n".join(tool_lines)
-
-    def _get_installed_packages_markdown(self) -> str:
-        """Generates Markdown for installed packages section in package index."""
-        if not self.distribution:
-            return ""  # Distribution not initialized yet.
-        self.installed_packages = self.distribution.get_installed_packages(update=True)
-        package_lines = [
-            f"[{pkg.name}]({pkg.url}) | {pkg.version} | {pkg.description}"
-            for pkg in sorted(self.installed_packages, key=lambda p: p.name.lower())
-        ]
-        return "\n".join(package_lines)
 
     @property
     def winpython_version_name(self) -> str:

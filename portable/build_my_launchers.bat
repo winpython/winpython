@@ -7,12 +7,17 @@ set VCVARS_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\
 
 rem pick the right ones and rename them in launchers_final
 set do_launcher=%~dp0launchers_src\build_one_launcher.bat
+set do_launcher_original=%~dp0launchers_src_original\build_one_launcher.bat
 
 ::WINDOWS launchers
-call %do_launcher% "powershell.ico" "cmd_ps.bat" "WinPython Powershell Prompt" WINDOWS
-
-pause
 call %do_launcher%  "python.ico" "winidle.bat" "IDLE (Python GUI)" WINDOWS
+
+echo displace this pause if you want to re-build more
+pause
+exit
+
+
+call %do_launcher% "powershell.ico" "cmd_ps.bat" "WinPython Powershell Prompt" WINDOWS
 call %do_launcher%  "spyder.ico" "winspyder.bat" "Spyder" WINDOWS
 call %do_launcher%  "spyder_reset.ico" "spyder_reset.bat" "Spyder reset" WINDOWS
 call %do_launcher%  "code.ico" "winvscode.bat" "VS Code" WINDOWS
