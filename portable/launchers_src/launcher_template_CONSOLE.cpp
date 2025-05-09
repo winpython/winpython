@@ -19,6 +19,26 @@ int main() {
     std::wstring exeDir = exePath;
     exeDir = exeDir.substr(0, exeDir.find_last_of(L"\\/"));
 
+    // Get command line string and extract arguments
+    LPWSTR commandLine = GetCommandLineW();
+    std::wstring args;
+    // If executable path is double quoted, skip the entire quoted section
+    if (commandLine[0] == L'"') {
+        LPWSTR closingQuote = wcschr(commandLine + 1, L'"');
+        if (closingQuote) {
+            args = closingQuote + 1;
+        }
+    // For non-quoted path, skip to character after first space if it exists
+    } else {
+        LPWSTR spacePos = wcschr(commandLine, L' ');
+        if (spacePos) {
+            args = spacePos + 1;
+        }
+    }
+    // Strip leading whitespace
+    size_t args_start = args.find_first_not_of(L' ');
+    args = (args_start != std::wstring::npos) ? args.substr(args_start) : L"";
+
     // Define the path to the "scripts" directory
     std::wstring scriptsDir = exeDir + L"\\scripts";
 
@@ -37,8 +57,13 @@ int main() {
         return 1;
     }
 
-    // Define the command to run
-    std::wstring target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
+    // Define the command to run and append arguments if present
+    std::wstring target;
+    if (!args.empty()) {
+        target = L"cmd.exe /c \"\"" LAUNCH_TARGET L"\" " + args + L"\"";
+    } else {
+        target = L"cmd.exe /c \"" LAUNCH_TARGET L"\"";
+    }
 
     // Configure the process startup info
     STARTUPINFO si = { sizeof(si) };
