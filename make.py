@@ -252,8 +252,6 @@ Name | Version | Description
                 self.distribution.do_pip_action(actions)
             self.distribution.patch_standard_packages()
 
-        self._print_action("Cleaning up distribution")
-        self.distribution.clean_up()  # still usefull ?
         self._print_action("Writing package index")
         self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
         output_markdown_filename = str(self.winpython_directory.parent / f"WinPython{self.flavor}-{self.distribution.architecture}bit-{self.winpyver2}.md")

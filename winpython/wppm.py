@@ -47,21 +47,6 @@ class Distribution:
         self.version, self.architecture = utils.get_python_infos(self.target)
         self.short_exe = Path(utils.get_python_executable(self.target)).name
 
-    def clean_up(self):
-        """Remove directories that were marked for removal."""
-        for path in self.to_be_removed:
-            try:
-                shutil.rmtree(path, onexc=utils.onerror)
-            except OSError as e:
-                print(f"Error: Could not remove directory {path}: {e}", file=sys.stderr)
-
-    def remove_directory(self, path: str):
-        """Try to remove a directory, add to removal list on failure."""
-        try:
-            shutil.rmtree(path)
-        except OSError:
-            self.to_be_removed.append(path)
-
     def create_file(self, package, name, dstdir, contents):
         """Generate data file -- path is relative to distribution root dir"""
         dst = Path(dstdir) / name
