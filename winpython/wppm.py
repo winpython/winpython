@@ -45,7 +45,8 @@ class Distribution:
         self.pip = None
         self.to_be_removed = []
         self.version, self.architecture = utils.get_python_infos(self.target)
-        self.short_exe = Path(utils.get_python_executable(self.target)).name
+        self.python_exe = utils.get_python_executable(self.target)
+        self.short_exe = Path(self.python_exe).name
 
     def create_file(self, package, name, dstdir, contents):
         """Generate data file -- path is relative to distribution root dir"""
@@ -224,81 +225,30 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 
 def main(test=False):
 
-    registerWinPythonHelp = f"Register distribution: associate file extensions, icons and context menu with this WinPython"
-    unregisterWinPythonHelp = f"Unregister distribution: de-associate file extensions, icons and context menu from this WinPython"
+    registerWinPythonHelp = f"Register WinPython: associate file extensions, icons and context menu with this WinPython"
+    unregisterWinPythonHelp = f"Unregister WinPython: de-associate file extensions, icons and context menu from this WinPython"
     parser = ArgumentParser(
         description="WinPython Package Manager: handle a WinPython Distribution and its packages",
         formatter_class=RawTextHelpFormatter,
     )
-    parser.add_argument(
-        "fname",
-        metavar="package",
-        nargs="?",
-        default="",
-        type=str,
-        help="optional package name or package wheel",
-    )
-    parser.add_argument(
-        "--register",
-        dest="registerWinPython",
-        action="store_true", # Store True when flag is present
-        help=registerWinPythonHelp,
-    )
-    parser.add_argument(
-        "--unregister",
-        dest="unregisterWinPython",
-        action="store_true",
-        help=unregisterWinPythonHelp,
-    )
-    parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="show more details on packages and actions",
-    )
-    parser.add_argument(
-        "-ls", "--list",
-        action="store_true",
-        help="list installed packages matching the given [optional] package expression: wppm -ls, wppm -ls pand",
-    )
-    parser.add_argument(
-        "-p",
-        dest="pipdown",
-        action="store_true",
-        help="show Package dependencies of the given package[option]: wppm -p pandas[test]",
-    )
-    parser.add_argument(
-        "-r",
-        dest="pipup",
-        action="store_true",
-        help=f"show Reverse dependancies of the given package[option]: wppm -r pytest[test]",
-    )
-    parser.add_argument(
-        "-l", "--levels",
-        type=int,
-        default=2,
-        help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1",
-    )
-    parser.add_argument(
-        "-lsa",
-        dest="all",
-        action="store_true",
-        help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1",
-    )
-    parser.add_argument(
-        "-t", "--target",
-        default=sys.prefix,
-        help=f'path to target Python distribution (default: "{sys.prefix}")',
-    )
-    parser.add_argument(
-        "-i", "--install",
-        action="store_true",
-        help="install a given package wheel (use pip for more features)",
-    )
-    parser.add_argument(
-        "-u", "--uninstall",
-        action="store_true", # Store True when flag is present
-        help="uninstall package  (use pip for more features)",
-    )
+    parser.add_argument("fname", metavar="package", nargs="?", default="", type=str, help="optional package name or package wheel")
+    parser.add_argument("-v", "--verbose", action="store_true", help="show more details on packages and actions")
+    parser.add_argument( "--register", dest="registerWinPython", action="store_true", help=registerWinPythonHelp)
+    # parser.add_argument( "--register_forall", action="store_true", help="Register distribution for all users")
+    parser.add_argument("--unregister", dest="unregisterWinPython", action="store_true", help=unregisterWinPythonHelp)
+    # parser.add_argument( "--unregister_forall", action="store_true", help="un-Register distribution for all users")
+    parser.add_argument("--fix", action="store_true", help="make WinPython fix")
+    parser.add_argument("--movable", action="store_true", help="make WinPython movable")
+    parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching the given [optional] package expression: wppm -ls, wppm -ls pand")
+    parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1")
+    parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option]: wppm -p pandas[test]")
+    parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse dependancies of the given package[option]: wppm -r pytest[test]")
+    parser.add_argument("-l", "--levels", type=int, default=2, help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1")
+    parser.add_argument("-t", "--target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
+    parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel (use pip for more features)")
+    parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
+
+
     args = parser.parse_args()
     targetpython = None
     if args.target and args.target != sys.prefix:
@@ -362,26 +312,35 @@ def main(test=False):
         if theAnswer == "Y":
             associate.unregister(dist.target, verbose=args.verbose)
             sys.exit()
-    elif not args.install and not args.uninstall:
-        args.install = True
-    if not Path(args.fname).is_file() and args.install:
-        if args.fname == "":
-            parser.print_help()
-            sys.exit()
-        else:
-            raise FileNotFoundError(f"File not found: {args.fname}")
     if utils.is_python_distribution(args.target):
         dist = Distribution(args.target, verbose=True)
-        try:
-            if args.uninstall:
-                package = dist.find_package(args.fname)
-                dist.uninstall(package)
+        cmd_fix = rf"from winpython import wppm;dist=wppm.Distribution(r'{dist.target}');dist.patch_standard_packages('pip', to_movable=False)"
+        cmd_mov = rf"from winpython import wppm;dist=wppm.Distribution(r'{dist.target}');dist.patch_standard_packages('pip', to_movable=True)"
+        if args.fix:
+            # dist.patch_standard_packages('pip', to_movable=False)  # would fail on wppm.exe
+            p = subprocess.Popen(["start", "cmd", "/k",dist.python_exe, "-c" , cmd_fix], shell = True,  cwd=dist.target)
+            sys.exit()
+        if args.movable:
+            p = subprocess.Popen(["start", "cmd", "/k",dist.python_exe, "-c" , cmd_mov], shell = True,  cwd=dist.target)
+            sys.exit()
+        if not args.install and not args.uninstall:
+            args.install = True
+        if not Path(args.fname).is_file() and args.install:
+            if args.fname == "":
+                parser.print_help()
+                sys.exit()
             else:
-                package = Package(args.fname)
-                if args.install:
-                    dist.install(package)
-        except NotImplementedError:
-            raise RuntimeError("Package is not (yet) supported by WPPM")
+                raise FileNotFoundError(f"File not found: {args.fname}")
+            try:
+                if args.uninstall:
+                    package = dist.find_package(args.fname)
+                    dist.uninstall(package)
+                elif args.install:
+                    package = Package(args.fname)
+                    if args.install:
+                        dist.install(package)
+            except NotImplementedError:
+                raise RuntimeError("Package is not (yet) supported by WPPM")
     else:
         raise OSError(f"Invalid Python distribution {args.target}")
 
