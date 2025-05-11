@@ -2,7 +2,7 @@ rem  generate_a_winpython_distro.bat: to be launched from a winpython directory,
 @echo on
 
 REM Initialize variables
-if "%my_release_level%"=="" set my_release_level=b3
+if "%my_release_level%"=="" set my_release_level=b1
 if "%my_create_installer%"=="" set my_create_installer=True
 
 rem Set archive directory and log file
@@ -26,8 +26,8 @@ if "%target_python_exe%"=="" set target_python_exe=python.exe
 
 rem Set Python target release based on my_python_target
 if %my_python_target%==311 set my_python_target_release=3119& set my_release=1
-if %my_python_target%==312 set my_python_target_release=31210& set my_release=0
-if %my_python_target%==313 set my_python_target_release=3133& set my_release=0
+if %my_python_target%==312 set my_python_target_release=31210& set my_release=1
+if %my_python_target%==313 set my_python_target_release=3133& set my_release=1
 if %my_python_target%==314 set my_python_target_release=3140& set my_release=0
 
 echo -------------------------------------- >>%my_archive_log%
@@ -113,6 +113,43 @@ set path=%my_original_path%
 cd /D %~dp0
 call %my_buildenv%\scripts\env.bat
 python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
+
+echo -------------------------------------- >>%my_archive_log%
+echo "(%date% %time%) generate lock files">>%my_archive_log%
+echo -------------------------------------- >>%my_archive_log%
+
+set path=%my_original_path%
+call %my_WINPYDIRBASE%\scripts\env.bat
+
+rem generate pip freeze requirements
+echo %date% %time%
+set LOCKDIR=%WINPYDIRBASE%\notebooks\
+set req=%LOCKDIR%requirement_%WINPYVER%_raw.txt
+set wanted_req=%LOCKDIR%requirement_%WINPYVER%.txt
+set pip_lock_web=%LOCKDIR%pylock_%WINPYVER%.toml
+set pip_lock_local=%LOCKDIR%pylock_%WINPYVER%_local.toml
+set my_archive_lockfile=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%.toml
+set my_archive_lockfile_local=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%_local.tml
+set my_changelog_lockfile=%~dp0changelogs\pylock_%WINPYVER%.toml
+
+
+python.exe -m pip freeze>%req%
+findstr /v "winpython" %req% > %wanted_req%
+
+rem pip lock from pypi the local, from a frozen req
+python.exe -m pip lock --no-deps  -c C:\WinP\constraints.txt -r %wanted_req% 
+copy pylock.toml %pip_lock_web%
+python.exe -m pip lock --no-deps --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r  %wanted_req% 
+copy pylock.toml %pip_lock_local%
+
+rem compare the two 
+findstr /V /R "^url =$" %pip_lock_web% > %pip_lock_web%.no_url.txt
+findstr /V /R "^url =$" %pip_lock_local% > %pip_lock_local%.no_url.txt
+
+fc  %pip_lock_web%.no_url.txt %pip_lock_local%.no_url.txt
+
+copy/Y %pip_lock_web% %my_archive_lockfile%
+copy/Y %pip_lock_web% %my_changelog_lockfile%
 
 echo -------------------------------------- >>%my_archive_log%
 echo "(%date% %time%) END OF CREATION">>%my_archive_log%
