@@ -1,13 +1,22 @@
-import tomli  # or import tomllib for Python 3.11+
-import hashlib
 import sys
 from pathlib import Path
 from collections import defaultdict
 
+# Use tomllib if available (Python 3.11+), otherwise fall back to tomli
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    try:
+        import tomli as tomllib  # For older Python versions
+    except ImportError:
+        print("Please install tomli for Python < 3.11: pip install tomli")
+        sys.exit(1)
+
+
 
 def parse_pylock_toml(path):
     with open(path, "rb") as f:
-        data = tomli.load(f)
+        data = tomllib.load(f)
 
     # This dictionary maps package names to (version, [hashes])
     package_hashes = defaultdict(lambda: {"version": "", "hashes": []})
