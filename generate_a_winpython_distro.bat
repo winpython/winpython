@@ -135,27 +135,22 @@ set my_archive_lockfile=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time
 set my_archive_lockfile_local=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%_local.tml
 set my_changelog_lockfile=%~dp0changelogs\pylock_%WINPYVER%.toml
 
-rem to get pylock.toml in a ok place...
-cd/D %LOCKDIR%
-
 python.exe -m pip freeze>%req%
 findstr /v "winpython" %req% > %wanted_req%
 
 
 rem pip lock from pypi, from the frozen req
-python.exe -m pip lock --no-deps  -c C:\WinP\constraints.txt -r "%wanted_req%"
-copy pylock.toml %pip_lock_web%
+python.exe -m pip lock --no-deps  -c C:\WinP\constraints.txt -r "%wanted_req%" -o %pip_lock_web%
 
 rem pip lock from local WheelHouse, from the frozen req
-python.exe -m pip lock --no-deps --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r  "%wanted_req%"
-copy pylock.toml %pip_lock_local%
+python.exe -m pip lock --no-deps --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r  "%wanted_req%" -o %pip_lock_local%
 
 rem generating also classic requirement with hash-256, from obtained pylock.toml
 python.exe -c "from winpython import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_web%', r'%req_lock_web%')"
 python.exe -c "from winpython import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_local%', r'%req_lock_local%')"
 
 rem compare the two (result from pypi and local Wheelhouse must be equal)
-fc  "%pip_lock_web%" "%pip_lock_local%"
+fc  "%req_lock_web%" "%req_lock_local%"
 
 copy/Y %pip_lock_web% %my_archive_lockfile%
 copy/Y %pip_lock_web% %my_changelog_lockfile%
