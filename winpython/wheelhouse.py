@@ -1,3 +1,5 @@
+#
+# WheelHouse.py 
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -15,7 +17,7 @@ except ImportError:
 
 
 def parse_pylock_toml(path):
-    with open(path, "rb") as f:
+    with open(Path(path), "rb") as f:
         data = tomllib.load(f)
 
     # This dictionary maps package names to (version, [hashes])
@@ -46,7 +48,7 @@ def parse_pylock_toml(path):
 
 
 def write_requirements_txt(package_hashes, output_path="requirements.txt"):
-    with open(output_path, "w") as f:
+    with open(Path(output_path), "w") as f:
         for name, data in sorted(package_hashes.items()):
             version = data["version"]
             hashes = data["hashes"]
@@ -60,6 +62,12 @@ def write_requirements_txt(package_hashes, output_path="requirements.txt"):
                 f.write(f"{name}=={version}\n")
 
     print(f"✅ requirements.txt written to {output_path}")
+
+def pylock_to_req(path, output_path=None):
+    pkgs = parse_pylock_toml(path)
+    if not output_path:
+        output_path = path.parent / (path.stem.replace('pylock','requirement_with_hash')+ '.txt')
+    write_requirements_txt(pkgs, output_path)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
