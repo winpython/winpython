@@ -115,7 +115,7 @@ call %my_buildenv%\scripts\env.bat
 python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
 
 echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) generate lock files">>%my_archive_log%
+echo "(%date% %time%) generate pylock.tomle files and requirement_with_hash.txt files">>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
 
 set path=%my_original_path%
@@ -123,30 +123,39 @@ call %my_WINPYDIRBASE%\scripts\env.bat
 
 rem generate pip freeze requirements
 echo %date% %time%
-set LOCKDIR=%WINPYDIRBASE%\notebooks\
+set LOCKDIR=%WINPYDIRBASE%\..\
 set req=%LOCKDIR%requirement_%WINPYVER%_raw.txt
 set wanted_req=%LOCKDIR%requirement_%WINPYVER%.txt
 set pip_lock_web=%LOCKDIR%pylock_%WINPYVER%.toml
 set pip_lock_local=%LOCKDIR%pylock_%WINPYVER%_local.toml
+set req_lock_web=%LOCKDIR%requirement_with_hash_%WINPYVER%.txt
+set req_lock_local=%LOCKDIR%requirement_with_hash_%WINPYVER%_local.txt
+
 set my_archive_lockfile=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%.toml
 set my_archive_lockfile_local=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%_local.tml
 set my_changelog_lockfile=%~dp0changelogs\pylock_%WINPYVER%.toml
 
+rem to get pylock.toml in a ok place...
+cd/D %LOCKDIR%
 
 python.exe -m pip freeze>%req%
 findstr /v "winpython" %req% > %wanted_req%
 
-rem pip lock from pypi the local, from a frozen req
-python.exe -m pip lock --no-deps  -c C:\WinP\constraints.txt -r %wanted_req% 
+
+rem pip lock from pypi, from the frozen req
+python.exe -m pip lock --no-deps  -c C:\WinP\constraints.txt -r "%wanted_req%"
 copy pylock.toml %pip_lock_web%
-python.exe -m pip lock --no-deps --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r  %wanted_req% 
+
+rem pip lock from local WheelHouse, from the frozen req
+python.exe -m pip lock --no-deps --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r  "%wanted_req%"
 copy pylock.toml %pip_lock_local%
 
-rem compare the two 
-findstr /V /R "^url =$" %pip_lock_web% > %pip_lock_web%.no_url.txt
-findstr /V /R "^url =$" %pip_lock_local% > %pip_lock_local%.no_url.txt
+rem generating also classic requirement with hash-256, from obtained pylock.toml
+python.exe -c "from winpython import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_web%', r'%req_lock_web%')"
+python.exe -c "from winpython import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_local%', r'%req_lock_local%')"
 
-fc  %pip_lock_web%.no_url.txt %pip_lock_local%.no_url.txt
+rem compare the two (result from pypi and local Wheelhouse must be equal)
+fc  "%pip_lock_web%" "%pip_lock_local%"
 
 copy/Y %pip_lock_web% %my_archive_lockfile%
 copy/Y %pip_lock_web% %my_changelog_lockfile%
