@@ -1,3 +1,5 @@
 @echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%" 
+rem "%WINPYDIR%\scripts\spyder.exe" %* -w "%WINPYWORKDIR1%" 
+"%WINPYDIR%\scripts\spyder.exe" %* 
+
