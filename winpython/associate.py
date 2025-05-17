@@ -133,8 +133,8 @@ def register_in_registery(target, current=True, reg_type=winreg.REG_SZ, verbose=
     lost_entries.append((rf"Software\Classes\Python.NoConFile\shell\Edit with IDLE", None, None))
 
     if Path(spyder_exe).exists():
-        dynamic_entries.append((rf"Software\Classes\Python.File\shell\Edit with Spyder\command", None, f'"{spyder_exe}" "%1" -w "%~p1."'))
-        dynamic_entries.append((rf"Software\Classes\Python.NoConFile\shell\Edit with Spyder\command", None, f'"{spyder_exe}" "%1" -w "%~p1."'))
+        dynamic_entries.append((rf"Software\Classes\Python.File\shell\Edit with Spyder\command", None, f'"{spyder_exe}" "%1" -w "%w"'))
+        dynamic_entries.append((rf"Software\Classes\Python.NoConFile\shell\Edit with Spyder\command", None, f'"{spyder_exe}" "%1" -w "%w"'))
         lost_entries.append((rf"Software\Classes\Python.File\shell\Edit with Spyder", None, None))
         lost_entries.append((rf"Software\Classes\Python.NoConFile\shell\Edit with Spyder", None, None))
 
