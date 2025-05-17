@@ -2,7 +2,7 @@ rem  generate_a_winpython_distro.bat: to be launched from a winpython directory,
 @echo on
 
 REM Initialize variables
-if "%my_release_level%"=="" set my_release_level=b1
+if "%my_release_level%"=="" set my_release_level=b2
 if "%my_create_installer%"=="" set my_create_installer=True
 
 rem Set archive directory and log file
@@ -124,16 +124,18 @@ call %my_WINPYDIRBASE%\scripts\env.bat
 rem generate pip freeze requirements
 echo %date% %time%
 set LOCKDIR=%WINPYDIRBASE%\..\
-set req=%LOCKDIR%requirement_%WINPYVER%_raw.txt
-set wanted_req=%LOCKDIR%requirement_%WINPYVER%.txt
-set pip_lock_web=%LOCKDIR%pylock_%WINPYVER%.toml
-set pip_lock_local=%LOCKDIR%pylock_%WINPYVER%_local.toml
-set req_lock_web=%LOCKDIR%requirement_with_hash_%WINPYVER%.txt
-set req_lock_local=%LOCKDIR%requirement_with_hash_%WINPYVER%_local.txt
 
-set my_archive_lockfile=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%.toml
-set my_archive_lockfile_local=%my_archive_dir%\pylock_%WINPYVER%_%date:/=-%at_%my_time%_local.tml
-set my_changelog_lockfile=%~dp0changelogs\pylock_%WINPYVER%.toml
+set WINPYVERLOCK=%WINPYVER:.=_%
+set req=%LOCKDIR%requirement.%WINPYVERLOCK%_raw.txt
+set wanted_req=%LOCKDIR%requirement.%WINPYVERLOCK%.txt
+set pip_lock_web=%LOCKDIR%pylock.%WINPYVERLOCK%.toml
+set pip_lock_local=%LOCKDIR%pylock.%WINPYVER%_local.toml
+set req_lock_web=%LOCKDIR%requirement_with_hash.%WINPYVERLOCK%.txt
+set req_lock_local=%LOCKDIR%requirement_with_hash.%WINPYVERLOCK%_local.txt
+
+set my_archive_lockfile=%my_archive_dir%\pylock.%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml
+set my_archive_lockfile_local=%my_archive_dir%\pylock.%WINPYVERLOCK%_%date:/=-%at_%my_time%.local.toml
+set my_changelog_lockfile=%~dp0changelogs\pylock.%WINPYVERLOCK%.toml
 
 python.exe -m pip freeze>%req%
 findstr /v "winpython" %req% > %wanted_req%
