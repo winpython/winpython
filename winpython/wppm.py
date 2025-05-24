@@ -231,7 +231,7 @@ def main(test=False):
         description="WinPython Package Manager: handle a WinPython Distribution and its packages",
         formatter_class=RawTextHelpFormatter,
     )
-    parser.add_argument("fname", metavar="package", nargs="?", default="", type=str, help="optional package name or package wheel")
+    parser.add_argument("fname", metavar="package or lockfile", nargs="?", default="", type=str, help="optional package name or package wheel")
     parser.add_argument("-v", "--verbose", action="store_true", help="show more details on packages and actions")
     parser.add_argument( "--register", dest="registerWinPython", action="store_true", help=registerWinPythonHelp)
     # parser.add_argument( "--register_forall", action="store_true", help="Register distribution for all users")
@@ -239,13 +239,14 @@ def main(test=False):
     # parser.add_argument( "--unregister_forall", action="store_true", help="un-Register distribution for all users")
     parser.add_argument("--fix", action="store_true", help="make WinPython fix")
     parser.add_argument("--movable", action="store_true", help="make WinPython movable")
+    parser.add_argument("-wh", "--wheelhouse", default=None, type=str, help="wheelhouse location to search for wheels: wppm pylock.toml -wh directory_of_wheels")
     parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching the given [optional] package expression: wppm -ls, wppm -ls pand")
     parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option]: wppm -p pandas[test]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse dependancies of the given package[option]: wppm -r pytest[test]")
     parser.add_argument("-l", "--levels", type=int, default=2, help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1")
     parser.add_argument("-t", "--target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
-    parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel (use pip for more features)")
+    parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
 
 
@@ -331,7 +332,14 @@ def main(test=False):
                 sys.exit()
             else:
                 raise FileNotFoundError(f"File not found: {args.fname}")
+        else:
             try:
+                filename = Path(args.fname).name
+                if filename.split('.')[0] == "pylock" and filename.split('.')[-1] == 'toml':
+                    print(' a lock file !', args.fname, dist.target)
+                    from winpython import wheelhouse as wh
+                    wh.get_pylock_wheels(Path(dist.target).parent/ "WheelHouse", Path(args.fname), args.wheelhouse)
+                sys.exit()
                 if args.uninstall:
                     package = dist.find_package(args.fname)
                     dist.uninstall(package)
