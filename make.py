@@ -221,10 +221,7 @@ Name | Version | Description
         if rebuild:
             self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
             if self.winpython_directory.is_dir():
-                try:
-                    shutil.rmtree(self.winpython_directory, onexc=utils.onerror)
-                except TypeError:  # before 3.12
-                    shutil.rmtree(self.winpython_directory, onerror=utils.onerror)
+                shutil.rmtree(self.winpython_directory)
             os.makedirs(self.winpython_directory, exist_ok=True)
             # preventive re-Creation of settings directory
             (self.winpython_directory / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True)
