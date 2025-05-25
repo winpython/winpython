@@ -93,18 +93,20 @@ def run_pip_command(command: List[str], check: bool = True, capture_output=True)
     except Exception as e:
         return False, f"Unexpected error: {e}"
 
-def get_wheels(requirements: Path, wheeldir: Path, from_local: Optional[Path] = None
+def get_wheels(requirements: Path, wheeldrain: Path, wheelorigin: Optional[Path] = None
                , only_check: bool = True,post_install: bool = False) -> bool:
     """Download or check Python wheels based on requirements."""
     added = []
-    if from_local:
-        added += ['--no-index', '--trusted-host=None', f'--find-links={from_local}']
+    if wheelorigin:
+        added = ['--no-index', '--trusted-host=None', f'--find-links={wheelorigin}']
     pre_checks = [sys.executable, "-m", "pip", "install", "--dry-run", "--no-deps", "--require-hashes", "-r", str(requirements)] + added
-    instruction = [sys.executable, "-m", "pip", "download", "--no-deps", "--require-hashes", "-r", str(requirements), "--dest", str(wheeldir)] + added
+    instruction = [sys.executable, "-m", "pip", "download", "--no-deps", "--require-hashes", "-r", str(requirements), "--dest", str(wheeldrain)] + added
+    if wheeldrain:
+        added = ['--no-index', '--trusted-host=None', f'--find-links={wheeldrain}']
     post_install_cmd = [sys.executable, "-m", "pip", "install", "--no-deps", "--require-hashes", "-r", str(requirements)] + added
 
-    # Run pip dry-run, only  if a move of directory
-    if  from_local and from_local != wheeldir:
+    # Run pip dry-run, only  if a move of wheels
+    if  wheelorigin and wheelorigin != wheeldrain:
         success, output = run_pip_command(pre_checks, check=False)
         if not success:
             print("❌ Dry-run failed. Here's the output:\n")
@@ -135,15 +137,15 @@ def get_wheels(requirements: Path, wheeldir: Path, from_local: Optional[Path] = 
 
     return True
 
-def get_pylock_wheels(wheelhouse: Path, lockfile: Path, from_local: Optional[Path] = None) -> None:
-    """Get wheels for a pylock file."""
+def get_pylock_wheels(wheelhouse: Path, lockfile: Path, wheelorigin: Optional[Path] = None, wheeldrain: Optional[Path] = None) -> None:
+    """Get wheels asked pylock file."""
     filename = Path(lockfile).name
     wheelhouse.mkdir(parents=True, exist_ok=True)
     trusted_wheelhouse = wheelhouse / "included.wheels"
     trusted_wheelhouse.mkdir(parents=True, exist_ok=True)
 
     filename_lock = wheelhouse / filename
-    filename_req = wheelhouse / (Path(lockfile).stem.replace('pylock', 'requirement_with_hash') + '.txt')
+    filename_req = wheelhouse / (Path(lockfile).stem.replace('pylock', 'requirement') + '.txt')
 
     pylock_to_req(Path(lockfile), filename_req)
 
@@ -151,27 +153,29 @@ def get_pylock_wheels(wheelhouse: Path, lockfile: Path, from_local: Optional[Pat
         shutil.copy2(lockfile, filename_lock)
 
     # We create a destination for wheels that is specific, so we can check all is there
-    destination_wheelhouse = wheelhouse / Path(lockfile).name.replace('.toml', '.wheels')
+    destination_wheelhouse = Path(wheeldrain) if wheeldrain else wheelhouse / Path(lockfile).name.replace('.toml', '.wheels')
+    destination_wheelhouse.mkdir(parents=True, exist_ok=True)
+    # there can be an override
+
+
     in_trusted = False
 
-    if from_local is None:
+    if wheelorigin is None:
         # Try from trusted WheelHouse
         print(f"\n\n*** Checking if we can install from our Local WheelHouse: ***\n    {trusted_wheelhouse}\n\n")
-        in_trusted = get_wheels(filename_req, destination_wheelhouse, from_local=trusted_wheelhouse, only_check=True)
+        in_trusted = get_wheels(filename_req, destination_wheelhouse, wheelorigin=trusted_wheelhouse, only_check=True)
         if in_trusted:
             print(f"\n\n***  We can install from Local WheelHouse: ***\n    {trusted_wheelhouse}\n\n")
-            user_input = input("Do you want to continue and install from {trusted_wheelhouse} ? (yes/no):")
-            if user_input.lower() == "yes":
-                in_installed = get_wheels(filename_req, trusted_wheelhouse, from_local=trusted_wheelhouse, only_check=True, post_install=True)
+            in_installed = get_wheels(filename_req, trusted_wheelhouse, wheelorigin=trusted_wheelhouse, only_check=True, post_install=True)
 
     if not in_trusted:
-        post_install = True if from_local and Path(from_local).is_dir and Path(from_local).samefile(destination_wheelhouse) else False
+        post_install = True if wheelorigin and Path(wheelorigin).is_dir and Path(wheelorigin).samefile(destination_wheelhouse) else False
         if post_install:
             print(f"\n\n*** Installing from Local WheelHouse: ***\n    {destination_wheelhouse}\n\n")
         else:
-            print(f"\n\n*** Re-Checking if we can install from: {'pypi.org' if not from_local or from_local == '' else from_local}\n\n")
+            print(f"\n\n*** Re-Checking if we can install from: {'pypi.org' if not wheelorigin or wheelorigin == '' else wheelorigin}\n\n")
 
-        in_pylock = get_wheels(filename_req, destination_wheelhouse, from_local=from_local, only_check=False, post_install=post_install)
+        in_pylock = get_wheels(filename_req, destination_wheelhouse, wheelorigin=wheelorigin, only_check=False, post_install=post_install)
         if in_pylock:
             if not post_install:
                 print(f"\n\n*** You can now install from this dedicated WheelHouse: ***\n    {destination_wheelhouse}")

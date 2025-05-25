@@ -2,7 +2,7 @@ rem  generate_a_winpython_distro.bat: to be launched from a winpython directory,
 @echo on
 
 REM Initialize variables
-if "%my_release_level%"=="" set my_release_level=b2
+if "%my_release_level%"=="" set my_release_level=b3
 if "%my_create_installer%"=="" set my_create_installer=True
 
 rem Set archive directory and log file
@@ -101,21 +101,47 @@ echo -------------------------------------- >>%my_archive_log%
 python -m pip install -r %my_requirements% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
 python -c "from winpython import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('spyder', to_movable=True)"
 
-REM Archive success
+REM Add Wheelhouse (to replace per pip lock direct ? would allow paralellism)
 echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) Archive success">>%my_archive_log%
+echo "(%date% %time%) Add lockfile wheels">>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
-%target_python_exe% -m pip freeze > %my_archive_log%.packages_versions.txt
-
-REM Generate changelog and binaries
-echo "(%date% %time%) Generate changelog and binaries">>%my_archive_log%
 set path=%my_original_path%
-cd /D %~dp0
-call %my_buildenv%\scripts\env.bat
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
+@echo on
+call %my_WINPYDIRBASE%\scripts\env.bat
+@echo on
+set WINPYVERLOCK=%WINPYVER2:.=_%
+set pylockinclude=%my_root_dir_for_builds%\bd%my_python_target%\bu%addlockfile%\pylock.%addlockfile%-%WINPYARCH%bit-%WINPYVERLOCK%.toml
+echo pylockinclude="%pylockinclude%"
+if not "Z%addlockfile%Z"=="ZZ" if exist "%pylockinclude%" (
+echo %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pylockinclude%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels">>%my_archive_log%
+%my_WINPYDIRBASE%\python\scripts\wppm.exe "%pylockinclude%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
+)
 
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) generate pylock.tomle files and requirement_with_hash.txt files">>%my_archive_log%
+@echo on
+echo wheelhousereq=%wheelhousereq%
+set LOCKDIR=%WINPYDIRBASE%\..\
+set pip_lock_includedlocal=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheelslocal.toml
+set pip_lock_includedweb=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheels.toml
+set req_lock_includedlocal=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheelslocal.txt
+set req_lock_includedweb=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheels.txt
+
+if not "Z%wheelhousereq%Z"=="ZZ" if exist "%wheelhousereq%" (
+echo JOYYYwheelhousereq=%wheelhousereq%
+echo  z%pip_lock_includedlocal%z=%pip_lock_includedlocal% 
+rem no winpython in it naturally, with deps
+python.exe -m pip lock --no-index --trusted-host=None  --find-links=%my_find_links%  -c C:\WinP\constraints.txt -r  "%wheelhousereq%" -o %pip_lock_includedlocal% 
+rem generating also classic requirement with hash-256, from obtained pylock.toml
+python.exe -c "from winpython import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_includedlocal%', r'%req_lock_includedlocal%')"
+
+rem same with frozen web from local
+python.exe -m pip lock --no-deps --require-hashes    -c C:\WinP\constraints.txt -r  "%req_lock_includedlocal%" -o %pip_lock_includedweb%
+
+echo %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pip_lock_includedweb%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels">>%my_archive_log%
+%my_WINPYDIRBASE%\python\scripts\wppm.exe "%pip_lock_includedweb%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
+)
+
+echo -------------------------------------- >>%my_archive_log%;
+echo "(%date% %time%) generate pylock.toml files and requirement.txt with hash files">>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
 
 set path=%my_original_path%
@@ -125,17 +151,17 @@ rem generate pip freeze requirements
 echo %date% %time%
 set LOCKDIR=%WINPYDIRBASE%\..\
 
-set WINPYVERLOCK=%WINPYVER:.=_%
-set req=%LOCKDIR%requirement.%WINPYVERLOCK%_raw.txt
-set wanted_req=%LOCKDIR%requirement.%WINPYVERLOCK%.txt
-set pip_lock_web=%LOCKDIR%pylock.%WINPYVERLOCK%.toml
-set pip_lock_local=%LOCKDIR%pylock.%WINPYVER%_local.toml
-set req_lock_web=%LOCKDIR%requirement_with_hash.%WINPYVERLOCK%.txt
-set req_lock_local=%LOCKDIR%requirement_with_hash.%WINPYVERLOCK%_local.txt
+set WINPYVERLOCK=%WINPYVER2:.=_%
+set req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_raw.txt
+set wanted_req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.txt
+set pip_lock_web=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.toml
+set pip_lock_local=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_local.toml
+set req_lock_web=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.txt
+set req_lock_local=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_local.txt
 
-set my_archive_lockfile=%my_archive_dir%\pylock.%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml
-set my_archive_lockfile_local=%my_archive_dir%\pylock.%WINPYVERLOCK%_%date:/=-%at_%my_time%.local.toml
-set my_changelog_lockfile=%~dp0changelogs\pylock.%WINPYVERLOCK%.toml
+set my_archive_lockfile=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml
+set my_archive_lockfile_local=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.local.toml
+set my_changelog_lockfile=%~dp0changelogs\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.toml
 
 python.exe -m pip freeze>%req%
 findstr /v "winpython" %req% > %wanted_req%
@@ -156,6 +182,25 @@ fc  "%req_lock_web%" "%req_lock_local%"
 
 copy/Y %pip_lock_web% %my_archive_lockfile%
 copy/Y %pip_lock_web% %my_changelog_lockfile%
+
+
+REM Archive success
+echo -------------------------------------- >>%my_archive_log%
+echo "(%date% %time%) Archive success">>%my_archive_log%
+echo -------------------------------------- >>%my_archive_log%
+set path=%my_original_path%
+call %my_WINPYDIRBASE%\scripts\env.bat
+
+%target_python_exe% -m pip freeze > %my_archive_log%.packages_versions.txt
+
+REM Generate changelog and binaries
+echo "(%date% %time%) Generate changelog and binaries">>%my_archive_log%
+set path=%my_original_path%
+cd /D %~dp0
+call %my_buildenv%\scripts\env.bat
+
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
+
 
 echo -------------------------------------- >>%my_archive_log%
 echo "(%date% %time%) END OF CREATION">>%my_archive_log%

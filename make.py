@@ -208,6 +208,7 @@ Name | Version | Description
         # Replacements for batch scripts (PyPy compatibility)
         executable_name = self.distribution.short_exe if self.distribution else "python.exe"  # default to python.exe if distribution is not yet set
         init_variables = [('WINPYthon_exe', executable_name), ('WINPYthon_subdirectory_name', self.python_directory_name), ('WINPYVER', self.winpython_version_name)]
+        init_variables += [('WINPYVER2', f"{self.python_full_version}.{self.build_number}"), ('WINPYFLAVOR', self.flavor), ('WINPYARCH', self.architecture_bits)]
         with open(self.winpython_directory / "scripts" / "env.ini", "w") as f:
             f.writelines([f'{a}={b}\n' for a, b in init_variables])
 
@@ -264,7 +265,7 @@ def rebuild_winpython_package(source_directory: Path, target_directory: Path, ar
     for file in target_directory.glob("winpython-*"):
         if file.suffix in (".exe", ".whl", ".gz"):
             file.unlink()
-    utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=verbose)
+    utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=True)
 
 def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
