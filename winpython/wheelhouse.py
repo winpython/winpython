@@ -166,7 +166,7 @@ def get_pylock_wheels(wheelhouse: Path, lockfile: Path, wheelorigin: Optional[Pa
         in_trusted = get_wheels(filename_req, destination_wheelhouse, wheelorigin=trusted_wheelhouse, only_check=True)
         if in_trusted:
             print(f"\n\n***  We can install from Local WheelHouse: ***\n    {trusted_wheelhouse}\n\n")
-            in_installed = get_wheels(filename_req, trusted_wheelhouse, wheelorigin=trusted_wheelhouse, only_check=True, post_install=True)
+            in_installed = get_wheels(filename_req, trusted_wheelhouse, wheelorigin=trusted_wheelhouse, only_check=False, post_install=True)
 
     if not in_trusted:
         post_install = True if wheelorigin and Path(wheelorigin).is_dir and Path(wheelorigin).samefile(destination_wheelhouse) else False
