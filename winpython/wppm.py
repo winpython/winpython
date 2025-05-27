@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
 from winpython import utils, piptree, associate
-
+from winpython import wheelhouse as wh
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
@@ -24,7 +24,7 @@ class Package:
     def __init__(self, fname: str, suggested_summary: str = None):
         self.fname = fname
         self.description = piptree.sum_up(suggested_summary) if suggested_summary else ""
-        self.name, self.version = None, None
+        self.name, self.version = fname, '?.?.?'
         if fname.lower().endswith((".zip", ".tar.gz", ".whl")):
             bname = Path(self.fname).name # e.g., "sqlite_bro-1.0.0..."
             infos = utils.get_source_package_infos(bname) # get name, version
@@ -47,6 +47,7 @@ class Distribution:
         self.version, self.architecture = utils.get_python_infos(self.target)
         self.python_exe = utils.get_python_executable(self.target)
         self.short_exe = Path(self.python_exe).name
+        self.wheelhouse = Path(self.target).parent / "wheelhouse"
 
     def create_file(self, package, name, dstdir, contents):
         """Generate data file -- path is relative to distribution root dir"""
@@ -91,7 +92,8 @@ class Distribution:
 
     def install(self, package: Package, install_options: list[str] = None):
         """Install package in distribution."""
-        if package.fname.endswith((".whl", ".tar.gz", ".zip")): # Check extension with tuple
+        if package.fname.endswith((".whl", ".tar.gz", ".zip")) or (
+            ' ' not in package.fname and ';' not in package.fname and len(package.fname) >1): # Check extension with tuple
             self.install_bdist_direct(package, install_options=install_options)
         self.handle_specific_packages(package)
         # minimal post-install actions
@@ -239,7 +241,8 @@ def main(test=False):
     # parser.add_argument( "--unregister_forall", action="store_true", help="un-Register distribution for all users")
     parser.add_argument("--fix", action="store_true", help="make WinPython fix")
     parser.add_argument("--movable", action="store_true", help="make WinPython movable")
-    parser.add_argument("-wh", "--wheelhouse", default=None, type=str, help="wheelhouse location to search for wheels: wppm pylock.toml -wh directory_of_wheels")
+    parser.add_argument("-ws", dest="wheelsource", default=None, type=str, help="location to search wheels: wppm pylock.toml -ws source_of_wheels")
+    parser.add_argument("-wd", dest="wheeldrain" , default=None, type=str, help="location of found wheels: wppm pylock.toml -wd destination_of_wheels")
     parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching the given [optional] package expression: wppm -ls, wppm -ls pand")
     parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option]: wppm -p pandas[test]")
@@ -326,7 +329,7 @@ def main(test=False):
             sys.exit()
         if not args.install and not args.uninstall:
             args.install = True
-        if not Path(args.fname).is_file() and args.install:
+        if not Path(args.fname).is_file() and not args.install:
             if args.fname == "":
                 parser.print_help()
                 sys.exit()
@@ -335,18 +338,18 @@ def main(test=False):
         else:
             try:
                 filename = Path(args.fname).name
+                install_from_wheelhouse = ["--no-index", "--trusted-host=None", f"--find-links={dist.wheelhouse / 'included.wheels'}"]
                 if filename.split('.')[0] == "pylock" and filename.split('.')[-1] == 'toml':
                     print(' a lock file !', args.fname, dist.target)
-                    from winpython import wheelhouse as wh
-                    wh.get_pylock_wheels(Path(dist.target).parent/ "WheelHouse", Path(args.fname), args.wheelhouse)
-                sys.exit()
+                    wh.get_pylock_wheels(dist.wheelhouse, Path(args.fname), args.wheelsource, args.wheeldrain)
+                    sys.exit()
                 if args.uninstall:
                     package = dist.find_package(args.fname)
                     dist.uninstall(package)
                 elif args.install:
                     package = Package(args.fname)
                     if args.install:
-                        dist.install(package)
+                        dist.install(package, install_options=install_from_wheelhouse)
             except NotImplementedError:
                 raise RuntimeError("Package is not (yet) supported by WPPM")
     else:
