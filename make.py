@@ -120,6 +120,12 @@ Name | Version | Description
 -----|---------|------------
 {self.distribution.get_installed_packages_markdown()}
 
+### WheelHouse packages
+
+Name | Version | Description
+-----|---------|------------
+{self.distribution.get_wheelhouse_packages_markdown()}
+
 </details>
 """
 
