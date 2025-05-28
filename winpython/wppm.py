@@ -329,12 +329,12 @@ def main(test=False):
             sys.exit()
         if not args.install and not args.uninstall:
             args.install = True
-        if not Path(args.fname).is_file() and not args.install:
+        if not Path(args.fname).is_file() and args.install:
             if args.fname == "":
                 parser.print_help()
                 sys.exit()
             else:
-                raise FileNotFoundError(f"File not found: {args.fname}")
+                args.install = True  # for Drag & Drop of .toml (and not wheel)
         else:
             try:
                 filename = Path(args.fname).name
