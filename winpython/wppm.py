@@ -76,6 +76,17 @@ class Distribution:
         ]
         return "\n".join(package_lines)
 
+    def get_wheelhouse_packages_markdown(self) -> str:
+        wheeldir = self.wheelhouse / 'included.wheels'
+        if wheeldir.is_dir():
+            package_lines = [
+               f"[{name}](https://pypi.org/project/{name}) | {version} | {summary}"
+               for name, version, summary in wh.list_packages_with_metadata(str(wheeldir))
+               #for pkg in sorted(wh.list_packages_with_metadata(str(wheeldir)), key=lambda p: p.name.lower())
+            ]
+            return "\n".join(package_lines)
+        return ""
+
     def find_package(self, name: str) -> Package | None:
         """Find installed package by name."""
         for pack in self.get_installed_packages():

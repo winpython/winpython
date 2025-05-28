@@ -31,7 +31,7 @@ class Package:
     def from_text(self, text):
         match = re.match(self.PATTERN_OLD, text) or re.match(self.PATTERN, text)
         if not match:
-            raise ValueError("Text does not match expected pattern")
+            raise ValueError("Text does not match expected pattern: "+ text)
         self.name, self.url, self.version, self.description = match.groups()
 
     def to_wiki(self):
@@ -45,6 +45,7 @@ class PackageIndex:
     WINPYTHON_PATTERN = r"\#\# WinPython\-*[0-9b-t]* ([0-9\.a-zA-Z]*)"
     TOOLS_LINE = "### Tools"
     PYTHON_PACKAGES_LINE = "### Python packages"
+    WHEELHOUSE_PACKAGES_LINE = "### WheelHouse packages"
     HEADER_LINE1 = "Name | Version | Description"
     HEADER_LINE2 = "-----|---------|------------"
 
@@ -55,6 +56,7 @@ class PackageIndex:
         self.architecture = architecture
         self.other_packages = {}
         self.python_packages = {}
+        self.wheelhouse_packages = {}
         self.from_file(basedir)
 
     def from_file(self, basedir):
@@ -67,24 +69,29 @@ class PackageIndex:
     def from_text(self, text):
         version = re.match(self.WINPYTHON_PATTERN + self.flavor, text).groups()[0]
         assert version == self.version
-        tools_flag = python_flag = False
+        tools_flag = python_flag = wheelhouse_flag = False
         for line in text.splitlines():
             if line:
                 if line == self.TOOLS_LINE:
-                    tools_flag, python_flag = True, False
+                    tools_flag, python_flag, wheelhouse_flag = True, False, False
                     continue
                 elif line == self.PYTHON_PACKAGES_LINE:
-                    tools_flag, python_flag = False, True
+                    tools_flag, python_flag, wheelhouse_flag  = False, True, False
+                    continue
+                elif line == self.WHEELHOUSE_PACKAGES_LINE:
+                    tools_flag, python_flag, wheelhouse_flag  = False, False, True
                     continue
                 elif line in (self.HEADER_LINE1, self.HEADER_LINE2, "<details>", "</details>"):
                     continue
-                if tools_flag or python_flag:
+                if tools_flag or python_flag or wheelhouse_flag:
                     package = Package()
                     package.from_text(line)
                     if tools_flag:
                         self.other_packages[package.name] = package
-                    else:
+                    elif python_flag:
                         self.python_packages[package.name] = package
+                    else:
+                        self.wheelhouse_packages[package.name] = package
 
 def diff_package_dicts(old_packages, new_packages):
     """Return difference between package old and package new"""
@@ -140,6 +147,10 @@ def compare_package_indexes(version2, version1=None, basedir=None, flavor="", fl
     py_text = diff_package_dicts(pi1.python_packages, pi2.python_packages)
     if py_text:
         text += PackageIndex.PYTHON_PACKAGES_LINE + "\r\n\r\n" + py_text
+
+    py_text = diff_package_dicts(pi1.wheelhouse_packages, pi2.wheelhouse_packages)
+    if py_text:
+        text += PackageIndex.WHEELHOUSE_PACKAGES_LINE + "\r\n\r\n" + py_text
 
     text += "\r\n</details>\r\n* * *\r\n"
     return text
