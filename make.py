@@ -146,17 +146,18 @@ Name | Version | Description
         """Returns the architecture (32 or 64 bits) of the distribution."""
         return self.distribution.architecture if self.distribution else 64
 
-    def create_installer_7zip(self, installer_type: str = ".exe"):
-        """Creates a WinPython installer using 7-Zip: ".exe", ".7z", ".zip")"""
+    def create_installer_7zip(self, installer_type: str = "exe", compression= "mx5"):
+        """Creates a WinPython installer using 7-Zip: "exe", "7z", "zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
-        if installer_type not in [".exe", ".7z", ".zip"]:
-            raise RuntimeError("installer_type {installer_type} is undefined")
+        if installer_type not in ["exe", "7z", "zip"]:
+            return
         DISTDIR = self.winpython_directory
         filename_stem = f"Winpython{self.architecture_bits}-{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
-        fullfilename = DISTDIR.parent / (filename_stem + installer_type)
-        sfx_option = "-sfx7z.sfx" if installer_type == ".exe" else ""
-        zip_option = "-tzip" if installer_type == ".zip" else ""
-        command = f'"{find_7zip_executable()}" {zip_option} -mx5 a "{fullfilename}" "{DISTDIR}" {sfx_option}'
+        fullfilename = DISTDIR.parent / (filename_stem + "." + installer_type)
+        sfx_option = "-sfx7z.sfx" if installer_type == "exe" else ""
+        zip_option = "-tzip" if installer_type == "zip" else ""
+        compress_level = "mx5" if compression == "" else compression 
+        command = f'"{find_7zip_executable()}" {zip_option} -{compress_level} a "{fullfilename}" "{DISTDIR}" {sfx_option}'
         print(f'Executing 7-Zip script: "{command}"')
         try:
             subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
@@ -331,9 +332,9 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
 
     builder.build(rebuild=rebuild, requirements_files_list=requirements_files_list, winpy_dirname=winpython_dirname)
 
-    for installer_type in [".zip", ".7z", ".exe"]:
-        if installer_type in create_installer.lower().replace("7zip",".exe"):
-            builder.create_installer_7zip(installer_type)
+    for commmand in create_installer.lower().replace("7zip",".exe").split('.'):
+        installer_type, compression = (commmand + "-").split("-")[:2]
+        builder.create_installer_7zip(installer_type, compression)
 
 if __name__ == "__main__":
     # DO create only one Winpython distribution at a time

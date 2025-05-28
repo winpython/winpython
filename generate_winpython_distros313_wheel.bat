@@ -14,8 +14,8 @@ set my_release=
 set my_release_level=
 
 rem list of installers to create separated per dot: False=none, .zip=zip, .7z=.7z, 7zip=auto-extractible 7z
-set my_create_installer=7zip.7z.zip
-set my_create_installer=.7z
+set my_create_installer=7zip-mx5.7z-mx7.zip
+set my_create_installer=.7z-mx7
 
 set my_preclear_build_directory=Yes
 
