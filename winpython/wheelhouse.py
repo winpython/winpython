@@ -13,6 +13,8 @@ import shutil
 import subprocess
 from typing import Dict, List, Optional, Tuple
 from email import message_from_bytes
+from email.parser import BytesParser
+from email.policy import default
 from . import utils
 
 from packaging.utils import canonicalize_name
@@ -197,7 +199,7 @@ def extract_metadata_from_wheel(filepath: Path) -> Optional[Tuple[str, str, str]
         for name in z.namelist():
             if name.endswith(r'.dist-info/METADATA') and name.split("/")[1] == "METADATA":
                 with z.open(name) as meta_file:
-                    metadata = message_from_bytes(meta_file.read())
+                    metadata = BytesParser(policy=default).parse(meta_file)
                     name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
                     version = str(metadata.get('Version', 'unknown'))
                     summary = utils.sum_up(str(metadata.get('Summary', '')))
