@@ -17,6 +17,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
+from winpython import utils
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,15 +25,6 @@ logger = logging.getLogger(__name__)
 class PipDataError(Exception):
     """Custom exception for PipData related errors."""
     pass
-
-def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
-    """Summarize text to fit within max_length, ending at last complete sentence."""
-    summary = (text + os.linesep).splitlines()[0]
-    if len(summary) <= max_length:
-        return summary
-    if stop_at and stop_at in summary[:max_length]:
-        return summary[:summary.rfind(stop_at, 0, max_length)] + stop_at.rstrip()
-    return summary[:max_length].rstrip()
 
 class PipData:
     """Manages package metadata and dependency relationships in a Python environment."""
@@ -287,5 +279,5 @@ class PipData:
         """
         pkgs = sorted(self.distro.items())
         if full:
-            return [(p, d["version"], sum_up(d["summary"], max_length)) for p, d in pkgs]
+            return [(p, d["version"], utils.sum_up(d["summary"], max_length)) for p, d in pkgs]
         return [(p, d["version"]) for p, d in pkgs]

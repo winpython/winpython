@@ -71,30 +71,14 @@ def onerror(function, path, excinfo):
     else:
         raise
 
-def getFileProperties(fname):
-    """Read all properties of the given file return them as a dictionary."""
-    import win32api
-    prop_names = ('ProductName', 'ProductVersion', 'FileDescription', 'FileVersion')
-    props = {'FixedFileInfo': None, 'StringFileInfo': None, 'FileVersion': None}
-
-    try:
-        fixed_info = win32api.GetFileVersionInfo(fname, '\\')
-        props['FixedFileInfo'] = fixed_info
-        props['FileVersion'] = "{}.{}.{}.{}".format(
-            fixed_info['FileVersionMS'] // 65536,
-            fixed_info['FileVersionMS'] % 65536,
-            fixed_info['FileVersionLS'] // 65536,
-            fixed_info['FileVersionLS'] % 65536
-        )
-        lang, codepage = win32api.GetFileVersionInfo(fname, '\\VarFileInfo\\Translation')[0]
-        props['StringFileInfo'] = {
-            prop_name: win32api.GetFileVersionInfo(fname, f'\\StringFileInfo\\{lang:04X}{codepage:04X}\\{prop_name}')
-            for prop_name in prop_names
-        }
-    except:
-        pass
-
-    return props
+def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
+    """Summarize text to fit within max_length, ending at last complete sentence."""
+    summary = (text + os.linesep).splitlines()[0].strip()
+    if len(summary) <= max_length:
+        return summary
+    if stop_at and stop_at in summary[:max_length]:
+        return summary[:summary.rfind(stop_at, 0, max_length)] + stop_at.strip()
+    return summary[:max_length].strip()
 
 def get_special_folder_path(path_name):
     """Return special folder path."""
