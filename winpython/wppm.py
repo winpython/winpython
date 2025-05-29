@@ -14,8 +14,8 @@ import subprocess
 import json
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
-from winpython import utils, piptree, associate
-from winpython import wheelhouse as wh
+from . import utils, piptree, associate
+from . import wheelhouse as wh
 from operator import itemgetter
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]

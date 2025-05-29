@@ -17,7 +17,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
-from winpython import utils
+from . import utils
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
