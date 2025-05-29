@@ -338,14 +338,11 @@ def main(test=False):
         if args.movable:
             p = subprocess.Popen(["start", "cmd", "/k",dist.python_exe, "-c" , cmd_mov], shell = True,  cwd=dist.target)
             sys.exit()
-        if not args.install and not args.uninstall:
-            args.install = True
-        if not Path(args.fname).is_file() and args.install:
-            if args.fname == "":
+        if not args.install and not args.uninstall and args.fname.endswith(".toml"):
+            args.install = True  # for Drag & Drop of .toml (and not wheel)
+        if args.fname == "" or (not args.install and not args.uninstall):
                 parser.print_help()
                 sys.exit()
-            else:
-                args.install = True  # for Drag & Drop of .toml (and not wheel)
         else:
             try:
                 filename = Path(args.fname).name
