@@ -2,13 +2,20 @@
 """
 WheelHouse.py - manage WinPython local WheelHouse.
 """
-
+import os
+import re
+import tarfile
+import zipfile
 import sys
 from pathlib import Path
 from collections import defaultdict
 import shutil
 import subprocess
 from typing import Dict, List, Optional, Tuple
+from email import message_from_bytes
+from . import utils
+
+from packaging.utils import canonicalize_name
 
 # Use tomllib if available (Python 3.11+), otherwise fall back to tomli
 try:
@@ -182,6 +189,53 @@ def get_pylock_wheels(wheelhouse: Path, lockfile: Path, wheelorigin: Optional[Pa
                 print(f"\n via:\n    wppm {filename_lock} -wh {destination_wheelhouse}\n")
         else:
             print(f"\n\n*** We can't install {filename} ! ***\n\n")
+
+def extract_metadata_from_wheel(filepath: Path) -> Optional[Tuple[str, str, str]]:
+    "get metadata from a wheel package"
+    with zipfile.ZipFile(filepath, 'r') as z:
+        # Locate *.dist-info/METADATA file inside but not in a vendored directory (flit-core)
+        for name in z.namelist():
+            if name.endswith(r'.dist-info/METADATA') and name.split("/")[1] == "METADATA":
+                with z.open(name) as meta_file:
+                    metadata = message_from_bytes(meta_file.read())
+                    name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
+                    version = str(metadata.get('Version', 'unknown'))
+                    summary = utils.sum_up(str(metadata.get('Summary', '')))
+                    return name, version, summary
+    return None
+
+def extract_metadata_from_sdist(filepath: Path) -> Optional[Tuple[str, str, str]]:
+    "get metadata from a tar.gz or .zip package"
+    open_func = tarfile.open if filepath.suffixes[-2:] == ['.tar', '.gz'] else zipfile.ZipFile
+    with open_func(filepath, 'r') as archive:
+        namelist = archive.getnames() if isinstance(archive, tarfile.TarFile) else archive.namelist()
+        for name in namelist:
+            if name.endswith('PKG-INFO'):
+                content = archive.extractfile(name).read() if isinstance(archive, tarfile.TarFile) else archive.open(name).read()
+                metadata = message_from_bytes(content)
+                name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
+                version = str(metadata.get('Version', 'unknown'))
+                summary = utils.sum_up(str(metadata.get('Summary', '')))
+                return name, version, summary
+    return None
+
+def list_packages_with_metadata(directory: str) -> List[Tuple[str, str, str]]:
+    "get metadata from a Wheelhouse directory"
+    results = []
+    for file in os.listdir(directory):
+        path = Path(directory) / file
+        try:
+            if path.suffix == '.whl':
+                meta = extract_metadata_from_wheel(path)
+            elif path.suffix == '.zip' or path.name.endswith('.tar.gz'):
+                meta = extract_metadata_from_sdist(path)
+            else:
+                continue
+            if meta:
+                results.append(meta)
+        except OSError: #Exception as e: #  need to see it
+            print(f"Skipping {file}: {e}")
+    return results
 
 def main() -> None:
     """Main entry point for the script."""

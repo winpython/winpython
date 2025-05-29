@@ -16,6 +16,7 @@ from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
 from winpython import utils, piptree, associate
 from winpython import wheelhouse as wh
+from operator import itemgetter
 # Workaround for installing PyVISA on Windows from source:
 os.environ["HOME"] = os.environ["USERPROFILE"]
 
@@ -23,7 +24,7 @@ class Package:
     """Standardize a Package from filename or pip list."""
     def __init__(self, fname: str, suggested_summary: str = None):
         self.fname = fname
-        self.description = piptree.sum_up(suggested_summary) if suggested_summary else ""
+        self.description = (utils.sum_up(suggested_summary) if suggested_summary else "").strip()
         self.name, self.version = fname, '?.?.?'
         if fname.lower().endswith((".zip", ".tar.gz", ".whl")):
             bname = Path(self.fname).name # e.g., "sqlite_bro-1.0.0..."
@@ -81,8 +82,7 @@ class Distribution:
         if wheeldir.is_dir():
             package_lines = [
                f"[{name}](https://pypi.org/project/{name}) | {version} | {summary}"
-               for name, version, summary in wh.list_packages_with_metadata(str(wheeldir))
-               #for pkg in sorted(wh.list_packages_with_metadata(str(wheeldir)), key=lambda p: p.name.lower())
+               for name, version, summary in sorted(wh.list_packages_with_metadata(str(wheeldir)), key=itemgetter(0 , 1)) # lambda p: p[0].lower())
             ]
             return "\n".join(package_lines)
         return ""
