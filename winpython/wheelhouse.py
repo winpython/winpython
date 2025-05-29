@@ -17,7 +17,7 @@ from email.parser import BytesParser
 from email.policy import default
 from . import utils
 
-from packaging.utils import canonicalize_name
+from packaging.utils import canonicalize_name, parse_wheel_filename, parse_sdist_filename
 
 # Use tomllib if available (Python 3.11+), otherwise fall back to tomli
 try:
@@ -193,32 +193,64 @@ def get_pylock_wheels(wheelhouse: Path, lockfile: Path, wheelorigin: Optional[Pa
             print(f"\n\n*** We can't install {filename} ! ***\n\n")
 
 def extract_metadata_from_wheel(filepath: Path) -> Optional[Tuple[str, str, str]]:
-    "get metadata from a wheel package"
+    "Extract package metadata from a .whl file and validate it matches the filename"
+    wheel_name = filepath.name
+    try:
+        name, version, build, tags = parse_wheel_filename(wheel_name)
+        filename_name = canonicalize_name(name)
+        filename_version = str(version)
+    except Exception as e:
+        print(f"❌ Could not parse filename: {wheel_name}", e)
+        return None
+    
     with zipfile.ZipFile(filepath, 'r') as z:
         # Locate *.dist-info/METADATA file inside but not in a vendored directory (flit-core)
         for name in z.namelist():
             if name.endswith(r'.dist-info/METADATA') and name.split("/")[1] == "METADATA":
                 with z.open(name) as meta_file:
                     metadata = BytesParser(policy=default).parse(meta_file)
-                    name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
-                    version = str(metadata.get('Version', 'unknown'))
+                    meta_name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
+                    meta_version  = str(metadata.get('Version', 'unknown'))
                     summary = utils.sum_up(str(metadata.get('Summary', '')))
-                    return name, version, summary
+                    # Assert consistency
+                    if meta_name != filename_name or meta_version != filename_version:
+                        print(f"⚠️ Mismatch in {wheel_name}: filename says {filename_name}=={filename_version}, "
+                              f"but METADATA says {meta_name}=={meta_version}")
+                        return None
+                    return meta_name, meta_version , summary
     return None
 
 def extract_metadata_from_sdist(filepath: Path) -> Optional[Tuple[str, str, str]]:
     "get metadata from a tar.gz or .zip package"
     open_func = tarfile.open if filepath.suffixes[-2:] == ['.tar', '.gz'] else zipfile.ZipFile
+    sdist_name = filepath.name
+    try:
+        name, version = parse_sdist_filename(sdist_name)
+        filename_name = canonicalize_name(name)
+        filename_version = str(version)
+    except Exception as e:
+        print(f"❌ Could not parse filename: {sdist_name}", e)
+        return None
+    
     with open_func(filepath, 'r') as archive:
         namelist = archive.getnames() if isinstance(archive, tarfile.TarFile) else archive.namelist()
         for name in namelist:
             if name.endswith('PKG-INFO'):
-                content = archive.extractfile(name).read() if isinstance(archive, tarfile.TarFile) else archive.open(name).read()
-                metadata = message_from_bytes(content)
-                name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
-                version = str(metadata.get('Version', 'unknown'))
-                summary = utils.sum_up(str(metadata.get('Summary', '')))
-                return name, version, summary
+                if isinstance(archive, tarfile.TarFile):
+                    content = archive.extractfile(name)
+                else:
+                    content = archive.open(name)
+                if content:
+                    metadata = BytesParser(policy=default).parse(content)
+                    meta_name = canonicalize_name(str(metadata.get('Name', 'unknown')))  # Avoid Head type
+                    meta_version = str(metadata.get('Version', 'unknown'))
+                    summary = utils.sum_up(str(metadata.get('Summary', '')))
+                    # Assert consistency
+                    if meta_name != filename_name or meta_version != filename_version:
+                        print(f"⚠️ Mismatch in {sdist_name}: filename says {filename_name}=={filename_version}, "
+                              f"but METADATA says {meta_name}=={meta_version}")
+                        return None
+                    return meta_name, meta_version, summary
     return None
 
 def list_packages_with_metadata(directory: str) -> List[Tuple[str, str, str]]:

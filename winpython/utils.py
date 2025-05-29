@@ -18,8 +18,6 @@ from pathlib import Path
 import re
 import tarfile
 import zipfile
-import atexit
-import winreg
 
 # SOURCE_PATTERN defines what an acceptable source package name is
 SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[\-]?[0-9]*)(\.zip|\.tar\.gz|\-(py[2-7]*|py[2-7]*\.py[2-7]*)\-none\-any\.whl)'
