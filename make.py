@@ -12,9 +12,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from winpython import wppm, utils
-# Local import
-import diff
+from winpython import wppm, utils, diff
 
 # Define constant paths for clarity
 CHANGELOGS_DIRECTORY = Path(__file__).parent / "changelogs"
@@ -265,7 +263,7 @@ Name | Version | Description
 
         self._print_action("Writing changelog")
         shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
-        diff.write_changelog(self.winpyver2, None, self.base_directory, self.flavor, self.distribution.architecture)
+        diff.write_changelog(self.winpyver2, None, CHANGELOGS_DIRECTORY, self.flavor, self.distribution.architecture, basedir=self.winpython_directory.parent)
 
 def rebuild_winpython_package(source_directory: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
     """Rebuilds the winpython package from source using flit."""
