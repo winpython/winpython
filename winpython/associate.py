@@ -10,9 +10,71 @@ import os
 from pathlib import Path
 import importlib.util
 import winreg
-from winpython import utils
+from . import utils
 from argparse import ArgumentParser
 
+def get_special_folder_path(path_name):
+    """Return special folder path."""
+    from win32com.shell import shell, shellcon
+    try:
+        csidl = getattr(shellcon, path_name)
+        return shell.SHGetSpecialFolderPath(0, csidl, False)
+    except OSError:
+        print(f"{path_name} is an unknown path ID")
+
+def get_winpython_start_menu_folder(current=True):
+    """Return WinPython Start menu shortcuts folder."""
+    folder = get_special_folder_path("CSIDL_PROGRAMS")
+    if not current:
+        try:
+            folder = get_special_folder_path("CSIDL_COMMON_PROGRAMS")
+        except OSError:
+            pass
+    return str(Path(folder) / 'WinPython')
+
+def remove_winpython_start_menu_folder(current=True):
+    """Remove WinPython Start menu folder -- remove it if it already exists"""
+    path = get_winpython_start_menu_folder(current=current)
+    if Path(path).is_dir():
+        try:
+            shutil.rmtree(path, onexc=onerror)
+        except WindowsError:
+            print(f"Directory {path} could not be removed", file=sys.stderr)
+
+def create_winpython_start_menu_folder(current=True):
+    """Create WinPython Start menu folder."""
+    path = get_winpython_start_menu_folder(current=current)
+    if Path(path).is_dir():
+        try:
+            shutil.rmtree(path, onexc=onerror)
+        except WindowsError:
+            print(f"Directory {path} could not be removed", file=sys.stderr)
+    Path(path).mkdir(parents=True, exist_ok=True)
+    return path
+
+def create_shortcut(path, description, filename, arguments="", workdir="", iconpath="", iconindex=0, verbose=True):
+    """Create Windows shortcut (.lnk file)."""
+    import pythoncom
+    from win32com.shell import shell
+    ilink = pythoncom.CoCreateInstance(shell.CLSID_ShellLink, None, pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
+    ilink.SetPath(path)
+    ilink.SetDescription(description)
+    if arguments:
+        ilink.SetArguments(arguments)
+    if workdir:
+        ilink.SetWorkingDirectory(workdir)
+    if iconpath or iconindex:
+        ilink.SetIconLocation(iconpath, iconindex)
+    # now save it.
+    ipf = ilink.QueryInterface(pythoncom.IID_IPersistFile)
+    if not filename.endswith('.lnk'):
+        filename += '.lnk'
+    if verbose:
+        print(f'create menu *{filename}*')
+    try:
+        ipf.Save(filename, 0)
+    except:
+        print("a fail !")
 
 # --- Helper functions for Registry ---
 
@@ -53,7 +115,7 @@ def _has_pywin32():
 def _remove_start_menu_folder(target, current=True, has_pywin32=False):
     "remove menu Folder for target WinPython if pywin32 exists"
     if has_pywin32:
-        utils.remove_winpython_start_menu_folder(current=current)
+        remove_winpython_start_menu_folder(current=current)
     else:
         print("Skipping start menu removal as pywin32 package is not installed.")
 
@@ -68,7 +130,7 @@ def _get_shortcut_data(target, current=True, has_pywin32=False):
         bname, ext = Path(name).stem, Path(name).suffix
         if ext.lower() == ".exe":
             # Path for the shortcut file in the start menu folder
-            shortcut_name = str(Path(utils.create_winpython_start_menu_folder(current=current)) / bname) + '.lnk'
+            shortcut_name = str(Path(create_winpython_start_menu_folder(current=current)) / bname) + '.lnk'
             data.append(
                 (
                     str(Path(wpdir) / name), # Target executable path
@@ -180,9 +242,9 @@ def register(target, current=True, reg_type=winreg.REG_SZ, verbose=True):
             print(f'Creating WinPython menu for all icons in {target.parent}')
         for path, desc, fname in _get_shortcut_data(target, current=current, has_pywin32=True):
             try:
-                 utils.create_shortcut(path, desc, fname, verbose=verbose)
+                create_shortcut(path, desc, fname, verbose=verbose)
             except Exception as e:
-                 print(f"Error creating shortcut for {desc} at {fname}: {e}", file=sys.stderr)
+                print(f"Error creating shortcut for {desc} at {fname}: {e}", file=sys.stderr)
     else:
         print("Skipping start menu shortcut creation as pywin32 package is needed.") 
 
