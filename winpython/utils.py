@@ -78,69 +78,6 @@ def sum_up(text: str, max_length: int = 144, stop_at: str = ". ") -> str:
         return summary[:summary.rfind(stop_at, 0, max_length)] + stop_at.strip()
     return summary[:max_length].strip()
 
-def get_special_folder_path(path_name):
-    """Return special folder path."""
-    from win32com.shell import shell, shellcon
-    try:
-        csidl = getattr(shellcon, path_name)
-        return shell.SHGetSpecialFolderPath(0, csidl, False)
-    except OSError:
-        print(f"{path_name} is an unknown path ID")
-
-def get_winpython_start_menu_folder(current=True):
-    """Return WinPython Start menu shortcuts folder."""
-    folder = get_special_folder_path("CSIDL_PROGRAMS")
-    if not current:
-        try:
-            folder = get_special_folder_path("CSIDL_COMMON_PROGRAMS")
-        except OSError:
-            pass
-    return str(Path(folder) / 'WinPython')
-
-def remove_winpython_start_menu_folder(current=True):
-    """Remove WinPython Start menu folder -- remove it if it already exists"""
-    path = get_winpython_start_menu_folder(current=current)
-    if Path(path).is_dir():
-        try:
-            shutil.rmtree(path, onexc=onerror)
-        except WindowsError:
-            print(f"Directory {path} could not be removed", file=sys.stderr)
-
-def create_winpython_start_menu_folder(current=True):
-    """Create WinPython Start menu folder."""
-    path = get_winpython_start_menu_folder(current=current)
-    if Path(path).is_dir():
-        try:
-            shutil.rmtree(path, onexc=onerror)
-        except WindowsError:
-            print(f"Directory {path} could not be removed", file=sys.stderr)
-    Path(path).mkdir(parents=True, exist_ok=True)
-    return path
-
-def create_shortcut(path, description, filename, arguments="", workdir="", iconpath="", iconindex=0, verbose=True):
-    """Create Windows shortcut (.lnk file)."""
-    import pythoncom
-    from win32com.shell import shell
-    ilink = pythoncom.CoCreateInstance(shell.CLSID_ShellLink, None, pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
-    ilink.SetPath(path)
-    ilink.SetDescription(description)
-    if arguments:
-        ilink.SetArguments(arguments)
-    if workdir:
-        ilink.SetWorkingDirectory(workdir)
-    if iconpath or iconindex:
-        ilink.SetIconLocation(iconpath, iconindex)
-    # now save it.
-    ipf = ilink.QueryInterface(pythoncom.IID_IPersistFile)
-    if not filename.endswith('.lnk'):
-        filename += '.lnk'
-    if verbose:
-        print(f'create menu *{filename}*')
-    try:
-        ipf.Save(filename, 0)
-    except:
-        print("a fail !")
-
 def print_box(text):
     """Print text in a box"""
     line0 = "+" + ("-" * (len(text) + 2)) + "+"
