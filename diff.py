@@ -17,120 +17,94 @@ CHANGELOGS_DIR = Path(__file__).parent / "changelogs"
 assert CHANGELOGS_DIR.is_dir()
 
 class Package:
-    # SourceForge Wiki syntax:
-    PATTERN = r"\[([a-zA-Z\-\:\/\.\_0-9]*)\]\(([^\]\ ]*)\) \| ([^\|]*) \| ([^\|]*)"
-    # Google Code Wiki syntax:
-    PATTERN_OLD = r"\[([a-zA-Z\-\:\/\.\_0-9]*) ([^\]\ ]*)\] \| ([^\|]*) \| ([^\|]*)"
+    PATTERNS = [
+        r"\[([\w\-\:\/\.\_]+)\]\(([^)]+)\) \| ([^\|]*) \| ([^\|]*)",  # SourceForge
+        r"\[([\w\-\:\/\.\_]+) ([^\]\ ]+)\] \| ([^\|]*) \| ([^\|]*)"   # Google Code
+    ]
 
-    def __init__(self):
-        self.name = self.version = self.description = self.url = None
-
-    def __str__(self):
-        return f"{self.name} {self.version}\r\n{self.description}\r\nWebsite: {self.url}"
+    def __init__(self, text=None):
+        self.name = self.url = self.version = self.description = None
+        if text:
+            self.from_text(text)
 
     def from_text(self, text):
-        match = re.match(self.PATTERN_OLD, text) or re.match(self.PATTERN, text)
-        if not match:
-            raise ValueError("Text does not match expected pattern: "+ text)
-        self.name, self.url, self.version, self.description = match.groups()
+        for pattern in self.PATTERNS:
+            match = re.match(pattern, text)
+            if match:
+                self.name, self.url, self.version, self.description = match.groups()
+                return
+        raise ValueError(f"Unrecognized package line format: {text}")
 
     def to_wiki(self):
         return f"  * [{self.name}]({self.url}) {self.version} ({self.description})\r\n"
 
     def upgrade_wiki(self, other):
-        assert self.name.replace("-", "_").lower() == other.name.replace("-", "_").lower()
         return f"  * [{self.name}]({self.url}) {other.version} → {self.version} ({self.description})\r\n"
 
 class PackageIndex:
-    WINPYTHON_PATTERN = r"\#\# WinPython\-*[0-9b-t]* ([0-9\.a-zA-Z]*)"
-    TOOLS_LINE = "### Tools"
-    PYTHON_PACKAGES_LINE = "### Python packages"
-    WHEELHOUSE_PACKAGES_LINE = "### WheelHouse packages"
-    HEADER_LINE1 = "Name | Version | Description"
-    HEADER_LINE2 = "-----|---------|------------"
+    HEADERS = {"tools": "### Tools", "python": "### Python packages", "wheelhouse": "### WheelHouse packages"}
+    BLANKS = ["Name | Version | Description", "-----|---------|------------", "", "<details>", "</details>"]
 
     def __init__(self, version, basedir=None, flavor="", architecture=64):
         self.version = version
         self.flavor = flavor
         self.basedir = basedir
         self.architecture = architecture
-        self.other_packages = {}
-        self.python_packages = {}
-        self.wheelhouse_packages = {}
-        self.from_file(basedir)
+        self.packages = {"tools": {}, "python": {}, "wheelhouse": {}}
+        self._load_index()
 
-    def from_file(self, basedir):
-        fname = CHANGELOGS_DIR / f"WinPython{self.flavor}-{self.architecture}bit-{self.version}.md"
-        if not fname.exists():
-            raise FileNotFoundError(f"Changelog file not found: {fname}")
-        with open(fname, "r", encoding=utils.guess_encoding(fname)[0]) as fdesc:
-            self.from_text(fdesc.read())
+    def _load_index(self):
+        filename = CHANGELOGS_DIR / f"WinPython{self.flavor}-{self.architecture}bit-{self.version}.md"
+        if not filename.exists():
+            raise FileNotFoundError(f"Changelog not found: {filename}")
 
-    def from_text(self, text):
-        version = re.match(self.WINPYTHON_PATTERN + self.flavor, text).groups()[0]
-        assert version == self.version
-        tools_flag = python_flag = wheelhouse_flag = False
+        with open(filename, "r", encoding=utils.guess_encoding(filename)[0]) as f:
+            self._parse_index(f.read())
+
+    def _parse_index(self, text):
+        current = None
         for line in text.splitlines():
-            if line:
-                if line == self.TOOLS_LINE:
-                    tools_flag, python_flag, wheelhouse_flag = True, False, False
-                    continue
-                elif line == self.PYTHON_PACKAGES_LINE:
-                    tools_flag, python_flag, wheelhouse_flag  = False, True, False
-                    continue
-                elif line == self.WHEELHOUSE_PACKAGES_LINE:
-                    tools_flag, python_flag, wheelhouse_flag  = False, False, True
-                    continue
-                elif line in (self.HEADER_LINE1, self.HEADER_LINE2, "<details>", "</details>"):
-                    continue
-                if tools_flag or python_flag or wheelhouse_flag:
-                    package = Package()
-                    package.from_text(line)
-                    if tools_flag:
-                        self.other_packages[package.name] = package
-                    elif python_flag:
-                        self.python_packages[package.name] = package
-                    else:
-                        self.wheelhouse_packages[package.name] = package
+            if line in self.HEADERS.values():
+                current = [k for k, v in self.HEADERS.items() if v == line][0]
+                continue
+            if line.strip() in self.BLANKS:
+                continue
+            if current:
+                pkg = Package(line)
+                self.packages[current][pkg.name] = pkg
 
-def diff_package_dicts(old_packages, new_packages):
+def compare_packages(old, new):
     """Return difference between package old and package new"""
 
     # wheel replace '-' per '_' in key
-    old = {k.replace("-", "_").lower(): v for k, v in old_packages.items()}
-    new = {k.replace("-", "_").lower(): v for k, v in new_packages.items()}
-    text = ""
+    def normalize(d): return {k.replace("-", "_").lower(): v for k, v in d.items()}
+    old, new = normalize(old), normalize(new)
+    output = ""
 
-    if new_keys := sorted(set(new) - set(old)):
-       text += "New packages:\r\n\r\n" + "".join(new[k].to_wiki() for k in new_keys) + "\r\n"
+    added = [new[k].to_wiki() for k in new if k not in old]
+    upgraded = [new[k].upgrade_wiki(old[k]) for k in new if k in old and new[k].version != old[k].version]
+    removed = [old[k].to_wiki() for k in old if k not in new]
 
-    if upgraded := [new[k].upgrade_wiki(old[k]) for k in sorted(set(old) & set(new)) if old[k].version != new[k].version]:
-        text += "Upgraded packages:\r\n\r\n" + f"{''.join(upgraded)}" + "\r\n"
+    if added:
+        output += "New packages:\r\n\r\n" + "".join(added) + "\r\n"
+    if upgraded:
+        output += "Upgraded packages:\r\n\r\n" + "".join(upgraded) + "\r\n"
+    if removed:
+        output += "Removed packages:\r\n\r\n" + "".join(removed) + "\r\n"
+    return output
 
-    if removed_keys := sorted(set(old) - set(new)):
-        text += "Removed packages:\r\n\r\n" + "".join(old[k].to_wiki() for k in removed_keys) + "\r\n"
-    return text
-
-def find_closer_version(version1, basedir=None, flavor="", architecture=64):
+def find_previous_version(target_version, basedir=None, flavor="", architecture=64):
     """Find version which is the closest to `version`"""
-    builddir = Path(basedir) / f"bu{flavor}"
-    pattern = re.compile(rf"WinPython{flavor}-{architecture}bit-([0-9\.]*)\.(txt|md)")
-    versions = [pattern.match(name).groups()[0] for name in os.listdir(builddir) if pattern.match(name)]
+    build_dir = Path(basedir) / f"bu{flavor}"
+    pattern = re.compile(rf"WinPython{flavor}-{architecture}bit-([0-9\.]+)\.(txt|md)")
+    versions = [pattern.match(f).group(1) for f in os.listdir(build_dir) if pattern.match(f)]
+    versions = [v for v in versions if version.parse(v) < version.parse(target_version)]
+    return max(versions, key=version.parse, default=target_version)
 
-    if version1 not in versions:
-        raise ValueError(f"Unknown version {version1}")
+def compare_package_indexes(version2, version1=None, basedir=None, flavor="", flavor1=None, architecture=64):
+    version1 = version1 or find_previous_version(version2, basedir, flavor, architecture)
+    flavor1 = flavor1 or flavor
 
-    version_below = '0.0.0.0'
-    for v in versions:
-        if version.parse(version_below) < version.parse(v) and version.parse(v) < version.parse(version1):
-            version_below = v
-
-    return version_below if version_below != '0.0.0.0' else version1
-
-def compare_package_indexes(version2, version1=None, basedir=None, flavor="", flavor1=None,architecture=64):
-    """Compare two package index Wiki pages"""
-    version1 = version1 if version1 else find_closer_version(version2, basedir, flavor, architecture)
-    flavor1 = flavor1 if flavor1 else flavor
     pi1 = PackageIndex(version1, basedir, flavor1, architecture)
     pi2 = PackageIndex(version2, basedir, flavor, architecture)
 
@@ -140,37 +114,29 @@ def compare_package_indexes(version2, version1=None, basedir=None, flavor="", fl
         "<details>\r\n\r\n"
     )
 
-    tools_text = diff_package_dicts(pi1.other_packages, pi2.other_packages)
-    if tools_text:
-        text += PackageIndex.TOOLS_LINE + "\r\n\r\n" + tools_text
+    for key in PackageIndex.HEADERS:
+        diff = compare_packages(pi1.packages[key], pi2.packages[key])
+        if diff:
+            text += f"{PackageIndex.HEADERS[key]}\r\n\r\n{diff}"
 
-    py_text = diff_package_dicts(pi1.python_packages, pi2.python_packages)
-    if py_text:
-        text += PackageIndex.PYTHON_PACKAGES_LINE + "\r\n\r\n" + py_text
+    return text + "\r\n</details>\r\n* * *\r\n"
 
-    py_text = diff_package_dicts(pi1.wheelhouse_packages, pi2.wheelhouse_packages)
-    if py_text:
-        text += PackageIndex.WHEELHOUSE_PACKAGES_LINE + "\r\n\r\n" + py_text
-
-    text += "\r\n</details>\r\n* * *\r\n"
-    return text
-
-def _copy_all_changelogs(version, basedir, flavor="", architecture=64):
+def copy_changelogs(version, basedir, flavor="", architecture=64):
     basever = ".".join(version.split(".")[:2])
-    pattern = re.compile(rf"WinPython{flavor}-{architecture}bit-{basever}([0-9\.]*)\.(txt|md)")
-    for name in os.listdir(CHANGELOGS_DIR):
-        if pattern.match(name):
-            shutil.copyfile(CHANGELOGS_DIR / name, Path(basedir) / f"bu{flavor}" / name)
+    pattern = re.compile(rf"WinPython{flavor}-{architecture}bit-{basever}[0-9\.]*\.(txt|md)")
+    dest = Path(basedir) / f"bu{flavor}"
+    for fname in os.listdir(CHANGELOGS_DIR):
+        if pattern.match(fname):
+            shutil.copyfile(CHANGELOGS_DIR / fname, dest / fname)
 
 def write_changelog(version2, version1=None, basedir=None, flavor="", architecture=64):
     """Write changelog between version1 and version2 of WinPython"""
-    _copy_all_changelogs(version2, basedir, flavor, architecture)
+    copy_changelogs(version2, basedir, flavor, architecture)
     print("comparing_package_indexes", version2, basedir, flavor, architecture)
-    changelog_text = compare_package_indexes(version2, version1, basedir, flavor, architecture=architecture)
+    changelog = compare_package_indexes(version2, version1, basedir, flavor, architecture=architecture)
     output_file = Path(basedir) / f"bu{flavor}" / f"WinPython{flavor}-{architecture}bit-{version2}_History.md"
-
-    with open(output_file, "w", encoding="utf-8") as fdesc:
-        fdesc.write(changelog_text)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(changelog)
     # Copy to winpython/changelogs
     shutil.copyfile(output_file, CHANGELOGS_DIR / output_file.name)
 
