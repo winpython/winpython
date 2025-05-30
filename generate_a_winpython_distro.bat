@@ -2,7 +2,7 @@ rem  generate_a_winpython_distro.bat: to be launched from a winpython directory,
 @echo on
 
 REM Initialize variables
-if "%my_release_level%"=="" set my_release_level=b3
+if "%my_release_level%"=="" set my_release_level=b4
 if "%my_create_installer%"=="" set my_create_installer=True
 
 rem Set archive directory and log file
@@ -158,6 +158,12 @@ set pip_lock_web=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.toml
 set pip_lock_local=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_local.toml
 set req_lock_web=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.txt
 set req_lock_local=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_local.txt
+
+set pip_lock_web=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.toml
+set pip_lock_local=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.toml
+set req_lock_web=%LOCKDIR%requirement.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.txt
+set req_lock_local=%LOCKDIR%requirement.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%_local.txt
+
 
 set my_archive_lockfile=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml
 set my_archive_lockfile_local=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.local.toml
