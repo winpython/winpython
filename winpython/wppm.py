@@ -87,14 +87,19 @@ class Distribution:
             return "\n".join(package_lines)
         return ""
 
-    def generate_package_index_markdown(self, python_executable_directory: str, winpyver2: str,
-                                         flavor: str, architecture_bits: int, release_level: str) -> str:
+    def generate_package_index_markdown(self, python_executable_directory: str|None = None, winpyver2: str|None = None,
+                                         flavor: str|None = None, architecture_bits: int|None = None, release_level: str|None = None) -> str:
         """Generates a Markdown formatted package index page."""
-        from winpython import utils  # If needed
+        my_ver , my_arch = utils.get_python_infos(python_executable_directory or self.target)
+        # suppose we suite ourself (method will vary over time)
+        my_winpyver2 = winpyver2 or os.getenv("WINPYVER2","")
+        my_winpyver2 = my_winpyver2 if my_winpyver2 != "" else my_ver
+        my_flavor = flavor or os.getenv("WINPYFLAVOR", "")
+        my_release_level = release_level or  os.getenv("WINPYVER", "").replace(my_winpyver2+my_flavor, "")
 
-        return f"""## WinPython {winpyver2 + flavor}
+        return f"""## WinPython {my_winpyver2 + my_flavor}
 
-The following packages are included in WinPython-{architecture_bits}bit v{winpyver2 + flavor} {release_level}.
+The following packages are included in WinPython-{my_arch}bit v{my_winpyver2 + my_flavor} {my_release_level}.
 
 <details>
 
