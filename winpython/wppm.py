@@ -87,6 +87,38 @@ class Distribution:
             return "\n".join(package_lines)
         return ""
 
+    def generate_package_index_markdown(self, python_executable_directory: str, winpyver2: str,
+                                         flavor: str, architecture_bits: int, release_level: str) -> str:
+        """Generates a Markdown formatted package index page."""
+        from winpython import utils  # If needed
+
+        return f"""## WinPython {winpyver2 + flavor}
+
+The following packages are included in WinPython-{architecture_bits}bit v{winpyver2 + flavor} {release_level}.
+
+<details>
+
+### Tools
+
+Name | Version | Description
+-----|---------|------------
+{utils.get_installed_tools_markdown(utils.get_python_executable(python_executable_directory))}
+
+### Python packages
+
+Name | Version | Description
+-----|---------|------------
+{self.get_installed_packages_markdown()}
+
+### WheelHouse packages
+
+Name | Version | Description
+-----|---------|------------
+{self.get_wheelhouse_packages_markdown()}
+
+</details>
+"""
+
     def find_package(self, name: str) -> Package | None:
         """Find installed package by name."""
         for pack in self.get_installed_packages():

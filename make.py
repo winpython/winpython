@@ -100,32 +100,13 @@ class WinPythonDistributionBuilder:
     @property
     def package_index_markdown(self) -> str:
         """Generates a Markdown formatted package index page."""
-        return f"""## WinPython {self.winpyver2 + self.flavor}
-
-The following packages are included in WinPython-{self.architecture_bits}bit v{self.winpyver2 + self.flavor} {self.release_level}.
-
-<details>
-
-### Tools
-
-Name | Version | Description
------|---------|------------
-{utils.get_installed_tools_markdown(utils.get_python_executable(self.python_executable_directory))}
-
-### Python packages
-
-Name | Version | Description
------|---------|------------
-{self.distribution.get_installed_packages_markdown()}
-
-### WheelHouse packages
-
-Name | Version | Description
------|---------|------------
-{self.distribution.get_wheelhouse_packages_markdown()}
-
-</details>
-"""
+        return self.distribution.generate_package_index_markdown(
+        self.python_executable_directory,
+        self.winpyver2,
+        self.flavor,
+        self.architecture_bits,
+        self.release_level
+    )
 
     @property
     def winpython_version_name(self) -> str:
