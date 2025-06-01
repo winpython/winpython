@@ -18,6 +18,7 @@ from pip._vendor.packaging.markers import Marker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
 from . import utils
+from . import packagemetadata as pm 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class PipDataError(Exception):
 class PipData:
     """Manages package metadata and dependency relationships in a Python environment."""
 
-    def __init__(self, target: Optional[str] = None):
+    def __init__(self, target: Optional[str] = None, wheelhouse = None):
         """
         Initialize the PipData instance.
 
@@ -39,7 +40,7 @@ class PipData:
         self.raw: Dict[str, Dict] = {}
         self.environment = self._get_environment()
         try:
-            packages = self._get_packages(target or sys.executable)
+            packages = self._get_packages(target or sys.executable, wheelhouse)
             self._process_packages(packages)
             self._populate_reverse_dependencies()
         except Exception as e:
@@ -67,12 +68,14 @@ class PipData:
             "sys_platform": sys.platform,
         }
 
-    def _get_packages(self, search_path: str) -> List[Distribution]:
+    def _get_packages(self, search_path: str, wheelhouse) -> List[Distribution]:
         """Retrieve installed packages from the specified path."""
+        if wheelhouse:
+            return pm.get_directory_metadata(wheelhouse)
         if sys.executable == search_path:
-            return Distribution.discover()
+            return pm.get_installed_metadata() #Distribution.discover()
         else:
-            return distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
+            return pm.get_installed_metadata(path=[str(Path(search_path).parent / 'lib' / 'site-packages')]) #distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
 
     def _process_packages(self, packages: List[Distribution]) -> None:
         """Process packages metadata and store them in the distro dictionary."""
