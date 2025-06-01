@@ -69,24 +69,16 @@ class Distribution:
         pip_list = self.pip.pip_list(full=True)
         return [Package(f"{i[0].replace('-', '_').lower()}-{i[1]}-py3-none-any.whl", suggested_summary=i[2]) for i in pip_list]
 
-    def get_installed_packages_markdown(self) -> str:
-        """Generates Markdown for installed packages section in package index."""
-        package_lines = [
-            f"[{pkg.name}]({pkg.url}) | {pkg.version} | {pkg.description}"
-            for pkg in sorted(self.get_installed_packages(), key=lambda p: p.name.lower())
-        ]
-        return "\n".join(package_lines)
-
-    def get_wheelhouse_packages_markdown(self) -> str:
-        wheeldir = self.wheelhouse / 'included.wheels'
-        if wheeldir.is_dir():
-            package_lines = [
-               f"[{name}](https://pypi.org/project/{name}) | {version} | {summary}"
-               for name, version, summary in sorted(wh.list_packages_with_metadata(str(wheeldir)), key=itemgetter(0 , 1)) # lambda p: p[0].lower())
-            ]
-            return "\n".join(package_lines)
-        return ""
-
+    def render_markdown_for_list(self, title, items):
+        """Generates a Markdown section; name, url, version, summary"""
+        md = f"### {title}\n\n"
+        md += "Name | Version | Description\n"
+        md += "-----|---------|------------\n"
+        for name, url, version, summary in sorted(items, key=lambda p: (p[0].lower(), p[2])):
+            md += f"[{name}]({url}) | {version} | {summary} \n"
+        md += "\n"
+        return md
+    
     def generate_package_index_markdown(self, python_executable_directory: str|None = None, winpyver2: str|None = None,
                                          flavor: str|None = None, architecture_bits: int|None = None, release_level: str|None = None) -> str:
         """Generates a Markdown formatted package index page."""
@@ -97,30 +89,23 @@ class Distribution:
         my_flavor = flavor or os.getenv("WINPYFLAVOR", "")
         my_release_level = release_level or  os.getenv("WINPYVER", "").replace(my_winpyver2+my_flavor, "")
 
+        tools_list = utils.get_installed_tools(utils.get_python_executable(python_executable_directory))
+        package_list = [(pkg.name, pkg.url, pkg.version, pkg.description) for pkg in self.get_installed_packages()]
+        wheelhouse_list = []
+        wheeldir = self.wheelhouse / 'included.wheels'
+        if wheeldir.is_dir():
+            wheelhouse_list = [(name, f"https://pypi.org/project/{name}", version, summary)
+               for name, version, summary in wh.list_packages_with_metadata(str(wheeldir)) ]
+
         return f"""## WinPython {my_winpyver2 + my_flavor}
 
 The following packages are included in WinPython-{my_arch}bit v{my_winpyver2 + my_flavor} {my_release_level}.
 
 <details>
 
-### Tools
-
-Name | Version | Description
------|---------|------------
-{utils.get_installed_tools_markdown(utils.get_python_executable(python_executable_directory))}
-
-### Python packages
-
-Name | Version | Description
------|---------|------------
-{self.get_installed_packages_markdown()}
-
-### WheelHouse packages
-
-Name | Version | Description
------|---------|------------
-{self.get_wheelhouse_packages_markdown()}
-
+{self.render_markdown_for_list("Tools", tools_list)}
+{self.render_markdown_for_list("Python packages", package_list)}
+{self.render_markdown_for_list("WheelHouse packages", wheelhouse_list)}
 </details>
 """
 

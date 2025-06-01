@@ -11,9 +11,7 @@ import sys
 import stat
 import shutil
 import locale
-import tempfile
 import subprocess
-import configparser as cp
 from pathlib import Path
 import re
 import tarfile
@@ -41,25 +39,24 @@ def get_site_packages_path(path=None):
     pypy_site_packages = base_dir / 'site-packages'  # For PyPy
     return str(pypy_site_packages if pypy_site_packages.is_dir() else site_packages)
 
-def get_installed_tools_markdown(path=None)-> str:
+def get_installed_tools(path=None)-> str:
         """Generates Markdown for installed tools section in package index."""
         tool_lines = []
         python_exe = Path(get_python_executable(path))
         version = exec_shell_cmd(f'powershell (Get-Item {python_exe}).VersionInfo.FileVersion', python_exe.parent).splitlines()[0]
-        tool_lines.append(f"[Python](http://www.python.org/) | {version} | Python programming language with standard library")
+        tool_lines.append(("Python" ,f"http://www.python.org/", version, "Python programming language with standard library"))
         if (node_exe := python_exe.parent.parent / "n" / "node.exe").exists():
             version = exec_shell_cmd(f'powershell (Get-Item {node_exe}).VersionInfo.FileVersion', node_exe.parent).splitlines()[0]
-            tool_lines.append(f"[Nodejs](https://nodejs.org) | {version} | a JavaScript runtime built on Chrome's V8 JavaScript engine")
+            tool_lines.append("Nodejs", "https://nodejs.org", version, "a JavaScript runtime built on Chrome's V8 JavaScript engine")
 
         if (pandoc_exe := python_exe.parent.parent / "t" / "pandoc.exe").exists():
             version = exec_shell_cmd("pandoc -v", pandoc_exe.parent).splitlines()[0].split(" ")[-1]
-            tool_lines.append(f"[Pandoc](https://pandoc.org) | {version} | an universal document converter")
+            tool_lines.append("Pandoc", "https://pandoc.org", version, "an universal document converter")
 
         if (vscode_exe := python_exe.parent.parent / "t" / "VSCode" / "Code.exe").exists():
             version = exec_shell_cmd(f'powershell (Get-Item {vscode_exe}).VersionInfo.FileVersion', vscode_exe.parent).splitlines()[0]
-            tool_lines.append(f"[VSCode](https://code.visualstudio.com) | {version} | a source-code editor developed by Microsoft")
-        return "\n".join(tool_lines)
-
+            tool_lines.append("VSCode","https://code.visualstudio.com", version, "a source-code editor developed by Microsoft")
+        return tool_lines
 
 def onerror(function, path, excinfo):
     """Error handler for `shutil.rmtree`."""
