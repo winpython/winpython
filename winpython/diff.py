@@ -36,10 +36,10 @@ class Package:
         raise ValueError(f"Unrecognized package line format: {text}")
 
     def to_wiki(self):
-        return f"  * [{self.name}]({self.url}) {self.version} ({self.description})\r\n"
+        return f"  * [{self.name}]({self.url}) {self.version} ({self.description})\n"
 
     def upgrade_wiki(self, other):
-        return f"  * [{self.name}]({self.url}) {other.version} → {self.version} ({self.description})\r\n"
+        return f"  * [{self.name}]({self.url}) {other.version} → {self.version} ({self.description})\n"
 
 class PackageIndex:
     HEADERS = {"tools": "### Tools", "python": "### Python packages", "wheelhouse": "### WheelHouse packages"}
@@ -86,11 +86,11 @@ def compare_packages(old, new):
     removed = [old[k].to_wiki() for k in old if k not in new]
 
     if added:
-        output += "New packages:\r\n\r\n" + "".join(added) + "\r\n"
+        output += "New packages:\n\n" + "".join(added) + "\n\n"
     if upgraded:
-        output += "Upgraded packages:\r\n\r\n" + "".join(upgraded) + "\r\n"
+        output += "Upgraded packages:\n\n" + "".join(upgraded) + "\n\n"
     if removed:
-        output += "Removed packages:\r\n\r\n" + "".join(removed) + "\r\n"
+        output += "Removed packages:\n\n" + "".join(removed) + "\n\n"
     return output
 
 def find_previous_version(target_version, searchdir=None, flavor="", architecture=64):
@@ -110,16 +110,16 @@ def compare_package_indexes(version2, version1=None, searchdir=None, flavor="", 
 
     text = (
         f"## History of changes for WinPython-{architecture}bit {version2 + flavor}\r\n\r\n"
-        f"The following changes were made to WinPython-{architecture}bit distribution since version {version1 + flavor1}.\r\n\r\n"
-        "<details>\r\n\r\n"
+        f"The following changes were made to WinPython-{architecture}bit distribution since version {version1 + flavor1}.\n\n\n"
+        "<details>\n\n"
     )
 
     for key in PackageIndex.HEADERS:
         diff = compare_packages(pi1.packages[key], pi2.packages[key])
         if diff:
-            text += f"{PackageIndex.HEADERS[key]}\r\n\r\n{diff}"
+            text += f"\n{PackageIndex.HEADERS[key]}\n\n{diff}"
 
-    return text + "\r\n</details>\r\n* * *\r\n"
+    return text + "\n</details>\n\n* * *\n"
 
 def copy_changelogs(version, searchdir, flavor="", architecture=64, basedir=None):
     basever = ".".join(version.split(".")[:2])
