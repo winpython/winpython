@@ -274,14 +274,15 @@ def main(test=False):
     # parser.add_argument( "--unregister_forall", action="store_true", help="un-Register distribution for all users")
     parser.add_argument("--fix", action="store_true", help="make WinPython fix")
     parser.add_argument("--movable", action="store_true", help="make WinPython movable")
-    parser.add_argument("-ws", dest="wheelsource", default=None, type=str, help="location to search wheels: wppm pylock.toml -ws source_of_wheels")
-    parser.add_argument("-wd", dest="wheeldrain" , default=None, type=str, help="location of found wheels: wppm pylock.toml -wd destination_of_wheels")
-    parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching the given [optional] package expression: wppm -ls, wppm -ls pand")
-    parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of package names matching given regular expression: wppm -lsa pandas -l1")
-    parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option]: wppm -p pandas[test]")
-    parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse dependancies of the given package[option]: wppm -r pytest[test]")
-    parser.add_argument("-l", "--levels", type=int, default=2, help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1")
-    parser.add_argument("-t", "--target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
+    parser.add_argument("-ws", dest="wheelsource", default=None, type=str, help="wheels location, '.' = WheelHouse): wppm pylock.toml -ws source_of_wheels, wppm -ls -ws .")
+    parser.add_argument("-wd", dest="wheeldrain" , default=None, type=str, help="wheels destination: wppm pylock.toml -wd destination_of_wheels")
+    parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching [optional] expression: wppm -ls, wppm -ls pand")
+    parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of packages matching [optional]  expression: wppm -lsa pandas -l1")
+    parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary if the installation")
+    parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
+    parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse wppmdependancies of the given package[option]: wppm -r pytest[test]")
+    parser.add_argument("-l", dest="levels", type=int, default=2, help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1")
+    parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
 
@@ -290,6 +291,10 @@ def main(test=False):
     targetpython = None
     if args.target and args.target != sys.prefix:
         targetpython = args.target if args.target.lower().endswith('.exe') else str(Path(args.target) / 'python.exe')
+    if args.wheelsource == ".": # play in default WheelHouse
+        if utils.is_python_distribution(args.target):
+            dist = Distribution(args.target)
+            args.wheelsource = dist.wheelhouse / 'included.wheels'
     if args.install and args.uninstall:
         raise RuntimeError("Incompatible arguments: --install and --uninstall")
     if args.registerWinPython and args.unregisterWinPython:
@@ -359,6 +364,9 @@ def main(test=False):
             sys.exit()
         if args.movable:
             p = subprocess.Popen(["start", "cmd", "/k",dist.python_exe, "-c" , cmd_mov], shell = True,  cwd=dist.target)
+            sys.exit()
+        if args.markdown:
+            print(dist.generate_package_index_markdown())
             sys.exit()
         if not args.install and not args.uninstall and args.fname.endswith(".toml"):
             args.install = True  # for Drag & Drop of .toml (and not wheel)

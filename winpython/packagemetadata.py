@@ -14,7 +14,6 @@ import subprocess
 from typing import Dict, List, Optional, Tuple
 from . import utils
 
-from packaging.utils import canonicalize_name, parse_wheel_filename, parse_sdist_filename
 # --- Abstract metadata accessor ---
 
 class PackageMetadata:
@@ -64,7 +63,7 @@ def extract_metadata_from_wheel(path: str) -> PackageMetadata:
                 with zf.open(name) as f:
                     # Parse metadata (simple parsing for Name, Version, Requires-Dist)
                     return parse_metadata_file(f.read().decode())
-    raise ValueError(f"No METADATA found in {path}")
+        raise ValueError(f"No METADATA found in {path}")
 
 def extract_metadata_from_sdist(path: str) -> PackageMetadata:
     import tarfile
@@ -78,6 +77,8 @@ def extract_metadata_from_sdist(path: str) -> PackageMetadata:
 def parse_metadata_file(txt: str) -> PackageMetadata:
     name = version = summary = description = ""
     requires = []
+    description_lines = []
+    in_description = False
     for line in txt.splitlines():
         if line.startswith('Name: '):
             name = line[6:].strip()
@@ -86,14 +87,8 @@ def parse_metadata_file(txt: str) -> PackageMetadata:
         elif line.startswith('Summary: '):
             summary = description = line[9:].strip()
         elif line.startswith('Requires-Dist: '):
-            requires.append(line[14:].strip())
+            requires.append(line[14:].strip()) 
     return PackageMetadata(name, version, requires, summary, description, {'Name': name, "Summary": summary, "Description": description})
-
-# --- Main dependency tree logic ---
-
-def build_dependency_tree(pkgs: List[PackageMetadata]):
-    # Existing logic, but using our PackageMetadata objects
-    pass
 
 def main():
     if len(sys.argv) > 1:
@@ -103,7 +98,6 @@ def main():
     else:
         # Installed packages mode
         pkgs = get_installed_metadata()
-    build_dependency_tree(pkgs)
 
 if __name__ == "__main__":
     main()
