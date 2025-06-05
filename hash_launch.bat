@@ -1,8 +1,10 @@
-call C:\WPy64-3890\scripts\env.bat
+call C:\WinPdev\WPy64-310111\scripts\env.bat
 
 cd %~dp0
 
 rem echo %date% %time%>>gdc_counting.txt
-python hash.py %* >>hash_counting_%date:/=_%.txt
+python -c "import sys;from winpython import hash; hash.print_hashes(sys.argv[1:])" %* >>hash_counting_%date:/=_%.txt
+rem python hash.py %* >>hash_counting_%date:/=_%.txt
 
 start notepad.exe hash_counting_%date:/=_%.txt
+ 

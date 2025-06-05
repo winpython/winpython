@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-#
-# WinPython hash.py script
+"""
+hash.py: compute hash of given files into a markdown output
+"""
 # Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
 # (see winpython/__init__.py for details)
