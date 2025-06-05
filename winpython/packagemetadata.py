@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 packagemetadata.py - get metadata from designated place
 """
@@ -8,12 +8,11 @@ import tarfile
 import zipfile
 import sys
 from pathlib import Path
-from collections import defaultdict
-import shutil
-import subprocess
 from typing import Dict, List, Optional, Tuple
 from . import utils
-
+import importlib.metadata
+import email
+from packaging.utils import canonicalize_name
 # --- Abstract metadata accessor ---
 
 class PackageMetadata:
@@ -28,11 +27,10 @@ class PackageMetadata:
 
 def get_installed_metadata(path = None) -> List[PackageMetadata]:
     # Use importlib.metadata or pkg_resources
-    import importlib.metadata
     pkgs = []
     distro = importlib.metadata.distributions(path = path) if path else importlib.metadata.distributions()
     for dist in distro:
-        name = dist.metadata['Name']
+        name = canonicalize_name(dist.metadata['Name'])
         version = dist.version
         summary = dist.metadata.get("Summary", ""),
         description = dist.metadata.get("Description", ""),
@@ -56,7 +54,6 @@ def get_directory_metadata(directory: str) -> List[PackageMetadata]:
     return pkgs
 
 def extract_metadata_from_wheel(path: str) -> PackageMetadata:
-    import zipfile
     with zipfile.ZipFile(path) as zf:
         for name in zf.namelist():
             if name.endswith(r'.dist-info/METADATA') and name.split("/")[1] == "METADATA":
@@ -66,7 +63,6 @@ def extract_metadata_from_wheel(path: str) -> PackageMetadata:
         raise ValueError(f"No METADATA found in {path}")
 
 def extract_metadata_from_sdist(path: str) -> PackageMetadata:
-    import tarfile
     with tarfile.open(path, "r:gz") as tf:
         for member in tf.getmembers():
             if member.name.endswith('PKG-INFO'):
@@ -75,20 +71,13 @@ def extract_metadata_from_sdist(path: str) -> PackageMetadata:
     raise ValueError(f"No PKG-INFO found in {path}")
 
 def parse_metadata_file(txt: str) -> PackageMetadata:
-    name = version = summary = description = ""
-    requires = []
-    description_lines = []
-    in_description = False
-    for line in txt.splitlines():
-        if line.startswith('Name: '):
-            name = line[6:].strip()
-        elif line.startswith('Version: '):
-            version = line[9:].strip()
-        elif line.startswith('Summary: '):
-            summary = description = line[9:].strip()
-        elif line.startswith('Requires-Dist: '):
-            requires.append(line[14:].strip()) 
-    return PackageMetadata(name, version, requires, summary, description, {'Name': name, "Summary": summary, "Description": description})
+    meta = email.message_from_string(txt)
+    name = canonicalize_name(meta.get('Name', ''))
+    version = meta.get('Version', '')
+    summary = meta.get('Summary', '')
+    description = meta.get('Description', '')
+    requires = meta.get_all('Requires-Dist') or []
+    return PackageMetadata(name, version, requires, summary, description, dict(meta.items()))
 
 def main():
     if len(sys.argv) > 1:
