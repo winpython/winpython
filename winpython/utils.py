@@ -47,15 +47,15 @@ def get_installed_tools(path=None)-> str:
         tool_lines.append(("Python" ,f"http://www.python.org/", version, "Python programming language with standard library"))
         if (node_exe := python_exe.parent.parent / "n" / "node.exe").exists():
             version = exec_shell_cmd(f'powershell (Get-Item {node_exe}).VersionInfo.FileVersion', node_exe.parent).splitlines()[0]
-            tool_lines.append("Nodejs", "https://nodejs.org", version, "a JavaScript runtime built on Chrome's V8 JavaScript engine")
+            tool_lines.append(("Nodejs", "https://nodejs.org", version, "a JavaScript runtime built on Chrome's V8 JavaScript engine"))
 
         if (pandoc_exe := python_exe.parent.parent / "t" / "pandoc.exe").exists():
             version = exec_shell_cmd("pandoc -v", pandoc_exe.parent).splitlines()[0].split(" ")[-1]
-            tool_lines.append("Pandoc", "https://pandoc.org", version, "an universal document converter")
+            tool_lines.append(("Pandoc", "https://pandoc.org", version, "an universal document converter"))
 
         if (vscode_exe := python_exe.parent.parent / "t" / "VSCode" / "Code.exe").exists():
             version = exec_shell_cmd(f'powershell (Get-Item {vscode_exe}).VersionInfo.FileVersion', vscode_exe.parent).splitlines()[0]
-            tool_lines.append("VSCode","https://code.visualstudio.com", version, "a source-code editor developed by Microsoft")
+            tool_lines.append(("VSCode","https://code.visualstudio.com", version, "a source-code editor developed by Microsoft"))
         return tool_lines
 
 def onerror(function, path, excinfo):
