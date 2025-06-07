@@ -11,10 +11,11 @@ from pathlib import Path
 import re
 import shutil
 from packaging import version
+import sys
+
 from . import utils
 
 CHANGELOGS_DIR = Path(__file__).parent.parent / "changelogs"
-assert CHANGELOGS_DIR.is_dir()
 
 class Package:
     PATTERNS = [
@@ -48,7 +49,7 @@ class PackageIndex:
     def __init__(self, version, searchdir=None, flavor="", architecture=64):
         self.version = version
         self.flavor = flavor
-        self.searchdir = searchdir
+        self.searchdir = Path(searchdir) if searchdir else CHANGELOGS_DIR
         self.architecture = architecture
         self.packages = {"tools": {}, "python": {}, "wheelhouse": {}}
         self._load_index()
@@ -102,6 +103,10 @@ def find_previous_version(target_version, searchdir=None, flavor="", architectur
     return max(versions, key=version.parse, default=target_version)
 
 def compare_package_indexes(version2, version1=None, searchdir=None, flavor="", flavor1=None, architecture=64):
+    """Comparison by looking versions in a given Changelog directory"""
+    if not searchdir or (not Path(searchdir).is_dir() and not CHANGELOGS_DIR.is_dir()):
+        print(f"Error: changelogs directory {CHANGELOGS_DIR} does not exist.")
+        sys.exit(1)    
     version1 = version1 or find_previous_version(version2, searchdir, flavor, architecture)
     flavor1 = flavor1 or flavor
 
@@ -140,8 +145,49 @@ def write_changelog(version2, version1=None, searchdir=None, flavor="", architec
         f.write(changelog)
     # Copy to winpython/changelogs back to basedir
     if basedir:
-        shutil.copyfile(output_file, basedir / output_file.name)
+        shutil.copyfile(output_file, Path(basedir) / output_file.name)
+
+def compare_two_markdown_files(file1, file2):
+    """Compare two arbitrary markdown files with WinPython changelog format."""
+    class DummyPackageIndex(PackageIndex):
+        def __init__(self, filename):
+            self.packages = {"tools": {}, "python": {}, "wheelhouse": {}}
+            self._load_index(filename)
+
+        def _load_index(self, filename):
+            with open(filename, "r", encoding=utils.guess_encoding(filename)[0]) as f:
+                self._parse_index(f.read())
+
+    pi1 = DummyPackageIndex(Path(file1))
+    pi2 = DummyPackageIndex(Path(file2))
+
+    text = f"## Differences between {file1} and {file2}\n\n<details>\n\n"
+    for key in PackageIndex.HEADERS:
+        diff = compare_packages(pi1.packages[key], pi2.packages[key])
+        if diff:
+            text += f"\n{PackageIndex.HEADERS[key]}\n\n{diff}"
+    return text + "\n</details>\n\n* * *\n"
+
+def print_usage():
+    print("Usage:")
+    print("  python diff.py file1.md file2.md")
+    print("    - Compare two markdown changelog files directly.")
+    print("  python diff.py <version2> <version1> [searchdir] [flavor] [architecture]")
+    print("    - Compare WinPython markdown changelogs by version.")
 
 if __name__ == "__main__":
-    print(compare_package_indexes("3.7.4.0", "3.7.2.0", r"C:\WinP\bd37\budot", "Zero", architecture=32))
-    write_changelog("3.7.4.0", "3.7.2.0", r"C:\WinP\bd37\budot", "Ps2", architecture=64)
+    if len(sys.argv) == 3 and all(arg.lower().endswith('.md') for arg in sys.argv[1:]):
+        # Usage: python diff.py file1.md file2.md
+        file1, file2 = sys.argv[1], sys.argv[2]
+        print(compare_two_markdown_files(file1, file2))
+    elif len(sys.argv) >= 3:
+        # Original usage (version comparison)
+        # Example: python diff.py 3.7.4.0 3.7.2.0 "C:\WinP\bd37\budot" "Zero" 32
+        version2 = sys.argv[1]
+        version1 = sys.argv[2]
+        searchdir = Path(sys.argv[3]) if len(sys.argv) > 3 else CHANGELOGS_DIR
+        flavor = sys.argv[4] if len(sys.argv) > 4 else ""
+        architecture = int(sys.argv[5]) if len(sys.argv) > 5 else 64
+        print(compare_package_indexes(version2, version1, searchdir, flavor, architecture=architecture))
+    else:
+        print_usage()
