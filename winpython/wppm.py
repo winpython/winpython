@@ -184,7 +184,7 @@ The following packages are included in WinPython-{my_arch}bit v{my_winpyver2 + m
             # create movable launchers for previous package installations
             self.patch_all_shebang(to_movable=to_movable)
         if package_name.lower() in ("", "spyder"):
-            # spyder don't goes on internet without I ask
+            # spyder don't goes on internet without you ask
             utils.patch_sourcefile(
                 Path(self.target) / "lib" / "site-packages" / "spyder" / "config" / "main.py",
                 "'check_updates_on_startup': True,",
@@ -266,26 +266,23 @@ def main(test=False):
         description="WinPython Package Manager: handle a WinPython Distribution and its packages",
         formatter_class=RawTextHelpFormatter,
     )
-    parser.add_argument("fname", metavar="package or lockfile", nargs="?", default="", type=str, help="optional package name or package wheel")
+    parser.add_argument("fname", metavar="package(s) or lockfile", nargs="*", default=[""], type=str, help="optional package names, wheels, or lockfile")
     parser.add_argument("-v", "--verbose", action="store_true", help="show more details on packages and actions")
     parser.add_argument( "--register", dest="registerWinPython", action="store_true", help=registerWinPythonHelp)
-    # parser.add_argument( "--register_forall", action="store_true", help="Register distribution for all users")
     parser.add_argument("--unregister", dest="unregisterWinPython", action="store_true", help=unregisterWinPythonHelp)
-    # parser.add_argument( "--unregister_forall", action="store_true", help="un-Register distribution for all users")
     parser.add_argument("--fix", action="store_true", help="make WinPython fix")
     parser.add_argument("--movable", action="store_true", help="make WinPython movable")
     parser.add_argument("-ws", dest="wheelsource", default=None, type=str, help="wheels location, '.' = WheelHouse): wppm pylock.toml -ws source_of_wheels, wppm -ls -ws .")
     parser.add_argument("-wd", dest="wheeldrain" , default=None, type=str, help="wheels destination: wppm pylock.toml -wd destination_of_wheels")
     parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching [optional] expression: wppm -ls, wppm -ls pand")
     parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of packages matching [optional]  expression: wppm -lsa pandas -l1")
-    parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary if the installation")
+    parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse wppmdependancies of the given package[option]: wppm -r pytest[test]")
     parser.add_argument("-l", dest="levels", type=int, default=2, help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
-
 
     args = parser.parse_args()
     targetpython = None
@@ -301,17 +298,22 @@ def main(test=False):
         raise RuntimeError("Incompatible arguments: --install and --uninstall")
     if args.pipdown:
         pip = piptree.PipData(targetpython, args.wheelsource)
-        pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-        print(pip.down(pack, extra, args.levels, verbose=args.verbose))
+        for args_fname in args.fname:
+            pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
+            print(pip.down(pack, extra, args.levels, verbose=args.verbose))
         sys.exit()
     elif args.pipup:
         pip = piptree.PipData(targetpython, args.wheelsource)
-        pack, extra, *other = (args.fname + "[").replace("]", "[").split("[")
-        print(pip.up(pack, extra, args.levels, verbose=args.verbose))
+        for args_fname in args.fname:
+            pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
+            print(pip.up(pack, extra, args.levels, verbose=args.verbose))
         sys.exit()
     elif args.list:
         pip = piptree.PipData(targetpython, args.wheelsource)
-        todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0]))]
+        todo= []
+        for args_fname in args.fname:
+            todo += [l for l in pip.pip_list(full=True) if bool(re.search(args_fname, l[0]))]
+        todo  = sorted(set(todo)) #, key=lambda p: (p[0].lower(), p[2])
         titles = [['Package', 'Version', 'Summary'], ['_' * max(x, 6) for x in utils.columns_width(todo)]]
         listed = utils.formatted_list(titles + todo, max_width=70)
         for p in listed:
@@ -319,17 +321,17 @@ def main(test=False):
         sys.exit()
     elif args.all:
         pip = piptree.PipData(targetpython, args.wheelsource)
-        todo = [l for l in pip.pip_list(full=True) if bool(re.search(args.fname, l[0]))]
-        for l in todo:
-            # print(pip.distro[l[0]])
-            title = f"**  Package: {l[0]}  **"
-            print("\n" + "*" * len(title), f"\n{title}", "\n" + "*" * len(title))
-            for key, value in pip.raw[l[0]].items():
-                rawtext = json.dumps(value, indent=2, ensure_ascii=False)
-                lines = [l for l in rawtext.split(r"\n") if len(l.strip()) > 2]
-                if key.lower() != 'description' or args.verbose:
-                    print(f"{key}: ", "\n".join(lines).replace('"', ""))
-        sys.exit()
+        for args_fname in args.fname:
+            todo = [l for l in pip.pip_list(full=True) if bool(re.search(args_fname, l[0]))]
+            for l in sorted(set(todo)):
+                title = f"**  Package: {l[0]}  **"
+                print("\n" + "*" * len(title), f"\n{title}", "\n" + "*" * len(title))
+                for key, value in pip.raw[l[0]].items():
+                    rawtext = json.dumps(value, indent=2, ensure_ascii=False)
+                    lines = [l for l in rawtext.split(r"\n") if len(l.strip()) > 2]
+                    if key.lower() != 'description' or args.verbose:
+                        print(f"{key}: ", "\n".join(lines).replace('"', ""))
+            sys.exit()
     if args.registerWinPython:
         print(registerWinPythonHelp)
         if utils.is_python_distribution(args.target):
@@ -373,26 +375,27 @@ def main(test=False):
             else:
                 print(default)
             sys.exit()
-        if not args.install and not args.uninstall and args.fname.endswith(".toml"):
+        if not args.install and not args.uninstall and args.fname[0].endswith(".toml"):
             args.install = True  # for Drag & Drop of .toml (and not wheel)
-        if args.fname == "" or (not args.install and not args.uninstall):
+        if args.fname[0] == "" or (not args.install and not args.uninstall):
                 parser.print_help()
                 sys.exit()
         else:
             try:
-                filename = Path(args.fname).name
-                install_from_wheelhouse = ["--no-index", "--trusted-host=None", f"--find-links={dist.wheelhouse / 'included.wheels'}"]
-                if filename.split('.')[0] == "pylock" and filename.split('.')[-1] == 'toml':
-                    print(' a lock file !', args.fname, dist.target)
-                    wh.get_pylock_wheels(dist.wheelhouse, Path(args.fname), args.wheelsource, args.wheeldrain)
-                    sys.exit()
-                if args.uninstall:
-                    package = dist.find_package(args.fname)
-                    dist.uninstall(package)
-                elif args.install:
-                    package = Package(args.fname)
-                    if args.install:
-                        dist.install(package, install_options=install_from_wheelhouse)
+               for args_fname in args.fname:
+                    filename = Path(args_fname).name
+                    install_from_wheelhouse = ["--no-index", "--trusted-host=None", f"--find-links={dist.wheelhouse / 'included.wheels'}"]
+                    if filename.split('.')[0] == "pylock" and filename.split('.')[-1] == 'toml':
+                        print(' a lock file !', args_fname, dist.target)
+                        wh.get_pylock_wheels(dist.wheelhouse, Path(args_fname), args.wheelsource, args.wheeldrain)
+                        sys.exit()
+                    if args.uninstall:
+                        package = dist.find_package(args_fname)
+                        dist.uninstall(package)
+                    elif args.install:
+                        package = Package(args_fname)
+                        if args.install:
+                            dist.install(package, install_options=install_from_wheelhouse)
             except NotImplementedError:
                 raise RuntimeError("Package is not (yet) supported by WPPM")
     else:
