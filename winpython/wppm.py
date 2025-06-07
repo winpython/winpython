@@ -14,7 +14,7 @@ import subprocess
 import json
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
-from . import utils, piptree, associate
+from . import utils, piptree, associate, diff
 from . import wheelhouse as wh
 from operator import itemgetter
 # Workaround for installing PyVISA on Windows from source:
@@ -80,10 +80,10 @@ class Distribution:
         return md
     
     def generate_package_index_markdown(self, python_executable_directory: str|None = None, winpyver2: str|None = None,
-                                         flavor: str|None = None, architecture_bits: int|None = None, release_level: str|None = None) -> str:
+                                         flavor: str|None = None, architecture_bits: int|None = None
+                                         , release_level: str|None = None, wheeldir: str|None = None) -> str:
         """Generates a Markdown formatted package index page."""
         my_ver , my_arch = utils.get_python_infos(python_executable_directory or self.target)
-        # suppose we suite ourself (method will vary over time)
         my_winpyver2 = winpyver2 or os.getenv("WINPYVER2","")
         my_winpyver2 = my_winpyver2 if my_winpyver2 != "" else my_ver
         my_flavor = flavor or os.getenv("WINPYFLAVOR", "")
@@ -92,10 +92,10 @@ class Distribution:
         tools_list = utils.get_installed_tools(utils.get_python_executable(python_executable_directory))
         package_list = [(pkg.name, pkg.url, pkg.version, pkg.description) for pkg in self.get_installed_packages()]
         wheelhouse_list = []
-        wheeldir = self.wheelhouse / 'included.wheels'
-        if wheeldir.is_dir():
+        my_wheeldir = Path(wheeldir) if wheeldir else self.wheelhouse / 'included.wheels'
+        if my_wheeldir.is_dir():
             wheelhouse_list = [(name, f"https://pypi.org/project/{name}", version, summary)
-               for name, version, summary in wh.list_packages_with_metadata(str(wheeldir)) ]
+               for name, version, summary in wh.list_packages_with_metadata(str(my_wheeldir)) ]
 
         return f"""## WinPython {my_winpyver2 + my_flavor}
 
@@ -366,7 +366,12 @@ def main(test=False):
             p = subprocess.Popen(["start", "cmd", "/k",dist.python_exe, "-c" , cmd_mov], shell = True,  cwd=dist.target)
             sys.exit()
         if args.markdown:
-            print(dist.generate_package_index_markdown())
+            default = dist.generate_package_index_markdown()
+            if args.wheelsource:
+                compare = dist.generate_package_index_markdown(wheeldir = args.wheelsource)
+                print(diff.compare_markdown_sections(default, compare,'python', 'wheelhouse', 'installed', 'wheelhouse')) 
+            else:
+                print(default)
             sys.exit()
         if not args.install and not args.uninstall and args.fname.endswith(".toml"):
             args.install = True  # for Drag & Drop of .toml (and not wheel)
