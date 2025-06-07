@@ -19,7 +19,7 @@ This is the `winpython` Python package, not the distribution itself.
 It includes two main features:
 
 WinPython Package Manager (WPPM)
-  a complementary tool to navigate provided package list or register WinPython. 
+  a complementary tool to navigate provided packages, install packages from included Wheelhouse, or register WinPython. 
   pip is the recommanded way to add or remove packages
 			
 WinPython build toolchain
@@ -29,7 +29,7 @@ WinPython build toolchain
 Dependencies
 ------------   
 
-* Python3 >= 3.9
+* Python3 >= 3.10
 
 
 Requirements
@@ -58,6 +58,6 @@ More informations
 
 * Downloads: https://sourceforge.net/projects/winpython/files/ or https://github.com/winpython/winpython/releases
 
-* Development, bug reports and feature requests: https://github.com/winpython/winpython
+* Development, bug reports, discussions and feature requests: https://github.com/winpython/winpython
 
 * Discussions: https://groups.google.com/group/winpython
