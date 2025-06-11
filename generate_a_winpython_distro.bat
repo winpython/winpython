@@ -162,7 +162,7 @@ set req_lock_local=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK
 set pip_lock_web=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.toml
 set pip_lock_local=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.toml
 set req_lock_web=%LOCKDIR%requirement.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.txt
-set req_lock_local=%LOCKDIR%requirement.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%_local.txt
+set req_lock_local=%LOCKDIR%requirement.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.txt
 
 
 set my_archive_lockfile=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml
