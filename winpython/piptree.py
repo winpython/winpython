@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Enhanced script to inspect and display Python package dependencies,
+piptree.py: inspect and display Python package dependencies,
 supporting both downward and upward dependency trees.
 Requires Python 3.8+ due to importlib.metadata.
 """
