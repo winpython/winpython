@@ -75,7 +75,7 @@ class Distribution:
         md += "Name | Version | Description\n"
         md += "-----|---------|------------\n"
         for name, url, version, summary in sorted(items, key=lambda p: (p[0].lower(), p[2])):
-            md += f"[{name}]({url}) | {version} | {summary} \n"
+            md += f"[{name}]({url}) | {version} | {summary}\n"
         md += "\n"
         return md
     
@@ -94,7 +94,7 @@ class Distribution:
         wheelhouse_list = []
         my_wheeldir = Path(wheeldir) if wheeldir else self.wheelhouse / 'included.wheels'
         if my_wheeldir.is_dir():
-            wheelhouse_list = [(name, f"https://pypi.org/project/{name}", version, summary)
+            wheelhouse_list = [(name, f"https://pypi.org/project/{name}", version, utils.sum_up(summary))
                for name, version, summary in wh.list_packages_with_metadata(str(my_wheeldir)) ]
 
         return f"""## WinPython {my_winpyver2 + my_flavor}
