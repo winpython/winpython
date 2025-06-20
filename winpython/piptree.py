@@ -197,10 +197,12 @@ class PipData:
                                     extra + ',' in dependency["req_extra"] + ',' and \
                                     Marker(dependency["req_marker"]).evaluate(environment=environment | {"extra": up_req})):
                                     # IA risk error: # dask[array] go upwards as dask[dataframe], so {"extra": up_req} , not {"extra": extra}
+                                    #tag downward limiting dependancies
+                                    wall = " " if dependency["req_version"].startswith("<") or dependency["req_version"].startswith("==") else ""
                                     ret += self._get_dependency_tree(
                                         dependency["req_key"],
                                         up_req,
-                                        f"[requires: {package_name}"
+                                        f"[requires{wall}: {package_name}"
                                         + (f"[{dependency['req_extra']}]" if dependency["req_extra"] != "" else "")
                                         + f'{dependency["req_version"]}]',
                                         depth,
@@ -242,16 +244,18 @@ class PipData:
         lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
         return "\n".join(lines).replace('"', "")
 
-    def up(self, pp: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
+    def up(self, ppw: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
         """Generate upward dependency tree as formatted string."""
+        pp = ppw[:-1] if ppw.endswith('!') else ppw
+        ppend = "!" if ppw.endswith('!') else "" #show only downward limiting dependancies
         if pp == ".":
-            results = [self.up(p, extra, depth, indent, version_req, verbose) for p in sorted(self.distro)]
+            results = [self.up(p + ppend, extra, depth, indent, version_req, verbose) for p in sorted(self.distro)]
             return '\n'.join(filter(None, results))
 
         if extra == ".":
             if pp in self.distro:
                 extras = set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"]))
-                results = [self.up(pp, e, depth, indent, version_req, verbose=verbose) for e in sorted(extras)]
+                results = [self.up(pp + ppend, e, depth, indent, version_req, verbose=verbose) for e in sorted(extras)]
                 return '\n'.join(filter(None, results))
             return ""
 
@@ -259,8 +263,8 @@ class PipData:
             return ""
 
         rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose, upward=True), indent=indent)
-        lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
-        return "\n".join(filter(None, lines)).replace('"', "")
+        lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2   and ( ppend=="" or not "[requires:" in l)]
+        return "\n".join(filter(None, lines)).replace('"', "").replace('[requires :', '[requires:')
 
     def description(self, pp: str) -> None:
         """Return package description or None if not found."""
