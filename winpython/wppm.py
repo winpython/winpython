@@ -278,8 +278,8 @@ def main(test=False):
     parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of packages matching [optional]  expression: wppm -lsa pandas -l1")
     parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
-    parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse wppmdependancies of the given package[option]: wppm -r pytest[test]")
-    parser.add_argument("-l", dest="levels", type=int, default=2, help="show 'LEVELS' levels of dependencies (with -p, -r), default is 2: wppm -p pandas -l1")
+    parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
+    parser.add_argument("-l", dest="levels", type=int, default=-1, help="show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
@@ -300,13 +300,13 @@ def main(test=False):
         pip = piptree.PipData(targetpython, args.wheelsource)
         for args_fname in args.fname:
             pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
-            print(pip.down(pack, extra, args.levels, verbose=args.verbose))
+            print(pip.down(pack, extra, args.levels if args.levels>0 else 2, verbose=args.verbose))
         sys.exit()
     elif args.pipup:
         pip = piptree.PipData(targetpython, args.wheelsource)
         for args_fname in args.fname:
             pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
-            print(pip.up(pack, extra, args.levels, verbose=args.verbose))
+            print(pip.up(pack, extra, args.levels if args.levels>=0 else 1, verbose=args.verbose))
         sys.exit()
     elif args.list:
         pip = piptree.PipData(targetpython, args.wheelsource)
