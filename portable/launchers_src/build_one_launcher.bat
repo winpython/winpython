@@ -3,6 +3,7 @@ set icon_name=%1
 set LAUNCH_TARGET=%2
 set launcher_name=%3
 set subsystem=%4
+set destination=%5
 
 set icon_name=%icon_name:"=%
 set LAUNCH_TARGET=%LAUNCH_TARGET:"=%
@@ -12,7 +13,7 @@ set subsystem=%subsystem:"=%
 set ROOT_PATH=%~dp0..\
 set SCRIPT_PATH=%~dp0
 set TEMPO_PATH=%ROOT_PATH%launchers_temp
-set OUTPUT_DIR=%ROOT_PATH%launchers_final
+set OUTPUT_DIR=%ROOT_PATH%launchers_%destination%
 
 set "ICON_FILE=%ROOT_PATH%icons\%icon_name%"
 set LAUNCHER_EXE=%OUTPUT_DIR%\%launcher_name%.exe
