@@ -63,8 +63,4 @@ Param([int]$x=$host.ui.rawui.windowsize.width,
 }
 # Windows10 yelling at us with 150 40 6000
 # Set-WindowSize 195 40 6000 
-
-### Colorize to distinguish
-$host.ui.RawUI.BackgroundColor = "Black"
-$host.ui.RawUI.ForegroundColor = "White"
 }
