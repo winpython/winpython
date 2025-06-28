@@ -3,13 +3,13 @@ requires = ["flit_core"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "winpython"
+name = "wppm"
 authors = [
     {name = "Pierre Raybaut"},
     {name = "stonebig"},
 ]
 dependencies = []
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 readme = "README.rst"
 license = {file = "LICENSE"}
 classifiers=[
@@ -25,7 +25,7 @@ classifiers=[
     'Topic :: Software Development :: Widget Sets',
 ]
 dynamic = ["version",]
-description="WinPython distribution tools, including WPPM"
+description="WinPython Package Management"
 keywords = ["Portable","Windows"]
 
 [project.urls]
@@ -33,4 +33,4 @@ Documentation = "https://winpython.github.io/"
 Source = "https://github.com/winpython/winpython"
 
 [project.scripts]
-wppm = "winpython.wppm:main"
+wppm = "wppm.wppm:main"
