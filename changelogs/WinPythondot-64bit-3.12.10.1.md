@@ -1,6 +1,6 @@
-## WinPython 3.14.0.0dot
+## WinPython 3.12.10.1dot
 
-The following packages are included in WinPython-64bit v3.14.0.0dot b3.
+The following packages are included in WinPython-64bit v3.12.10.1dot 3.10.11.1dot.
 
 <details>
 
@@ -8,7 +8,7 @@ The following packages are included in WinPython-64bit v3.14.0.0dot b3.
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | 3.14.0b3 | Python programming language with standard library
+[Python](http://www.python.org/) | 3.12.10 | Python programming language with standard library
 
 
 ### Python packages
@@ -24,7 +24,7 @@ Name | Version | Description
 [sqlite-bro](https://pypi.org/project/sqlite-bro) | 0.13.1 | a graphic SQLite Client in 1 Python file
 [sv-ttk](https://pypi.org/project/sv-ttk) | 2.6.0 | A gorgeous theme for Tkinter, based on Windows 11's UI
 [wheel](https://pypi.org/project/wheel) | 0.45.1 | A built-package format for Python
-[winpython](https://pypi.org/project/winpython) | 16.6.20250620 | WinPython distribution tools, including WPPM
+[winpython](https://pypi.org/project/winpython) | 16.5.20250614 | WinPython distribution tools, including WPPM
 
 
 ### WheelHouse packages

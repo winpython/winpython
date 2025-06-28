@@ -1,6 +1,6 @@
-## WinPython 3.14.0.0dot
+## WinPython 3.14.0.0free
 
-The following packages are included in WinPython-64bit v3.14.0.0dot b3.
+The following packages are included in WinPython-64bit v3.14.0.0free b3.
 
 <details>
 

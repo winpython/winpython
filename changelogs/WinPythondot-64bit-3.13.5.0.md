@@ -1,6 +1,6 @@
-## WinPython 3.14.0.0dot
+## WinPython 3.13.5.0dot
 
-The following packages are included in WinPython-64bit v3.14.0.0dot b3.
+The following packages are included in WinPython-64bit v3.13.5.0dot 3.10.11.1dot.
 
 <details>
 
@@ -8,7 +8,7 @@ The following packages are included in WinPython-64bit v3.14.0.0dot b3.
 
 Name | Version | Description
 -----|---------|------------
-[Python](http://www.python.org/) | 3.14.0b3 | Python programming language with standard library
+[Python](http://www.python.org/) | 3.13.5 | Python programming language with standard library
 
 
 ### Python packages
