@@ -15,8 +15,7 @@ set my_release_level=
 
 rem list of installers to create separated per dot: False=none, .zip=zip, .7z=.7z, 7zip=auto-extractible 7z
 set my_create_installer=7zip-mx5.7z-mx7.zip
-set my_create_installer=.7z-mx7
-
+set my_create_installer=.7z-mx9
 set my_preclear_build_directory=Yes
 
 set tmp_reqdir=%my_root_dir_for_builds%\bd%my_python_target%
@@ -26,12 +25,12 @@ set my_source_dirs=C:\Winp\bd313\packages.win-amd64
 
 set my_find_links=C:\Winp\packages.srcreq
 set my_toolsdirs=C:\Winp\bdTools\Tools.dot
-set my_docsdirs=C:\WinP\bdDocs\docs.dot
 
 set my_install_options=--no-index --pre --trusted-host=None
 
 rem set addlockfile=dot
 
+set wheelhousereq=C:\Winp\bd313\dot_requirements.txt
 set wheelhousereq=C:\Winp\bd313\requirements64_whl.txt
 
 
