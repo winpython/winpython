@@ -230,13 +230,6 @@ class WinPythonDistributionBuilder:
         shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
         diff.write_changelog(self.winpyver2, None, CHANGELOGS_DIRECTORY, self.flavor, self.distribution.architecture, basedir=self.winpython_directory.parent)
 
-def rebuild_winpython_package(source_directory: Path, target_directory: Path, architecture: int = 64, verbose: bool = False):
-    """Rebuilds the winpython or wppm package from source using flit."""
-    for file in target_directory.glob("w*p*-*.*"):
-        if file.suffix in (".exe", ".whl", ".gz"):
-            file.unlink()
-    utils.buildflit_wininst(source_directory, copy_to=target_directory, verbose=True)
-
 def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
              flavor: str = "", requirements: str | list[Path] = None, find_links: str | list[Path] = None,
@@ -275,8 +268,6 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     if rebuild:
         utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
         os.makedirs(build_directory, exist_ok=True)
-        # use source_dirs as the directory to re-build Winpython wheel
-        winpython_source_dir = Path(__file__).resolve().parent
 
     builder = WinPythonDistributionBuilder(
         build_number, release_level, build_directory, wheels_directory=source_dirs,
