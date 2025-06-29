@@ -58,7 +58,7 @@ class WinPythonDistributionBuilder:
     """Builds a WinPython distribution."""
 
     def __init__(self, build_number: int, release_level: str, target_directory: Path, wheels_directory: Path,
-                 tools_directories: list[Path] = None, documentation_directories: list[Path] = None, verbose: bool = False,
+                 tools_directories: list[Path] = None, verbose: bool = False,
                  base_directory: Path = None, install_options: list[str] = None, flavor: str = ""):
         """
         Initializes the WinPythonDistributionBuilder.
@@ -68,7 +68,6 @@ class WinPythonDistributionBuilder:
             target_directory: The base directory where WinPython will be created.
             wheels_directory: Directory containing wheel files for packages.
             tools_directories: List of directories containing development tools to include.
-            documentation_directories: List of directories containing documentation to include.
             verbose: Enable verbose output.
             base_directory: Base directory for building (optional, for relative paths).
             install_options: Additional pip install options.
@@ -79,7 +78,6 @@ class WinPythonDistributionBuilder:
         self.target_directory = Path(target_directory)
         self.wheels_directory = Path(wheels_directory)
         self.tools_directories = tools_directories or []
-        self.documentation_directories = documentation_directories or []
         self.verbose = verbose
         self.winpython_directory: Path | None = None
         self.distribution: wppm.Distribution | None = None
@@ -242,7 +240,7 @@ def rebuild_winpython_package(source_directory: Path, target_directory: Path, ar
 def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
              flavor: str = "", requirements: str | list[Path] = None, find_links: str | list[Path] = None,
-             source_dirs: Path = None, toolsdirs: str | list[Path] = None, docsdirs: str | list[Path] = None,
+             source_dirs: Path = None, toolsdirs: str | list[Path] = None,
              python_target_release: str = None, # e.g. "37101" for 3.7.10
 ):
     """
@@ -262,14 +260,12 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
         find_links: package directories (r'D:\Winpython\packages.srcreq')
         source_dirs: the python.zip + rebuilt winpython wheel package directory
         toolsdirs: Directory with development tools r'D:\WinPython\basedir34\t.Slim'
-        docsdirs: Directory with documentation r'D:\WinPython\basedir34\docs.Slim'
         python_target_release: Target Python release (str).
     """
     assert basedir is not None, "The *basedir* directory must be specified"
     assert architecture in (32, 64)
 
     tools_dirs_list = parse_list_argument(toolsdirs, ",")
-    docs_dirs_list = parse_list_argument(docsdirs, ",")
     install_options_list = parse_list_argument(install_options, " ")
     find_links_dirs_list = parse_list_argument(find_links, ",")
     requirements_files_list = [Path(f) for f in parse_list_argument(requirements, ",") if f]
@@ -285,7 +281,6 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     builder = WinPythonDistributionBuilder(
         build_number, release_level, build_directory, wheels_directory=source_dirs,
         tools_directories=[Path(d) for d in tools_dirs_list],
-        documentation_directories=[Path(d) for d in docs_dirs_list],
         verbose=verbose, base_directory=basedir,
         install_options=install_options_list + find_links_options,
         flavor=flavor
@@ -321,5 +316,4 @@ if __name__ == "__main__":
         find_links=r"D:\Winpython\packages.srcreq",
         source_dirs=r"D:\WinPython\basedir34\packages.win-amd64",
         toolsdirs=r"D:\WinPython\basedir34\t.Slim",
-        docsdirs=r"D:\WinPython\basedir34\docs.Slim",
     )

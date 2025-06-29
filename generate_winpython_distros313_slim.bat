@@ -30,11 +30,8 @@ set my_toolsdirs=C:\Winp\bdTools\Tools.dot
 REM 2024-07-13:put back pandoc (so from 598Mo to 518Mo?)
 set my_toolsdirs=C:\WinP\bdTools\tools64_pandoc_alone
 
-set my_docsdirs=C:\WinP\bdDocs\docs.dot
-
 set my_install_options=--no-index --pre --trusted-host=None
 
 call %~dp0\generate_a_winpython_distro.bat
-
 
 pause
