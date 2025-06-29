@@ -182,7 +182,7 @@ class WinPythonDistributionBuilder:
         with open(self.winpython_directory / "scripts" / "env.ini", "w") as f:
             f.writelines([f'{a}={b}\n' for a, b in init_variables])
 
-    def build(self, rebuild: bool = True, requirements_files_list=None, winpy_dirname: str = None):
+    def build(self, rebuild: bool = True, winpy_dirname: str = None):
         """Make or finalise WinPython distribution in the target directory"""
         print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
         if winpy_dirname is None:
@@ -205,20 +205,12 @@ class WinPythonDistributionBuilder:
             self._create_initial_batch_scripts()
             utils.python_execmodule("ensurepip", self.distribution.target)
             self.distribution.patch_standard_packages("pip")
-
             essential_packages = ["pip", "setuptools", "wheel", "wppm"]
             for package_name in essential_packages:
                 actions = ["install", "--upgrade", "--pre", package_name] + self.install_options
                 self._print_action(f"Piping: {' '.join(actions)}")
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(package_name)
-
-        if requirements_files_list:
-            for req in requirements_files_list:
-                actions = ["install", "-r", req] + (self.install_options or [])
-                self._print_action(f"Piping: {' '.join(actions)}")
-                self.distribution.do_pip_action(actions)
-            self.distribution.patch_standard_packages()
 
         self._print_action("Writing package index")
         self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
@@ -232,7 +224,7 @@ class WinPythonDistributionBuilder:
 
 def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
-             flavor: str = "", requirements: str | list[Path] = None, find_links: str | list[Path] = None,
+             flavor: str = "", find_links: str | list[Path] = None,
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
              python_target_release: str = None, # e.g. "37101" for 3.7.10
 ):
@@ -249,7 +241,6 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
         create_installer: Type of installer to create (str).
         install_options: pip options (r'--no-index --pre --trusted-host=None')
         flavor: WinPython flavor (str).
-        requirements: package lists for pip (r'D:\requirements.txt')
         find_links: package directories (r'D:\Winpython\packages.srcreq')
         source_dirs: the python.zip + rebuilt winpython wheel package directory
         toolsdirs: Directory with development tools r'D:\WinPython\basedir34\t.Slim'
@@ -261,7 +252,6 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     tools_dirs_list = parse_list_argument(toolsdirs, ",")
     install_options_list = parse_list_argument(install_options, " ")
     find_links_dirs_list = parse_list_argument(find_links, ",")
-    requirements_files_list = [Path(f) for f in parse_list_argument(requirements, ",") if f]
     find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
     build_directory = Path(basedir) / ("bu" + flavor)
 
@@ -286,7 +276,7 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     else:
         winpython_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{python_minor_version_str}{build_number}{release_level}"
 
-    builder.build(rebuild=rebuild, requirements_files_list=requirements_files_list, winpy_dirname=winpython_dirname)
+    builder.build(rebuild=rebuild, winpy_dirname=winpython_dirname)
 
     for commmand in create_installer.lower().replace("7zip",".exe").split('.'):
         installer_type, compression = (commmand + "-").split("-")[:2]
@@ -302,7 +292,6 @@ if __name__ == "__main__":
         verbose=True,
         architecture=64,
         flavor="Barebone",
-        requirements=r"D:\Winpython\basedir34\barebone_requirements.txt",
         install_options=r"--no-index --pre --trusted-host=None",
         find_links=r"D:\Winpython\packages.srcreq",
         source_dirs=r"D:\WinPython\basedir34\packages.win-amd64",
