@@ -167,26 +167,12 @@ class WinPythonDistributionBuilder:
 
     def _copy_essential_files(self):
         """Copies pre-made objects"""
-        self._print_action("Copying default scripts")
-        copy_items([PORTABLE_DIRECTORY / "scripts"], self.winpython_directory / "scripts", self.verbose)
-
         self._print_action("Copying launchers")
         copy_items([PORTABLE_DIRECTORY / "launchers_final"], self.winpython_directory, self.verbose)
-
-        docs_target_directory = self.winpython_directory / "notebooks" / "docs"
-        self._print_action(f"Copying documentation to {docs_target_directory}")
-        copy_items(self.documentation_directories, docs_target_directory, self.verbose)
 
         tools_target_directory = self.winpython_directory / "t"
         self._print_action(f"Copying tools to {tools_target_directory}")
         copy_items(self.tools_directories, tools_target_directory, self.verbose)
-
-        if (nodejs_current_directory := tools_target_directory / "n").is_dir():
-            self._print_action(f"Moving tools from {nodejs_current_directory} to {tools_target_directory.parent / NODEJS_RELATIVE_PATH}")
-            try:
-                shutil.move(nodejs_current_directory, tools_target_directory.parent / NODEJS_RELATIVE_PATH)
-            except Exception as e:
-                print(f"Error moving Node.js directory: {e}")
 
     def _create_initial_batch_scripts(self):
         """Creates initial batch scripts, including environment setup."""
@@ -295,7 +281,6 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
         os.makedirs(build_directory, exist_ok=True)
         # use source_dirs as the directory to re-build Winpython wheel
         winpython_source_dir = Path(__file__).resolve().parent
-        # 2025-06-28 no more: rebuild_winpython_package(winpython_source_dir, Path(source_dirs), architecture, verbose)
 
     builder = WinPythonDistributionBuilder(
         build_number, release_level, build_directory, wheels_directory=source_dirs,
