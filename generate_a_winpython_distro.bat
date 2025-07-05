@@ -30,6 +30,8 @@ if %my_python_target%==312 set my_python_target_release=31210& set my_release=2
 if %my_python_target%==313 set my_python_target_release=3135& set my_release=1
 if %my_python_target%==314 set my_python_target_release=3140& set my_release=1
 
+set my_basedir_wpy=%my_basedir%\bu%my_flavor%\WPy%my_arch%-%my_python_target_release%%my_release%
+
 echo -------------------------------------- >>%my_archive_log%
 echo (%date% %time%) preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
@@ -59,7 +61,7 @@ call %my_buildenv%\scripts\env.bat
 
 REM Create basic build infrastructure
 echo "(%date% %time%) Create basic build infrastructure">>%my_archive_log%
-python.exe  -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_basedir_wpy%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
 
 REM Check infrastructure is in place
 echo "(%date% %time%) Check infrastructure">>%my_archive_log%
@@ -209,7 +211,7 @@ set path=%my_original_path%
 cd /D %~dp0
 call %my_buildenv%\scripts\env.bat
 
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', pyver='%my_pyver%', basedir=r'%my_basedir%', verbose=True, architecture=%my_arch%, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_basedir_wpy%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
 
 
 echo -------------------------------------- >>%my_archive_log%

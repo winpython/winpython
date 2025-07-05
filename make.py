@@ -59,17 +59,16 @@ class WinPythonDistributionBuilder:
 
     def __init__(self, build_number: int, release_level: str, target_directory: Path, wheels_directory: Path,
                  tools_directories: list[Path] = None, verbose: bool = False,
-                 base_directory: Path = None, install_options: list[str] = None, flavor: str = ""):
+                 install_options: list[str] = None, flavor: str = ""):
         """
         Initializes the WinPythonDistributionBuilder.
         Args:
             build_number: The build number (integer).
             release_level: The release level (e.g., "beta", "").
-            target_directory: The base directory where WinPython will be created.
+            target_directory: The base directory below which WinPython will be created.
             wheels_directory: Directory containing wheel files for packages.
             tools_directories: List of directories containing development tools to include.
             verbose: Enable verbose output.
-            base_directory: Base directory for building (optional, for relative paths).
             install_options: Additional pip install options.
             flavor: WinPython flavor (e.g., "Barebone").
         """
@@ -81,7 +80,6 @@ class WinPythonDistributionBuilder:
         self.verbose = verbose
         self.winpython_directory: Path | None = None
         self.distribution: wppm.Distribution | None = None
-        self.base_directory = base_directory
         self.install_options = install_options or []
         self.flavor = flavor
         self.python_zip_file: Path = self._get_python_zip_file()
@@ -132,11 +130,11 @@ class WinPythonDistributionBuilder:
     def create_installer_7zip(self, installer_type: str = "exe", compression= "mx5"):
         """Creates a WinPython installer using 7-Zip: "exe", "7z", "zip")"""
         self._print_action(f"Creating WinPython installer ({installer_type})")
-        if installer_type not in ["exe", "7z", "zip"]:
-            return
         DISTDIR = self.winpython_directory
         filename_stem = f"Winpython{self.architecture_bits}-{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
         fullfilename = DISTDIR.parent / (filename_stem + "." + installer_type)
+        if installer_type not in ["exe", "7z", "zip"]:
+            return
         sfx_option = "-sfx7z.sfx" if installer_type == "exe" else ""
         zip_option = "-tzip" if installer_type == "zip" else ""
         compress_level = "mx5" if compression == "" else compression 
@@ -182,12 +180,12 @@ class WinPythonDistributionBuilder:
         with open(self.winpython_directory / "scripts" / "env.ini", "w") as f:
             f.writelines([f'{a}={b}\n' for a, b in init_variables])
 
-    def build(self, rebuild: bool = True, winpy_dirname: str = None):
+    def build(self, rebuild: bool = True, winpy_dir: Path = None):
         """Make or finalise WinPython distribution in the target directory"""
         print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
-        if winpy_dirname is None:
+        if winpy_dir is None:
             raise RuntimeError("WinPython base directory to create is undefined")
-        self.winpython_directory = self.target_directory / winpy_dirname
+        self.winpython_directory = winpy_dir
 
         if rebuild:
             self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
@@ -222,7 +220,7 @@ class WinPythonDistributionBuilder:
         shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
         diff.write_changelog(self.winpyver2, None, CHANGELOGS_DIRECTORY, self.flavor, self.distribution.architecture, basedir=self.winpython_directory.parent)
 
-def make_all(build_number: int, release_level: str, pyver: str, architecture: int, basedir: Path,
+def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
              flavor: str = "", find_links: str | list[Path] = None,
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
@@ -233,9 +231,7 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     Args:
         build_number: build number [int]
         release_level: release level (e.g. 'beta1', '') [str]
-        pyver: python version ('3.4' or 3.5')
-        architecture: [int] (32 or 64)
-        basedir: where to create the build (r'D:\Winpython\basedir34')
+        basedir_wpy:  top directory of the build (c:\...\Wpy...)
         verbose: Enable verbose output (bool).
         rebuild: Whether to rebuild the distribution (bool).
         create_installer: Type of installer to create (str).
@@ -246,23 +242,22 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
         toolsdirs: Directory with development tools r'D:\WinPython\basedir34\t.Slim'
         python_target_release: Target Python release (str).
     """
-    assert basedir is not None, "The *basedir* directory must be specified"
-    assert architecture in (32, 64)
+    assert basedir_wpy is not None, "The *winpython_dirname* directory must be specified"
 
     tools_dirs_list = parse_list_argument(toolsdirs, ",")
     install_options_list = parse_list_argument(install_options, " ")
     find_links_dirs_list = parse_list_argument(find_links, ",")
     find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
-    build_directory = Path(basedir) / ("bu" + flavor)
+    winpy_dir = Path(basedir_wpy)
 
     if rebuild:
-        utils.print_box(f"Making WinPython {architecture}bits at {Path(basedir) / ('bu' + flavor)}")
-        os.makedirs(build_directory, exist_ok=True)
+        utils.print_box(f"Making WinPython at {winpy_dir}")
+        os.makedirs(winpy_dir, exist_ok=True)
 
     builder = WinPythonDistributionBuilder(
-        build_number, release_level, build_directory, wheels_directory=source_dirs,
+        build_number, release_level, winpy_dir.parent, wheels_directory=source_dirs,
         tools_directories=[Path(d) for d in tools_dirs_list],
-        verbose=verbose, base_directory=basedir,
+        verbose=verbose,
         install_options=install_options_list + find_links_options,
         flavor=flavor
     )
@@ -270,13 +265,8 @@ def make_all(build_number: int, release_level: str, pyver: str, architecture: in
     python_minor_version_str = "".join(builder.python_name.replace(".amd64", "").split(".")[-2:-1])
     while not python_minor_version_str.isdigit() and len(python_minor_version_str) > 0:
         python_minor_version_str = python_minor_version_str[:-1]
-    # simplify for PyPy
-    if python_target_release is not None:
-        winpython_dirname = f"WPy{architecture}-{python_target_release}{build_number}{release_level}"
-    else:
-        winpython_dirname = f"WPy{architecture}-{pyver.replace('.', '')}{python_minor_version_str}{build_number}{release_level}"
 
-    builder.build(rebuild=rebuild, winpy_dirname=winpython_dirname)
+    builder.build(rebuild=rebuild, winpy_dir=winpy_dir)
 
     for commmand in create_installer.lower().replace("7zip",".exe").split('.'):
         installer_type, compression = (commmand + "-").split("-")[:2]
@@ -286,14 +276,12 @@ if __name__ == "__main__":
     # DO create only one Winpython distribution at a time
     make_all(
         build_number=1,
-        release_level="build3",
-        pyver="3.4",
-        basedir=r"D:\Winpython\basedir34",
+        release_level="b3",
+        basedir_wpy=r"D:\WinPython\bd314\budot\WPy64-31401b3",
         verbose=True,
-        architecture=64,
-        flavor="Barebone",
+        flavor="dot",
         install_options=r"--no-index --pre --trusted-host=None",
         find_links=r"D:\Winpython\packages.srcreq",
-        source_dirs=r"D:\WinPython\basedir34\packages.win-amd64",
-        toolsdirs=r"D:\WinPython\basedir34\t.Slim",
+        source_dirs=r"D:\WinPython\bd314\packages.win-amd64",
+        toolsdirs=r"D:\WinPython\bd314\t.Slim",
     )
