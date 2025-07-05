@@ -303,6 +303,16 @@ def normalize(this):
     """Apply PEP 503 normalization to the string."""
     return re.sub(r"[-_.]+", "-", this).lower()
 
+def zip_directory(folder_path, output_zip_path):
+    folder_path = Path(folder_path)
+    output_zip_path = Path(output_zip_path)
+    
+    with zipfile.ZipFile(output_zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
+        for file in folder_path.rglob('*'):
+            if file.is_file():
+                arcname = file.relative_to(folder_path)
+                zipf.write(file, arcname)
+                
 if __name__ == '__main__':
     print_box("Test")
     dname = sys.prefix
