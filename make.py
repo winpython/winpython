@@ -14,7 +14,6 @@ from wppm import wppm, utils
 
 # Define constant paths for clarity
 PORTABLE_DIRECTORY = Path(__file__).parent / "portable"
-NODEJS_RELATIVE_PATH = "n"  # Relative path within WinPython dir
 
 # Ensure necessary directories exist at the start
 assert PORTABLE_DIRECTORY.is_dir(), f"Portable directory not found: {PORTABLE_DIRECTORY}"
@@ -82,17 +81,6 @@ class WinPythonDistributionBuilder:
         raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
 
     @property
-    def package_index_markdown(self) -> str:
-        """Generates a Markdown formatted package index page."""
-        return self.distribution.generate_package_index_markdown(
-        self.python_executable_directory,
-        self.winpyver2,
-        self.flavor,
-        self.architecture_bits,
-        self.release_level
-    )
-
-    @property
     def winpython_version_name(self) -> str:
         """Returns the full WinPython version string."""
         return f"{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
@@ -150,38 +138,36 @@ class WinPythonDistributionBuilder:
         with open(self.winpython_directory / "scripts" / "env.ini", "w") as f:
             f.writelines([f'{a}={b}\n' for a, b in init_variables])
 
-    def build(self, rebuild: bool = True, winpy_dir: Path = None):
+    def build(self, winpy_dir: Path = None):
         """Make or finalise WinPython distribution in the target directory"""
         print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
         if winpy_dir is None:
             raise RuntimeError("WinPython base directory to create is undefined")
         self.winpython_directory = winpy_dir
 
-        if rebuild:
-            self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
-            if self.winpython_directory.is_dir():
-                shutil.rmtree(self.winpython_directory)
-            os.makedirs(self.winpython_directory, exist_ok=True)
-            # preventive re-Creation of settings directory
-            (self.winpython_directory / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True)
-            self._extract_python_archive()
+        self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
+        if self.winpython_directory.is_dir():
+            shutil.rmtree(self.winpython_directory)
+        os.makedirs(self.winpython_directory, exist_ok=True)
+        # preventive re-Creation of settings directory
+        (self.winpython_directory / "settings" / "AppData" / "Roaming").mkdir(parents=True, exist_ok=True)
+        self._extract_python_archive()
 
         self.distribution = wppm.Distribution(self.python_executable_directory, verbose=self.verbose)
 
-        if rebuild:
-            self._copy_essential_files()
-            self._create_initial_batch_scripts()
-            utils.python_execmodule("ensurepip", self.distribution.target)
-            self.distribution.patch_standard_packages("pip")
-            essential_packages = ["pip", "setuptools", "wheel", "wppm"]
-            for package_name in essential_packages:
-                actions = ["install", "--upgrade", "--pre", package_name] + self.install_options
-                self._print_action(f"Piping: {' '.join(actions)}")
-                self.distribution.do_pip_action(actions)
-                self.distribution.patch_standard_packages(package_name)
+        self._copy_essential_files()
+        self._create_initial_batch_scripts()
+        utils.python_execmodule("ensurepip", self.distribution.target)
+        self.distribution.patch_standard_packages("pip")
+        essential_packages = ["pip", "setuptools", "wheel", "wppm"]
+        for package_name in essential_packages:
+            actions = ["install", "--upgrade", "--pre", package_name] + self.install_options
+            self._print_action(f"Piping: {' '.join(actions)}")
+            self.distribution.do_pip_action(actions)
+            self.distribution.patch_standard_packages(package_name)
 
 def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
-             verbose: bool = False, rebuild: bool = True, install_options=["--no-index"],
+             verbose: bool = False, install_options=["--no-index"],
              flavor: str = "", find_links: str | list[Path] = None,
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
 ):
@@ -192,7 +178,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
         release_level: release level (e.g. 'beta1', '') [str]
         basedir_wpy:  top directory of the build (c:\...\Wpy...)
         verbose: Enable verbose output (bool).
-        rebuild: Whether to rebuild the distribution (bool).
         install_options: pip options (r'--no-index --pre --trusted-host=None')
         flavor: WinPython flavor (str).
         find_links: package directories (r'D:\Winpython\packages.srcreq')
@@ -207,10 +192,8 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
     find_links_options = [f"--find-links={link}" for link in find_links_dirs_list + [source_dirs]]
     winpy_dir = Path(basedir_wpy)
 
-    if rebuild:
-        utils.print_box(f"Making WinPython at {winpy_dir}")
-        os.makedirs(winpy_dir, exist_ok=True)
-
+    utils.print_box(f"Making WinPython at {winpy_dir}")
+    os.makedirs(winpy_dir, exist_ok=True)
     builder = WinPythonDistributionBuilder(
         build_number, release_level, winpy_dir.parent, wheels_directory=source_dirs,
         tools_directories=[Path(d) for d in tools_dirs_list],
@@ -218,7 +201,7 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
         install_options=install_options_list + find_links_options,
         flavor=flavor
     )
-    builder.build(rebuild=rebuild, winpy_dir=winpy_dir)
+    builder.build(winpy_dir=winpy_dir)
 
 
 if __name__ == "__main__":
