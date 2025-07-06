@@ -15,12 +15,10 @@ from pathlib import Path
 from wppm import wppm, utils, diff
 
 # Define constant paths for clarity
-CHANGELOGS_DIRECTORY = Path(__file__).parent / "changelogs"
 PORTABLE_DIRECTORY = Path(__file__).parent / "portable"
 NODEJS_RELATIVE_PATH = "n"  # Relative path within WinPython dir
 
 # Ensure necessary directories exist at the start
-assert CHANGELOGS_DIRECTORY.is_dir(), f"Changelogs directory not found: {CHANGELOGS_DIRECTORY}"
 assert PORTABLE_DIRECTORY.is_dir(), f"Portable directory not found: {PORTABLE_DIRECTORY}"
 
 def copy_items(source_directories: list[Path], target_directory: Path, verbose: bool = False):
@@ -184,16 +182,6 @@ class WinPythonDistributionBuilder:
                 self.distribution.do_pip_action(actions)
                 self.distribution.patch_standard_packages(package_name)
 
-        self._print_action("Writing package index")
-        self.winpyver2 = f"{self.python_full_version}.{self.build_number}"
-        output_markdown_filename = str(self.winpython_directory.parent / f"WinPython{self.flavor}-{self.distribution.architecture}bit-{self.winpyver2}.md")
-        with open(output_markdown_filename, "w", encoding='utf-8') as f:
-            f.write(self.package_index_markdown)
-
-        self._print_action("Writing changelog")
-        shutil.copyfile(output_markdown_filename, str(Path(CHANGELOGS_DIRECTORY) / Path(output_markdown_filename).name))
-        diff.write_changelog(self.winpyver2, None, CHANGELOGS_DIRECTORY, self.flavor, self.distribution.architecture, basedir=self.winpython_directory.parent)
-
 def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
              flavor: str = "", find_links: str | list[Path] = None,
@@ -233,7 +221,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
         install_options=install_options_list + find_links_options,
         flavor=flavor
     )
-
     builder.build(rebuild=rebuild, winpy_dir=winpy_dir)
 
 
