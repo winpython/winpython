@@ -61,7 +61,7 @@ call %my_buildenv%\scripts\env.bat
 
 REM Create basic build infrastructure
 echo "(%date% %time%) Create basic build infrastructure">>%my_archive_log%
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', create_installer='False')">>%my_archive_log%
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')">>%my_archive_log%
 
 REM Check infrastructure is in place
 echo "(%date% %time%) Check infrastructure">>%my_archive_log%
