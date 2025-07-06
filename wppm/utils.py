@@ -312,7 +312,35 @@ def zip_directory(folder_path, output_zip_path):
             if file.is_file():
                 arcname = file.relative_to(folder_path)
                 zipf.write(file, arcname)
-                
+
+def find_7zip_executable() -> str:
+    """Locates the 7-Zip executable (7z.exe)."""
+    possible_program_files = [r"C:\Program Files", r"C:\Program Files (x86)", Path(sys.prefix).parent / "t"]
+    for base_dir in possible_program_files:
+        if (executable_path := Path(base_dir) / "7-Zip" / "7z.exe").is_file():
+            return str(executable_path)
+    raise RuntimeError("7ZIP is not installed on this computer.")
+
+def create_installer_7zip(origin, destination, filename_stem, installer_type: str = "exe", compression= "mx5"):
+    """Creates a WinPython installer using 7-Zip: "exe", "7z", "zip")"""
+    fullfilename = destination / (filename_stem + "." + installer_type)
+    if installer_type not in ["exe", "7z", "zip"]:
+        return
+    sfx_option = "-sfx7z.sfx" if installer_type == "exe" else ""
+    zip_option = "-tzip" if installer_type == "zip" else ""
+    compress_level = "mx5" if compression == "" else compression 
+    command = f'"{find_7zip_executable()}" {zip_option} -{compress_level} a "{fullfilename}" "{origin}" {sfx_option}'
+    print(f'Executing 7-Zip script: "{command}"')
+    try:
+        subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
+
+def command_installer_7zip(origin, destination, filename_stem, create_installer: str = "exe"):
+     for commmand in create_installer.lower().replace("7zip",".exe").split('.'):
+        installer_type, compression = (commmand + "-").split("-")[:2]
+        create_installer_7zip(Path(origin), Path(destination), filename_stem, installer_type, compression)
+
 if __name__ == '__main__':
     print_box("Test")
     dname = sys.prefix

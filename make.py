@@ -23,14 +23,6 @@ NODEJS_RELATIVE_PATH = "n"  # Relative path within WinPython dir
 assert CHANGELOGS_DIRECTORY.is_dir(), f"Changelogs directory not found: {CHANGELOGS_DIRECTORY}"
 assert PORTABLE_DIRECTORY.is_dir(), f"Portable directory not found: {PORTABLE_DIRECTORY}"
 
-def find_7zip_executable() -> str:
-    """Locates the 7-Zip executable (7z.exe)."""
-    possible_program_files = [r"C:\Program Files", r"C:\Program Files (x86)", Path(sys.prefix).parent / "t"]
-    for base_dir in possible_program_files:
-        if (executable_path := Path(base_dir) / "7-Zip" / "7z.exe").is_file():
-            return str(executable_path)
-    raise RuntimeError("7ZIP is not installed on this computer.")
-
 def copy_items(source_directories: list[Path], target_directory: Path, verbose: bool = False):
     """Copies items from source directories to the target directory."""
     target_directory.mkdir(parents=True, exist_ok=True)
@@ -138,7 +130,7 @@ class WinPythonDistributionBuilder:
         sfx_option = "-sfx7z.sfx" if installer_type == "exe" else ""
         zip_option = "-tzip" if installer_type == "zip" else ""
         compress_level = "mx5" if compression == "" else compression 
-        command = f'"{find_7zip_executable()}" {zip_option} -{compress_level} a "{fullfilename}" "{DISTDIR}" {sfx_option}'
+        command = f'"{utils.find_7zip_executable()}" {zip_option} -{compress_level} a "{fullfilename}" "{DISTDIR}" {sfx_option}'
         print(f'Executing 7-Zip script: "{command}"')
         try:
             subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
@@ -224,7 +216,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
              verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
              flavor: str = "", find_links: str | list[Path] = None,
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
-             python_target_release: str = None, # e.g. "37101" for 3.7.10
 ):
     """
     Make a WinPython distribution for a given set of parameters:
@@ -240,7 +231,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
         find_links: package directories (r'D:\Winpython\packages.srcreq')
         source_dirs: the python.zip + rebuilt winpython wheel package directory
         toolsdirs: Directory with development tools r'D:\WinPython\basedir34\t.Slim'
-        python_target_release: Target Python release (str).
     """
     assert basedir_wpy is not None, "The *winpython_dirname* directory must be specified"
 
@@ -261,10 +251,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
         install_options=install_options_list + find_links_options,
         flavor=flavor
     )
-    # define the directory where to create the distro
-    python_minor_version_str = "".join(builder.python_name.replace(".amd64", "").split(".")[-2:-1])
-    while not python_minor_version_str.isdigit() and len(python_minor_version_str) > 0:
-        python_minor_version_str = python_minor_version_str[:-1]
 
     builder.build(rebuild=rebuild, winpy_dir=winpy_dir)
 
