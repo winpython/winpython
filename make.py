@@ -119,24 +119,6 @@ class WinPythonDistributionBuilder:
         """Returns the architecture (32 or 64 bits) of the distribution."""
         return self.distribution.architecture if self.distribution else 64
 
-    def create_installer_7zip(self, installer_type: str = "exe", compression= "mx5"):
-        """Creates a WinPython installer using 7-Zip: "exe", "7z", "zip")"""
-        self._print_action(f"Creating WinPython installer ({installer_type})")
-        DISTDIR = self.winpython_directory
-        filename_stem = f"Winpython{self.architecture_bits}-{self.python_full_version}.{self.build_number}{self.flavor}{self.release_level}"
-        fullfilename = DISTDIR.parent / (filename_stem + "." + installer_type)
-        if installer_type not in ["exe", "7z", "zip"]:
-            return
-        sfx_option = "-sfx7z.sfx" if installer_type == "exe" else ""
-        zip_option = "-tzip" if installer_type == "zip" else ""
-        compress_level = "mx5" if compression == "" else compression 
-        command = f'"{utils.find_7zip_executable()}" {zip_option} -{compress_level} a "{fullfilename}" "{DISTDIR}" {sfx_option}'
-        print(f'Executing 7-Zip script: "{command}"')
-        try:
-            subprocess.run(command, shell=True, check=True, stderr=sys.stderr, stdout=sys.stderr)
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing 7-Zip script: {e}", file=sys.stderr)
-
     def _print_action(self, text: str):
         """Prints an action message with progress indicator."""
         if self.verbose:
@@ -254,9 +236,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
 
     builder.build(rebuild=rebuild, winpy_dir=winpy_dir)
 
-    for commmand in create_installer.lower().replace("7zip",".exe").split('.'):
-        installer_type, compression = (commmand + "-").split("-")[:2]
-        builder.create_installer_7zip(installer_type, compression)
 
 if __name__ == "__main__":
     # DO create only one Winpython distribution at a time
