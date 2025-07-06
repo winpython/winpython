@@ -1,3 +1,4 @@
 @echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\jupyter-notebook.exe" %*
+rem "%WINPYDIR%\scripts\jupyter-notebook.exe" %*
+"%WINPYDIR%\python.exe" -m jupyter notebook %*

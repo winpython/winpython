@@ -1,3 +1,4 @@
 @echo off
 call "%~dp0env_for_icons.bat" %*
-"%WINPYDIR%\scripts\jupyter-lab.exe" %*
+rem "%WINPYDIR%\scripts\jupyter-lab.exe" %*
+"%WINPYDIR%\python.exe" -m jupyter lab %*
