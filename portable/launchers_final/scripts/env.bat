@@ -30,6 +30,7 @@ rem set PYTHONUTF8=1 creates issues in "movable" patching
 set HOME=%WINPYDIRBASE%\settings
 rem see https://github.com/winpython/winpython/issues/839
 rem set USERPROFILE=%HOME%
+set SPYDER_CONFDIR=%HOME%\settings\.spyder-py3
 set JUPYTER_DATA_DIR=%HOME%
 set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
 set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
