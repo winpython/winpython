@@ -61,7 +61,7 @@ call %my_buildenv%\scripts\env.bat
 
 REM Create basic build infrastructure
 echo "(%date% %time%) Create basic build infrastructure">>%my_archive_log%
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', create_installer='False', python_target_release='%my_python_target_release%')">>%my_archive_log%
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%', create_installer='False')">>%my_archive_log%
 
 REM Check infrastructure is in place
 echo "(%date% %time%) Check infrastructure">>%my_archive_log%
@@ -70,7 +70,7 @@ set WINPYDIRBASE=%my_WINPYDIRBASE%
 if not exist %my_WINPYDIRBASE%\scripts\env.bat (
  @echo off
  echo as %my_WINPYDIRBASE%\scripts\env.bat does not exist
- echo please check and correct my_python_target_release=%my_python_target_release% 
+ echo please check and correct:
  echo     my_arch=%my_arch%
  echo     my_python_target_release=%my_python_target_release%
  echo     my_release=%my_release%
@@ -206,12 +206,19 @@ call %my_WINPYDIRBASE%\scripts\env.bat
 
 REM Generate changelog and binaries
 echo "(%date% %time%) Generate changelog and binaries">>%my_archive_log%
-set path=%my_original_path%
-cd /D %~dp0
-call %my_buildenv%\scripts\env.bat
 
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', create_installer='%my_create_installer%', rebuild=False, python_target_release='%my_python_target_release%')" >> %my_archive_log%
+rem markdowm and markdown diff
+set mdn=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%.md
+%target_python_exe% -m wppm -md>%my_basedir%\bu%my_flavor%\%mdn%
+copy/y %my_basedir%\bu%my_flavor%\%mdn% %~dp0changelogs\%mdn%
 
+set out=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%_History.md
+%target_python_exe% -c "from wppm import diff ;a=(diff.compare_package_indexes(r'%WINPYVER2%', searchdir=r'%~dp0changelogs',flavor=r'%my_flavor%',architecture=%my_arch%));f=open(r'%my_basedir%\bu%my_flavor%\%out%','w', encoding='utf-8');f.write(a);f.close()" 
+copy/y %my_basedir%\bu%my_flavor%\%out% %~dp0changelogs\%out%
+
+rem compress
+set stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%
+%target_python_exe% -c "from wppm import utils;utils.command_installer_7zip(r'%my_WINPYDIRBASE%', r'%my_WINPYDIRBASE%\..',r'%stem%', r'%my_create_installer%')" 
 
 echo -------------------------------------- >>%my_archive_log%
 echo "(%date% %time%) END OF CREATION">>%my_archive_log%
