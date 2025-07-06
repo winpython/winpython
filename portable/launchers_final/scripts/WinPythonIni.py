@@ -17,6 +17,7 @@ WINPYWORKDIR = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\Notebooks
 USERPROFILE = %HOME%
 [environment]
 ## <?> Uncomment lines to override environment variables
+#SPYDER_CONFDIR = %HOME%\settings\.spyder-py3
 #JUPYTERLAB_SETTINGS_DIR = %HOME%\.jupyter\lab
 #JUPYTERLAB_WORKSPACES_DIR = %HOME%\.jupyter\lab\workspaces
 #R_HOME=%WINPYDIRBASE%\t\R
@@ -26,6 +27,7 @@ USERPROFILE = %HOME%
 #JULIA=%JULIA_HOME%%JULIA_EXE%
 #JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 #QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
+
 '''
 
 def get_file(file_name):
