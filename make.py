@@ -9,10 +9,8 @@
 import os
 import re
 import shutil
-import subprocess
-import sys
 from pathlib import Path
-from wppm import wppm, utils, diff
+from wppm import wppm, utils
 
 # Define constant paths for clarity
 PORTABLE_DIRECTORY = Path(__file__).parent / "portable"
@@ -183,7 +181,7 @@ class WinPythonDistributionBuilder:
                 self.distribution.patch_standard_packages(package_name)
 
 def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
-             verbose: bool = False, rebuild: bool = True, create_installer: str = "True", install_options=["--no-index"],
+             verbose: bool = False, rebuild: bool = True, install_options=["--no-index"],
              flavor: str = "", find_links: str | list[Path] = None,
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
 ):
@@ -195,7 +193,6 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
         basedir_wpy:  top directory of the build (c:\...\Wpy...)
         verbose: Enable verbose output (bool).
         rebuild: Whether to rebuild the distribution (bool).
-        create_installer: Type of installer to create (str).
         install_options: pip options (r'--no-index --pre --trusted-host=None')
         flavor: WinPython flavor (str).
         find_links: package directories (r'D:\Winpython\packages.srcreq')
