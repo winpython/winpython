@@ -12,6 +12,7 @@ import importlib.util
 import winreg
 from . import utils
 from argparse import ArgumentParser
+import shutil
 
 def get_special_folder_path(path_name):
     """Return special folder path."""
@@ -37,7 +38,7 @@ def remove_winpython_start_menu_folder(current=True):
     path = get_winpython_start_menu_folder(current=current)
     if Path(path).is_dir():
         try:
-            shutil.rmtree(path, onexc=onerror)
+            shutil.rmtree(path)
         except WindowsError:
             print(f"Directory {path} could not be removed", file=sys.stderr)
 
@@ -46,7 +47,7 @@ def create_winpython_start_menu_folder(current=True):
     path = get_winpython_start_menu_folder(current=current)
     if Path(path).is_dir():
         try:
-            shutil.rmtree(path, onexc=onerror)
+            shutil.rmtree(path)
         except WindowsError:
             print(f"Directory {path} could not be removed", file=sys.stderr)
     Path(path).mkdir(parents=True, exist_ok=True)
@@ -239,7 +240,7 @@ def register(target, current=True, reg_type=winreg.REG_SZ, verbose=True):
     # Create start menu entries
     if has_pywin32:
         if verbose:
-            print(f'Creating WinPython menu for all icons in {target.parent}')
+            print(f'Creating WinPython menu for all icons in {Path(target).parent}')
         for path, desc, fname in _get_shortcut_data(target, current=current, has_pywin32=True):
             try:
                 create_shortcut(path, desc, fname, verbose=verbose)
@@ -268,7 +269,7 @@ def unregister(target, current=True, verbose=True):
     # Remove start menu shortcuts
     if has_pywin32:
         if verbose:
-            print(f'Removing WinPython menu for all icons in {target.parent}')
+            print(f'Removing WinPython menu for all icons in {Path(target).parent}')
         _remove_start_menu_folder(target, current=current, has_pywin32=True)
         # The original code had commented out code to delete .lnk files individually.
     else:
