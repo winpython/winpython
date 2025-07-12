@@ -1,9 +1,9 @@
 WinPython tools
 ===============
 
-Copyright @ 2012-2013 Pierre Raybaut
+Copyright 2012-2013 Pierre Raybaut
 
-Copyright @ 2014-2025+ The Winpython development team https://github.com/winpython/
+Copyright 2014-2025+ The Winpython development team: https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see wppm/__init__.py for details)
@@ -13,7 +13,7 @@ Overview
 --------
 
 WinPython is a portable distribution of the Python programming 
-language for Windows (https://winpython.github.io).
+language for Windows: https://winpython.github.io
 		
 This is the `wppm` Python package and build toolchain repository, not the distribution itself.
 It includes two main features:
@@ -49,24 +49,31 @@ Wppm build
 From the source package (see section 'Building dependencies'), you may 
 build WPPM using the following commands:
 
-**python -m pip install flit**
+.. code-block:: bash
 
-**python -m flit build**
+   python -m pip install flit
+   python -m flit build
 
 Winpython Distribution wheels installation
 ------------------------------------------
     
 To only install the wheels assembled per WinPython Distribution, you may
-**python -m pip install --no-deps --require-hashes https://github.com/winpython/winpython/releases/download/16.6.20250620final/requir.64-3_13_5_0slim.txt  
+
+.. code-block:: bash
+
+   python -m pip install --no-deps --require-hashes https://github.com/winpython/winpython/releases/download/16.6.20250620final/requir.64-3_13_5_0slim.txt
 
 A pylock file is also available, when you package manager can handle it
-**https://github.com/winpython/winpython/releases/download/16.6.20250620final/pylock.64-3_13_5_0slim.toml
+
+.. code-block:: text
+
+   https://github.com/winpython/winpython/releases/download/16.6.20250620final/pylock.64-3_13_5_0slim.toml
 
 But the easiest way to install the last stable release of WinPython is 
 by using a zipped distribution with or without auto-extractor: https://winpython.github.io/
             
-More informations
------------------
+More information
+----------------
 
 * Downloads: https://sourceforge.net/projects/winpython/files/ or https://github.com/winpython/winpython/releases
 
