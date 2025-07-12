@@ -61,7 +61,7 @@ call %my_buildenv%\scripts\env.bat
 
 REM Create basic build infrastructure
 echo "(%date% %time%) Create basic build infrastructure">>%my_archive_log%
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', install_options=r'%my_install_options%', find_links=r'%my_find_links%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')">>%my_archive_log%
+python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')">>%my_archive_log%
 
 REM Check infrastructure is in place
 echo "(%date% %time%) Check infrastructure">>%my_archive_log%
@@ -87,7 +87,11 @@ echo -------------------------------------- >>%my_archive_log%
 set path=%my_original_path%
 call %my_WINPYDIRBASE%\scripts\env.bat
 
-rem Install pre-requirements if any
+rem python -m ensurepip
+rem insta essential packages
+python -m pip install --upgrade pip setuptools wheel wppm -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
+
+rem Install complementary pre-requirements if any
 if not "Z%my_requirements_pre%Z"=="ZZ" (
     if "%my_find_links_pre%"=="" set my_find_links_pre=%my_find_links%
     python -m pip install -r %my_requirements_pre% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links_pre% >> %my_archive_log%
@@ -100,7 +104,7 @@ echo -------------------------------------- >>%my_archive_log%
 echo "(%date% %time%) Add requirement packages">>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
 python -m pip install -r %my_requirements% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
-python -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('spyder', to_movable=True)"
+python -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('', to_movable=True)"
 
 REM Add Wheelhouse (to replace per pip lock direct ? would allow paralellism)
 echo -------------------------------------- >>%my_archive_log%
