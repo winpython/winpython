@@ -4,7 +4,7 @@
 # Copyright © 2012 Pierre Raybaut
 # Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
-# (see winpython/__init__.py for details)
+# (see wppm/__init__.py for details)
 
 import os
 import re
@@ -358,8 +358,8 @@ def main(test=False):
             sys.exit()
     if utils.is_python_distribution(args.target):
         dist = Distribution(args.target, verbose=True)
-        cmd_fix = rf"from winpython import wppm;dist=wppm.Distribution(r'{dist.target}');dist.patch_standard_packages('pip', to_movable=False)"
-        cmd_mov = rf"from winpython import wppm;dist=wppm.Distribution(r'{dist.target}');dist.patch_standard_packages('pip', to_movable=True)"
+        cmd_fix = rf"from wppm import wppm;dist=wppm.Distribution(r'{dist.target}');dist.patch_standard_packages('pip', to_movable=False)"
+        cmd_mov = rf"from wppm import wppm;dist=wppm.Distribution(r'{dist.target}');dist.patch_standard_packages('pip', to_movable=True)"
         if args.fix:
             # dist.patch_standard_packages('pip', to_movable=False)  # would fail on wppm.exe
             p = subprocess.Popen(["start", "cmd", "/k",dist.python_exe, "-c" , cmd_fix], shell = True,  cwd=dist.target)
