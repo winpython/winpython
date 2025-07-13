@@ -120,7 +120,6 @@ class WinPythonDistributionBuilder:
         }
         env_path = self.winpython_directory / "scripts" / "env.ini"
         env_path.parent.mkdir(parents=True, exist_ok=True)
-        print("zzz env_path", env_path)
         self._print_action(f"Creating env.ini environment {env_path}")
         env_path.write_text("\n".join(f"{k}={v}" for k, v in config.items()))
 
