@@ -198,7 +198,7 @@ class PipData:
                                     Marker(dependency["req_marker"]).evaluate(environment=environment | {"extra": up_req})):
                                     # IA risk error: # dask[array] go upwards as dask[dataframe], so {"extra": up_req} , not {"extra": extra}
                                     #tag downward limiting dependancies
-                                    wall = " " if dependency["req_version"][:1] = "~" or dependency["req_version"].startswith("==") or "<" in dependency["req_version"] else ""
+                                    wall = " " if dependency["req_version"][:1] == "~" or dependency["req_version"].startswith("==") or "<" in dependency["req_version"] else ""
                                     ret += self._get_dependency_tree(
                                         dependency["req_key"],
                                         up_req,
