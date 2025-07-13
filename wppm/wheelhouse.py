@@ -2,10 +2,6 @@
 """
 WheelHouse.py - manage WinPython local WheelHouse.
 """
-import os
-import re
-import tarfile
-import zipfile
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -13,9 +9,6 @@ import shutil
 import subprocess
 from typing import Dict, List, Optional, Tuple
 from . import packagemetadata as pm
-from . import utils
-
-from packaging.utils import canonicalize_name, parse_wheel_filename, parse_sdist_filename
 
 # Use tomllib if available (Python 3.11+), otherwise fall back to tomli
 try:
@@ -163,7 +156,6 @@ def get_pylock_wheels(wheelhouse: Path, lockfile: Path, wheelorigin: Optional[Pa
     destination_wheelhouse = Path(wheeldrain) if wheeldrain else wheelhouse / Path(lockfile).name.replace('.toml', '.wheels')
     destination_wheelhouse.mkdir(parents=True, exist_ok=True)
     # there can be an override
-
 
     in_trusted = False
 
