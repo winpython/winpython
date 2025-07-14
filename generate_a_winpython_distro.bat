@@ -1,36 +1,49 @@
 rem  generate_a_winpython_distro.bat: to be launched from a winpython directory, where 'make.py' is
 @echo on
 
-REM Initialize variables -!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!
-if "%my_release_level%"=="" set my_release_level=b1
-if "%my_create_installer%"=="" set my_create_installer=True
+REM === Set default values if not already defined ===
+if not defined my_release_level set "my_release_level=b1"
+if not defined my_create_installer set "my_create_installer=True"
+if not defined my_constraints set "my_constraints=C:\WinP\constraints.txt"
+if not defined target_python_exe set "target_python_exe=python.exe"
 
-rem Set archive directory and log file
-set my_archive_dir=%~dp0WinPython_build_logs
-if not exist %my_archive_dir% mkdir %my_archive_dir%
+REM === Define archive directory ===
+set "my_archive_dir=%~dp0WinPython_build_logs"
+if not exist "%my_archive_dir%" mkdir "%my_archive_dir%"
 
-set my_time=%time:~0,5%
-set my_time=%my_time::=_%
-set my_time=%my_time: =0%
-set my_archive_log=%my_archive_dir%\build_%my_pyver%._.%my_release%%my_flavor%_%my_release_level%_of_%date:/=-%at_%my_time%.txt
+REM === Format current time for use in log file ===
+set "my_time=%time:~0,5%"
+set "my_time=%my_time::=_%"
+set "my_time=%my_time: =0%"
 
-set my_basedir=%my_root_dir_for_builds%\bd%my_python_target%
+REM === Define archive log file path ===
+set "my_archive_log=%my_archive_dir%\build_%my_pyver%_%my_release%%my_flavor%_%my_release_level%_of_%date:/=-%at_%my_time%.txt"
+
+REM === Set Python version and release ===
+if "%my_python_target%"=="311" (
+    set "my_python_target_release=3119"
+    set "my_release=2"
+) else if "%my_python_target%"=="312" (
+    set "my_python_target_release=31210"
+    set "my_release=2"
+) else if "%my_python_target%"=="313" (
+    set "my_python_target_release=3135"
+    set "my_release=1"
+) else if "%my_python_target%"=="314" (
+    set "my_python_target_release=3140"
+    set "my_release=1"
+)
+
+REM === Define base build and distribution paths ===
+set "my_basedir=%my_root_dir_for_builds%\bd%my_python_target%"
+set "my_WINPYDIRBASE=%my_basedir%\bu%my_flavor%\WPy%my_arch%-%my_python_target_release%%my_release%%my_release_level%"
+
 
 rem a building env need is a Python with packages: WinPython + build + flit + packaging + mkshim400.py
 set my_buildenv=C:\WinPdev\WPy64-310111
 
-if "%my_constraints%"=="" set my_constraints=C:\WinP\constraints.txt
 
-rem  2021-04-22 : path PyPy3 (as we don't try to copy PyPy3.exe to Python.exe) 
-if "%target_python_exe%"=="" set target_python_exe=python.exe
 
-rem Set Python target release based on my_python_target
-if %my_python_target%==311 set my_python_target_release=3119& set my_release=2
-if %my_python_target%==312 set my_python_target_release=31210& set my_release=2
-if %my_python_target%==313 set my_python_target_release=3135& set my_release=1
-if %my_python_target%==314 set my_python_target_release=3140& set my_release=1
-
-set my_WINPYDIRBASE=%my_basedir%\bu%my_flavor%\WPy%my_arch%-%my_python_target_release%%my_release%%my_release_level%
 
 echo -------------------------------------- >>%my_archive_log%
 echo (%date% %time%) preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
