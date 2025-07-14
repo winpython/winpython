@@ -110,12 +110,39 @@ if defined my_requirements_pre (
     echo No pre-requisite packages specified >>"%my_archive_log%"
 )
 
-call :log_section  Add requirement packages
+REM === Step: Install main requirement packages ===
+call :log_section  Add main requirement packages
+python -m pip install -r "%my_requirements%" -c "%my_constraints%" --pre --no-index --trusted-host=None --find-links="%my_find_links%" >>"%my_archive_log%"
 
-python -m pip install -r %my_requirements% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
+REM Patch installed packages to be portable (WinPython style)
 python -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('', to_movable=True)"
 
-call :log_section  Add lockfile wheels
+REM === Define lockfile paths for included wheels ===
+set "WINPYVERLOCK=%WINPYVER2:.=_%"
+set "LOCKDIR=%WINPYDIRBASE%\..\"
+
+set "pip_lock_includedlocal=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheelslocal.toml"
+set "pip_lock_includedweb=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheels.toml"
+set "req_lock_includedlocal=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheelslocal.txt"
+set "req_lock_includedweb=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheels.txt"
+
+@echo on
+REM === Step: Add lockfile wheels for the Wheelhouse (optional) ===
+if defined wheelhousereq if exist "%wheelhousereq%" (
+    call :log_section Add wheels for the Wheelhouse
+
+    REM Generate pylock from wheelhousereq
+    python -m pip lock --no-index --trusted-host=None --find-links="%my_find_links%" -c "%my_constraints%" -r "%wheelhousereq%" -o "%pip_lock_includedlocal%"
+
+    REM Convert pylock to requirement file with hashes
+    python -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'%pip_lock_includedlocal%', r'%req_lock_includedlocal%')"
+
+    REM Freeze lock again from local hashes
+    python -m pip lock --no-deps --require-hashes -c "%my_constraints%" -r "%req_lock_includedlocal%" -o "%pip_lock_includedweb%"
+
+    REM Use wppm to install from lock
+    "%my_WINPYDIRBASE%\python\scripts\wppm.exe" "%pip_lock_includedweb%" -ws "%my_find_links%" -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
+)
 
 set path=%my_original_path%
 @echo on
@@ -130,33 +157,8 @@ echo %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pylockinclude%" -ws  "%my_find_
 )
 
 @echo on
-echo wheelhousereq=%wheelhousereq%
-set LOCKDIR=%WINPYDIRBASE%\..\
-set pip_lock_includedlocal=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheelslocal.toml
-set pip_lock_includedweb=%LOCKDIR%pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheels.toml
-set req_lock_includedlocal=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheelslocal.txt
-set req_lock_includedweb=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_includedwheels.txt
-
-set pip_lock_includedlocal=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheelslocal.toml
-set pip_lock_includedweb=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheels.toml
-set req_lock_includedlocal=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheelslocal.txt
-set req_lock_includedweb=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheels.txt
 
 
-if not "Z%wheelhousereq%Z"=="ZZ" if exist "%wheelhousereq%" (
-echo JOYYYwheelhousereq=%wheelhousereq%
-echo  z%pip_lock_includedlocal%z=%pip_lock_includedlocal% 
-rem no winpython in it naturally, with deps
-python.exe -m pip lock --no-index --trusted-host=None  --find-links=%my_find_links%  -c C:\WinP\constraints.txt -r  "%wheelhousereq%" -o %pip_lock_includedlocal% 
-rem generating also classic requirement with hash-256, from obtained pylock.toml
-python.exe -c "from wppm import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_includedlocal%', r'%req_lock_includedlocal%')"
-
-rem same with frozen web from local
-python.exe -m pip lock --no-deps --require-hashes    -c C:\WinP\constraints.txt -r  "%req_lock_includedlocal%" -o %pip_lock_includedweb%
-
-echo %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pip_lock_includedweb%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels">>%my_archive_log%
-%my_WINPYDIRBASE%\python\scripts\wppm.exe "%pip_lock_includedweb%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
-)
 
 call :log_section generate pylock.toml files and requirement.txt with hash files
 
