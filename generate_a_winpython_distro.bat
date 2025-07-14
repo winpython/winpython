@@ -45,7 +45,6 @@ set my_buildenv=C:\WinPdev\WPy64-310111
 call :log_section preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***
 
 REM === Step: Pre-clear previous build infrastructure ===
-
 if /i "%my_preclear_build_directory%"=="Yes" (
     call :log_section Pre-clear previous build infrastructure
 
@@ -64,32 +63,33 @@ if /i "%my_preclear_build_directory%"=="Yes" (
     )
 )
 
-
+REM === Step: Create new build ===
 call :log_section Create a new build
 
-cd /D %~dp0
-set path=%my_original_path%
-call %my_buildenv%\scripts\env.bat
-@echo on
+REM Activate base build environment
+cd /D "%~dp0"
+set "path=%my_original_path%"
+call "%my_buildenv%\scripts\env.bat"
 
+REM Call make_all to create basic infrastructure
 call :log_section  Create basic build infrastructure
-echo "(%date% %time%) Create basic build infrastructure">>%my_archive_log%
-python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')">>%my_archive_log%
+python.exe -c "from make import make_all; make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')" >>"%my_archive_log%"
 
-call :log_section  Check infrastructure is in place
-echo "(%date% %time%) Check infrastructure">>%my_archive_log%
-set WINPYDIRBASE=%my_WINPYDIRBASE% 
 
-if not exist %my_WINPYDIRBASE%\scripts\env.bat (
- @echo off
- echo as %my_WINPYDIRBASE%\scripts\env.bat does not exist
- echo please check and correct:
- echo     my_arch=%my_arch%
- echo     my_python_target_release=%my_python_target_release%
- echo     my_release=%my_release%
- echo     my_release_level=%my_release_level%
- pause
- exit
+REM === Check infrastructure exists ===
+call :log_section  Check infrastructure
+
+set "WINPYDIRBASE=%my_WINPYDIRBASE%"
+
+if not exist "%WINPYDIRBASE%\scripts\env.bat" (
+    echo ERROR: %WINPYDIRBASE%\scripts\env.bat does not exist
+    echo Please verify:
+    echo     my_arch=%my_arch%
+    echo     my_python_target_release=%my_python_target_release%
+    echo     my_release=%my_release%
+    echo     my_release_level=%my_release_level%
+    pause
+    exit /b 1
 )
 
 call :log_section Add pre-requisite packages
