@@ -44,19 +44,26 @@ set my_buildenv=C:\WinPdev\WPy64-310111
 
 call :log_section preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***
 
-rem Pre-clear previous build infrastructure
-if "%my_preclear_build_directory%"=="Yes" (
-    echo "(%date% %time%) Pre-clear previous build infrastructure">>%my_archive_log%
-    del -y %userprofile%\.jupyter\jupyter_notebook_config.py
-    cd /D %my_root_dir_for_builds%\bd%my_python_target%
-    set build_det=\%my_flavor%
-    if "%my_flavor%"=="" set build_det=
-    dir %build_det%
-    ren bu%my_flavor% bu%my_flavor%_old
-    start rmdir /S /Q bu%my_flavor%_old
-    rmdir /S /Q bu%my_flavor%
-    rmdir /S /Q dist
+REM === Step: Pre-clear previous build infrastructure ===
+
+if /i "%my_preclear_build_directory%"=="Yes" (
+    call :log_section Pre-clear previous build infrastructure
+
+    REM Delete Jupyter config if it exists
+    if exist "%userprofile%\.jupyter\jupyter_notebook_config.py" (
+        del /f /q "%userprofile%\.jupyter\jupyter_notebook_config.py"
+    )
+
+    REM Navigate to build directory
+    cd /D "%my_root_dir_for_builds%\bd%my_python_target%"
+
+    REM Rename previous build folder if it exists
+    if exist "bu%my_flavor%" (
+        ren "bu%my_flavor%" "bu%my_flavor%_old"
+        rmdir /s /q "bu%my_flavor%_old"
+    )
 )
+
 
 call :log_section Create a new build
 
