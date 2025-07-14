@@ -186,29 +186,31 @@ copy /Y "%pip_lock_web%" "%my_archive_lockfile%"
 copy /Y "%pip_lock_web%" "%my_changelog_lockfile%"
 copy /Y "%req_lock_web%" "%my_changelog_reqfile%"
 
-
 call :log_section  Archive success
 
-set path=%my_original_path%
-call %my_WINPYDIRBASE%\scripts\env.bat
+rem set path=%my_original_path%
+rem call %my_WINPYDIRBASE%\scripts\env.bat
 
 %target_python_exe% -m pip freeze > %my_archive_log%.packages_versions.txt
 
-REM Generate changelog and binaries
-echo "(%date% %time%) Generate changelog and binaries">>%my_archive_log%
+REM === Step 13: Generate changelog and binaries ===
+call :log_section Generate changelog and binaries
 
-rem markdowm and markdown diff
-set mdn=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%.md
-%target_python_exe% -m wppm -md>%my_basedir%\bu%my_flavor%\%mdn%
-copy/y %my_basedir%\bu%my_flavor%\%mdn% %~dp0changelogs\%mdn%
+REM Define markdown changelog filenames
+set "mdn=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%.md"
+set "out=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%_History.md"
 
-set out=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%_History.md
-%target_python_exe% -c "from wppm import diff ;a=(diff.compare_package_indexes(r'%WINPYVER2%', searchdir=r'%~dp0changelogs',flavor=r'%my_flavor%',architecture=%my_arch%));f=open(r'%my_basedir%\bu%my_flavor%\%out%','w', encoding='utf-8');f.write(a);f.close()" 
-copy/y %my_basedir%\bu%my_flavor%\%out% %~dp0changelogs\%out%
+REM Create markdown package list
+%target_python_exe% -m wppm -md > "%my_WINPYDIRBASE%\..\%mdn%"
+copy /Y "%my_WINPYDIRBASE%\..\%mdn%" "%~dp0changelogs\%mdn%"
 
-rem compress
-set stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%%my_release_level%
-%target_python_exe% -c "from wppm import utils;utils.command_installer_7zip(r'%my_WINPYDIRBASE%', r'%my_WINPYDIRBASE%\..',r'%stem%', r'%my_create_installer%')" 
+REM Generate historical diff
+%target_python_exe% -c "from wppm import diff; result = diff.compare_package_indexes('%WINPYVER2%', searchdir=r'%~dp0changelogs', flavor=r'%my_flavor%', architecture=%my_arch%); open(r'%my_WINPYDIRBASE%\..\%out%', 'w', encoding='utf-8').write(result)"
+copy /Y "%my_WINPYDIRBASE%\..\%out%" "%~dp0changelogs\%out%"
+
+REM === Step 13b: Compress distribution to .7z or installer ===
+set "stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%%my_release_level%"
+%target_python_exe% -c "from wppm import utils; utils.command_installer_7zip(r'%my_WINPYDIRBASE%', r'%my_WINPYDIRBASE%\..', r'%stem%', r'%my_create_installer%')"
 
 call :log_section END OF CREATION
 
@@ -223,6 +225,7 @@ exit
 echo. >>%my_archive_log%
 echo -------------------------------------- >>%my_archive_log%
 echo (%date% %time%) %* >>%my_archive_log%
+echo (%date% %time%) %*
 echo -------------------------------------- >>%my_archive_log%
 echo. >>%my_archive_log%
 exit /b
