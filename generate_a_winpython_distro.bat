@@ -42,12 +42,7 @@ set "my_WINPYDIRBASE=%my_basedir%\bu%my_flavor%\WPy%my_arch%-%my_python_target_r
 rem a building env need is a Python with packages: WinPython + build + flit + packaging + mkshim400.py
 set my_buildenv=C:\WinPdev\WPy64-310111
 
-
-
-
-echo -------------------------------------- >>%my_archive_log%
-echo (%date% %time%) preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***>>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***
 
 rem Pre-clear previous build infrastructure
 if "%my_preclear_build_directory%"=="Yes" (
@@ -63,20 +58,18 @@ if "%my_preclear_build_directory%"=="Yes" (
     rmdir /S /Q dist
 )
 
-REM Create a new build
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) Create a new build">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section Create a new build
+
 cd /D %~dp0
 set path=%my_original_path%
 call %my_buildenv%\scripts\env.bat
 @echo on
 
-REM Create basic build infrastructure
+call :log_section  Create basic build infrastructure
 echo "(%date% %time%) Create basic build infrastructure">>%my_archive_log%
 python.exe -c "from make import *;make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')">>%my_archive_log%
 
-REM Check infrastructure is in place
+call :log_section  Check infrastructure is in place
 echo "(%date% %time%) Check infrastructure">>%my_archive_log%
 set WINPYDIRBASE=%my_WINPYDIRBASE% 
 
@@ -92,10 +85,7 @@ if not exist %my_WINPYDIRBASE%\scripts\env.bat (
  exit
 )
 
-REM Add pre-requisite packages
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) Add pre-requisite packages">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section Add pre-requisite packages
 
 set path=%my_original_path%
 call %my_WINPYDIRBASE%\scripts\env.bat
@@ -112,17 +102,13 @@ if not "Z%my_requirements_pre%Z"=="ZZ" (
     echo "No pre-requisite packages">>%my_archive_log%
 )
 
-REM Add requirement packages
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) Add requirement packages">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section  Add requirement packages
+
 python -m pip install -r %my_requirements% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
 python -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('', to_movable=True)"
 
-REM Add Wheelhouse (to replace per pip lock direct ? would allow paralellism)
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) Add lockfile wheels">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section  Add lockfile wheels
+
 set path=%my_original_path%
 @echo on
 call %my_WINPYDIRBASE%\scripts\env.bat
@@ -164,9 +150,7 @@ echo %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pip_lock_includedweb%" -ws  "%m
 %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pip_lock_includedweb%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
 )
 
-echo -------------------------------------- >>%my_archive_log%;
-echo "(%date% %time%) generate pylock.toml files and requirement.txt with hash files">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section generate pylock.toml files and requirement.txt with hash files
 
 set path=%my_original_path%
 call %my_WINPYDIRBASE%\scripts\env.bat
@@ -212,10 +196,8 @@ copy/Y %pip_lock_web% %my_changelog_lockfile%
 copy/Y %req_lock_web% %my_changelog_reqfile%
 
 
-REM Archive success
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) Archive success">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section  Archive success
+
 set path=%my_original_path%
 call %my_WINPYDIRBASE%\scripts\env.bat
 
@@ -237,10 +219,19 @@ rem compress
 set stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%%my_release_level%
 %target_python_exe% -c "from wppm import utils;utils.command_installer_7zip(r'%my_WINPYDIRBASE%', r'%my_WINPYDIRBASE%\..',r'%stem%', r'%my_create_installer%')" 
 
-echo -------------------------------------- >>%my_archive_log%
-echo "(%date% %time%) END OF CREATION">>%my_archive_log%
-echo -------------------------------------- >>%my_archive_log%
+call :log_section END OF CREATION
+
 start notepad.exe %my_archive_log%
 start notepad.exe %my_archive_log%.packages_versions.txt
 
 set path=%my_original_path%
+pause
+exit
+
+:log_section
+echo. >>%my_archive_log%
+echo -------------------------------------- >>%my_archive_log%
+echo (%date% %time%) %* >>%my_archive_log%
+echo -------------------------------------- >>%my_archive_log%
+echo. >>%my_archive_log%
+exit /b
