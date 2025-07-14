@@ -92,21 +92,22 @@ if not exist "%WINPYDIRBASE%\scripts\env.bat" (
     exit /b 1
 )
 
+REM === Step: Add pre-requisite packages ===
 call :log_section Add pre-requisite packages
 
-set path=%my_original_path%
-call %my_WINPYDIRBASE%\scripts\env.bat
+set "path=%my_original_path%"
+call "%my_WINPYDIRBASE%\scripts\env.bat"
 
 rem python -m ensurepip
-rem insta essential packages
-python -m pip install --upgrade pip setuptools wheel wppm -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links% >>%my_archive_log%
+REM Upgrade essential pip tools
+python -m pip install --upgrade pip setuptools wheel wppm  -c "%my_constraints%" --pre --no-index --trusted-host=None --find-links="%my_find_links%" >>"%my_archive_log%"
 
-rem Install complementary pre-requirements if any
-if not "Z%my_requirements_pre%Z"=="ZZ" (
-    if "%my_find_links_pre%"=="" set my_find_links_pre=%my_find_links%
-    python -m pip install -r %my_requirements_pre% -c %my_constraints% --pre --no-index --trusted-host=None --find-links=%my_find_links_pre% >> %my_archive_log%
+REM Install additional pre-requirements if specified
+if defined my_requirements_pre (
+    if not defined my_find_links_pre set "my_find_links_pre=%my_find_links%"
+    python -m pip install -r "%my_requirements_pre%" -c "%my_constraints%" --pre --no-index --trusted-host=None --find-links="%my_find_links_pre%" >>"%my_archive_log%"
 ) else (
-    echo "No pre-requisite packages">>%my_archive_log%
+    echo No pre-requisite packages specified >>"%my_archive_log%"
 )
 
 call :log_section  Add requirement packages
