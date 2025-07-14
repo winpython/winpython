@@ -221,7 +221,7 @@ set out=WinPython%my_flavor%-%my_arch%bit-%WINPYVER2%_History.md
 copy/y %my_basedir%\bu%my_flavor%\%out% %~dp0changelogs\%out%
 
 rem compress
-set stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%%my_release_level
+set stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%%my_release_level%
 %target_python_exe% -c "from wppm import utils;utils.command_installer_7zip(r'%my_WINPYDIRBASE%', r'%my_WINPYDIRBASE%\..',r'%stem%', r'%my_create_installer%')" 
 
 echo -------------------------------------- >>%my_archive_log%
