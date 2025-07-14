@@ -126,7 +126,6 @@ set "pip_lock_includedweb=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%
 set "req_lock_includedlocal=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheelslocal.txt"
 set "req_lock_includedweb=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheels.txt"
 
-@echo on
 REM === Step: Add lockfile wheels for the Wheelhouse (optional) ===
 if defined wheelhousereq if exist "%wheelhousereq%" (
     call :log_section Add wheels for the Wheelhouse
@@ -144,66 +143,48 @@ if defined wheelhousereq if exist "%wheelhousereq%" (
     "%my_WINPYDIRBASE%\python\scripts\wppm.exe" "%pip_lock_includedweb%" -ws "%my_find_links%" -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
 )
 
-set path=%my_original_path%
-@echo on
-call %my_WINPYDIRBASE%\scripts\env.bat
-@echo on
-set WINPYVERLOCK=%WINPYVER2:.=_%
-set pylockinclude=%my_root_dir_for_builds%\bd%my_python_target%\bu%addlockfile%\pylock.%addlockfile%-%WINPYARCH%bit-%WINPYVERLOCK%.toml
-echo pylockinclude="%pylockinclude%"
-if not "Z%addlockfile%Z"=="ZZ" if exist "%pylockinclude%" (
-echo %my_WINPYDIRBASE%\python\scripts\wppm.exe "%pylockinclude%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels">>%my_archive_log%
-%my_WINPYDIRBASE%\python\scripts\wppm.exe "%pylockinclude%" -ws  "%my_find_links%"  -wd "%my_WINPYDIRBASE%\wheelhouse\included.wheels"
-)
-
-@echo on
+rem set path=%my_original_path%
+rem call %my_WINPYDIRBASE%\scripts\env.bat
 
 
+REM === Freeze environment and generate final lockfiles ===
+call :log_section Freeze environment and generate lockfiles
 
-call :log_section generate pylock.toml files and requirement.txt with hash files
+set "req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_raw.txt"
+set "wanted_req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.txt"
 
-set path=%my_original_path%
-call %my_WINPYDIRBASE%\scripts\env.bat
+set "pip_lock_web=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.toml"
+set "pip_lock_local=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.toml"
+set "req_lock_web=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.txt"
+set "req_lock_local=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.txt"
+ 
+REM Archive paths
+set "my_archive_lockfile=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml"
+set "my_changelog_lockfile=%~dp0changelogs\pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.toml"
+set "my_changelog_reqfile=%~dp0changelogs\requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.txt"
 
-rem generate pip freeze requirements
-echo %date% %time%
-set LOCKDIR=%WINPYDIRBASE%\..\
+REM Freeze full environment (excluding winpython)
+python -m pip freeze > "%req%"
+findstr /v "winpython" "%req%" > "%wanted_req%"
 
-set WINPYVERLOCK=%WINPYVER2:.=_%
-set req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_raw.txt
-set wanted_req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%.txt
+REM Lock from PyPI
+python -m pip lock --no-deps -c "%my_constraints%" -r "%wanted_req%" -o "%pip_lock_web%"
 
-set pip_lock_web=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.toml
-set pip_lock_local=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.toml
-set req_lock_web=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.txt
-set req_lock_local=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_local.txt
+REM Lock from local wheelhouse
+python -m pip lock --no-deps --no-index --trusted-host=None --find-links="%my_find_links%" -c "%my_constraints%" -r "%wanted_req%" -o "%pip_lock_local%"
 
+REM Convert both locks to requirement.txt with hash256
+python -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'%pip_lock_web%', r'%req_lock_web%')"
+python -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'%pip_lock_local%', r'%req_lock_local%')"
 
-set my_archive_lockfile=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.toml
-set my_archive_lockfile_local=%my_archive_dir%\pylock.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_%date:/=-%at_%my_time%.local.toml
-set my_changelog_lockfile=%~dp0changelogs\pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.toml
-set my_changelog_reqfile=%~dp0changelogs\requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%.txt
+REM Compare for reproducibility check
+fc "%req_lock_web%" "%req_lock_local%"
+@echo off
 
-python.exe -m pip freeze>%req%
-findstr /v "winpython" %req% > %wanted_req%
-
-
-rem pip lock from pypi, from the frozen req
-python.exe -m pip lock --no-deps  -c C:\WinP\constraints.txt -r "%wanted_req%" -o %pip_lock_web%
-
-rem pip lock from local WheelHouse, from the frozen req
-python.exe -m pip lock --no-deps --no-index --trusted-host=None  --find-links=C:\WinP\packages.srcreq -c C:\WinP\constraints.txt -r  "%wanted_req%" -o %pip_lock_local%
-
-rem generating also classic requirement with hash-256, from obtained pylock.toml
-python.exe -c "from wppm import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_web%', r'%req_lock_web%')"
-python.exe -c "from wppm import wheelhouse as wh;wh.pylock_to_req(r'%pip_lock_local%', r'%req_lock_local%')"
-
-rem compare the two (result from pypi and local Wheelhouse must be equal)
-fc  "%req_lock_web%" "%req_lock_local%"
-
-copy/Y %pip_lock_web% %my_archive_lockfile%
-copy/Y %pip_lock_web% %my_changelog_lockfile%
-copy/Y %req_lock_web% %my_changelog_reqfile%
+REM Archive generated lockfile
+copy /Y "%pip_lock_web%" "%my_archive_lockfile%"
+copy /Y "%pip_lock_web%" "%my_changelog_lockfile%"
+copy /Y "%req_lock_web%" "%my_changelog_reqfile%"
 
 
 call :log_section  Archive success
