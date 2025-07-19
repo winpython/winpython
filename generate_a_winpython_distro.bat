@@ -1,7 +1,7 @@
 rem  generate_a_winpython_distro.bat: to be launched from a winpython directory, where 'make.py' is
 @echo on
 
-REM === Set default values if not already defined ===
+REM === Step 01:Set default values if not already defined ===
 if not defined my_release_level set "my_release_level=b1"
 if not defined my_create_installer set "my_create_installer=True"
 if not defined my_constraints set "my_constraints=C:\WinP\constraints.txt"
@@ -19,7 +19,7 @@ set "my_time=%my_time: =0%"
 REM === Define archive log file path ===
 set "my_archive_log=%my_archive_dir%\build_%my_pyver%_%my_release%%my_flavor%_%my_release_level%_of_%date:/=-%at_%my_time%.txt"
 
-REM === Set Python version and release ===
+REM === Step 02:Set Python version and release ===
 if "%my_python_target%"=="311" (
     set "my_python_target_release=3119"
     set "my_release=2"
@@ -34,7 +34,7 @@ if "%my_python_target%"=="311" (
     set "my_release=1"
 )
 
-REM === Define base build and distribution paths ===
+REM === Step 03:Define base build and distribution paths ===
 set "my_basedir=%my_root_dir_for_builds%\bd%my_python_target%"
 set "my_WINPYDIRBASE=%my_basedir%\bu%my_flavor%\WPy%my_arch%-%my_python_target_release%%my_release%%my_release_level%"
 
@@ -44,7 +44,7 @@ set my_buildenv=C:\WinPdev\WPy64-310111
 
 call :log_section preparing winPython for %my_pyver% (%my_python_target%)release %my_release%%my_flavor% (%my_release_level%) *** %my_arch% bit ***
 
-REM === Step: Pre-clear previous build infrastructure ===
+REM === Step 04: Pre-clear previous build infrastructure ===
 if /i "%my_preclear_build_directory%"=="Yes" (
     call :log_section Pre-clear previous build infrastructure
 
@@ -63,7 +63,7 @@ if /i "%my_preclear_build_directory%"=="Yes" (
     )
 )
 
-REM === Step: Create new build ===
+REM === Step 05: Create new build ===
 call :log_section Create a new build
 
 REM Activate base build environment
@@ -92,7 +92,7 @@ if not exist "%WINPYDIRBASE%\scripts\env.bat" (
     exit /b 1
 )
 
-REM === Step: Add pre-requisite packages ===
+REM === Step 06: Add pre-requisite packages ===
 call :log_section Add pre-requisite packages
 
 set "path=%my_original_path%"
@@ -110,14 +110,14 @@ if defined my_requirements_pre (
     echo No pre-requisite packages specified >>"%my_archive_log%"
 )
 
-REM === Step: Install main requirement packages ===
+REM === Step 07: Install main requirement packages ===
 call :log_section  Add main requirement packages
 python -m pip install -r "%my_requirements%" -c "%my_constraints%" --pre --no-index --trusted-host=None --find-links="%my_find_links%" >>"%my_archive_log%"
 
 REM Patch installed packages to be portable (WinPython style)
 python -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('', to_movable=True)"
 
-REM === Define lockfile paths for included wheels ===
+REM === Step 08: Define lockfile paths for included wheels ===
 set "WINPYVERLOCK=%WINPYVER2:.=_%"
 set "LOCKDIR=%WINPYDIRBASE%\..\"
 
@@ -126,7 +126,7 @@ set "pip_lock_includedweb=%LOCKDIR%pylock.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%
 set "req_lock_includedlocal=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheelslocal.txt"
 set "req_lock_includedweb=%LOCKDIR%requir.%WINPYARCH%-%WINPYVERLOCK%%my_flavor%%my_release_level%_wheels.txt"
 
-REM === Step: Add lockfile wheels for the Wheelhouse (optional) ===
+REM === Step 09: Add lockfile wheels for the Wheelhouse (optional) ===
 if defined wheelhousereq if exist "%wheelhousereq%" (
     call :log_section Add wheels for the Wheelhouse
 
@@ -147,7 +147,7 @@ rem set path=%my_original_path%
 rem call %my_WINPYDIRBASE%\scripts\env.bat
 
 
-REM === Freeze environment and generate final lockfiles ===
+REM === Step 10: Freeze environment and generate final lockfiles ===
 call :log_section Freeze environment and generate lockfiles
 
 set "req=%LOCKDIR%requirement.%my_flavor%-%WINPYARCH%bit-%WINPYVERLOCK%_raw.txt"
@@ -188,12 +188,7 @@ copy /Y "%req_lock_web%" "%my_changelog_reqfile%"
 
 call :log_section  Archive success
 
-rem set path=%my_original_path%
-rem call %my_WINPYDIRBASE%\scripts\env.bat
-
-%target_python_exe% -m pip freeze > %my_archive_log%.packages_versions.txt
-
-REM === Step 13: Generate changelog and binaries ===
+REM === Step 11: Generate changelog and binaries ===
 call :log_section Generate changelog and binaries
 
 REM Define markdown changelog filenames
@@ -212,12 +207,24 @@ REM === Step 13b: Compress distribution to .7z or installer ===
 set "stem=WinPython%my_arch%-%WINPYVER2%%my_flavor%%my_release_level%"
 %target_python_exe% -c "from wppm import utils; utils.command_installer_7zip(r'%my_WINPYDIRBASE%', r'%my_WINPYDIRBASE%\..', r'%stem%', r'%my_create_installer%')"
 
+REM === Step 12: Final logs and cleanup ===
+call :log_section Final logs and cleanup
+
+REM Restore environment
+set "path=%my_original_path%"
+call "%my_WINPYDIRBASE%\scripts\env.bat"
+
+REM Freeze final package versions to archive
+%target_python_exe% -m pip freeze > "%my_archive_log%.packages_versions.txt"
+
 call :log_section END OF CREATION
 
-start notepad.exe %my_archive_log%
-start notepad.exe %my_archive_log%.packages_versions.txt
+REM Open log files in Notepad for review
+start notepad.exe "%my_archive_log%"
+start notepad.exe "%my_archive_log%.packages_versions.txt"
 
-set path=%my_original_path%
+REM Restore path again (in case env.bat changed it)
+set "path=%my_original_path%"
 pause
 exit
 
