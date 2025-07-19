@@ -4,7 +4,7 @@
 # Copyright © 2012 Pierre Raybaut
 # Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/
 # Licensed under the terms of the MIT License
-# (see winpython/__init__.py for details)
+# (see wppm/__init__.py for details)
 
 import os
 import re
@@ -40,27 +40,27 @@ def parse_list_argument(argument_value: str | list[str], separator=" ") -> list[
 class WinPythonDistributionBuilder:
     """Builds a WinPython distribution."""
 
-    def __init__(self, build_number: int, release_level: str, target_directory: Path, wheels_directory: Path,
-                 tools_directories: list[Path] = None, verbose: bool = False,
-                 flavor: str = ""):
+    def __init__(self, build_number: int, release_level: str, basedir_wpy: Path,
+                 source_dirs: Path, tools_directories: list[Path] = None,
+                 verbose: bool = False, flavor: str = ""):
         """
         Initializes the WinPythonDistributionBuilder.
         Args:
             build_number: The build number (integer).
             release_level: The release level (e.g., "beta", "").
-            target_directory: The base directory below which WinPython will be created.
-            wheels_directory: Directory containing wheel files for packages.
+            basedir_wpy:  top directory of the build (c:\...\Wpy...)
+            source_dirs: Directory containing wheel files for packages.
             tools_directories: List of directories containing development tools to include.
             verbose: Enable verbose output.
             flavor: WinPython flavor (e.g., "Barebone").
         """
         self.build_number = build_number
         self.release_level = release_level
-        self.target_directory = Path(target_directory)
-        self.wheels_directory = Path(wheels_directory)
+        self.winpython_directory = Path(basedir_wpy)
+        self.target_directory = self.winpython_directory.parent
+        self.source_dirs = Path(source_dirs)
         self.tools_directories = tools_directories or []
         self.verbose = verbose
-        self.winpython_directory: Path | None = None
         self.distribution: wppm.Distribution | None = None
         self.flavor = flavor
         self.python_zip_file: Path = self._get_python_zip_file()
@@ -69,10 +69,10 @@ class WinPythonDistributionBuilder:
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
-        for source_item in self.wheels_directory.iterdir():
+        for source_item in self.source_dirs.iterdir():
             if re.match(r"(pypy3|python-).*\.zip", source_item.name):
                 return source_item
-        raise RuntimeError(f"Could not find Python zip package in {self.wheels_directory}")
+        raise RuntimeError(f"Could not find Python zip package in {self.source_dirs}")
 
     @property
     def winpython_version_name(self) -> str:
@@ -108,7 +108,6 @@ class WinPythonDistributionBuilder:
 
     def _create_env_config(self):
         """Creates environment setup"""
-        self._print_action("Creating env.ini environment setup")
         executable_name = self.distribution.short_exe if self.distribution else "python.exe"
         config = {
             "WINPYthon_exe": executable_name,
@@ -123,10 +122,9 @@ class WinPythonDistributionBuilder:
         self._print_action(f"Creating env.ini environment {env_path}")
         env_path.write_text("\n".join(f"{k}={v}" for k, v in config.items()))
 
-    def build(self, winpy_dir: Path = None):
+    def build(self):
         """Make or finalise WinPython distribution in the target directory"""
         print(f"Building WinPython with Python archive: {self.python_zip_file.name}")
-        self.winpython_directory = Path(winpy_dir)
         self._print_action(f"Creating WinPython {self.winpython_directory} base directory")
         if self.winpython_directory.is_dir() and len(self.winpython_directory.parts)>=4:
             shutil.rmtree(self.winpython_directory)
@@ -139,10 +137,8 @@ class WinPythonDistributionBuilder:
         self._create_env_config()
 
 def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
-             verbose: bool = False,
-             flavor: str = "",
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
-):
+             verbose: bool = False, flavor: str = ""):
     """
     Make a WinPython distribution for a given set of parameters:
     Args:
@@ -157,16 +153,14 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
     assert basedir_wpy is not None, "The *winpython_dirname* directory must be specified"
 
     tools_directories = [Path(d) for d in parse_list_argument(toolsdirs, ",")]
-    winpy_dir = Path(basedir_wpy)
-    utils.print_box(f"Making WinPython at {winpy_dir}")
-    os.makedirs(winpy_dir, exist_ok=True)
+    utils.print_box(f"Making WinPython at {basedir_wpy}")
+    os.makedirs(basedir_wpy, exist_ok=True)
 
     builder = WinPythonDistributionBuilder(
-        build_number, release_level, winpy_dir.parent, wheels_directory=source_dirs,
-        tools_directories=tools_directories,
-        verbose=verbose, flavor=flavor
-    )
-    builder.build(winpy_dir)
+        build_number, release_level, Path(basedir_wpy), 
+        verbose=verbose, flavor=flavor,
+        source_dirs=source_dirs, tools_directories=tools_directories)
+    builder.build()
 
 if __name__ == "__main__":
     make_all(
