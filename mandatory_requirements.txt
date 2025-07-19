@@ -1,0 +1,5 @@
+# the mandatory
+pip
+setuptools
+#not Wheel
+wppm
