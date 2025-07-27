@@ -50,7 +50,7 @@ REM === Begin Build ===
 call :log_section Creating Build Infrastructure
 call :activate_env "%my_buildenv%"
 
-python.exe -c "from make import make_all; make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')" >>"%my_archive_log%"
+python.exe -c "from winpython import make;make.make_all(%my_release%, '%my_release_level%', basedir_wpy=r'%my_WINPYDIRBASE%', verbose=True, flavor='%my_flavor%', source_dirs=r'%my_source_dirs%', toolsdirs=r'%my_toolsdirs%')" >>"%my_archive_log%"
 
 
 REM === Check env.bat has been created ===
