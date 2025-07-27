@@ -102,6 +102,54 @@ def run_make_py(build_python, winpydirbase, args):
         verbose=True, flavor=args.flavor,
         source_dirs=args.source_dirs, toolsdirs=args.tools_dirs
     )
+
+def process_wheelhouse_requirements(target_python: Path, winpydirbase: Path,args: argparse.Namespace,file_postfix: str):
+    """
+    Handle installation and conversion of wheelhouse requirements.
+    """
+    log_section(f"🙏 Step 5: install wheelhouse requirements {args.wheelhousereq}")
+    wheelhousereq = Path(args.wheelhousereq)
+    kind = "local"
+    out = winpydirbase.parent / f"pylock.{file_postfix}_wheels{kind}.toml"
+    outreq = winpydirbase.parent / f"requir.{file_postfix}_wheels{kind}.txt"
+    if wheelhousereq.is_file():
+        # Generate pylock from wheelhousereq
+        cmd = [
+            str(target_python), "-m", "pip", "lock", "--no-index", "--trusted-host=None",
+            "--find-links", args.find_links, "-c", args.constraints, "-r", str(wheelhousereq),
+            "-o", str(out)
+        ]
+        run_command(cmd)
+        # Convert pylock to requirements with hash
+        pylock_to_req_cmd = [
+            str(target_python), "-X", "utf8", "-c",
+            f"from wppm import wheelhouse as wh; wh.pylock_to_req(r'{out}', r'{outreq}')"
+        ]
+        run_command(pylock_to_req_cmd, check=False)
+
+        kind = ""
+        outw = winpydirbase.parent / f"pylock.{file_postfix}_wheels{kind}.toml"
+        outreqw = winpydirbase.parent / f"requir.{file_postfix}_wheels{kind}.txt"
+        # Generate web pylock from local frozen hashes
+        web_lock_cmd = [
+            str(target_python), "-m", "pip", "lock", "--no-deps", "--require-hashes",
+            "-r", str(outreq), "-o", str(outw)
+        ]
+        run_command(web_lock_cmd)
+        pylock_to_req_cmd2 = [
+            str(target_python), "-X", "utf8", "-c",
+            f"from wppm import wheelhouse as wh; wh.pylock_to_req(r'{outw}', r'{outreqw}')"
+        ]
+        run_command(pylock_to_req_cmd2, check=False)
+
+        # Use wppm to download local from req made with web hashes
+        wheelhouse = winpydirbase / "wheelhouse" / "included.wheels"
+        wppm_cmd = [
+            str(target_python), "-X", "utf8", "-m", "wppm", str(out), "-ws", args.find_links,
+            "-wd", str(wheelhouse)
+        ]
+        run_command(wppm_cmd, check=False)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--python-target', required=True, help='Target Python version, e.g. 311')
@@ -165,37 +213,7 @@ def main():
     patch_winpython(target_python)
 
     if args.wheelhousereq:
-        log_section(f"🙏 Step 5: install wheelhouse requirements {args.wheelhousereq}")
-        wheelhousereq = Path(args.wheelhousereq)
-        kind = "local"
-        out = winpydirbase.parent / f"pylock.{file_postfix}_wheels{kind}.toml"
-        outreq = winpydirbase.parent / f"requir.{file_postfix}_wheels{kind}.txt"
-        if wheelhousereq.is_file():
-            # Generate pylock from wheelhousereq
-            cmd = [str(target_python), "-m" , "pip", "lock","--no-index", "--trusted-host=None",
-            "--find-links", args.find_links, "-c", str(args.constraints), "-r", str(wheelhousereq),
-            "-o", str(out) ]
-            run_command(cmd)
-            # Convert pylock to requirements with hash
-            cmd = [str(target_python), "-X", "utf8", "-c", f"from wppm import wheelhouse as wh; wh.pylock_to_req(r'{out}', r'{outreq}')"]
-            run_command(cmd, check=False)
-
-            kind = ""
-            outw = winpydirbase.parent / f"pylock.{file_postfix}_wheels{kind}.toml"
-            outreqw = winpydirbase.parent / f"requir.{file_postfix}_wheels{kind}.txt"
-            # Generate web pylock from local frozen hashes
-            cmd = [str(target_python), "-m" , "pip", "lock","--no-deps", "--require-hashes",
-            "-r", str(outreq), "-o", str(outw) ]
-            run_command(cmd) 
-            cmd = [str(target_python), "-X", "utf8", "-c", f"from wppm import wheelhouse as wh; wh.pylock_to_req(r'{outw}', r'{outreqw}')"]
-            run_command(cmd, check=False)
-
-            # Use wppm to download local from req made with web hashes
-            wheelhouse = winpydirbase / "wheelhouse" / "included.wheels"
-            cmd = [str(target_python), "-X", "utf8", "-m", "wppm", str(out), "-ws", args.find_links,
-            "-wd", str(wheelhouse)
-            ]
-            run_command(cmd, check=False)
+        process_wheelhouse_requirements(target_python, winpydirbase, args, file_postfix)
 
     log_section("🙏 Step 6: install lockfiles")
     print(target_python, winpydirbase, args.constraints, args.find_links, file_postfix)
