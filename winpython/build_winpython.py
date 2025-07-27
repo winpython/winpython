@@ -107,7 +107,6 @@ def process_wheelhouse_requirements(target_python: Path, winpydirbase: Path,args
     """
     Handle installation and conversion of wheelhouse requirements.
     """
-    log_section(f"🙏 Step 5: install wheelhouse requirements {args.wheelhousereq}")
     wheelhousereq = Path(args.wheelhousereq)
     kind = "local"
     out = winpydirbase.parent / f"pylock.{file_postfix}_wheels{kind}.toml"
@@ -192,15 +191,15 @@ def main():
 
     log_section(f"Preparing build for Python {args.python_target} ({args.arch}-bit)")
 
-    log_section(f"🙏 Step 0: displace old {Path(winpydirbase)}")
+    log_section(f"🙏 Step 1: displace old {Path(winpydirbase)}")
     delete_folder_if_exists(winpydirbase.parent, check_flavor=args.flavor) #bu{flavor]}
 
-    log_section(f"🙏 Step 1: make.py Python with {str(build_python)} at ({winpydirbase}")
+    log_section(f"🙏 Step 2: make.py Python with {str(build_python)} at ({winpydirbase}")
     run_make_py(str(build_python), winpydirbase, args)
 
     check_env_bat(winpydirbase)
 
-    log_section("🙏 Step 3: install requirements")
+    log_section("🙏 Step 3: install requirements")
 
     for label, req in [
         ("Mandatory", args.mandatory_req),
@@ -209,23 +208,23 @@ def main():
     ]:
         pip_install(target_python, req, args.constraints, args.find_links, label)
 
-    log_section("🙏 Step 4: Patch Winpython")
+    log_section("🙏 Step 4: Patch Winpython")
     patch_winpython(target_python)
 
+    log_section(f"🙏 Step 5: install wheelhouse requirements {args.wheelhousereq}")
     if args.wheelhousereq:
         process_wheelhouse_requirements(target_python, winpydirbase, args, file_postfix)
 
-    log_section("🙏 Step 6: install lockfiles")
+    log_section("🙏 Step 6: install lockfiles")
     print(target_python, winpydirbase, args.constraints, args.find_links, file_postfix)
     generate_lockfiles(target_python, winpydirbase, args.constraints, args.find_links, file_postfix)
 
-    # 6) generate changelog
+
+    log_section(f"🙏 Step 7: generate changelog") 
     mdn = f"WinPython{args.flavor}-{args.arch}bit-{winpyver2}.md"
     out = f"WinPython{args.flavor}-{args.arch}bit-{winpyver2}_History.md"
     changelog_dir = log_dir.parent/ "changelogs"
     
-    log_section(f"🙏 Step 6: generate changelog {mdn}") 
-
     cmd = ["set", f"WINPYVER2={winpyver2}&",  "set",  f"WINPYFLAVOR={args.flavor}&",
         "set", f"WINPYVER={winpyver2}{args.flavor}{args.release_level}&",
         str(target_python), "-X", "utf8", "-c" , 
@@ -245,10 +244,9 @@ def main():
         )]
     run_command(cmd, check=False)
     shutil.copyfile (winpydirbase.parent / out, changelog_dir / out)
-    log_section("✅ Step 6 complete")
 
     if args.create_installer != "":
-        log_section("🙏 Step 7 Create Installer")
+        log_section("🙏 Step 8: Create Installer")
         stem = f"WinPython{args.arch}-{winpyver2}{args.flavor}{args.release_level}"
         cmd = [str(target_python), "-c",
         f"from wppm import utils; utils.command_installer_7zip(r'{winpydirbase}', r'{winpydirbase.parent}', r'{stem}', r'{args.create_installer}')" ]
