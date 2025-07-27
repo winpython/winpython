@@ -17,7 +17,11 @@ set "my_time=%time:~0,5%"
 set "my_time=%my_time::=_%"
 set "my_time=%my_time: =0%"
 
-set "my_archive_log=%my_archive_dir%\build_%my_pyver%_%my_release%%my_flavor%_%my_release_level%_of_%date:/=-%at_%my_time%.txt"
+REM === Determine Python target version ===
+if "%my_python_target%"=="311" (set "my_python_target_release=3119" & set "my_release=2")
+if "%my_python_target%"=="312" (set "my_python_target_release=31210" & set "my_release=2")
+if "%my_python_target%"=="313" (set "my_python_target_release=3135" & set "my_release=1")
+if "%my_python_target%"=="314" (set "my_python_target_release=3140" & set "my_release=1")
 
 REM === Define base build and distribution paths ===
 set "my_basedir=%my_root_dir_for_builds%\bd%my_python_target%"
@@ -33,6 +37,6 @@ set "my_requirements_pre=%mandatory_requirements%"
 
 cd/d %~dp0
 echo %my_python_exe% -m winpython.build_winpython --buildenv %my_buildenvi% --python-target %my_python_target% --release %my_release% --release-level %my_release_level% --winpydirbase  %my_WINPYDIRBASE%   --flavor %my_flavor% --source_dirs %my_source_dirs%  --tools_dirs %my_toolsdirs% --log-dir %~dp0WinPython_build_logs --mandatory-req %mandatory_requirements% --pre-req %my_requirements_pre% --requirements %my_requirements% --constraints %my_constraints% --find-links %my_find_links%  --wheelhousereq "%wheelhousereq%" --create-installer "%my_create_installer%"
-%my_python_exe% -m winpython.build_winpython  --buildenv %my_buildenvi%  --python-target %my_python_target%  --release %my_release% --release-level %my_release_level% --winpydirbase  %my_WINPYDIRBASE%   --flavor %my_flavor% --source_dirs %my_source_dirs%  --tools_dirs %my_toolsdirs% --log-dir %~dp0WinPython_build_logs --mandatory-req %mandatory_requirements% --pre-req %my_requirements_pre%  --requirements %my_requirements% --constraints %my_constraints% --find-links %my_find_links%  --wheelhousereq "%wheelhousereq%" --create-installer "%my_create_installer%"
+%my_python_exe% -m winpython.build_winpython  --buildenv %my_buildenvi%  --python-target %my_python_target% --release %my_release%  --release-level %my_release_level% --winpydirbase  %my_WINPYDIRBASE%   --flavor %my_flavor% --source_dirs %my_source_dirs%  --tools_dirs %my_toolsdirs% --log-dir %~dp0WinPython_build_logs --mandatory-req %mandatory_requirements% --pre-req %my_requirements_pre%  --requirements %my_requirements% --constraints %my_constraints% --find-links %my_find_links%  --wheelhousereq "%wheelhousereq%" --create-installer "%my_create_installer%"
 pause
 exit

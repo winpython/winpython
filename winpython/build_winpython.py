@@ -2,65 +2,43 @@
 import os, sys, argparse, datetime, subprocess, shutil
 from pathlib import Path
 
-# --- logging, helpers (same as Step 2) ---
+# --- Logging ---
 def log_section(logfile, message):
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     section = f"\n{'-'*40}\n({ts}) {message}\n{'-'*40}\n"
-    print(section); open(logfile, 'a', encoding='utf-8').write(section)
+    print(section)
+    with open(logfile, 'a', encoding='utf-8') as f:
+        f.write(section)
 
-# --- Helpers ---
-def get_target_release(python_target):
-    mapping = {
-        '311': ('3119', '2'),
-        '312': ('31210', '2'),
-        '313': ('3135', '1'),
-        '314': ('3140', '1')
-    }
-    return mapping.get(python_target, (None, None))
 
-def delete_folder_if_exists(folder: Path,check_flavor: str=""):
+# --- Utility Functions ---
+
+def delete_folder_if_exists(folder: Path, check_flavor: str = ""):
     check_last = folder.parent.name if not folder.is_dir() else folder.name
-    if folder.exists() and folder.is_dir() and check_last=="bu" + check_flavor:
-        print ("hello", folder)
-        folder_old = Path(str(folder)+'.old')
+    expected_name = "bu" + check_flavor
+
+    if folder.exists() and folder.is_dir() and check_last == expected_name:
+        print("Removing old backup:", folder)
+        folder_old = folder.with_suffix('.old')
         if folder_old.exists():
-            shutil.rmtree(Path(str(folder)+'.old'))
-        os.rename(folder, folder_old)
-        shutil.rmtree(Path(str(folder)+'.old'))
-        return     
-        for item in folder_old:
-            if item.is_dir():
-                pass
-                # delete_folder_if_exists(item)
-            else:
-                pass
-                # item.unlink()
-        # folder.rmdir()
-
-def activate_env(env_path):
-    # Windows-specific virtual env activation
-    env_script = Path(env_path) / "scripts" / "env.bat"
-    if not env_script.exists():
-        raise FileNotFoundError(f"Cannot find env.bat at {env_script}")
-    # Note: This step is simplified here. Full environment activation logic will be added later.
+            shutil.rmtree(folder_old)
+        folder.rename(folder_old)
+        shutil.rmtree(folder_old)
 
 
-def run_make_py(build_python, winpydirbase, args, logfile):
-    cmd = [
-        build_python, "-c",
-        (
-            "from wppm import make; "
-            f"make.make_all({args.release}, '{args.release_level}', basedir_wpy=r'{winpydirbase}', "
-            f"verbose=True, flavor='{args.flavor}', source_dirs=r'{args.source_dirs}', "
-            f"toolsdirs=r'{args.tools_dirs}')" #, portable_dir=r'{args.portable_dir}')"
-        )
-    ]
-    print(cmd)
-    from . import make
-    make.make_all( args.release ,  args.release_level , basedir_wpy=  winpydirbase ,  
-             verbose=True, flavor= args.flavor , source_dirs= args.source_dirs  ,  
-             toolsdirs= args.tools_dirs) #, portable_dir= args.portable_dir )
-    #subprocess.run(cmd, stdout=open(logfile, 'a'), stderr=subprocess.STDOUT, check=True)
+def run_command(cmd, log_file=None, shell=False, check=True):
+    print(f"[RUNNING] {' '.join(cmd) if isinstance(cmd, list) else cmd}")
+    with subprocess.Popen(
+        cmd, shell=shell, stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT, universal_newlines=True
+    ) as proc:
+        with open(log_file, 'a', encoding='utf-8') if log_file else open(os.devnull, 'w') as logf:
+            for line in proc.stdout:
+                print(line, end="")
+                logf.write(line)
+    if check and proc.wait() != 0:
+        raise subprocess.CalledProcessError(proc.returncode, cmd)
+
 
 def pip_install(python_exe: Path, req_file: str, constraints: str, find_links: str, logfile: Path, label: str):
     if req_file and Path(req_file).exists():
@@ -69,29 +47,18 @@ def pip_install(python_exe: Path, req_file: str, constraints: str, find_links: s
             "-r", req_file, "-c", constraints,
             "--pre", "--no-index", f"--find-links={find_links}"
         ]
-        log_section(logfile, f"Pip‑install {label}")
-        subprocess.run(cmd, stdout=open(logfile, 'a'), stderr=subprocess.STDOUT, check=True)
+        log_section(logfile, f"Pip-install {label}")
+        run_command(cmd, log_file=logfile)
     else:
         log_section(logfile, f"No {label} specified/skipped")
 
-def run_command(cmd, env=None, log_file=None):
-    print(f"[RUN] {cmd}")
-    with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, universal_newlines=True) as proc:
-        for line in proc.stdout:
-            print(line, end="")
-            if log_file:
-                with open(log_file, "a", encoding="utf-8") as logf:
-                    logf.write(line)
 
-def patch_winpython(python_exe: Path, logfile: Path):
-    cmd = [str(python_exe), "-c" ,
-        (
-        "from wppm import wppm;"
-        "wppm.Distribution().patch_standard_packages('', to_movable=True)"
-        )]
-    print(cmd)
-    subprocess.run(cmd, stdout=open(logfile, 'a'), stderr=subprocess.STDOUT, check=True)
-    #run_command(f'{activate_env(WINPYDIRBASE)} python -c "from wppm import wppm; wppm.Distribution(r\'{WINPYDIRBASE}\').patch_standard_packages(\'\', to_movable=True)"')
+def patch_winpython(python_exe, logfile):
+    cmd = [
+        str(python_exe), "-c",
+        "from wppm import wppm; wppm.Distribution().patch_standard_packages('', to_movable=True)"
+    ]
+    run_command(cmd, log_file=logfile)
 
 
 def check_env_bat(winpydirbase: Path):
@@ -99,13 +66,13 @@ def check_env_bat(winpydirbase: Path):
     if not envbat.exists():
         raise FileNotFoundError(f"Missing env.bat at {envbat}")
 
+
 def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str, find_links: str, logfile: Path, file_postfix: str):
     pip_req = winpydirbase.parent / "requirement_temp.txt"
     with subprocess.Popen([str(target_python), "-m", "pip", "freeze"], stdout=subprocess.PIPE) as proc:
         packages = [l for l in proc.stdout if b"winpython" not in l]
     pip_req.write_bytes(b"".join(packages))
     # Lock to web and local (scaffolding)
-    # if local --no-index --trusted-host=None --find-links="%my_find_links%"
     for kind in ("", "local"):
         out = winpydirbase.parent / f"pylock.{file_postfix}_{kind}.toml"
         outreq = winpydirbase.parent / f"requir.{file_postfix}_{kind}.txt"
@@ -138,22 +105,24 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
     else:
        print ("match ok ",winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
 
-# --- main ---
+# --- Main Logic ---
+def run_make_py(build_python, winpydirbase, args, logfile):
+    from . import make
+    make.make_all(
+        args.release, args.release_level, basedir_wpy=winpydirbase,
+        verbose=True, flavor=args.flavor,
+        source_dirs=args.source_dirs, toolsdirs=args.tools_dirs
+    )
 def main():
     parser = argparse.ArgumentParser()
-    
     parser.add_argument('--python-target', required=True, help='Target Python version, e.g. 311')
     parser.add_argument('--release', default='', help='Release')
     parser.add_argument('--flavor', default='', help='Build flavor')
     parser.add_argument('--arch', default='64', help='Architecture')
-
     parser.add_argument('--release-level', default='b1', help='Release level (e.g., b1, rc)')
     parser.add_argument('--winpydirbase', required=True, help='Path to put environment')
     parser.add_argument('--source_dirs', required=True, help='Path to directory with python zip')
-
     parser.add_argument('--tools_dirs', required=True, help='Path to directory with python zip')
-    #parser.add_argument('--portable_dir', required=True, help='Path to normal make.py')
-
     parser.add_argument('--buildenv', required=True, help='Path to build environment')
     parser.add_argument('--constraints', default='constraints.txt', help='Constraints file')
     parser.add_argument('--requirements', help='Main requirements.txt file')
@@ -180,26 +149,20 @@ def main():
     #logs termination
     z = Path(winpydirbase).name[(4+len(args.arch)):-len(args.release_level)]
     tada = f"{z[:1]}_{z[1:3]}_{z[3]}_{args.release}"
-    winpyver2 =  tada.replace('_','.')
-    file_postfix=f"{args.arch}-{args.python_target[:1]}_{args.python_target[1:]}_{args.release}{args.flavor}{args.release_level}"
-    file_postfix=f"{args.arch}-{tada}{args.flavor}{args.release_level}"
+    winpyver2 = tada.replace('_', '.')
+    file_postfix = f"{args.arch}-{tada}{args.flavor}{args.release_level}"
 
     log_section(log_file, f"Preparing build for Python {args.python_target} ({args.arch}-bit)")
 
     log_section(log_file, f"🙏 Step 0: displace old {Path(winpydirbase)}")
-    # O) Pre-clear
-    
-    #delete_folder_if_exists(Path(winpydirbase))
+
     delete_folder_if_exists(winpydirbase.parent, check_flavor=args.flavor) #bu{flavor]}
 
     log_section(log_file, f"🙏 Step 1: make.py Python with {str(build_python)} at ({winpydirbase}")
-    # 1) run make.py
     run_make_py(str(build_python), winpydirbase, args, log_file)
 
-    # 2) env.bat exists
     check_env_bat(winpydirbase)
 
-    # 3) pip install in built environment
     log_section(log_file, "🙏 Step 3: install requirements")
 
     for label, req in [
@@ -209,11 +172,9 @@ def main():
     ]:
         pip_install(target_python, req, args.constraints, args.find_links, log_file, label)
 
-    # 4) patch Winpython
     log_section(log_file, "🙏 Step 4: Patch Winpython")
     patch_winpython(target_python, log_file)
 
-    # 5) Install Wheelhouse
     if args.wheelhousereq:
         log_section(log_file, f"🙏 Step 5: install wheelhouse requirements {args.wheelhousereq}")
         wheelhousereq = Path(args.wheelhousereq)
@@ -255,14 +216,9 @@ def main():
             subprocess.run(cmd, stdout=open(log_file, 'a'), stderr=subprocess.STDOUT, check=False)
 
 
-
-    # 6) lock files
     log_section(log_file, "🙏 Step 6: install lockfiles")
     print(target_python, winpydirbase, args.constraints, args.find_links, log_file)
-    print(' - - -')
     generate_lockfiles(target_python, winpydirbase, args.constraints, args.find_links, log_file, file_postfix)
-
-    # 5b) Archive lock files
 
     # 6) generate changelog
     mdn = f"WinPython{args.flavor}-{args.arch}bit-{winpyver2}.md"
@@ -286,14 +242,13 @@ def main():
     cmd = [str(target_python), "-c",
         (
         "from wppm import diff;"
-        f"result = diff.compare_package_indexes('{winpyver2}', searchdir=r'{log_dir}', flavor=r'{args.flavor}', architecture={args.arch});"
+        f"result = diff.compare_package_indexes('{winpyver2}', searchdir=r'{changelog_dir}', flavor=r'{args.flavor}', architecture={args.arch});"
         f"open(r'{winpydirbase.parent / out}', 'w', encoding='utf-8').write(result)" 
         )]
     subprocess.run(cmd, stdout=open(log_file, 'a'), stderr=subprocess.STDOUT, check=True)
     shutil.copyfile (winpydirbase.parent / out, changelog_dir / out)
     log_section(log_file, "✅ Step 6 complete")
 
-    # 7) Create Installers
     if args.create_installer != "":
         log_section(log_file, "🙏 Step 7 Create Installer")
         stem = f"WinPython{args.arch}-{winpyver2}{args.flavor}{args.release_level}"
