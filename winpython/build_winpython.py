@@ -89,10 +89,10 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
     # check equality
     web, local = "", "local"
     if not cmp(winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt"):
-       print("ALARM differences in ", winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
+       print("⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️differences in ", winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
        raise os.error
     else:
-       print ("match ok ",winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
+       print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
 
 # --- Main Logic ---
 def run_make_py(build_python, winpydirbase, args):
