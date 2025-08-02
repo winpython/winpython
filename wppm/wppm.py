@@ -14,7 +14,7 @@ import subprocess
 import json
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
-from . import utils, piptree, associate, diff
+from . import utils, piptree, associate, diff, __version__
 from . import wheelhouse as wh
 from operator import itemgetter
 # Workaround for installing PyVISA on Windows from source:
@@ -263,7 +263,7 @@ def main(test=False):
     registerWinPythonHelp = f"Register WinPython: associate file extensions, icons and context menu with this WinPython"
     unregisterWinPythonHelp = f"Unregister WinPython: de-associate file extensions, icons and context menu from this WinPython"
     parser = ArgumentParser(prog="wppm",
-        description="WinPython Package Manager: handle a WinPython Distribution and its packages",
+        description=f"WinPython Package Manager: handle a WinPython Distribution and its packages ({__version__})",
         formatter_class=RawTextHelpFormatter,
     )
     parser.add_argument("fname", metavar="package(s) or lockfile", nargs="*", default=[""], type=str, help="optional package names, wheels, or lockfile")
