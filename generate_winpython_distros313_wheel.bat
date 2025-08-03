@@ -34,6 +34,7 @@ set wheelhousereq=C:\Winp\bd313\dot_requirements.txt
 set wheelhousereq=C:\Winp\bd313\requirements64_whl.txt
 
 
-call %~dp0\generate_a_winpython_distro.bat
+rem call %~dp0\generate_a_winpython_distro.bat
+call %~dp0\generate_a_winpython_distropy.bat
 
 pause
