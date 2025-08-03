@@ -29,6 +29,7 @@ set my_toolsdirs=C:\Winp\bdTools\Tools.dot
 
 set my_install_options=--no-index --pre --trusted-host=None
 
-call %~dp0\generate_a_winpython_distro.bat
+rem call %~dp0\generate_a_winpython_distro.bat
+call %~dp0\generate_a_winpython_distropy.bat
 
 pause

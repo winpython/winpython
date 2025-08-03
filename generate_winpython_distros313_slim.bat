@@ -32,6 +32,7 @@ set my_toolsdirs=C:\WinP\bdTools\tools64_pandoc_alone
 
 set my_install_options=--no-index --pre --trusted-host=None
 
-call %~dp0\generate_a_winpython_distro.bat
+rem call %~dp0\generate_a_winpython_distro.bat
+call %~dp0\generate_a_winpython_distropy.bat
 
 pause
