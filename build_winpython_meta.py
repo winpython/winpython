@@ -93,7 +93,7 @@ def run_build(build, python_versions):
     subprocess.run(build_cmd, cwd=os.getcwd(), check=False)
 
 def main():
-    config_file = sys.argv[1] if len(sys.argv) > 1 else "winpython_buildsZZZ.toml"
+    config_file = sys.argv[1] if len(sys.argv) > 1 else "winpython_buildsNOT.toml"
     builds, python_versions = load_builds(config_file)
     for build in builds:
         run_build(build, python_versions)
