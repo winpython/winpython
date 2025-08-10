@@ -7,6 +7,15 @@ from pathlib import Path
 winpython_inidefault=r'''
 [debug]
 state = disabled
+[env.bat]
+#PYTHONPATHz = %WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
+#see https://github.com/winpython/winpython/issues/839
+#USERPROFILE = %HOME%
+#PYTHONUTF8=1 creates issues in "movable" patching
+SPYDER_CONFDIR = %HOME%\settings\.spyder-py3
+JUPYTER_DATA_DIR = %HOME%
+JUPYTER_CONFIG_DIR = %WINPYDIR%\etc\jupyter
+JUPYTER_CONFIG_PATH = %WINPYDIR%\etc\jupyter
 [inactive_environment_per_user]
 ## <?> changing this segment to [active_environment_per_user] makes this segment of lines active or not
 HOME = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\settings
@@ -39,7 +48,7 @@ def get_file(file_name):
         with open(file_name, 'r') as file:
            return file.read()
     except FileNotFoundError:
-        if file_name[-3:] == 'ini':
+        if file_name.endswith("winpython.ini"):
             os.makedirs(Path(file_name).parent, exist_ok=True)
             with open(file_name, 'w') as file:
                 file.write(winpython_inidefault)
@@ -77,7 +86,8 @@ def main():
             if not (p / 'qt.conf').is_file():
                 with open(p / 'qt.conf', 'w') as file:
                     file.write(qt_conf)
-
+    prefix , postfix = "set ", "&& "
+    #prefix , postfix = "set ", "\n"
     for l in my_lines:
         if l.startswith("["):
             segment = l[1:].split("]")[0]
@@ -85,11 +95,11 @@ def main():
             data = l.split("=", 1)
             if segment == "debug" and data[0].strip() == "state":
                 data[0] = "WINPYDEBUG"
-            if segment in ["environment", "debug", "active_environment_per_user", "active_environment_common"]:
-                txt += f"set {data[0].strip()}={translate(data[1].strip(), env)}&& "
+            if segment in ["env.bat", "environment", "debug", "active_environment_per_user", "active_environment_common"]:
+                txt += f"{prefix}{data[0].strip()}={translate(data[1].strip(), env)}{postfix}"
                 env[data[0].strip()] = translate(data[1].strip(), env)
             if segment == "debug" and data[0].strip() == "state":
-                txt += f"set WINPYDEBUG={data[1].strip()}&&"
+                txt += f"{prefix}WINPYDEBUG={data[1].strip()}{postfix}"
 
     print(txt)
 

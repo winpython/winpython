@@ -16,29 +16,19 @@ if "%WINPYDIRBASE:~-1%"=="\" set WINPYDIRBASE=%WINPYDIRBASE:~0,-1%
 set WINPYDIRBASETMP=
 popd
 
-set WINPYDIR=%WINPYDIRBASE%\%WINpython_subdirectory_name%
+set WINPYDIR=%WINPYDIRBASE%\%WINPYthon_subdirectory_name%
 rem 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%\python.exe
 set PYTHON=%WINPYDIR%\%WINpython_exe%
-set PYTHONPATHz=%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
-set WINPYVER=%WINPYVER%
 
 rem 2023-02-12 utf-8 on console to avoid pip crash
 rem see https://github.com/pypa/pip/issues/11798#issuecomment-1427069681
 set PYTHONIOENCODING=utf-8
-rem set PYTHONUTF8=1 creates issues in "movable" patching
 
 set HOME=%WINPYDIRBASE%\settings
-rem see https://github.com/winpython/winpython/issues/839
-rem set USERPROFILE=%HOME%
-set SPYDER_CONFDIR=%HOME%\settings\.spyder-py3
-set JUPYTER_DATA_DIR=%HOME%
-set JUPYTER_CONFIG_DIR=%WINPYDIR%\etc\jupyter
-set JUPYTER_CONFIG_PATH=%WINPYDIR%\etc\jupyter
-set FINDDIR=%WINDIR%\system32
 
 rem Remove all double quotes
 set PATH_CLEANED=%PATH:"=%
-echo ";%PATH_CLEANED%;" | %FINDDIR%\find.exe /C /I ";%WINPYDIR%\;" >nul
+echo ";%PATH_CLEANED%;" | %WINDIR%\system32\find.exe /C /I ";%WINPYDIR%\;" >nul
 if %ERRORLEVEL% NEQ 0 (
    set "PATH=%WINPYDIR%\Lib\site-packages\PyQt5;%WINPYDIR%\;%WINPYDIR%\DLLs;%WINPYDIR%\Scripts;%WINPYDIR%\..\t;%WINPYDIR%\..\n;%PATH%"
    cd .
