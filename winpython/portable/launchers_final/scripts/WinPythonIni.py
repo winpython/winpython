@@ -76,13 +76,36 @@ def main():
          my_lines += ["QT_API=pyqt5"]
     if (PYPANDOC_PANDOC := WINPYDIRBASE / "t" / "pandoc.exe").is_file():
          my_lines += [f"PYPANDOC_PANDOC={PYPANDOC_PANDOC}"]
-
+   
     # theorical option: a "winpython.ini" file as an initial parameter
     if len(args) >=2 and args[1].endswith("winpython.ini"):
         file_name = args[1] 
         args = args[1:]
     else:
         file_name = "..\\settings\\winpython.ini"
+
+    # env_for_icons.bat default directory logic transfered to WinpythonIni.py
+
+    env['WINPYWORKDIR'] = WINPYWORKDIR = WINPYDIRBASE / "Notebooks"
+    my_lines += [f"WINPYWORKDIR={WINPYWORKDIR}"]
+
+    # supposing winpython.ini is given the %* parameters to apply in python the [tricky] change of directory logic
+    # if a file or directory is in %1 parameter, and current directory is not the icon nor scripts, we use that directory to define WINPYWORKDIR1
+    WINPYWORKDIR1 = WINPYWORKDIR
+    if len(args) >=2:
+        if Path(args[1:1]).isfile():
+            WINPYWORKDIR1 = Path(args[1:1]).parent
+        if Path(args[1:1]).isdir():
+            WINPYWORKDIR1 = Path(args[1:1])
+        
+    # if WinPython launched from another directory than icon origin, it's not a Drag&Drop so keep current directory
+    CD_directory = Path(os.getcwd())
+    dp0_directory = Path(__file__).parent
+    if  CD_directory != dp0_directory and  CD_directory / "scripts" != dp0_directory:
+        WINPYWORKDIR1 = CD_directory
+    env['WINPYWORKDIR'] = WINPYWORKDIR1
+    my_lines += [f"WINPYWORKDIR1={WINPYWORKDIR1}"]
+
     # classic WinpythonIni.py actions: digesting winpython.ini file
     my_lines += get_file(file_name).splitlines()
 
@@ -119,12 +142,13 @@ def main():
             if segment == "debug" and data[0].strip() == "state":
                 txt += f"{prefix}WINPYDEBUG={data[1].strip()}{postfix}"
 
-    print(txt)
-
-    # set potential directory
-    for i in ('HOME', 'WINPYWORKDIR'):
+    # create potential directory
+    for i in ('HOME', 'WINPYWORKDIR', 'WINPYWORKDIR1'):
         if i in env:
             os.makedirs(Path(env[i]), exist_ok=True)
+    # output to push change upward
+    print(txt)
+
     # later_version:
     # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True)
     # p.wait()    # I can wait until finished (although it too finishes after start finishes)
