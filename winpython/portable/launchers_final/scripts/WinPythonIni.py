@@ -63,13 +63,31 @@ def translate(line, env):
 
 def main():
     import sys
-    args = sys.argv[1:]
-    file_name = args[0] if args else "..\\settings\\winpython.ini"
+    args = sys.argv[:]
+    env = os.environ.copy() # later_version: env = os.environ
+    my_lines = []
+    # before env.ini
+    # env.bat things transfered to WinpythonIni.py
+    env["WINPYDIRBASE"] = WINPYDIRBASE = Path(env.get('WINPYDIRBASE', Path(__file__).parent.parent))
+    my_lines += [f"WINPYDIRBASE={WINPYDIRBASE}"]
+    env["WINPYDIR"] = WINPYDIR = Path(env.get('WINPYDIR', WINPYDIRBASE / env.get('WINPYthon_subdirectory_name', 'python')))
+    my_lines += [f"WINPYDIR={WINPYDIR}"]
+    if (WINPYDIR / "Lib" / "site-package" / "PyQt5" / "__init__.py").is_file():
+         my_lines += ["QT_API=pyqt5"]
+    if (PYPANDOC_PANDOC := WINPYDIRBASE / "t" / "pandoc.exe").is_file():
+         my_lines += [f"PYPANDOC_PANDOC={PYPANDOC_PANDOC}"]
 
-    my_lines = get_file(file_name).splitlines()
+    # theorical option: a "winpython.ini" file as an initial parameter
+    if len(args) >=2 and args[1].endswith("winpython.ini"):
+        file_name = args[1] 
+        args = args[1:]
+    else:
+        file_name = "..\\settings\\winpython.ini"
+    # classic WinpythonIni.py actions: digesting winpython.ini file
+    my_lines += get_file(file_name).splitlines()
+
     segment = "environment"
     txt = ""
-    env = os.environ.copy() # later_version: env = os.environ
 
     # default directories (from .bat)
     os.makedirs(Path(env['WINPYDIRBASE']) / 'settings' / 'Appdata' / 'Roaming', exist_ok=True)
