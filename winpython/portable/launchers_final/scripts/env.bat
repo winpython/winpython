@@ -29,8 +29,6 @@ set HOME=%WINPYDIRBASE%\settings
 rem Remove all double quotes
 set PATH_CLEANED=%PATH:"=%
 echo ";%PATH_CLEANED%;" | %WINDIR%\system32\find.exe /C /I ";%WINPYDIR%\;" >nul
-if %ERRORLEVEL% NEQ 0 (
-   set "PATH=%WINPYDIR%\Lib\site-packages\PyQt5;%WINPYDIR%\;%WINPYDIR%\DLLs;%WINPYDIR%\Scripts;%WINPYDIR%\..\t;%WINPYDIR%\..\n;%PATH%"
-   cd .
-)
+if %ERRORLEVEL% NEQ 0 set "PATH=%WINPYDIR%\;%WINPYDIR%\Scripts;%WINPYDIR%\..\t;%WINPYDIR%\..\n;%PATH%"
+
 set PATH_CLEANED=
