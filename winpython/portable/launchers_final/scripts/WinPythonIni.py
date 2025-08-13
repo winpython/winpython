@@ -6,10 +6,8 @@ winpython_inidefault = r'''
 [debug]
 state = disabled
 [env.bat]
-#PYTHONPATHz = %WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs
 #see https://github.com/winpython/winpython/issues/839
 #USERPROFILE = %HOME%
-#PYTHONUTF8=1 creates issues in "movable" patching
 SPYDER_CONFDIR = %HOME%\settings\.spyder-py3
 JUPYTER_DATA_DIR = %HOME%
 JUPYTER_CONFIG_DIR = %WINPYDIR%\etc\jupyter
@@ -26,10 +24,6 @@ USERPROFILE = %HOME%
 [environment]
 ## <?> Uncomment lines to override environment variables
 #SPYDER_CONFDIR = %HOME%\settings\.spyder-py3
-#JUPYTERLAB_SETTINGS_DIR = %HOME%\.jupyter\lab
-#JUPYTERLAB_WORKSPACES_DIR = %HOME%\.jupyter\lab\workspaces
-#R_HOME=%WINPYDIRBASE%\t\R
-#R_HOMEbin=%R_HOME%\bin\x64
 #JULIA_HOME=%WINPYDIRBASE%\t\Julia\bin\
 #JULIA_EXE=julia.exe
 #JULIA=%JULIA_HOME%%JULIA_EXE%
@@ -166,14 +160,11 @@ class WinPythonEnv:
         self.ensure_dirs()
         # Setup Qt conf files
         self.setup_qt_conf()
-
-        # Output
-        #print('\n'.join(self.output_lines))
         
         for l in self.output_lines:
             print(rf"set {l}" , end="&&")
-        # later_version:
+        # later_version ?
         # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True)
-        # p.wait()    # wait until finished ?
+
 if __name__ == "__main__":
     WinPythonEnv().run()
