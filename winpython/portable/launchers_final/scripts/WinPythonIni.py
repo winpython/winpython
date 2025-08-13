@@ -52,8 +52,8 @@ class WinPythonEnv:
         """we do what env.bat was doing"""
         self.winpy_base = Path(Path(__file__).parent.parent).resolve()
         self.home_dir = Path(self.winpy_base / 'settings') 
-        self.winpy_dir = Path(sys.executable).name
-        self.python_exe = Path(sys.executable).parent
+        self.winpy_dir = Path(sys.executable).parent
+        self.python_exe = Path(sys.executable) 
 
     def get_file(self, file_path: Path, default_content=None) -> str:
         if not file_path.exists() and default_content:
