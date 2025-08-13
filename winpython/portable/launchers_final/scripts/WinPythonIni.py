@@ -49,15 +49,11 @@ class WinPythonEnv:
         else:
             self.winpython_ini = self.winpy_base / "settings" / "winpython.ini"
     def _initialize_paths(self):
-        self.winpy_base = Path(self.env.get('WINPYDIRBASE', Path(__file__).parent.parent)).resolve()
-        self.env['WINPYDIRBASE'] = str(self.winpy_base)
-        self.subdir_name = self.env.get('WINPYthon_subdirectory_name', 'python')
-        self.winpy_dir = Path(self.env.get('WINPYDIR', self.winpy_base / self.subdir_name))
-        self.env['WINPYDIR'] = str(self.winpy_dir)
-        self.python_exe = Path(self.env.get('PYTHON', self.winpy_dir / self.env.get('WINPYthon_exe', 'python.exe')))
-        self.env['PYTHON'] = str(self.python_exe)
-        self.home_dir = Path(self.env.get('HOME', self.winpy_base / 'settings'))
-        self.env['HOME'] = str(self.home_dir)
+        """we do what env.bat was doing"""
+        self.winpy_base = Path(Path(__file__).parent.parent).resolve()
+        self.home_dir = Path(self.winpy_base / 'settings') 
+        self.winpy_dir = Path(sys.executable).name
+        self.python_exe = Path(sys.executable).parent
 
     def get_file(self, file_path: Path, default_content=None) -> str:
         if not file_path.exists() and default_content:
@@ -97,6 +93,7 @@ class WinPythonEnv:
             pkg_path = self.winpy_dir / "Lib" / "site-packages" / subpkg
             if pkg_path.exists() and not (pkg_path / "qt.conf").exists():
                 (pkg_path / "qt.conf").write_text(qt_conf_text)
+
 
     def setup_paths(self):
         lines = [
@@ -140,7 +137,7 @@ class WinPythonEnv:
         if cd_dir != script_dir and cd_dir / "scripts" != script_dir:
             winpyworkdir1 = cd_dir
         self.env['WINPYWORKDIR1'] = str(winpyworkdir1)
-        self.output_lines.append("WINPYWORKDIR1={winpyworkdir1}")
+        self.output_lines.append(f"WINPYWORKDIR1={winpyworkdir1}")
 
     def run(self):
        #  env.ini
