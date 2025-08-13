@@ -1,6 +1,7 @@
 
 # Prepares a dynamic list of variables settings from a .ini file
 import os
+import sys
 import subprocess
 from pathlib import Path
 
@@ -66,17 +67,39 @@ def main():
     args = sys.argv[:]
     env = os.environ.copy() # later_version: env = os.environ
     my_lines = []
-    # before env.ini
+    # before env.ini (we replay just in case)
+    env['WINPYthon_subdirectory_name'] = WINPYthon_subdirectory_name = env.get('WINPYthon_subdirectory_name', 'python')
+    my_lines += [f"WINPYthon_subdirectory_name={WINPYthon_subdirectory_name}"]
+    env['WINPYthon_exe'] = WINPYthon_exe =  env.get('WINPYthon_exe', 'python.exe')
+    my_lines += [f"WINPYthon_exe={WINPYthon_exe}"]
+
+    # bypassing env.bat for env.ini
+    if (env_ini_file := Path(__file__).parent /  "env.ini").is_file():
+        my_lines = get_file(str(env_ini_file)).splitlines() + my_lines
+        for l in my_lines:
+            if "=" in l:
+                var , value = l.split("=")
+                env[var.strip()] = value.strip()
+
     # env.bat things transfered to WinpythonIni.py
-    env["WINPYDIRBASE"] = WINPYDIRBASE = Path(env.get('WINPYDIRBASE', Path(__file__).parent.parent))
+    env['WINPYDIRBASE'] = WINPYDIRBASE = Path(env.get('WINPYDIRBASE', Path(__file__).parent.parent)).resolve()
     my_lines += [f"WINPYDIRBASE={WINPYDIRBASE}"]
-    env["WINPYDIR"] = WINPYDIR = Path(env.get('WINPYDIR', WINPYDIRBASE / env.get('WINPYthon_subdirectory_name', 'python')))
+    env["WINPYDIR"] = WINPYDIR = Path(env.get('WINPYDIR',WINPYDIRBASE / 'WINPYthon_subdirectory_name'))
     my_lines += [f"WINPYDIR={WINPYDIR}"]
+    env["PYTHON"] = PYTHON = Path(env.get('PYTHON', WINPYDIR / WINPYthon_exe))
+    my_lines += [f"PYTHON={PYTHON}"]
+    env["HOME"] = HOME = env.get("HOME",  WINPYDIRBASE / 'settings'")
+    my_lines += [f"HOME={HOME}"]
+
     if (WINPYDIR / "Lib" / "site-package" / "PyQt5" / "__init__.py").is_file():
          my_lines += ["QT_API=pyqt5"]
     if (PYPANDOC_PANDOC := WINPYDIRBASE / "t" / "pandoc.exe").is_file():
          my_lines += [f"PYPANDOC_PANDOC={PYPANDOC_PANDOC}"]
-   
+
+    path_me = f"{WINPYDIR};{WINPYDIR / 'Scripts'};{WINPYDIR / ".." /'t'};{WINPYDIR / ".." / 'n'}"
+    if not path_me in env.get('PATH', ''):
+        my_lines += [f"PATH={path_me}{env.get('PATH', '')}"]
+
     # theorical option: a "winpython.ini" file as an initial parameter
     if len(args) >=2 and args[1].endswith("winpython.ini"):
         file_name = args[1] 
@@ -127,8 +150,9 @@ def main():
             if not (p / 'qt.conf').is_file():
                 with open(p / 'qt.conf', 'w') as file:
                     file.write(qt_conf)
-    prefix , postfix = "set ", "&& "
-    #prefix , postfix = "set ", "\n"
+    
+    # setting both the variable if downard, and the associated list if upward
+    prefix, postfix ="" , "\n"
     for l in my_lines:
         if l.startswith("["):
             segment = l[1:].split("]")[0]
@@ -142,10 +166,18 @@ def main():
             if segment == "debug" and data[0].strip() == "state":
                 txt += f"{prefix}WINPYDEBUG={data[1].strip()}{postfix}"
 
-    # create potential directory
+    # create potential directory need
     for i in ('HOME', 'WINPYWORKDIR', 'WINPYWORKDIR1'):
         if i in env:
             os.makedirs(Path(env[i]), exist_ok=True)
+
+    # Including env_for_icons.bat stuff after WinpythonIni.py actions
+    spyder_workdir_specfile = Path(env['HOME']) / f".spyder-py{sys.version_info[0]}" / "workingdir"
+    if not spyder_workdir_specfile.exists(): 
+        os.makedirs(spyder_workdir_specfile.parent, exist_ok=True)
+        with open(spyder_workdir_specfile, 'w') as file:
+            file.write(f"{Path(env['HOME']) / "Notebooks"}")
+
     # output to push change upward
     print(txt)
 
