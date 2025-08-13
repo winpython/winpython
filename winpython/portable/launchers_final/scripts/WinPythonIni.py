@@ -5,7 +5,7 @@ import sys
 import subprocess
 from pathlib import Path
 
-winpython_inidefault=r'''
+winpython_inidefault = r'''
 [debug]
 state = disabled
 [env.bat]
@@ -24,6 +24,7 @@ USERPROFILE = %HOME%
 JUPYTER_DATA_DIR = %HOME%
 WINPYWORKDIR = %HOMEDRIVE%%HOMEPATH%\Documents\WinPython%WINPYVER%\Notebooks
 [inactive_environment_common]
+## <?> changing this segment to [inactive_environment_common] makes this segment of lines active
 USERPROFILE = %HOME%
 [environment]
 ## <?> Uncomment lines to override environment variables
@@ -37,7 +38,6 @@ USERPROFILE = %HOME%
 #JULIA=%JULIA_HOME%%JULIA_EXE%
 #JULIA_PKGDIR=%WINPYDIRBASE%\settings\.julia
 #QT_PLUGIN_PATH=%WINPYDIR%\Lib\site-packages\pyqt5_tools\Qt\plugins
-
 '''
 
 def get_file(file_name):
@@ -152,7 +152,6 @@ def main():
                     file.write(qt_conf)
     
     # setting both the variable if downard, and the associated list if upward
-    prefix, postfix ="" , "\n"
     for l in my_lines:
         if l.startswith("["):
             segment = l[1:].split("]")[0]
@@ -161,10 +160,10 @@ def main():
             if segment == "debug" and data[0].strip() == "state":
                 data[0] = "WINPYDEBUG"
             if segment in ["env.bat", "environment", "debug", "active_environment_per_user", "active_environment_common"]:
-                txt += f"{prefix}{data[0].strip()}={translate(data[1].strip(), env)}{postfix}"
+                txt += f"{data[0].strip()}={translate(data[1].strip(), env)}"
                 env[data[0].strip()] = translate(data[1].strip(), env)
             if segment == "debug" and data[0].strip() == "state":
-                txt += f"{prefix}WINPYDEBUG={data[1].strip()}{postfix}"
+                txt += f"WINPYDEBUG={data[1].strip()}"
 
     # create potential directory need
     for i in ('HOME', 'WINPYWORKDIR', 'WINPYWORKDIR1'):
@@ -179,7 +178,8 @@ def main():
             file.write(f"{Path(env['HOME']) / "Notebooks"}")
 
     # output to push change upward
-    print(txt)
+    for l in self.output_lines:
+        print(rf"set {l}" , end="&&")
 
     # later_version:
     # p = subprocess.Popen(["start", "cmd", "/k", "set"], shell = True)
