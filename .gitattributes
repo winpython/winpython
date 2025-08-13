@@ -1,0 +1,9 @@
+# Set default behavior
+* text=auto
+
+# Explicit line endings for important file types
+*.sh   text eol=lf
+*.py   text eol=lf
+*.js   text eol=lf
+*.bat  text eol=crlf
+*.ps1  text eol=crlf
