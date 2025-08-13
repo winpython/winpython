@@ -1,3 +1,4 @@
+# build_winpython_meta.py
 import os
 import sys
 # Use tomllib if available (Python 3.11+), otherwise fall back to tomli
@@ -10,7 +11,7 @@ except ImportError:
         print("Please install tomli for Python < 3.11: pip install tomli")
         sys.exit(1)
 
-#import yaml
+#import yaml: we choose toml, more python standard
 import subprocess
 from pathlib import Path
 
@@ -20,8 +21,6 @@ def load_builds(config_file):
     builds = config["builds"]
     python_versions = config.get("pythons", {})
     return builds, python_versions
-    #with open(config_file, "r", encoding="utf-8") as f:
-    #    return yaml.safe_load(f)["builds"]
 
 def run_build(build, python_versions):
     print(f"\n=== Building WinPython: {build['name']} ===")
@@ -46,10 +45,7 @@ def run_build(build, python_versions):
     my_release = vinfo.get("release", "")
     my_release_level = vinfo.get("my_release_level", "b0")
     mandatory_requirements = vinfo.get("mandatory_requirements", os.path.join(os.getcwd(), "mandatory_requirements.txt"))
- 
-    # Get Python release info from TOML [pythons] 
     my_constraints = build.get("my_constraints", r"C:\WinP\constraints.txt")
-    target_python_exe = build.get("target_python_exe", "python.exe")
 
     # Build directory logic
     my_basedir = f"{root_dir_for_builds}\\bd{my_python_target}"
