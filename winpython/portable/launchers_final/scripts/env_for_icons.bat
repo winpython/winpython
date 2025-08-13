@@ -1,13 +1,15 @@
 @echo off
 call "%~dp0env.bat"
-
+setlocal enabledelayedexpansion
 rem you can use winpython.ini to change defaults
-FOR /F "delims=" %%i IN ('""%WINPYDIR%\python.exe" "%~dp0WinpythonIni.py"  %*"') DO set winpythontoexec=%%i
-%winpythontoexec%set winpythontoexec=
+for /f "tokens=1,* delims==" %%A in (
+    'cmd /c ""%~dp0..\python\python.exe" "%~dp0WinpythonIni.py" %*"'
+) do (
+    set "key=%%A"
+    set "value=%%B"
+    set "!key!=!value!"
+)
 
 rem Change of directory only if we are in a launcher directory
 if  "%__CD__%scripts\"=="%~dp0"  cd/D %WINPYWORKDIR1%
 if  "%__CD__%"=="%~dp0"          cd/D %WINPYWORKDIR1%
-
-if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%"  mkdir "%HOME%\.spyder-py%WINPYVER:~0,1%"
-if not exist "%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir" echo %HOME%\Notebooks>"%HOME%\.spyder-py%WINPYVER:~0,1%\workingdir"

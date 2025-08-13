@@ -24,7 +24,6 @@ if (-not ($env:WINPYDIR -eq [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE+"\{
 $env:WINPYDIR = $env:WINPYDIRBASE+ "\" +$env:WINPYthon_subdirectory_name
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 $env:PYTHON = $env:WINPYthon_exe
-$env:PYTHONPATHz = "%WINPYDIR%;%WINPYDIR%\Lib;%WINPYDIR%\DLLs"
 
 $env:WINPYVER = $env:WINPYVER
 # rem 2023-02-12 try utf-8 on console
@@ -32,9 +31,6 @@ $env:WINPYVER = $env:WINPYVER
 $env:PYTHONIOENCODING = "utf-8"
 
 $env:HOME = "$env:WINPYDIRBASE\settings"
-
-# rem read https://github.com/winpython/winpython/issues/839
-# $env:USERPROFILE = "$env:HOME"
 
 $env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
