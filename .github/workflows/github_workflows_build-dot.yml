@@ -14,8 +14,8 @@ jobs:
         run: |
           curl -L -o python-3.13-embed.zip https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip
           mkdir dotpython
-          tar -xf python-3.13-embed.zip -C dotpython
-
+          # tar -xf python-3.13-embed.zip -C dotpython
+          powershell -Command "Expand-Archive -Path 'python-3.13-embed.zip' -DestinationPath 'dotpython'"
       - name: Prepare WinPython dot structure
         run: |
           mkdir WinPython-dot-3.13
