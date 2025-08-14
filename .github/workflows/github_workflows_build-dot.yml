@@ -30,7 +30,7 @@ jobs:
         run: |
           #New-Item -ItemType Directory -Path dotpython
           #Expand-Archive -Path python-3.13-embed.zip -DestinationPath dotpython
-          mkdir WPy64-31351cloudb3
+          mkdir dotpython
           tar -xf python-3.13-embed.zip -C dotpython
 
       - name: Copy launchers_final files to dotpython
