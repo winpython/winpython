@@ -31,7 +31,7 @@ jobs:
           #New-Item -ItemType Directory -Path dotpython
           #Expand-Archive -Path python-3.13-embed.zip -DestinationPath dotpython
           mkdir WPy64-31351cloudb3
-          tar -xf python-3.13-embed.zip -C WPy64-31351cloudb3
+          tar -xf python-3.13-embed.zip -C dotpython
 
       - name: Copy launchers_final files to dotpython
         # enriching things: will need one python to play on the other, so why not there too
@@ -48,13 +48,13 @@ jobs:
         run: |
           Get-ChildItem -Recurse dotpython
 
-      - name: Prepare WinPython dot structure
+      - name: Prepare WinPython target dot structure
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path WPy64-31351b3
           # Get-ChildItem dotpython | Move-Item -Destination WinPython-dot-3.13
           # fix: Usually, indygreg zips extract all files directly into the target, not into a subfolder: dotpython/python.exe, dotpython/Lib, etc.
-          Get-ChildItem -Path dotpython -Force | Move-Item -Destination WPy64-31351cloudb3 -Force
+          Get-ChildItem -Path dotpython -Force | Move-Item -Destination WPy64-31351b3 -Force
           # Add more WinPython-specific folders/files here if needed
 
       - name: List WPy64-31351cloudb3 contents (for debugging)
