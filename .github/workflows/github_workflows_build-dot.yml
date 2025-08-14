@@ -57,6 +57,11 @@ jobs:
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination WPy64-31351b3 -Force
           # Add more WinPython-specific folders/files here if needed
 
+      - name: try upgrade pip
+        shell: pwsh
+        run: |
+          WPy64-31351b3\python\python.exe -m pip install --upgrade pip
+
       - name: List WPy64-31351cloudb3 contents (for debugging)
         shell: pwsh
         run: |
