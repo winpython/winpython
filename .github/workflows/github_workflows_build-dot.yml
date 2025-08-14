@@ -1,4 +1,4 @@
-name: Build WinPython Dot 3.13, # fix to build #3
+name: Build WinPython Dot 3.13, # fix to build #5, Copilote AI pwsh was not a so good idea
 
 on:
   workflow_dispatch:
@@ -11,15 +11,25 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download python-3.13 standalone
+        shell: cmd
+        run: |
+          curl -L -o python-3.13-embed.zip https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip
+
+      - name: Show downloaded file info
         shell: pwsh
         run: |
-          $url = "https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip"
-          $output = "python-3.13-embed.zip"
-          Invoke-WebRequest -Uri $url -OutFile $output
-          Get-Item $output | Format-List Name,Length,LastWriteTime
+          Get-Item python-3.13-embed.zip | Format-List Name,Length,LastWriteTime
+
+      - name: Wait before extraction
+        shell: pwsh
+        run: |
           Start-Sleep -Seconds 2
+
+      - name: Extract python-3.13-embed.zip
+        shell: pwsh
+        run: |
           New-Item -ItemType Directory -Path dotpython
-          Expand-Archive -Path $output -DestinationPath dotpython
+          Expand-Archive -Path python-3.13-embed.zip -DestinationPath dotpython
 
       - name: List dotpython contents (for debugging)
         shell: pwsh
