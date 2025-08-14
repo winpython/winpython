@@ -35,8 +35,13 @@ jobs:
 
       - name: Copy launchers_final files to dotpython
         # enriching things: will need one python to play on the other, so why not there too
+        #shell: bash
+        shell: pwsh
         run: |
-          cp -r winpython/portable/launchers_final/* dotpython/
+          # would run with shell: bash
+          # cp -r winpython/portable/launchers_final/* dotpython/
+          if (-not (Test-Path "dotpython")) { New-Item -ItemType Directory -Path "dotpython" | Out-Null }
+          Copy-Item -Path "winpython/portable/launchers_final/*" -Destination "dotpython/" -Recurse -Force
 
       - name: List dotpython contents (for debugging)
         shell: pwsh
