@@ -72,7 +72,7 @@ jobs:
       - name: try install requirements as hashed-requirements
         shell: pwsh
         run: |
-          WPy64-31351b3\python\python.exe -m pip install --dest dotpython\wheelHouse --no-deps --require-hashes -r "winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt"
+          WPy64-31351b3\python\python.exe -m pip install --no-deps --no-index --trusted-host=None --find-links=dotpython\wheelhouse --require-hashes -r "winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt"
 
       - name: List dotpython contents (for debugging)
         shell: pwsh
