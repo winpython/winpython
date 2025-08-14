@@ -1,0 +1,14 @@
+[builds]
+[[builds]]
+name = "WinPython-dot-3.13"
+root_dir_for_builds = "build_output"
+python_target = "3.13"
+flavor = "dot"
+arch = "amd64"
+source_dirs = ""
+toolsdirs = ""
+requirements = ""
+create_installer = false
+
+[pythons]
+"3.13" = { python_target_release = "3.13.0", release = "b1", my_release_level = "b0", mandatory_requirements = "" }
