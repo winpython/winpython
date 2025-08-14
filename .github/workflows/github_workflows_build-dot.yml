@@ -11,21 +11,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download python-3.13 standalone
+        shell: pwsh
         run: |
-          curl -L -o python-3.13-embed.zip https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip
-          mkdir dotpython
-          # tar -xf python-3.13-embed.zip -C dotpython
-          powershell -Command "Expand-Archive -Path 'python-3.13-embed.zip' -DestinationPath 'dotpython'"
+          $url = "https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip"
+          $output = "python-3.13-embed.zip"
+          Invoke-WebRequest -Uri $url -OutFile $output
+          Get-Item $output | Format-List Name,Length,LastWriteTime
+          Start-Sleep -Seconds 2
+          New-Item -ItemType Directory -Path dotpython
+          Expand-Archive -Path $output -DestinationPath dotpython
 
-      - name: List dotpython contents
+      - name: List dotpython contents (for debugging)
         shell: pwsh
         run: |
           Get-ChildItem -Recurse dotpython
 
       - name: Prepare WinPython dot structure
-        # run: |
-        #  mkdir WinPython-dot-3.13
-        #  move dotpython\* WinPython-dot-3.13\
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path WinPython-dot-3.13
@@ -34,6 +35,10 @@ jobs:
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination WinPython-dot-3.13 -Force
           # Add more WinPython-specific folders/files here if needed
 
+      - name: List WinPython-dot-3.13 contents (for debugging)
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse WinPython-dot-3.13
       - name: Zip the result
         # run: |
         #  Compress-Archive -Path WinPython-dot-3.13\* -DestinationPath WinPython-dot-3.13.zip
