@@ -31,7 +31,12 @@ jobs:
           #New-Item -ItemType Directory -Path dotpython
           #Expand-Archive -Path python-3.13-embed.zip -DestinationPath dotpython
           mkdir dotpython
-          tar -xf python-3.13-embed.zip -C dotpython
+          tar -xf python-3.13-embed.zip -C WPy64-31351cloudb3
+
+      - name: Copy launchers_final files to dotpython
+        # enriching things: will need one python to play on the other, so why not there too
+        run: |
+          cp -r winpython/portable/launchers_final/* dotpython/
 
       - name: List dotpython contents (for debugging)
         shell: pwsh
@@ -41,25 +46,25 @@ jobs:
       - name: Prepare WinPython dot structure
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path WinPython-dot-3.13
+          New-Item -ItemType Directory -Path WPy64-31351b3
           # Get-ChildItem dotpython | Move-Item -Destination WinPython-dot-3.13
           # fix: Usually, indygreg zips extract all files directly into the target, not into a subfolder: dotpython/python.exe, dotpython/Lib, etc.
-          Get-ChildItem -Path dotpython -Force | Move-Item -Destination WinPython-dot-3.13 -Force
+          Get-ChildItem -Path dotpython -Force | Move-Item -Destination WPy64-31351cloudb3 -Force
           # Add more WinPython-specific folders/files here if needed
 
-      - name: List WinPython-dot-3.13 contents (for debugging)
+      - name: List WPy64-31351cloudb3 contents (for debugging)
         shell: pwsh
         run: |
-          Get-ChildItem -Recurse WinPython-dot-3.13
+          Get-ChildItem -Recurse WPy64-31351b3
       - name: Zip the result
         # run: |
         #  Compress-Archive -Path WinPython-dot-3.13\* -DestinationPath WinPython-dot-3.13.zip
         shell: pwsh
         run: |
-          Compress-Archive -Path WinPython-dot-3.13\* -DestinationPath WinPython-dot-3.13.zip
+          Compress-Archive -Path WPy64-31351b3\* -DestinationPath WinPython64-3.13.5.1dotcloudb3.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WinPython-dot-3.13
-          path: WinPython-dot-3.13.zip
+          name: WinPython64-3.13.5.1dotcloudb3
+          path: WinPython64-3.13.5.1dotcloudb3.zip
