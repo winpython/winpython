@@ -17,12 +17,19 @@ jobs:
           # tar -xf python-3.13-embed.zip -C dotpython
           powershell -Command "Expand-Archive -Path 'python-3.13-embed.zip' -DestinationPath 'dotpython'"
       - name: Prepare WinPython dot structure
+        # run: |
+        #  mkdir WinPython-dot-3.13
+        #  move dotpython\* WinPython-dot-3.13\
+        shell: pwsh
         run: |
-          mkdir WinPython-dot-3.13
-          move dotpython\* WinPython-dot-3.13\
+          New-Item -ItemType Directory -Path WinPython-dot-3.13
+          Get-ChildItem dotpython | Move-Item -Destination WinPython-dot-3.13
           # Add more WinPython-specific folders/files here if needed
 
       - name: Zip the result
+        # run: |
+        #  Compress-Archive -Path WinPython-dot-3.13\* -DestinationPath WinPython-dot-3.13.zip
+        shell: pwsh
         run: |
           Compress-Archive -Path WinPython-dot-3.13\* -DestinationPath WinPython-dot-3.13.zip
 
