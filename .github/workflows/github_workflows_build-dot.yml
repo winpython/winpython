@@ -11,10 +11,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download python-3.13 standalone
-        shell: cmd
+        #shell: cmd
         run: |
-          curl -L -o python-3.13-embed.zip https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip
-
+          #curl -L -o python-3.13-embed.zip https://github.com/indygreg/python-build-standalone/releases/download/20240421/cpython-3.13.0b1+20240421-x86_64-pc-windows-msvc-shared-install_only.zip
+          curl -L -o python-3.13-embed.zip https://github.com/astral-sh/python-build-standalone/releases/download/20250807/cpython-3.13.6+20250807-x86_64-pc-windows-msvc-install_only_stripped.tar.gz
       - name: Show downloaded file info
         shell: pwsh
         run: |
@@ -26,10 +26,12 @@ jobs:
           Start-Sleep -Seconds 2
 
       - name: Extract python-3.13-embed.zip
-        shell: pwsh
+        #shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path dotpython
-          Expand-Archive -Path python-3.13-embed.zip -DestinationPath dotpython
+          #New-Item -ItemType Directory -Path dotpython
+          #Expand-Archive -Path python-3.13-embed.zip -DestinationPath dotpython
+          mkdir dotpython
+          tar -xf python-3.13-embed.zip -C dotpython
 
       - name: List dotpython contents (for debugging)
         shell: pwsh
