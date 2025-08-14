@@ -1,4 +1,4 @@
-name: Build WinPython Dot 3.13
+name: Build WinPython Dot 3.13, # fix to build #3
 
 on:
   workflow_dispatch:
@@ -16,6 +16,12 @@ jobs:
           mkdir dotpython
           # tar -xf python-3.13-embed.zip -C dotpython
           powershell -Command "Expand-Archive -Path 'python-3.13-embed.zip' -DestinationPath 'dotpython'"
+
+      - name: List dotpython contents
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse dotpython
+
       - name: Prepare WinPython dot structure
         # run: |
         #  mkdir WinPython-dot-3.13
@@ -23,7 +29,9 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path WinPython-dot-3.13
-          Get-ChildItem dotpython | Move-Item -Destination WinPython-dot-3.13
+          # Get-ChildItem dotpython | Move-Item -Destination WinPython-dot-3.13
+          # fix: Usually, indygreg zips extract all files directly into the target, not into a subfolder: dotpython/python.exe, dotpython/Lib, etc.
+          Get-ChildItem -Path dotpython -Force | Move-Item -Destination WinPython-dot-3.13 -Force
           # Add more WinPython-specific folders/files here if needed
 
       - name: Zip the result
