@@ -62,19 +62,36 @@ jobs:
         run: |
           WPy64-31351b3\python\python.exe -m pip install --upgrade pip
 
+      - name: try install download requirements as hashed-requirements
+        shell: pwsh
+        run: |
+          WPy64-31351b3\python\python.exe -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r "winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt"
+          WPy64-31351b3\python\python.exe -m pip install --no-deps --no-index --trusted-host=None --find-links=dotpython\wheelhouse --require-hashes -r "winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt"
+
+      - name: List dotpython contents (for debugging)
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse dotpython\wheelhouse
+
+
+      - name: try install  requirements as hashed-requirements
+        shell: pwsh
+        run: |
+          WPy64-31351b3\python\python.exe -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r "winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt"
+
       - name: List WPy64-31351cloudb3 contents (for debugging)
         shell: pwsh
         run: |
           Get-ChildItem -Recurse WPy64-31351b3
-      - name: Zip the result
-        # run: |
-        #  Compress-Archive -Path WinPython-dot-3.13\* -DestinationPath WinPython-dot-3.13.zip
-        shell: pwsh
-        run: |
-          Compress-Archive -Path WPy64-31351b3\* -DestinationPath WinPython64-3.13.5.1dotcloudb3.zip
 
-      - name: Upload artifact
+      #step avoided: upload-artifact will also .zip it (perplexity AI advising)
+      #- name: Zip the result
+      #  shell: pwsh
+      #  run: |
+      #    Compress-Archive -Path WPy64-31351b3\* -DestinationPath WinPython64-3.13.5.1dotcloudb3.zip
+
+      - name: Upload WinPython folder as artifact
         uses: actions/upload-artifact@v4
         with:
           name: WinPython64-3.13.5.1dotcloudb3
-          path: WinPython64-3.13.5.1dotcloudb3.zip
+          path: WPy64-31351b3
