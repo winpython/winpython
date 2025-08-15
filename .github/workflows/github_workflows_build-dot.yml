@@ -29,6 +29,7 @@ jobs:
           echo "WINPYrequirements=winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt" >> $GITHUB_ENV
 
       - name: Download python-3 standalone
+        shell: bash
         run: |
           curl -L -o python-$WINPYVERSION-embed.tar.gz $python_source
           # Calculate SHA256 hash
