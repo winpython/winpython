@@ -30,7 +30,7 @@ jobs:
 
           #3.13.5
           echo "build_location=WPy64-31351b3" >> $GITHUB_ENV
-          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250723/cpython-3.12.11+20250723-aarch64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250723/cpython-3.13.5+20250723-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
           echo "python_sha256=4d88fdda4a59e0d6d45953c37c2fcb4e114dd5a2d41cb5b24b75b42ab8328ff8" >> $GITHUB_ENV
           echo "build_location=WPy64-31350b3" >> $GITHUB_ENV
           echo "WINPYVER=3.13.5.1dotcb3" >> $GITHUB_ENV
