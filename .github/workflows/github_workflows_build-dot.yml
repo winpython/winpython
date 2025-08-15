@@ -134,7 +134,7 @@ jobs:
           & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=dotpython\wheelhouse -r dotpython\freeze.txt -o $destfile
 
           $outreq = "publish_dot\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').txt"
-          & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$env:destfile', r'$env:outreq')"
+          & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile', r'$outreq')"
 
       - name: Zip the result
         shell: pwsh
