@@ -140,7 +140,7 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.zip" 
-          Compress-Archive -Path "$env:build_location"\* -DestinationPath $destfile
+          Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
 
       - name: 7z archive the result
         shell: pwsh
