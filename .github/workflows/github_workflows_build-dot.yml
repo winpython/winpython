@@ -19,7 +19,7 @@ jobs:
           echo "WINPYrequirementswhl=" >> $GITHUB_ENV
           echo "WINPYZIP=1">> $GITHUB_ENV
           echo "WINPY7Z=0">> $GITHUB_ENV
-          echo "WINPYEXE=0">> $GITHUB_ENV
+          echo "WINPYEXE=1">> $GITHUB_ENV
 
           #3.13.6
           #echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
@@ -43,6 +43,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Output "WINPYVERSION is $env:WINPYVERSION" 
+          Write-Output "WINPYFLAVOR is $env:WINPYFLAVOR"  
           Write-Output "python_source is $env:python_source"
           Write-Output "python_sha256 is $env:python_sha256"
           Write-Output "WINPYrequirements is $env:WINPYrequirements"
@@ -162,14 +163,14 @@ jobs:
       - name: Zip the result
         shell: pwsh
         run: |
-          $destfile = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.zip" 
+          $destfile = "publish_dot\WinPython$env:WINPYARCH-$env:WINPYVER.zip" 
           if ($env:WINPYZIP -eq "1") {
               Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
               }
       - name: 7z archive the result
         shell: pwsh
         run: |
-          $destfile7z = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.7z"
+          $destfile7z = "publish_dot\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
           $sourceDir = "$env:build_location"
     
           # Use 7z.exe from PATH, or specify full path if needed
@@ -180,7 +181,7 @@ jobs:
       - name: 7z executable archive the result
         shell: pwsh
         run: |
-          $destfile7z = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.exe"
+          $destfile7z = "publish_dot\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $sourceDir = "$env:build_location"
     
           # Use 7z.exe from PATH, or specify full path if needed
