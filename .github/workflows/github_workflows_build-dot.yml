@@ -13,8 +13,13 @@ jobs:
       - name: set variables
         shell: bash
         run: |
+          echo "WINPYARCH=64" >> $GITHUB_ENV
           echo "WINPYVERSION=313" >> $GITHUB_ENV
           echo "WINPYrequirements=winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt" >> $GITHUB_ENV
+          echo "WINPYrequirementswhl=" >> $GITHUB_ENV
+          echo "WINPYZIP=1">> $GITHUB_ENV
+          echo "WINPY7Z=0">> $GITHUB_ENV
+          echo "WINPYEXE=0">> $GITHUB_ENV
 
           #3.13.6
           #echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
@@ -26,11 +31,12 @@ jobs:
           #3.13.5
           echo "build_location=WPy64-31351b3" >> $GITHUB_ENV
           echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250723/cpython-3.12.11+20250723-aarch64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+          echo "python_sha256=4d88fdda4a59e0d6d45953c37c2fcb4e114dd5a2d41cb5b24b75b42ab8328ff8" >> $GITHUB_ENV
           echo "build_location=WPy64-31350b3" >> $GITHUB_ENV
           echo "WINPYVER=3.13.5.1dotcb3" >> $GITHUB_ENV
           echo "WINPYVER2=3.13.5.1" >> $GITHUB_ENV
+
           echo "WINPYFLAVOR=dotc" >> $GITHUB_ENV
-          echo "WINPYARCH=64" >> $GITHUB_ENV
 
 
       - name: see variables
