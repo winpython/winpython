@@ -78,18 +78,6 @@ jobs:
           # would run with shell: pwsh
           #if (-not (Test-Path "dotpython")) { New-Item -ItemType Directory -Path "dotpython" | Out-Null }
           #Copy-Item -Path "winpython/portable/launchers_final/*" -Destination "dotpython/" -Recurse -Force
-
-      - name: Write env.ini file
-        shell: pwsh
-        run: |
-          $destDir = "$env:build_location\python\scripts"
-          echo "WINPYthon_exe=$env:WINPYthon_exe" > env.ini
-          echo "WINPYthon_subdirectory_name=$env:WINPYthon_subdirectory_name" >> env.ini
-          echo "WINPYVER=$env:WINPYVER" >> env.ini
-          echo "WINPYVER2=$env:WINPYVER2" >> env.ini
-          echo "WINPYFLAVOR=$env:WINPYFLAVOR" >> env.ini
-          echo "WINPYARCH=$env:WINPYARCH" >> env.ini
-          Copy-Item -Path "env.ini" -Destination "$destDir\env.ini"
       
       - name: List dotpython contents (for debugging)
         shell: pwsh
@@ -103,10 +91,23 @@ jobs:
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
           # Add more WinPython-specific folders/files here if needed
 
-      - name: upgrade pip to get icons launchers
+      - name: upgrade pip to get structure and icons launchers
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade pip
+
+
+      - name: Write env.ini file
+        shell: pwsh
+        run: |
+          $destDir = "$env:build_location\python\scripts"
+          echo "WINPYthon_exe=$env:WINPYthon_exe" > env.ini
+          echo "WINPYthon_subdirectory_name=$env:WINPYthon_subdirectory_name" >> env.ini
+          echo "WINPYVER=$env:WINPYVER" >> env.ini
+          echo "WINPYVER2=$env:WINPYVER2" >> env.ini
+          echo "WINPYFLAVOR=$env:WINPYFLAVOR" >> env.ini
+          echo "WINPYARCH=$env:WINPYARCH" >> env.ini
+          Copy-Item -Path "env.ini" -Destination "$destDir\env.ini"
 
       - name: download requirements as hashed-requirements in dotpython\wheelhouse
         shell: pwsh
