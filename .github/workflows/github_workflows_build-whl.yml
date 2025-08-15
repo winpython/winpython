@@ -45,6 +45,8 @@ jobs:
           Write-Output "WINPYVERSION is $env:WINPYVERSION" 
           Write-Output "python_source is $env:python_source"
           Write-Output "python_sha256 is $env:python_sha256"
+          Write-Output "WINPYrequirements is $env:WINPYrequirements"
+          Write-Output "WINPYrequirementswhl is $env:WINPYrequirementswhl"
 
       - name: Download python-3 standalone
         shell: pwsh
