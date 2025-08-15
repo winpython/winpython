@@ -24,7 +24,7 @@ jobs:
           echo "WINPYthon_subdirectory_name=python" >> $GITHUB_ENV
           echo "WINPYVER=3.13.6.0dotb3" >> $GITHUB_ENV
           echo "WINPYVER2=3.13.6.0" >> $GITHUB_ENV
-          echo "WINPYFLAVOR=dot" >> $GITHUB_ENV
+          echo "WINPYFLAVOR=dotc" >> $GITHUB_ENV
           echo "WINPYARCH=64" >> $GITHUB_ENV
 
           echo "WINPYrequirements=winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt" >> $GITHUB_ENV
@@ -119,19 +119,40 @@ jobs:
         run: |
           & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=dotpython\wheelhouse --require-hashes -r $env:WINPYrequirements
 
+
       - name: List build_location Markdowned content (for debugging)
         shell: pwsh
         run: |
+          mkdir publish_dot
+          $destfile = "publish_dot\WinPython$env:WINPYFLAVOR-$env:WINPYARCHbit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md
+          & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile -Encoding utf8 
 
-      #step avoided: upload-artifact will also .zip it (perplexity AI advising)
-      #- name: Zip the result
-      #  shell: pwsh
-      #  run: |
-      #    Compress-Archive -Path WPy64-31351b3\* -DestinationPath WinPython64-3.13.5.1dotcloudb3.zip
 
+          & "$env:build_location\python\python.exe" -m pip freeze --dest dotpython\freeze.txt
+          $destfile = "publish_dot\pylock.$env:WINPYARCH.$($env:WINPYVER -replace '\.', '_').toml"
+          & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=dotpython\wheelhouse --require-hashes -r $env:WINPYrequirements -o $destfile
+
+          $outreq = "publish_dot\requir.$env:WINPYARCH.$($env:WINPYVER -replace '\.', '_').txt"
+          & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$env:destfile', r'$env:outreq')"
+
+      - name: Zip the result
+        shell: pwsh
+        run: |
+          $destfile = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.zip" 
+          Compress-Archive -Path "$env:build_location"\* -DestinationPath $destfile
+
+      - name: 7z archive the result
+        shell: pwsh
+        run: |
+          $destfile7z = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.7z"
+          $sourceDir = "$env:build_location"
+    
+          # Use 7z.exe from PATH, or specify full path if needed
+          7z a $destfile7z $sourceDir
+    
       - name: Upload WinPython folder as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WinPython64-3.13.6.0dotcloudb3
-          path: WPy64-31360b3
+            name: publish_dotc
+            path: publish_dot
