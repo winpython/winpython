@@ -1,4 +1,4 @@
-name: Build WinPython Dot 3.13.6, # 2025-08-14: python-3.13.6, before 3.13.7 (the 15th...)
+name: Build WinPython whl 3.13.6, # 2025-08-14: python-3.13.6, before 3.13.7 (the 15th...)
 # later we can use matrix https://github.com/orgs/community/discussions/7835#discussioncomment-1769026
 on:
   workflow_dispatch:
