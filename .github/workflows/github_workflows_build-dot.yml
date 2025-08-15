@@ -11,6 +11,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: set variables
+        shell: pwsh
         run: |
           echo "build_location=WPy64-31360b3" >> $GITHUB_ENV
           echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
@@ -28,25 +29,32 @@ jobs:
 
           echo "WINPYrequirements=winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt" >> $GITHUB_ENV
 
-      - name: Download python-3 standalone
-        shell: bash
-        env:
-          WINPYVERSION: ${{ env.WINPYVERSION }}
-          python_source: ${{ env.python_source }}
-          python_sha256: ${{ env.python_sha256 }}
+      - name: see variables
+        shell: pwsh
         run: |
-          curl.exe -L -o python-$WINPYVERSION-embed.tar.gz $python_source
-          # Calculate SHA256 hash
-          actual_hash=$(sha256sum python-$WINPYVERSION-embed.tar.gz | cut -d' ' -f1)
+          echo $env:WINPYVERSION
+          echo $env:python_source
+          echo $env:python_sha256
 
-          if [ "$actual_hash" = "$python_sha256" ]; then
-             echo "Hash matches."
-          else
-             echo "Hash does NOT match."
-             echo "$actual_hash"
-             echo "$python_sha256"
-             exit 1
-          fi
+      - name: Download python-3 standalone
+        shell: pwsh
+        run: |
+          curl.exe -L -o "python-$env:WINPYVERSION-embed.tar.gz" $env:python_source
+          # Calculate SHA256 hash
+          $filePath = "python-$env:WINPYVERSION-embed.tar.gz"
+          $expectedHash = $env:python_sha256
+
+          $hashObject = Get-FileHash -Path $filePath -Algorithm SHA256
+          $actualHash = $hashObject.Hash.ToLower()
+
+          if ($actualHash -eq $expectedHash.ToLower()) {
+              Write-Output "Hash matches."
+          } else {
+              Write-Output "Hash does NOT match."
+              Write-Output "Actual: $actualHash"
+              Write-Output "Expected: $expectedHash"
+              exit 1
+          }
 
       - name: Extract python-$WINPYVERSION-embed.tar.gz to dotpython
         shell: bash
