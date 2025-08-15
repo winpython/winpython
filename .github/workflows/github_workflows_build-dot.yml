@@ -45,6 +45,8 @@ jobs:
           Write-Output "WINPYVERSION is $env:WINPYVERSION" 
           Write-Output "python_source is $env:python_source"
           Write-Output "python_sha256 is $env:python_sha256"
+          Write-Output "WINPYrequirements is $env:WINPYrequirements"
+          Write-Output "WINPYrequirementswhl is $env:WINPYrequirementswhl"
 
       - name: Download python-3 standalone
         shell: pwsh
@@ -88,7 +90,9 @@ jobs:
           # would run with shell: pwsh
           #if (-not (Test-Path "dotpython")) { New-Item -ItemType Directory -Path "dotpython" | Out-Null }
           #Copy-Item -Path "winpython/portable/launchers_final/*" -Destination "dotpython/" -Recurse -Force
-      
+       
+          mkdir "dotpython\wheelhouse"
+
       - name: List dotpython contents (for debugging)
         shell: pwsh
         run: |
@@ -124,6 +128,16 @@ jobs:
         run: |
           & "$env:build_location\python\python.exe" -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r $env:WINPYrequirements
 
+      - name: download wheelhouserequirements as hashed-requirements in $env:build_location\wheelhouse
+        shell: pwsh
+        run: |
+          $destwheelhouse="$env:build_location\wheelhouse"
+          if ($env:WINPYrequirementswhl -eq "") {
+              Write-Output "no Wheelhouse"
+          } else {
+          & "$env:build_location\python\python.exe" -m pip download --dest $destwheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
+          }
+
       - name: install requirements as hashed-requirements from dotpython\wheelhouse
         shell: pwsh
         run: |
@@ -138,7 +152,6 @@ jobs:
           & "$env:build_location\python\python.exe" -m wppm -md
           & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile -Encoding utf8 
 
-
           & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
           $destfile = "publish_dot\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').toml"
           & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=dotpython\wheelhouse -r dotpython\freeze.txt -o $destfile
@@ -150,8 +163,9 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.zip" 
-          Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
-
+          if ($env:WINPYZIP -eq "1") {
+              Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
+              }
       - name: 7z archive the result
         shell: pwsh
         run: |
@@ -159,8 +173,21 @@ jobs:
           $sourceDir = "$env:build_location"
     
           # Use 7z.exe from PATH, or specify full path if needed
+          if ($env:WINPY7Z -eq "1") {
           7z a $destfile7z $sourceDir
+            }
+
+      - name: 7z executable archive the result
+        shell: pwsh
+        run: |
+          $destfile7z = "publish_dot\WinPython-$env:WINPYARCHbit-$env:WINPYVER.exe"
+          $sourceDir = "$env:build_location"
     
+          # Use 7z.exe from PATH, or specify full path if needed
+          if ($env:WINPYEXE -eq "1") {
+          7z a -sfx $destfile7z $sourceDir
+            }
+
       - name: Upload WinPython folder as artifact
         uses: actions/upload-artifact@v4
         with:
