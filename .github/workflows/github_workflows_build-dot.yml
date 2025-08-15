@@ -30,8 +30,12 @@ jobs:
 
       - name: Download python-3 standalone
         shell: bash
+        env:
+          WINPYVERSION: ${{ env.WINPYVERSION }}
+          python_source: ${{ env.python_source }}
+          python_sha256: ${{ env.python_sha256 }}
         run: |
-          curl -L -o python-$WINPYVERSION-embed.tar.gz $python_source
+          curl.exe -L -o "python-$WINPYVERSION-embed.tar.gz $python_source
           # Calculate SHA256 hash
           actual_hash=$(sha256sum python-$WINPYVERSION-embed.tar.gz | cut -d' ' -f1)
 
@@ -45,6 +49,9 @@ jobs:
           fi
 
       - name: Extract python-$WINPYVERSION-embed.tar.gz to dotpython
+        shell: bash
+        env:
+          WINPYVERSION: ${{ env.WINPYVERSION }}
         run: |
           mkdir dotpython
           tar -xf python-$WINPYVERSION-embed.tar.gz -C dotpython
@@ -56,7 +63,7 @@ jobs:
 
       - name: Copy launchers_final files to dotpython
         # enriching things: dotpython can be used as the building python
-        #shell: pwsh
+        shell: bash
         run: |
           # would run with shell: bash
           cp -r winpython/portable/launchers_final/* dotpython/
