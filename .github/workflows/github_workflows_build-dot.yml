@@ -32,16 +32,16 @@ jobs:
       - name: see variables
         shell: pwsh
         run: |
-          echo $env:WINPYVERSION
-          echo $env:python_source
-          echo $env:python_sha256
+          Write-Output "WINPYVERSION is $env:WINPYVERSION" 
+          Write-Output "python_source is $env:python_source"
+          Write-Output "python_sha256 is $env:python_sha256"
 
       - name: Download python-3 standalone
         shell: pwsh
         run: |
-          curl.exe -L -o "python-$env:WINPYVERSION-embed.tar.gz" $env:python_source
+          curl.exe -L -o "python-3-embed.tar.gz" $env:python_source
           # Calculate SHA256 hash
-          $filePath = "python-$env:WINPYVERSION-embed.tar.gz"
+          $filePath = "python-3-embed.tar.gz"
           $expectedHash = $env:python_sha256
 
           $hashObject = Get-FileHash -Path $filePath -Algorithm SHA256
@@ -56,13 +56,13 @@ jobs:
               exit 1
           }
 
-      - name: Extract python-$WINPYVERSION-embed.tar.gz to dotpython
+      - name: Extract python-3-embed.tar.gz to dotpython
         shell: bash
         env:
           WINPYVERSION: ${{ env.WINPYVERSION }}
         run: |
           mkdir dotpython
-          tar -xf python-$WINPYVERSION-embed.tar.gz -C dotpython
+          tar -xf python-3-embed.tar.gz -C dotpython
     
       #- name: re-compress archive in zip for usual worflow
       #  shell: pwsh
