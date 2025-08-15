@@ -15,8 +15,8 @@ jobs:
         run: |
           echo "WINPYARCH=64" >> $GITHUB_ENV
           echo "WINPYVERSION=313" >> $GITHUB_ENV
-          echo "WINPYrequirements=winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt" >> $GITHUB_ENV
-          echo "WINPYrequirementswhl=winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3_wheels.txt" >> $GITHUB_ENV
+          echo "WINPYrequirements   =winpython\portable\cycle_2025_04\requir.64-3_13_5_1dotb3.txt" >> $GITHUB_ENV
+          echo "WINPYrequirementswhl=winpython\portable\cycle_2025_04\requir.64-3_13_5_1whlb3_wheels.txt" >> $GITHUB_ENV
           echo "WINPYZIP=0">> $GITHUB_ENV
           echo "WINPY7Z=1">> $GITHUB_ENV
           echo "WINPYEXE=0">> $GITHUB_ENV
@@ -128,7 +128,7 @@ jobs:
           if ($env:WINPYrequirementswhl -eq "") {
               Write-Output "no Wheelhouse"
           } else {
-          & "$env:build_location\python\python.exe" -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
+          & "$env:build_location\python\python.exe" -m pip download --dest $destwheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
           }
       - name: install requirements as hashed-requirements from dotpython\wheelhouse
         shell: pwsh
