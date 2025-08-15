@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: set variables
-        shell: pwsh
+        shell: bash
         run: |
           echo "build_location=WPy64-31360b3" >> $GITHUB_ENV
           echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
