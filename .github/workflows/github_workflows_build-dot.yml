@@ -35,7 +35,7 @@ jobs:
           python_source: ${{ env.python_source }}
           python_sha256: ${{ env.python_sha256 }}
         run: |
-          curl.exe -L -o "python-$WINPYVERSION-embed.tar.gz $python_source
+          curl.exe -L -o python-$WINPYVERSION-embed.tar.gz $python_source
           # Calculate SHA256 hash
           actual_hash=$(sha256sum python-$WINPYVERSION-embed.tar.gz | cut -d' ' -f1)
 
