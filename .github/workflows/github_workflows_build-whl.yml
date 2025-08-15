@@ -88,7 +88,9 @@ jobs:
           # would run with shell: pwsh
           #if (-not (Test-Path "dotpython")) { New-Item -ItemType Directory -Path "dotpython" | Out-Null }
           #Copy-Item -Path "winpython/portable/launchers_final/*" -Destination "dotpython/" -Recurse -Force
-      
+       
+          mkdir "dotpython\wheelhouse"
+          
       - name: List dotpython contents (for debugging)
         shell: pwsh
         run: |
@@ -124,6 +126,9 @@ jobs:
         run: |
           & "$env:build_location\python\python.exe" -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r $env:WINPYrequirements
 
+      - name: download wheelhouserequirements as hashed-requirements in $env:build_location\wheelhouse
+        shell: pwsh
+        run: |
           $destwheelhouse="$env:build_location\wheelhouse"
           if ($env:WINPYrequirementswhl -eq "") {
               Write-Output "no Wheelhouse"
