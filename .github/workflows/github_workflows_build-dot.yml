@@ -13,8 +13,8 @@ jobs:
       - name: set variables
         run: |
           echo "build_location=WPy64-31360b3" >> $GITHUB_ENV
-          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-          echo "python_sha256=09e489d2e7123cbd8111293e91af08efd203c9229c9e761ba3995bb263a6fa92"
+          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+          echo "python_sha256=09e489d2e7123cbd8111293e91af08efd203c9229c9e761ba3995bb263a6fa92" >> $GITHUB_ENV
 
           echo "WINPYINSTALLER=7zip.zip" >> $GITHUB_ENV
           echo "WINPYVERSION=313" >> $GITHUB_ENV
