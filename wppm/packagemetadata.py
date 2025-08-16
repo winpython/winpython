@@ -12,7 +12,8 @@ from typing import Dict, List, Optional, Tuple
 from . import utils
 import importlib.metadata
 import email
-from packaging.utils import canonicalize_name
+#from packaging.utils import canonicalize_name
+from utils import normalize as canonicalize_name
 # --- Abstract metadata accessor ---
 
 class PackageMetadata:
