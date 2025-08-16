@@ -133,11 +133,11 @@ def compare_package_indexes(version2, version1=None, searchdir=None, flavor="", 
     result = (
         f"## History of changes for WinPython-{architecture}bit {version2 + flavor}\r\n\r\n"
         f"The following changes were made to WinPython-{architecture}bit distribution since version {version1 + flavor1}.\n\n\n"
-        "<details>\n\n"
+        "\n"
     )
     for k in PackageIndex.HEADERS:
         result += compare_markdown_sections(md1, md2, k, k, version1, version2) + "\n"
-    return result+ "\n</details>\n\n* * *\n"
+    return result+ "\n\n* * *\n"
 
 def copy_changelogs(version, searchdir, flavor="", architecture=64, basedir=None):
     """Copy all changelogs for a major.minor version into basedir."""

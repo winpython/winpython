@@ -101,12 +101,10 @@ class Distribution:
 
 The following packages are included in WinPython-{my_arch}bit v{my_winpyver2 + my_flavor} {my_release_level}.
 
-<details>
 
 {self.render_markdown_for_list("Tools", tools_list)}
 {self.render_markdown_for_list("Python packages", package_list)}
 {self.render_markdown_for_list("WheelHouse packages", wheelhouse_list)}
-</details>
 """
 
     def find_package(self, name: str) -> Package | None:
