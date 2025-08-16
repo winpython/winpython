@@ -1,5 +1,4 @@
-name: build_wppm,
-
+name: build_wppm
 # 2025-08-16: from TornadoWeb simple example
 # object:
 # - learn the matrix method
@@ -11,22 +10,13 @@ name: build_wppm,
 # python -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req('pylock.wppmbuild.toml', r'requir.wppmbuild.txt')"
 # 
 on:
-  push:
-    #branches:
-    #  # Run on release branches. This gives us a chance to detect rot in this
-    #  # configuration before pushing a tag (which we'd rather not have to undo).
-    #  - "branch[0-9]*"
-    #tags:
-    #  # The main purpose of this workflow is to build wheels for release tags.
-    #  # It runs automatically on tags matching this pattern and pushes to pypi.
-    #  - "v*"
   workflow_dispatch:
     # Allow this workflow to be run manually (pushing to testpypi instead of pypi)
 permissions: {}
 
 env:
   python-version: '3.13'
-  WINPYrequirements=winpython/portable/cycle_2025_04/requir.wppmbuild.toml
+  WINPYrequirements: 'winpython/portable/cycle_2025_04/requir.wppmbuild.toml'
 
 jobs:
   build_wheels:
