@@ -106,11 +106,11 @@ jobs:
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
           # Add more WinPython-specific folders/files here if needed
 
-      - name: upgrade pip to get structure and icons launchers
+      - name: upgrade pip to get its mini-launcher, and patch the launchers to movable
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade pip
-
+          & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)
 
       - name: Write env.ini file
         shell: pwsh
@@ -149,6 +149,10 @@ jobs:
         shell: pwsh
         run: |
           mkdir publish_dot
+
+          # we need to ensure unicode here so wppm can output utf-8
+          $env:PYTHONUTF8 = 1
+          
           $destfile = "publish_dot\WinPython$env:WINPYFLAVOR-$env:WINPYARCHbit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md
           & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile -Encoding utf8 
