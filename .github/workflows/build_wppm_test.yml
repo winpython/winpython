@@ -69,7 +69,7 @@ jobs:
       - name: generate hashes wppm style
         shell: bash
         run: |
-          DESTFILE = "./wheelhouse/hashes.md" 
+          DESTFILE="./wheelhouse/hashes.md" 
           python -c "import sys;from winpython import hash; hash.print_hashes(sys.argv[1:])" wheelhouse/*.whl > $DESTFILE 
           
 
