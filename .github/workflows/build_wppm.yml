@@ -18,6 +18,7 @@ permissions: {}
 env:
   python-version: '3.13'
   WINPYrequirements: './winpython/portable/cycle_2025_04/requir.wppmbuild.txt'
+  PYTHONIOENCODING: utf-8
 
 jobs:
   build_wheels:
@@ -69,7 +70,7 @@ jobs:
       - name: generate hashes wppm style
         shell: bash
         run: |
-          DESTFILE = "./wheelhouse/hashes.md" 
+          DESTFILE="./wheelhouse/hashes.md" 
           python -c "import sys;from winpython import hash; hash.print_hashes(sys.argv[1:])" wheelhouse/*.whl > $DESTFILE 
           
 
