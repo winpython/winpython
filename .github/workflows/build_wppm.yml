@@ -1,8 +1,9 @@
 name: build_wppm
-# 2025-08-16: from TornadoWeb simple example
+# 2025-08-16: from TornadoWeb simple example, and full bash
 # object:
 # - learn the matrix method
 # - be compatible with cibuilds later
+# - copy the methods the most widly used
 #
 # using a predefined hashed wheel environnment: pylock.wppmbuild.toml
 # pip freeze>test.txt  
@@ -16,7 +17,7 @@ permissions: {}
 
 env:
   python-version: '3.13'
-  WINPYrequirements: 'winpython/portable/cycle_2025_04/requir.wppmbuild.toml'
+  WINPYrequirements: './winpython/portable/cycle_2025_04/requir.wppmbuild.toml'
 
 jobs:
   build_wheels:
@@ -38,9 +39,9 @@ jobs:
           python-version: ${{ env.python-version }}
 
       - name: Install dependencies to build
-        shell: pwsh
+        shell: bash
         run:  |
-          python -m pip install --no-deps --no-index --require-hashes -r $env:WINPYrequirements
+          python -m pip install --no-deps --no-index --require-hashes -r ${{ env.WINPYrequirements }}
 
       - name: Build sdist
         shell: bash
@@ -55,16 +56,16 @@ jobs:
           cp dist/*.whl wheelhouse
 
       - name: generate hashes wppm style
-        shell: pwsh
+        shell: bash
         run: |
-          $destfile = "wheelhouse\hashes.md" 
-          python -c "import sys;from winpython import hash; hash.print_hashes(sys.argv[1:])" wheelhouse\*.whl | | Out-File -FilePath $destfile -Encoding utf8 
+          DESTFILE = "./wheelhouse/hashes.md" 
+          python -c "import sys;from winpython import hash; hash.print_hashes(sys.argv[1:])" wheelhouse/*.whl > $DESTFILE 
           
 
       - name: List wheelhouse contents (for debugging)
-        shell: pwsh
+        shell: bash
         run: |
-          Get-ChildItem wheelhouse
+          ls -1 wheelhouse
           
       - uses: actions/upload-artifact@v4
         with:
