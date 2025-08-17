@@ -48,6 +48,10 @@ jobs:
       #  run:  |
       #    python -m pip install --no-deps --require-hashes -r $env.WINPYrequirements
 
+      - name: try diagnos flit problem
+        shell: bash
+        run:  |
+          git status
 
       - name: Build sdist
         shell: bash
