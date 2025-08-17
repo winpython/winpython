@@ -57,7 +57,7 @@ jobs:
       - name: Build sdist
         shell: bash
         run:  |
-          python -m flit build --format=wheel --verify-metadata --no-sdist --diff && ls -l dist
+          python -m flit build -V --diff && ls -l dist && ls -l dist
 
 
       - name: prepare result
