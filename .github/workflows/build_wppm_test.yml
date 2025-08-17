@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: |
           DESTFILE="./wheelhouse/hashes.md" 
-          python -c "import sys;from winpython import hash; hash.print_hashes(sys.argv[1:])" wheelhouse/*.whl > $DESTFILE 
+          python -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" wheelhouse/*.whl > $DESTFILE 
           
 
       - name: List wheelhouse contents (for debugging)
