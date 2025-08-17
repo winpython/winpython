@@ -1,3 +1,8 @@
+# Folders
+venv/
+.venv/
+.env
+
 # Compiled python files
 *.py[oc]
 
@@ -10,8 +15,10 @@
 .pydevproject
 .orig
 .DS_Store
+
 ^build/
-^dist/
+# ^dist/ is dead syntax
+/dist/
 ^bin/
 ^tools/gnuwin32/
 ^tools/TortoiseHg/
