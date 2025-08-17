@@ -71,4 +71,4 @@ jobs:
         with:
           name: artifacts-${{ matrix.os }}
           path: ./wheelhouse/*.*
-          #retention-days: 30  # keeps artifact for 30 days
+          retention-days: 3  # keeps artifact for 3 days
