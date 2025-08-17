@@ -1,4 +1,4 @@
-name: build_wppm_test_publish
+name: build_wppm_prod_publish
 # 2025-08-16: from TornadoWeb simple example, and full bash
 # object:
 # - learn the matrix method
