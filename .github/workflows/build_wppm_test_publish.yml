@@ -1,0 +1,104 @@
+name: build_wppm_test_publish
+# 2025-08-16: from TornadoWeb simple example, and full bash
+# object:
+# - learn the matrix method
+# - be compatible with cibuilds later
+# - copy the methods the most widly used
+#
+# using a predefined hashed wheel environnment: pylock.wppmbuild.toml
+# pip freeze>test.txt  
+# python -m pip lock --no-deps --find-links=C:\WinP\packages.srcreq -r test.txt -o pylock.wppmbuild.toml
+# python -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req('pylock.wppmbuild.toml', r'requir.wppmbuild.txt')"
+# 
+on:
+  workflow_dispatch:
+    # Allow this workflow to be run manually (pushing to testpypi instead of pypi)
+permissions: {}
+
+env:
+  python-version: '3.13'
+  WINPYrequirements: './winpython/portable/cycle_2025_04/requir.wppmbuild.txt'
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+  
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: ${{ env.python-version }}
+
+      - name: Install dependencies to build with bash
+        shell: bash
+        run:  |
+          python -m pip install --no-deps --require-hashes -r ${{ env.WINPYrequirements }}
+
+      #- name: Install dependencies to build with pwsh
+      #  shell: pwsh
+      #  run:  |
+      #    python -m pip install --no-deps --require-hashes -r $env.WINPYrequirements
+
+      - name: try diagnose flit problem
+        shell: bash
+        run:  |
+          git status
+          git status --ignored --untracked-files=all
+    
+      - name: Build sdist
+        shell: bash
+        run:  |
+          python -m flit build  && ls -l dist 
+
+
+      - name: prepare result
+        shell: bash
+        run: |
+          mkdir wheelhouse
+          cp dist/*.whl wheelhouse
+
+      - name: generate hashes wppm style
+        shell: bash
+        run: |
+          DESTFILE="./wheelhouse/hashes.md" 
+          python -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" wheelhouse/*.whl > $DESTFILE 
+          
+
+      - name: List wheelhouse contents (for debugging)
+        shell: bash
+        run: |
+          ls -1 wheelhouse
+          
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.os }}
+          path: ./wheelhouse/*.*
+          retention-days: 3  # keeps artifact for 3 days
+
+  upload_pypi_test:
+    name: Upload to PyPI (test)
+    needs: [build_wheels]
+    runs-on: windows-latest
+    permissions:
+      # This permission is required for pypi's "trusted publisher" feature
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: artifacts-*
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
