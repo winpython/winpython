@@ -43,22 +43,10 @@ jobs:
         run:  |
           python -m pip install --no-deps --require-hashes -r ${{ env.WINPYrequirements }}
 
-      #- name: Install dependencies to build with pwsh
-      #  shell: pwsh
-      #  run:  |
-      #    python -m pip install --no-deps --require-hashes -r $env.WINPYrequirements
-
-      - name: try diagnose flit problem
-        shell: bash
-        run:  |
-          git status
-          git status --ignored --untracked-files=all
-    
       - name: Build sdist
         shell: bash
         run:  |
           python -m flit build  && ls -l dist 
-
 
       - name: prepare result
         shell: bash
@@ -81,13 +69,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: artifacts-${{ matrix.os }}
-          path: ./wheelhouse/*.*
-          retention-days: 3  # keeps artifact for 3 days
+          path: ./dist/wppm*.whl
+          retention-days: 66  # keeps artifact for 66 days
 
   upload_pypi_test:
     name: Upload to PyPI (test)
     needs: [build_wheels]
-    runs-on: windows-latest
+    runs-on: ubuntu-24.04
     permissions:
       # This permission is required for pypi's "trusted publisher" feature
       id-token: write
