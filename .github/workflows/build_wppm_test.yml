@@ -1,4 +1,4 @@
-name: build_wppm
+name: build_wppm_test
 # 2025-08-16: from TornadoWeb simple example, and full bash
 # object:
 # - learn the matrix method
@@ -38,10 +38,19 @@ jobs:
         with:
           python-version: ${{ env.python-version }}
 
-      - name: Install dependencies to build
+      - name: Install dependencies to build with bash
         shell: bash
         run:  |
           python -m pip install --no-deps --no-index --require-hashes -r ${{ env.WINPYrequirements }}
+          # fails impossibly... ERROR: Could not find a version that satisfies the requirement build==1.2.2.post1 (from versions: none)
+          # maybe line ending ?
+
+      - name: Install dependencies to build with pwsh
+        shell: pwsh
+        run:  |
+          python -m pip install --no-deps --no-index --require-hashes -r $env.WINPYrequirements
+          # fails impossibly... ERROR: Could not find a version that satisfies the requirement build==1.2.2.post1 (from versions: none)
+          # maybe line ending ?
 
       - name: Build sdist
         shell: bash
