@@ -48,7 +48,7 @@ jobs:
       #  run:  |
       #    python -m pip install --no-deps --require-hashes -r $env.WINPYrequirements
 
-      - name: try diagnos flit problem
+      - name: try diagnose flit problem
         shell: bash
         run:  |
           git status
@@ -57,7 +57,7 @@ jobs:
       - name: Build sdist
         shell: bash
         run:  |
-          python -m flit build && ls -l dist
+          python -m flit build --format=wheel --verify-metadata --no-sdist --diff && ls -l dist
 
 
       - name: prepare result
