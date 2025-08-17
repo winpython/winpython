@@ -16,15 +16,15 @@ venv/
 .orig
 .DS_Store
 
-^build/
 # ^dist/ is dead syntax
 /dist/
-^bin/
-^tools/gnuwin32/
-^tools/TortoiseHg/
-^tools/WinMerge/
-^winpython.egg-info/
+
 MANIFEST
 Thumbs.db
 *~
 *.swp
+
+# Other build artifacts
+*.spec
+*.log
+htmlcov/
