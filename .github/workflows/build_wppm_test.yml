@@ -52,7 +52,8 @@ jobs:
         shell: bash
         run:  |
           git status
-
+          git status --ignored --untracked-files=all
+    
       - name: Build sdist
         shell: bash
         run:  |
