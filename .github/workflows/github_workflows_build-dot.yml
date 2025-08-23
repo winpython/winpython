@@ -160,7 +160,7 @@ jobs:
           # we need to ensure unicode here so wppm can output utf-8
           $env:PYTHONIOENCODING="utf-8"
 
-          $destfile = "publish_dot\WinPython$env:WINPYFLAVOR-$env:WINPYARCHbit-$env:WINPYVER2.md" 
+          $destfile = "publish_dot\WinPython$env:WINPYFLAVOR-$($env:WINPYARCH)bit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md
           & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile -Encoding utf8 
 
