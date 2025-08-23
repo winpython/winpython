@@ -156,7 +156,7 @@ jobs:
           # Ensure unicode for wppm output
           $env:PYTHONIOENCODING="utf-8"
 
-          $destfile_md = "publish_output\WinPython$env:WINPYFLAVOR-$env:WINPYARCHbit-$env:WINPYVER2.md" 
+          $destfile_md = "publish_output\WinPython$env:WINPYFLAVOR-$($env:WINPYARCH)bit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8 
 
           & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
@@ -189,19 +189,19 @@ jobs:
           $sourceDir = "$env:build_location"
           7z a -sfx $destfile7z $sourceDir
 
+      - name: generate hashes wppm style
+        shell: pwsh
+        run: |
+          $DESTFILE="./publish_output/hashes.md" 
+          Get-ChildItem -Path ".\publish_output\*.*"
+          # Get the list of files matching the pattern and pass them as arguments
+          $filesToHash = Get-ChildItem -Path ".\publish_output\*64*.*"
+          & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
+          gc $DESTFILE
+
       - name: Upload WinPython folder as artifact
         uses: actions/upload-artifact@v4
         with:
             name: ${{ matrix.flavor_config.ARTIFACT_NAME }}
             path: publish_output
             retention-days: 66  # keeps artifact for 66 days
-
-      - name: generate hashes wppm style
-        shell: pwsh
-        run: |
-          $DESTFILE="./publish_output/hashes.md" 
-          Get-ChildItem -Path ".\publish_output\*64*.*"
-          # Get the list of files matching the pattern and pass them as arguments
-          $filesToHash = Get-ChildItem -Path ".\publish_output\*64*.*"
-          & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
-          gc $DESTFILE
