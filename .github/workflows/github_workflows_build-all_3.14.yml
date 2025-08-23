@@ -197,8 +197,8 @@ jobs:
             retention-days: 66  # keeps artifact for 66 days
 
       - name: generate hashes wppm style
-        shell: bash
+        shell: pwsh
         run: |
           DESTFILE="./publish_output/hashes.md" 
-          python -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" publish_output/*64.* > $DESTFILE 
-          cat  $DESTFILE  
+          & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" publish_output\*64.* > $DESTFILE 
+          gc  $DESTFILE  
