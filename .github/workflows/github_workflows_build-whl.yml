@@ -20,6 +20,13 @@ jobs:
           echo "WINPYZIP=0">> $GITHUB_ENV
           echo "WINPY7Z=1">> $GITHUB_ENV
           echo "WINPYEXE=0">> $GITHUB_ENV
+          
+          #3.13.7 as the base for now (3.13.6 was skipped)
+          #echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.13.7+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz >> $GITHUB_ENV
+          #echo "python_sha256=d60173a7693c3134b8364814b80f98ddde0638e0e75e5b004f37452fccf67a33" >> $GITHUB_ENV
+          #echo "build_location=WPy64-31370b3" >> $GITHUB_ENV
+          #echo "WINPYVER=3.13.7.0dotcb3" >> $GITHUB_ENV
+          #echo "WINPYVER2=3.13.7.0" >> $GITHUB_ENV
 
           #3.13.6
           #echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250814/cpython-3.13.6+20250814-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
@@ -151,7 +158,7 @@ jobs:
           mkdir publish_dot
 
           # we need to ensure unicode here so wppm can output utf-8
-          $env:PYTHONIOENCODING = 1
+          $env:PYTHONIOENCODING="utf-8"
           
           $destfile = "publish_dot\WinPython$env:WINPYFLAVOR-$env:WINPYARCHbit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md
