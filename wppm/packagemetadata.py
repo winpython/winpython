@@ -13,7 +13,6 @@ from . import utils
 import importlib.metadata
 import email
 #from packaging.utils import canonicalize_name
-from utils import normalize as canonicalize_name
 # --- Abstract metadata accessor ---
 
 class PackageMetadata:
@@ -31,7 +30,7 @@ def get_installed_metadata(path = None) -> List[PackageMetadata]:
     pkgs = []
     distro = importlib.metadata.distributions(path = path) if path else importlib.metadata.distributions()
     for dist in distro:
-        name = canonicalize_name(dist.metadata['Name'])
+        name = utils.canonicalize_name(dist.metadata['Name'])
         version = dist.version
         summary = dist.metadata.get("Summary", ""),
         description = dist.metadata.get("Description", ""),
@@ -73,7 +72,7 @@ def extract_metadata_from_sdist(path: str) -> PackageMetadata:
 
 def parse_metadata_file(txt: str) -> PackageMetadata:
     meta = email.message_from_string(txt)
-    name = canonicalize_name(meta.get('Name', ''))
+    name = utils.canonicalize_name(meta.get('Name', ''))
     version = meta.get('Version', '')
     summary = meta.get('Summary', '')
     description = meta.get('Description', '')
