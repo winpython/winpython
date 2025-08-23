@@ -113,7 +113,7 @@ jobs:
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade pip
-          & "$env:build_location\python\python.exe" -m pip install --upgrade packaging==0.25.0
+          & "$env:build_location\python\python.exe" -m pip install --upgrade packaging==25.0
           & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution(r'$env:build_location');dist.patch_standard_packages('pip', to_movable=True)"
 
       - name: Write env.ini file
