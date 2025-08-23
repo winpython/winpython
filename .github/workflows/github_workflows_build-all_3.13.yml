@@ -51,7 +51,7 @@ jobs:
           
           #3.13.7 as the base for now (3.13.6 was skipped)
           # Gemini says: can update this section to dynamically select Python versions based on matrix if needed.
-          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.13.7+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz >> $GITHUB_ENV
+          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.13.7+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
           echo "python_sha256=d60173a7693c3134b8364814b80f98ddde0638e0e75e5b004f37452fccf67a33" >> $GITHUB_ENV
           echo "build_location=WPy64-31370b3" >> $GITHUB_ENV
           echo "WINPYVER=3.13.7.0${{ matrix.flavor_config.FLAVOR }}b3" >> $GITHUB_ENV
