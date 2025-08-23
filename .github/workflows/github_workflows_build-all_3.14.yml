@@ -199,6 +199,6 @@ jobs:
       - name: generate hashes wppm style
         shell: pwsh
         run: |
-          DESTFILE="./publish_output/hashes.md" 
+          $DESTFILE="./publish_output/hashes.md" 
           & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" publish_output\*64.* > $DESTFILE 
           gc  $DESTFILE  
