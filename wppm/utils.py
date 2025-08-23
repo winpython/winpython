@@ -303,6 +303,10 @@ def normalize(this):
     """Apply PEP 503 normalization to the string."""
     return re.sub(r"[-_.]+", "-", this).lower()
 
+def canonicalize_name(this):
+    """Apply PEP 503 normalization to the string."""
+    return re.sub(r"[-_.]+", "-", this).lower()
+
 def zip_directory(folder_path, output_zip_path):
     folder_path = Path(folder_path)
     output_zip_path = Path(output_zip_path)
