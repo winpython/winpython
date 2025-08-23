@@ -200,5 +200,7 @@ jobs:
         shell: pwsh
         run: |
           $DESTFILE="./publish_output/hashes.md" 
-          & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" .\publish_output\*64.* > $DESTFILE 
-          gc  $DESTFILE  
+          # Get the list of files matching the pattern and pass them as arguments
+          $filesToHash = Get-ChildItem -Path ".\publish_output\WinPython*64.*"
+          & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
+          gc $DESTFILE
