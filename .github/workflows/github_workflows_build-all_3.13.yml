@@ -1,0 +1,219 @@
+name: Build WinPython Distribution for 3.13
+# matrix allows to avoid duplicated code in github_workflows_build-dot, github_workflows_build-whl, github_workflows_build-slim
+# 2025-08-23a: merged code proposed per Gemini 2.5 flash, it corrected also PYTHONIOENCODING="utf-8" error
+# 2025-08-23b: moved manually to Python-3.13.7
+on:
+  workflow_dispatch:
+
+jobs:
+  build-winpython:
+    runs-on: windows-latest
+    
+    strategy:
+      fail-fast: true # Allows other matrix jobs to complete even if one fails
+      matrix:
+        # Define different WinPython build configurations
+        flavor_config:
+          # WinPython Dot configuration
+          - FLAVOR: "dotc"
+            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_5_1dotb3.txt"
+            REQUIREMENTS_WHL: ""
+            ZIP: "1"
+            SEVEN_Z: "0"
+            EXE: "1"
+            ARTIFACT_NAME: "publish_dotc"
+          # WinPython Slim configuration
+          - FLAVOR: "slimc"
+            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_5_1slimb3.txt"
+            REQUIREMENTS_WHL: ""
+            ZIP: "0"
+            SEVEN_Z: "1"
+            EXE: "1"
+            ARTIFACT_NAME: "publish_slimc"
+          # WinPython Whl configuration
+          - FLAVOR: "whlc"
+            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_5_1dotb3.txt" # Note: Original whl used dotb3 requirements, verify if this is intended
+            REQUIREMENTS_WHL: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_5_1whlb3_wheels.txt"
+            ZIP: "0"
+            SEVEN_Z: "1"
+            EXE: "0"
+            ARTIFACT_NAME: "publish_whlc"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set static variables and Python version
+        shell: bash
+        run: |
+          echo "WINPYARCH=64" >> $GITHUB_ENV
+          echo "WINPYVERSION=313" >> $GITHUB_ENV
+          
+          #3.13.7 as the base for now (3.13.6 was skipped)
+          # Gemini says: can update this section to dynamically select Python versions based on matrix if needed.
+          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.13.7+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz >> $GITHUB_ENV
+          echo "python_sha256=d60173a7693c3134b8364814b80f98ddde0638e0e75e5b004f37452fccf67a33" >> $GITHUB_ENV
+          echo "build_location=WPy64-31370b3" >> $GITHUB_ENV
+          echo "WINPYVER=3.13.7.0${{ matrix.flavor_config.FLAVOR }}b3" >> $GITHUB_ENV
+          echo "WINPYVER2=3.13.7.0" >> $GITHUB_ENV
+          
+          # Use Python 3.13.5 former base 
+          #echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250723/cpython-3.13.5+20250723-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+          #echo "python_sha256=4d88fdda4a59e0d6d45953c37c2fcb4e114dd5a2d41cb5b24b75b42ab8328ff8" >> $GITHUB_ENV
+          #echo "build_location=WPy64-31350b3" >> $GITHUB_ENV # This will be consistent across builds
+          #echo "WINPYVER=3.13.5.1${{ matrix.flavor_config.FLAVOR }}b3" >> $GITHUB_ENV
+          #echo "WINPYVER2=3.13.5.1" >> $GITHUB_ENV
+
+
+          # Set matrix-specific variables
+          echo "WINPYFLAVOR=${{ matrix.flavor_config.FLAVOR }}" >> $GITHUB_ENV
+          echo "WINPYrequirements=${{ matrix.flavor_config.REQUIREMENTS }}" >> $GITHUB_ENV
+          echo "WINPYrequirementswhl=${{ matrix.flavor_config.REQUIREMENTS_WHL }}" >> $GITHUB_ENV
+          echo "WINPYZIP=${{ matrix.flavor_config.ZIP }}" >> $GITHUB_ENV
+          echo "WINPY7Z=${{ matrix.flavor_config.SEVEN_Z }}" >> $GITHUB_ENV
+          echo "WINPYEXE=${{ matrix.flavor_config.EXE }}" >> $GITHUB_ENV
+
+      - name: See variables
+        shell: pwsh
+        run: |
+          Write-Output "WINPYVERSION is $env:WINPYVERSION" 
+          Write-Output "WINPYFLAVOR is $env:WINPYFLAVOR"  
+          Write-Output "python_source is $env:python_source"
+          Write-Output "python_sha256 is $env:python_sha256"
+          Write-Output "WINPYrequirements is $env:WINPYrequirements"
+          Write-Output "WINPYrequirementswhl is $env:WINPYrequirementswhl"
+          Write-Output "WINPYZIP is $env:WINPYZIP"
+          Write-Output "WINPY7Z is $env:WINPY7Z"
+          Write-Output "WINPYEXE is $env:WINPYEXE"
+          Write-Output "build_location is $env:build_location"
+          Write-Output "WINPYVER is $env:WINPYVER"
+          Write-Output "WINPYVER2 is $env:WINPYVER2"
+
+      - name: Download python-3 standalone
+        shell: pwsh
+        run: |
+          curl.exe -L -o "python-3-embed.tar.gz" $env:python_source
+          # Calculate SHA256 hash
+          $filePath = "python-3-embed.tar.gz"
+          $expectedHash = $env:python_sha256
+
+          $hashObject = Get-FileHash -Path $filePath -Algorithm SHA256
+          $actualHash = $hashObject.Hash.ToLower()
+
+          if ($actualHash -eq $expectedHash.ToLower()) {
+              Write-Output "Hash matches."
+          } else {
+              Write-Output "Hash does NOT match."
+              Write-Output "Actual: $actualHash"
+              Write-Output "Expected: $expectedHash"
+              exit 1
+          }
+
+      - name: Extract python-3-embed.tar.gz to dotpython
+        shell: bash
+        run: |
+          mkdir dotpython
+          tar -xf python-3-embed.tar.gz -C dotpython
+    
+      - name: Copy launchers_final files to dotpython
+        shell: bash
+        run: |
+          cp -r winpython/portable/launchers_final/* dotpython/
+          mkdir "dotpython\wheelhouse"
+
+      - name: List dotpython contents (for debugging)
+        shell: pwsh
+        run: |
+          Get-ChildItem dotpython
+
+      - name: Prepare WinPython target structure
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path $env:build_location
+          Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
+
+      - name: Upgrade pip and patch launchers
+        shell: pwsh
+        run: |
+          & "$env:build_location\python\python.exe" -m pip install --upgrade pip
+          & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution(r'$env:build_location');dist.patch_standard_packages('pip', to_movable=True)"
+
+      - name: Write env.ini file
+        shell: pwsh
+        run: |
+          $destDir = "$env:build_location\python\scripts"
+          echo "WINPYthon_exe=$env:WINPYthon_exe" > env.ini
+          echo "WINPYthon_subdirectory_name=$env:WINPYthon_subdirectory_name" >> env.ini
+          echo "WINPYVER=$env:WINPYVER" >> env.ini
+          echo "WINPYVER2=$env:WINPYVER2" >> env.ini
+          echo "WINPYFLAVOR=$env:WINPYFLAVOR" >> env.ini
+          echo "WINPYARCH=$env:WINPYARCH" >> env.ini
+          Copy-Item -Path "env.ini" -Destination "$destDir\env.ini"
+
+      - name: Download main requirements to wheelhouse
+        shell: pwsh
+        run: |
+          & "$env:build_location\python\python.exe" -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r $env:WINPYrequirements
+
+      - name: Download additional wheelhouse requirements
+        shell: pwsh
+        run: |
+          $destwheelhouse="$env:build_location\wheelhouse"
+          if ($env:WINPYrequirementswhl -eq "") {
+              Write-Output "No additional wheelhouse requirements."
+          } else {
+            & "$env:build_location\python\python.exe" -m pip download --dest $destwheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
+          }
+
+      - name: Install requirements
+        shell: pwsh
+        run: |
+          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=dotpython\wheelhouse --require-hashes -r $env:WINPYrequirements
+
+      - name: Generate Markdown content and pylock file
+        shell: pwsh
+        run: |
+          mkdir publish_output
+
+          # Ensure unicode for wppm output
+          $env:PYTHONIOENCODING="utf-8"
+
+          $destfile_md = "publish_output\WinPython$env:WINPYFLAVOR-$env:WINPYARCHbit-$env:WINPYVER2.md" 
+          & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8 
+
+          & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
+          $destfile_pylock = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').toml"
+          & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=dotpython\wheelhouse -r dotpython\freeze.txt -o $destfile_pylock
+
+          $outreq = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').txt"
+          & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylock', r'$outreq')"
+
+      - name: Zip the result
+        shell: pwsh
+        if: ${{ matrix.flavor_config.ZIP == '1' }}
+        run: |
+          $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip" 
+          Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
+
+      - name: 7z archive the result
+        shell: pwsh
+        if: ${{ matrix.flavor_config.SEVEN_Z == '1' }}
+        run: |
+          $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
+          $sourceDir = "$env:build_location"
+          7z a $destfile7z $sourceDir
+
+      - name: 7z executable archive the result
+        shell: pwsh
+        if: ${{ matrix.flavor_config.EXE == '1' }}
+        run: |
+          $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
+          $sourceDir = "$env:build_location"
+          7z a -sfx $destfile7z $sourceDir
+
+      - name: Upload WinPython folder as artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: ${{ matrix.flavor_config.ARTIFACT_NAME }}
+            path: publish_output
+            #retention-days: 30  # keeps artifact for 30 days
