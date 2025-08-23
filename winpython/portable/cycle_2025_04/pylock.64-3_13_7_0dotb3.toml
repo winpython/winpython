@@ -91,11 +91,11 @@ sha256 = "708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248"
 
 [[packages]]
 name = "wppm"
-version = "17.2.20250802b2"
+version = "17.2.20250823"
 
 [[packages.wheels]]
-name = "wppm-17.2.20250802b2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/80/7b/07a8203e29fea503b6012a075055fdbc57c4be95739e4a9b7d65ed8ef599/wppm-17.2.20250802b2-py3-none-any.whl"
+name = "wppm-17.2.20250823-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ae/a9/2581cc7f91354eada41367bf68b91b1b7fba6cb6fb469f500dbaf6191539/wppm-17.2.20250823-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "ed916dcefbc2d597a77cc74d459e8661c59584a690a7d4063d60976fb4d1499f"
+sha256 = "0945411b12eaf6da134a9d8662a4afb2b25e129dd34fc2f6ef76ee62d61411c3"
