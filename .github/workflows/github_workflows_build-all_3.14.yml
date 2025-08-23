@@ -38,9 +38,9 @@ jobs:
           # Gemini says: can update this section to dynamically select Python versions based on matrix if needed.
           echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
           echo "python_sha256=361a49531a5d4bdc72bbccc81f7b5881b5eb751e3b47683b233cacae5aeeaeed" >> $GITHUB_ENV
-          echo "build_location=WPy64-3140rc2" >> $GITHUB_ENV
-          echo "WINPYVER=3.14.0.0${{ matrix.flavor_config.FLAVOR }}b3" >> $GITHUB_ENV
-          echo "WINPYVER2=3.14.0.0" >> $GITHUB_ENV
+          echo "build_location=WPy64-31401rc2" >> $GITHUB_ENV
+          echo "WINPYVER=3.14.0.1${{ matrix.flavor_config.FLAVOR }}b3" >> $GITHUB_ENV
+          echo "WINPYVER2=3.14.0.1" >> $GITHUB_ENV
           
           # Set matrix-specific variables
           echo "WINPYFLAVOR=${{ matrix.flavor_config.FLAVOR }}" >> $GITHUB_ENV
@@ -194,4 +194,11 @@ jobs:
         with:
             name: ${{ matrix.flavor_config.ARTIFACT_NAME }}
             path: publish_output
-            #retention-days: 30  # keeps artifact for 30 days
+            retention-days: 66  # keeps artifact for 66 days
+
+      - name: generate hashes wppm style
+        shell: bash
+        run: |
+          DESTFILE="./publish_output/hashes.md" 
+          python -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" publish_output/*64.* > $DESTFILE 
+          cat  $DESTFILE  

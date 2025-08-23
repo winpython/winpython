@@ -117,7 +117,7 @@ jobs:
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade pip
-          & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution(r'%WINPYDIR%');dist.patch_standard_packages('pip', to_movable=True)"
+          & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
 
       - name: Write env.ini file
         shell: pwsh
