@@ -164,7 +164,7 @@ jobs:
           
           # Unzip the contents to the temporary directory
           Write-Host "Extracting archive to temporary directory"
-          Expand-Archive -Path $zipPath -DestinationPath $tempDir
+          Expand-Archive -Path $pandocZipPath -DestinationPath $tempDir
           
           # Create the final target directory
           Write-Host "Creating final target directory: $targetDir"
@@ -177,7 +177,7 @@ jobs:
           # Optional: Clean up temporary files
           Write-Host "Cleaning up temporary files..."
           Remove-Item -Path $tempDir -Recurse -Force
-          Remove-Item -Path $zipPath -Force
+          Remove-Item -Path $pandocZipPath -Force
           
           # Optional: Verify the contents
           Write-Host "Listing contents of $targetDir"
