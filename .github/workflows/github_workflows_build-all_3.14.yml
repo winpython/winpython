@@ -62,6 +62,10 @@ jobs:
           echo "WINPYZIP=${{ matrix.flavor_config.ZIP }}" >> $GITHUB_ENV
           echo "WINPY7Z=${{ matrix.flavor_config.SEVEN_Z }}" >> $GITHUB_ENV
           echo "WINPYEXE=${{ matrix.flavor_config.EXE }}" >> $GITHUB_ENV
+          
+          echo "python_sourcef==${{ matrix.flavor_config.python_sourcef }}" >> $GITHUB_ENV
+          echo "python_sha256f=${{ matrix.flavor_config.python_sha256f }}" >> $GITHUB_ENV
+
 
       - name: See variables
         shell: pwsh
