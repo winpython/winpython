@@ -23,6 +23,7 @@ jobs:
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
+            PANDOC: "0"
             ARTIFACT_NAME: "publish_314dotc"
             python_sourcef: "https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
             python_sha256f: "361a49531a5d4bdc72bbccc81f7b5881b5eb751e3b47683b233cacae5aeeaeed"
@@ -38,6 +39,7 @@ jobs:
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
+            PANDOC: "1"
             ARTIFACT_NAME: "publish_314freec"
             python_sourcef: "https://github.com/winpython/winpy.github.io/releases/download/20250825/cpython-3.14.0rc2+20250825-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
             python_sha256f: "dda491993214ae78948297848aa9d75d1d10762c33ff16487793ca5205516e4a"
@@ -61,7 +63,7 @@ jobs:
           echo "WINPYVER2=${{ matrix.flavor_config.WINPYVER2 }}" >> $GITHUB_ENV
           echo "my_release_level=${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
           echo "WINPYVER=${{ matrix.flavor_config.WINPYVER2 }}${{ matrix.flavor_config.FLAVOR }}${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
-          
+
           # Set matrix-specific variables
           echo "WINPYFLAVOR=${{ matrix.flavor_config.FLAVOR }}" >> $GITHUB_ENV
           echo "WINPYrequirements=${{ matrix.flavor_config.REQUIREMENTS }}" >> $GITHUB_ENV
@@ -73,6 +75,8 @@ jobs:
           echo "python_sourcef=${{ matrix.flavor_config.python_sourcef }}" >> $GITHUB_ENV
           echo "python_sha256f=${{ matrix.flavor_config.python_sha256f }}" >> $GITHUB_ENV
 
+          echo "pandoc_source=https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip" >> $GITHUB_ENV
+          echo "pandoc_sha256=f11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"  >> $GITHUB_ENV
 
       - name: See variables
         shell: pwsh
@@ -135,6 +139,31 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path $env:build_location
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
+
+      - name: Download and integrate pandoc binary
+        shell: pwsh
+        if: ${{ matrix.flavor_config.PANDOC == '1' }}
+        run: |
+          # Define the URL for the Pandoc binary and the target path
+          $pandocUrl = "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
+          $pandocZipPath = "pandoc.zip"
+          $targetDir = "$env:build_location\t"
+          
+          # Download the zip file
+          Write-Host "Downloading Pandoc from $pandocUrl"
+          curl.exe -L -o $pandocZipPath $pandocUrl
+          
+          # Create the target directory
+          Write-Host "Creating directory $targetDir"
+          mkdir $targetDir
+          
+          # Unzip the contents into the new directory
+          Write-Host "Extracting archive to $targetDir"
+          Expand-Archive -Path $pandocZipPath -DestinationPath $targetDir -Force
+          
+          # Optional: Verify the contents
+          Write-Host "Listing contents of $targetDir:"
+          Get-ChildItem -Path $targetDir
 
       - name: Upgrade pip and patch launchers
         shell: pwsh
