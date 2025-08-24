@@ -39,7 +39,7 @@ jobs:
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
-            PANDOC: "1"
+            PANDOC: "0"
             ARTIFACT_NAME: "publish_314freec"
             python_sourcef: "https://github.com/winpython/winpy.github.io/releases/download/20250825/cpython-3.14.0rc2+20250825-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
             python_sha256f: "dda491993214ae78948297848aa9d75d1d10762c33ff16487793ca5205516e4a"
