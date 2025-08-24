@@ -180,7 +180,7 @@ jobs:
           Remove-Item -Path $zipPath -Force
           
           # Optional: Verify the contents
-          Write-Host "Listing contents of $targetDir:"
+          Write-Host "Listing contents of $targetDir"
           Get-ChildItem -Path $targetDir
 
           # Calculate SHA256 hash
