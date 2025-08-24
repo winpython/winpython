@@ -3,6 +3,7 @@ name: Build WinPython Distribution for 3.14
 # 2025-08-23a: merged code proposed per Gemini 2.5 flash, it corrected also PYTHONIOENCODING="utf-8" error
 # 2025-08-23b: moved manually to Python-3.14.0rc2
 # 2025-08-25a: will use manual uploaded free-threading, as astral doesn't provide
+# 2025-08-25b: move up all parameters  
 on:
   workflow_dispatch:
 
@@ -17,25 +18,32 @@ jobs:
         flavor_config:
           # WinPython Dot configuration
           - FLAVOR: "dotc"
-            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_14_0_1dotrc2.txt"
+            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_14_0_1dotb3.txt"
             REQUIREMENTS_WHL: ""
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
-            ARTIFACT_NAME: "publish_dotc"
+            ARTIFACT_NAME: "publish_314dotc"
             python_sourcef: "https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
             python_sha256f: "361a49531a5d4bdc72bbccc81f7b5881b5eb751e3b47683b233cacae5aeeaeed"
+            WINPYARCH: "64"
+            WINPYVERSION: "314"
+            WINPYVER2: "3.14.0.1"
+            my_release_level: "b3"
+            build_location: "WPy64-31401b3"
 
           - FLAVOR: "freec"
-            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_14_0_1dotrc2.txt"
+            REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_14_0_1dotb3.txt"
             REQUIREMENTS_WHL: ""
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
-            ARTIFACT_NAME: "publish_freec"
+            ARTIFACT_NAME: "publish_314freec"
             python_sourcef: "https://github.com/winpython/winpy.github.io/releases/download/20250825/cpython-3.14.0rc2+20250825-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
             python_sha256f: "dda491993214ae78948297848aa9d75d1d10762c33ff16487793ca5205516e4a"
-
+            WINPYVER2: "3.14.0.1"
+            my_release_level: "b3"
+            build_location: "WPy64-31401b3"
 
     steps:
       - name: Checkout repository
@@ -44,16 +52,15 @@ jobs:
       - name: Set static variables and Python version
         shell: bash
         run: |
-          echo "WINPYARCH=64" >> $GITHUB_ENV
-          echo "WINPYVERSION=314" >> $GITHUB_ENV
-          
-          #3.14.0 as the base for now 
-          # Gemini says: can update this section to dynamically select Python versions based on matrix if needed.
-          echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-          echo "python_sha256=361a49531a5d4bdc72bbccc81f7b5881b5eb751e3b47683b233cacae5aeeaeed" >> $GITHUB_ENV
-          echo "build_location=WPy64-31401rc2" >> $GITHUB_ENV
-          echo "WINPYVER=3.14.0.1${{ matrix.flavor_config.FLAVOR }}b3" >> $GITHUB_ENV
-          echo "WINPYVER2=3.14.0.1" >> $GITHUB_ENV
+          # Set matrix-specific variables
+          echo "WINPYARCH=${{ matrix.flavor_config.WINPYARCH }}" >> $GITHUB_ENV
+          echo "WINPYVERSION=${{ matrix.flavor_config.WINPYVERSION }}" >> $GITHUB_ENV
+
+          echo "build_location=${{ matrix.flavor_config.build_location }}" >> $GITHUB_ENV
+
+          echo "WINPYVER2=${{ matrix.flavor_config.WINPYVER2 }}" >> $GITHUB_ENV
+          echo "my_release_level=${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
+          echo "WINPYVER=${{ matrix.flavor_config.WINPYVER2 }}${{ matrix.flavor_config.FLAVOR }}${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
           
           # Set matrix-specific variables
           echo "WINPYFLAVOR=${{ matrix.flavor_config.FLAVOR }}" >> $GITHUB_ENV
@@ -178,6 +185,8 @@ jobs:
 
           $destfile_md = "publish_output\WinPython$env:WINPYFLAVOR-$($env:WINPYARCH)bit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8 
+
+          gc $destfile_md
 
           & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
           $destfile_pylock = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').toml"
