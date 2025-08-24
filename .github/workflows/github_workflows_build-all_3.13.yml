@@ -21,7 +21,7 @@ jobs:
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
-            ARTIFACT_NAME: "publish_dotc"
+            ARTIFACT_NAME: "publish_313dotc"
           # WinPython Slim configuration
           - FLAVOR: "slimc"
             REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_7_0slimb3.txt"
@@ -29,7 +29,7 @@ jobs:
             ZIP: "0"
             SEVEN_Z: "1"
             EXE: "1"
-            ARTIFACT_NAME: "publish_slimc"
+            ARTIFACT_NAME: "publish_313slimc"
           # WinPython Whl configuration
           - FLAVOR: "whlc"
             REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_7_0dotb3.txt" # Note: Original whl used dotb3 requirements, verify if this is intended
@@ -37,7 +37,7 @@ jobs:
             ZIP: "0"
             SEVEN_Z: "1"
             EXE: "0"
-            ARTIFACT_NAME: "publish_whlc"
+            ARTIFACT_NAME: "publish_313whlc"
 
     steps:
       - name: Checkout repository
@@ -174,6 +174,8 @@ jobs:
           $destfile_md = "publish_output\WinPython$env:WINPYFLAVOR-$($env:WINPYARCH)bit-$env:WINPYVER2.md" 
           & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8 
 
+          gc $destfile_md
+
           & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
           $destfile_pylock = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').toml"
           & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=dotpython\wheelhouse -r dotpython\freeze.txt -o $destfile_pylock
@@ -213,10 +215,10 @@ jobs:
           $filesToHash = Get-ChildItem -Path ".\publish_output\*64*.*"
           & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
           gc $DESTFILE
-          
+
       - name: Upload WinPython folder as artifact
         uses: actions/upload-artifact@v4
         with:
             name: ${{ matrix.flavor_config.ARTIFACT_NAME }}
             path: publish_output
-            retention-days: 66  # keeps artifact for 30 days
+            retention-days: 66  # keeps artifact for 66 days
