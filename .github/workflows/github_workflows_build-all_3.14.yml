@@ -23,7 +23,7 @@ jobs:
             SEVEN_Z: "0"
             EXE: "1"
             ARTIFACT_NAME: "publish_dotc"
-            PYTHON_SOURCEF: "https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            PYTHON_SOURCEF: "https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
             PYTHON_SHA256F: "361a49531a5d4bdc72bbccc81f7b5881b5eb751e3b47683b233cacae5aeeaeed"
 
           - FLAVOR: "freec"
@@ -32,10 +32,9 @@ jobs:
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
-            ARTIFACT_NAME: "publish_dotc"
+            ARTIFACT_NAME: "publish_freec"
             PYTHON_SOURCEF: "https://github.com/winpython/winpy.github.io/releases/download/20250825/cpython-3.14.0rc2+20250825-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
             PYTHON_SHA256F: "dda491993214ae78948297848aa9d75d1d10762c33ff16487793ca5205516e4a"
-
 
 
     steps:
