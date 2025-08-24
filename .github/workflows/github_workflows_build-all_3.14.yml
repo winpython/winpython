@@ -147,23 +147,57 @@ jobs:
           # Define the URL for the Pandoc binary and the target path
           $pandocUrl = "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
           $pandocZipPath = "pandoc.zip"
+          $tempDir = "pandoc_temp"
           $targetDir = "$env:build_location\t"
           
           # Download the zip file
-          Write-Host "Downloading Pandoc from $pandocUrl"
-          curl.exe -L -o $pandocZipPath $pandocUrl
+          Write-Host "Downloading Pandoc from $env:pandoc_source"
+          curl.exe -L -o $pandocZipPath $env:pandoc_source
           
           # Create the target directory
           Write-Host "Creating directory $targetDir"
           mkdir $targetDir
           
-          # Unzip the contents into the new directory
-          Write-Host "Extracting archive to $targetDir"
-          Expand-Archive -Path $pandocZipPath -DestinationPath $targetDir -Force
+          # Create a temporary directory for extraction
+          Write-Host "Creating temporary directory for extraction"
+          New-Item -ItemType Directory -Path $tempDir
+          
+          # Unzip the contents to the temporary directory
+          Write-Host "Extracting archive to temporary directory"
+          Expand-Archive -Path $zipPath -DestinationPath $tempDir
+          
+          # Create the final target directory
+          Write-Host "Creating final target directory: $targetDir"
+          New-Item -ItemType Directory -Path $targetDir
+          
+          # Find and copy only the pandoc.exe file
+          Write-Host "Copying pandoc.exe to $targetDir"
+          Copy-Item -Path (Join-Path $tempDir "pandoc-3.1.9\pandoc.exe") -Destination $targetDir -Force         
+
+          # Optional: Clean up temporary files
+          Write-Host "Cleaning up temporary files..."
+          Remove-Item -Path $tempDir -Recurse -Force
+          Remove-Item -Path $zipPath -Force
           
           # Optional: Verify the contents
           Write-Host "Listing contents of $targetDir:"
           Get-ChildItem -Path $targetDir
+
+          # Calculate SHA256 hash
+          $filePath = $pandocZipPath
+          $expectedHash = $env:pandoc_sha256
+
+          $hashObject = Get-FileHash -Path $filePath -Algorithm SHA256
+          $actualHash = $hashObject.Hash.ToLower()
+
+          if ($actualHash -eq $expectedHash.ToLower()) {
+              Write-Output "Hash matches."
+          } else {
+              Write-Output "Hash does NOT match."
+              Write-Output "Actual: $actualHash"
+              Write-Output "Expected: $expectedHash"
+              exit 1
+          }
 
       - name: Upgrade pip and patch launchers
         shell: pwsh
