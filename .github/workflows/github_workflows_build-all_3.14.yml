@@ -23,7 +23,7 @@ jobs:
             SEVEN_Z: "0"
             EXE: "1"
             ARTIFACT_NAME: "publish_dotc"
-            PYTHON_SOURCEF: "https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            PYTHON_SOURCEF: "https://github.com/astral-sh/python-build-standalone/releases/download/20250818/cpython-3.14.0rc2+20250818-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
             PYTHON_SHA256F: "361a49531a5d4bdc72bbccc81f7b5881b5eb751e3b47683b233cacae5aeeaeed"
 
           - FLAVOR: "freec"
