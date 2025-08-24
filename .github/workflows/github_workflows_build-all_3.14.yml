@@ -160,7 +160,7 @@ jobs:
           
           # Create a temporary directory for extraction
           Write-Host "Creating temporary directory for extraction"
-          New-Item -ItemType Directory -Path $tempDir
+          mkdir -p $tempDir
           
           # Unzip the contents to the temporary directory
           Write-Host "Extracting archive to temporary directory"
@@ -168,7 +168,7 @@ jobs:
           
           # Create the final target directory
           Write-Host "Creating final target directory: $targetDir"
-          New-Item -ItemType Directory -Path $targetDir
+          mkdir -p $targetDir
           
           # Find and copy only the pandoc.exe file
           Write-Host "Copying pandoc.exe to $targetDir"
