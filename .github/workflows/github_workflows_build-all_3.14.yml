@@ -154,10 +154,6 @@ jobs:
           Write-Host "Downloading Pandoc from $env:pandoc_source"
           curl.exe -L -o $pandocZipPath $env:pandoc_source
           
-          # Create the target directory
-          Write-Host "Creating directory $targetDir"
-          mkdir $targetDir
-          
           # Create a temporary directory for extraction
           Write-Host "Creating temporary directory for extraction"
           mkdir -p $tempDir
@@ -168,7 +164,9 @@ jobs:
           
           # Create the final target directory
           Write-Host "Creating final target directory: $targetDir"
-          mkdir -p $targetDir
+          if (-not (Test-Path -Path $targetDir)) {
+              mkdir -p $targetDir
+          }
           
           # Find and copy only the pandoc.exe file
           Write-Host "Copying pandoc.exe to $targetDir"
