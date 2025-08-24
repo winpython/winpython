@@ -76,7 +76,7 @@ jobs:
           echo "python_sha256f=${{ matrix.flavor_config.python_sha256f }}" >> $GITHUB_ENV
 
           echo "pandoc_source=https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip" >> $GITHUB_ENV
-          echo "pandoc_sha256=f11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"  >> $GITHUB_ENV
+          echo "pandoc_sha256=11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"  >> $GITHUB_ENV
 
       - name: See variables
         shell: pwsh
