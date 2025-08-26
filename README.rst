@@ -21,10 +21,14 @@ It includes two main features:
 WinPython Package Manager (WPPM)
   a complementary tool to navigate provided packages, install packages from included Wheelhouse, or register WinPython. 
   pip is the recommanded way to add or remove packages otherwise
-			
-WinPython build toolchain
-  generate_a_winpython_distro.bat and make.py are the toolchain used to 
-  build a WinPython distribution from (almost) scratch.
+		
+WinPython build toolchain (historic)
+  generate_a_winpython_distropy_meta.bat with a toml file is the toolchain used to build a WinPython distribution from (almost) scratch.
+
+WinPython build toolchain via Github action (news of 2025-08-24)
+  fork the project and run github action like `github_workflows_build-all_3.14.yml` for python-3.14
+  you can modify the list of wheels with hash to your preference
+
 
 WinPython set of Wheel
   You can get also the equivalent of the WinPython distribution by using one of the provided pylock.toml
@@ -42,6 +46,8 @@ Requirements
 
 * installer can be 7-Zip or nothing (just .zip-it)
 
+* a basic github account allows you to build from your fork of this repository via github actions
+
 
 Wppm build 
 ----------
@@ -53,6 +59,8 @@ build WPPM using the following commands:
 
    python -m pip install flit
    python -m flit build
+
+wppm package is now build and published via github action `build_wppm_prod_publish.yml`
 
 Winpython Distribution wheels installation
 ------------------------------------------
