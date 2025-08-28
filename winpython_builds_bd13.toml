@@ -1,8 +1,8 @@
 [pythons]
 "311" = { python_target_release = "3119", release = "2", my_release_level = "b3" }
 "312" = { python_target_release = "31210", release = "2", my_release_level = "b3" }
-"313" = { python_target_release = "3137", release = "0", my_release_level = "b3" }
-"314" = { python_target_release = "3140", release = "1", my_release_level = "rc2" }
+"313" = { python_target_release = "3137", release = "0", my_release_level = "b4" }
+"314" = { python_target_release = "3140", release = "1", my_release_level = "b4" }
 
 
 [[builds]]

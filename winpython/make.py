@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+# make.py
 # WinPython build script
 # Copyright © 2012 Pierre Raybaut
 # Copyright © 2014-2025+ The Winpython development team https://github.com/winpython/

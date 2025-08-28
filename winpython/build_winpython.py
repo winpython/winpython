@@ -5,9 +5,7 @@ import logging
 from pathlib import Path
 from filecmp import cmp
 
-LOG_FORMAT = "%(asctime)s %(levelname)s: %(message)s"
-
-def setup_logging(log_file: Path):
+def setup_logging(log_file: Path, LOG_FORMAT="%(asctime)s %(levelname)s: %(message)s"):
     """Initialize logging to both file and stdout."""
     logging.basicConfig(
         level=logging.INFO,
@@ -18,10 +16,10 @@ def setup_logging(log_file: Path):
         ]
     )
 
-def log_section(message: str):
-    logging.info("\n" + "-"*40)
+def log_section(message: str, highlight_bar="-"*40):
+    logging.info("\n" + highlight_bar)
     logging.info(message)
-    logging.info("-"*40)
+    logging.info(highlight_bar)
 
 def delete_folder_if_exists(folder: Path, check_flavor: str = ""):
     check_last = folder.parent.name if not folder.is_dir() else folder.name
@@ -76,8 +74,8 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
     pip_req.write_bytes(b"".join(packages))
     # Lock to web and local (scaffolding)
     for kind in ("", "local"):
-        out = winpydirbase.parent / f"pylock.{file_postfix}_{kind}.toml"
-        outreq = winpydirbase.parent / f"requir.{file_postfix}_{kind}.txt"
+        out = winpydirbase.parent / f"pylock.{file_postfix}{kind}.toml"
+        outreq = winpydirbase.parent / f"requir.{file_postfix}{kind}.txt"
         cmd = [str(target_python), "-m", "pip", "lock", "--no-deps", "-c", constraints]
         if kind == "local":
             cmd += ["--find-links", find_links]
@@ -88,11 +86,11 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
         run_command(cmd)
     # check equality
     web, local = "", "local"
-    if not cmp(winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt"):
-       print("⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️differences in ", winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
+    if not cmp(winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt"):
+       print("⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️differences in ", winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
        raise os.error
     else:
-       print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}_{web}.txt", winpydirbase.parent / f"requir.{file_postfix}_{local}.txt")
+       print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
 
 # --- Main Logic ---
 def run_make_py(build_python, winpydirbase, args):
@@ -114,7 +112,7 @@ def process_wheelhouse_requirements(target_python: Path, winpydirbase: Path,args
     if wheelhousereq.is_file():
         # Generate pylock from wheelhousereq
         cmd = [
-            str(target_python), "-m", "pip", "lock", "--no-index", "--trusted-host=None",
+            str(target_python), "-m", "pip", "lock", "--no-index", "--trusted-host=None", "--pre", 
             "--find-links", args.find_links, "-c", args.constraints, "-r", str(wheelhousereq),
             "-o", str(out)
         ]
