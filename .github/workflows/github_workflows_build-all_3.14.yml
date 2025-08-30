@@ -61,6 +61,8 @@ jobs:
           echo "WINPYVERSION=${{ matrix.flavor_config.WINPYVERSION }}" >> $GITHUB_ENV
 
           echo "build_location=${{ matrix.flavor_config.build_location }}" >> $GITHUB_ENV
+          echo "dotwheelhouse=dotpython\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+          echo "destwheelhouse=${{ matrix.flavor_config.build_location }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
 
           echo "WINPYVER2=${{ matrix.flavor_config.WINPYVER2 }}" >> $GITHUB_ENV
           echo "my_release_level=${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
@@ -80,6 +82,7 @@ jobs:
           echo "pandoc_source=https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip" >> $GITHUB_ENV
           echo "pandoc_sha256=11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"  >> $GITHUB_ENV
 
+
       - name: See variables
         shell: pwsh
         run: |
@@ -95,6 +98,8 @@ jobs:
           Write-Output "WINPY7Z is $env:WINPY7Z"
           Write-Output "WINPYEXE is $env:WINPYEXE"
           Write-Output "build_location is $env:build_location"
+          Write-Output "dotwheelhouse is $env:dotwheelhouse"
+          Write-Output "destwheelhouse is $env:destwheelhouse"
           Write-Output "WINPYVER is $env:WINPYVER"
           Write-Output "WINPYVER2 is $env:WINPYVER2"
 
@@ -129,7 +134,7 @@ jobs:
         shell: bash
         run: |
           cp -r winpython/portable/launchers_final/* dotpython/
-          mkdir "dotpython\wheelhouse"
+          mkdir $env:dotwheelhouse
 
       - name: List dotpython contents (for debugging)
         shell: pwsh
@@ -219,25 +224,25 @@ jobs:
           echo "WINPYARCH=$env:WINPYARCH" >> env.ini
           Copy-Item -Path "env.ini" -Destination "$destDir\env.ini"
 
-      - name: Download main requirements to wheelhouse
+      - name: Download main requirements to $env:dotwheelhouse
         shell: pwsh
         run: |
-          & "$env:build_location\python\python.exe" -m pip download --dest dotpython\wheelhouse --no-deps --require-hashes -r $env:WINPYrequirements
+
+          & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYrequirements
 
       - name: Download additional wheelhouse requirements
         shell: pwsh
         run: |
-          $destwheelhouse="$env:build_location\wheelhouse"
           if ($env:WINPYrequirementswhl -eq "") {
               Write-Output "No additional wheelhouse requirements."
           } else {
-            & "$env:build_location\python\python.exe" -m pip download --dest $destwheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
+            & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
           }
 
       - name: Install requirements
         shell: pwsh
         run: |
-          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=dotpython\wheelhouse --require-hashes -r $env:WINPYrequirements
+          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYrequirements
 
       - name: Generate Markdown content and pylock file
         shell: pwsh
@@ -254,7 +259,7 @@ jobs:
 
           & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
           $destfile_pylock = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').toml"
-          & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=dotpython\wheelhouse -r dotpython\freeze.txt -o $destfile_pylock
+          & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=$env:dotwheelhouse -r dotpython\freeze.txt -o $destfile_pylock
 
           $outreq = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').txt"
           & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylock', r'$outreq')"
