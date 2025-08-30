@@ -79,8 +79,8 @@ jobs:
           echo "WINPYVERSION=${{ matrix.flavor_config.WINPYVERSION }}" >> $GITHUB_ENV
 
           echo "build_location=${{ matrix.flavor_config.build_location }}" >> $GITHUB_ENV
-          echo "dotwheelhouse="dotpython\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-          echo "destwheelhouse="${{ matrix.flavor_config.build_location }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+          echo "dotwheelhouse=dotpython\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+          echo "destwheelhouse=${{ matrix.flavor_config.build_location }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
 
           echo "WINPYVER2=${{ matrix.flavor_config.WINPYVER2 }}" >> $GITHUB_ENV
           echo "my_release_level=${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
