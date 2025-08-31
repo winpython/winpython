@@ -283,9 +283,10 @@ jobs:
           & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylock', r'$outreq')"
 
           if ($env:WINPYrequirementswhl -eq "") {
-          & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freezewheel.txt
+              Write-Output "No additional wheelhouse requirements."
+          } else {
           $destfile_pylockwheel = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_')_wheels.toml"
-          & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=$env:destwheelhouse -r dotpython\freezewheel.txt -o $destfile_pylockwheel
+          & "$env:build_location\python\python.exe" -m pip lock --no-deps --require-hashes -r $env:WINPYrequirementswhl -o $destfile_pylockwheel
 
           $outreqwheel = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_')_wheels.txt"
           & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylockwheel', r'$outreqwheel')"
