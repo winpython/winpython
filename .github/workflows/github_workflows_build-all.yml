@@ -99,7 +99,7 @@ jobs:
             REQUIREMENTS_313: ""
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_04\\requir.64-3_14_0_1dotb3.txt"
             REQUIREMENTS_WHL_313: ""
-            REQUIREMENTS_WHL_314: "WPy64-31401b4"
+            REQUIREMENTS_WHL_314: ""
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
