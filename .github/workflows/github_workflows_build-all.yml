@@ -6,8 +6,6 @@ name: Build WinPython Distribution for 3.13 and 3.14
 # 2025-08-25b: move up all parameters  
 # 2025-09-07: one single workflow to reduce code duplication 
 
-name: Build WinPython Distribution (3.13 & 3.14)
-
 on:
   workflow_dispatch:
     inputs:
