@@ -242,7 +242,7 @@ jobs:
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
 
       - name: Download and integrate pandoc binary
-        if: env.ARTIFACT_NAME != '' && ${{ matrix.flavor_config.PANDOC == '1' }}
+        if: env.ARTIFACT_NAME != '' && env.PANDOC == '1'
         shell: pwsh
         run: |
           # Define the URL for the Pandoc binary and the target path
