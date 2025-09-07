@@ -51,7 +51,7 @@ jobs:
             build_location: "WPy64-3170b4"
 
           # WinPython Whl configuration
-          - FLAVOR: "whlc"
+          - FLAVOR: "whl"
             REQUIREMENTS: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_7_0dotb4.txt" # Note: Original whl used dot requirements, verify if this is intended
             REQUIREMENTS_WHL: "winpython\\portable\\cycle_2025_04\\requir.64-3_13_7_0whlb4_wheels.txt"
             ZIP: "0"
