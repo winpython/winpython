@@ -378,14 +378,14 @@ jobs:
           }
 
       - name: Zip the result
-        if: env.ARTIFACT_NAME != '' && ${{ matrix.flavor_config.ZIP == '1' }}
+        if: env.ARTIFACT_NAME != '' && env.WINPYZIP == '1'
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip" 
           Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
 
       - name: 7z archive the result
-        if: env.ARTIFACT_NAME != '' && ${{ matrix.flavor_config.SEVEN_Z == '1' }}
+        if: env.ARTIFACT_NAME != '' && env.WINPY7Z == '1'
         shell: pwsh
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
@@ -393,7 +393,7 @@ jobs:
           7z a $destfile7z $sourceDir
 
       - name: 7z executable archive the result
-        if: env.ARTIFACT_NAME != '' && ${{ matrix.flavor_config.EXE == '1' }}
+        if: env.ARTIFACT_NAME != '' && env.WINPYEXE == '1'
         shell: pwsh
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
