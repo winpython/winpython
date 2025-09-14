@@ -153,7 +153,7 @@ def main():
     parser.add_argument('--release', default='', help='Release')
     parser.add_argument('--flavor', default='', help='Build flavor')
     parser.add_argument('--arch', default='64', help='Architecture')
-    parser.add_argument('--release-level', default='b1', help='Release level (e.g., b1, rc)')
+    parser.add_argument('--release-level', default='', help='Release level (e.g., b1, b2)')
     parser.add_argument('--winpydirbase', required=True, help='Path to put environment')
     parser.add_argument('--source_dirs', required=True, help='Path to directory with python zip')
     parser.add_argument('--tools_dirs', required=True, help='Path to directory with python zip')
@@ -182,7 +182,10 @@ def main():
     setup_logging(log_file)
 
     # Logs termination and version naming
-    z = Path(winpydirbase).name[(4+len(args.arch)):-len(args.release_level)]
+    if len(args.release_level) > 0:
+        z = Path(winpydirbase).name[(4+len(args.arch)):-len(args.release_level)]
+    else:
+        z = Path(winpydirbase).name[(4+len(args.arch)):]
     tada = f"{z[:1]}_{z[1:3]}_{z[3]}_{args.release}"
     winpyver2 = tada.replace('_', '.')
     file_postfix = f"{args.arch}-{tada}{args.flavor}{args.release_level}"
