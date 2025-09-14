@@ -1,8 +1,8 @@
 [pythons]
 "311" = { python_target_release = "3119", release = "2", my_release_level = "b3" }
 "312" = { python_target_release = "31210", release = "2", my_release_level = "b3" }
-"313" = { python_target_release = "3137", release = "0", my_release_level = "b4" }
-"314" = { python_target_release = "3140", release = "1", my_release_level = "b4" }
+"313" = { python_target_release = "3137", release = "0", my_release_level = "" }
+"314" = { python_target_release = "3140", release = "1", my_release_level = "" }
 
 
 [[builds]]
@@ -33,6 +33,42 @@ create_installer = "7zip.zip"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd314\\dot_requirements.txt"
+source_dirs = "C:\\Winp\\bd314\\packages.win-amd64t"
+find_links = "C:\\Winp\\packages.srcreq"
+toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
+install_options = "--no-index --pre --trusted-host=None"
+
+
+
+[[builds]]
+name = "slim"
+root_dir_for_builds = "C:\\Winp"
+python_target = "314"
+pyver = "3.14"
+flavor = "slim"
+arch = "64"
+create_installer = "None"
+preclear_build_directory = "Yes"
+mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
+requirements = "C:\\Winp\\bd314\\requirements_slim.txt"
+source_dirs = "C:\\Winp\\bd314\\packages.win-amd64t"
+find_links = "C:\\Winp\\packages.srcreq"
+toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
+install_options = "--no-index --pre --trusted-host=None"
+
+
+
+[[builds]]
+name = "slimf"
+root_dir_for_builds = "C:\\Winp"
+python_target = "314"
+pyver = "3.14"
+flavor = "slimf"
+arch = "64"
+create_installer = "None"
+preclear_build_directory = "Yes"
+mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
+requirements = "C:\\Winp\\bd314\\requirements_slimf.txt"
 source_dirs = "C:\\Winp\\bd314\\packages.win-amd64t"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
