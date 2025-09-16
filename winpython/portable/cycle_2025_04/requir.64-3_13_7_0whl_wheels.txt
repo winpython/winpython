@@ -134,8 +134,8 @@ cvxpy==1.7.1 \
     --hash=sha256:10c4757b858a9e903007bcd29f22cd1f9d6c1259a882f254235d15c867b63a37
 cycler==0.12.1 \
     --hash=sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30
-cython==3.1.3 \
-    --hash=sha256:00264cafcc451dcefc01eaf29ed5ec150fb73af21d4d21105d97e9d829a53e99
+cython==3.1.4 \
+    --hash=sha256:f2ee2bb77943044f301cec04d0b51d8e3810507c9c250d6cd079a3e2d6ba88f2
 cytoolz==1.0.1 \
     --hash=sha256:90e577e08d3a4308186d9e1ec06876d4756b1e8164b92971c69739ea17e15297
 dask==2025.7.0 \
@@ -170,8 +170,8 @@ docstring-to-markdown==0.17 \
     --hash=sha256:fd7d5094aa83943bf5f9e1a13701866b7c452eac19765380dead666e36d3711c
 docutils==0.21.2 \
     --hash=sha256:dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2
-duckdb==1.3.2 \
-    --hash=sha256:cd3d717bf9c49ef4b1016c2216517572258fa645c2923e91c5234053defa3fb5
+duckdb==1.4.0 \
+    --hash=sha256:07fcc612ea5f0fe6032b92bcc93693034eb00e7a23eb9146576911d5326af4f7
 entrypoints==0.4 \
     --hash=sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f
 et-xmlfile==2.0.0 \
@@ -286,8 +286,8 @@ imageio==2.37.0 \
     --hash=sha256:11efa15b87bc7871b61590326b2d635439acc321cf7f8ce996f812543ce10eed
 imagesize==1.4.1 \
     --hash=sha256:0d8d18d08f840c19d0ee7ca1fd82490fdc3729b7ac93f49870406ddde8ef8d8b
-imbalanced-learn==0.13.0 \
-    --hash=sha256:7eb5859f7827cb3babfa5789978c22fe36e56527d9c9768df2d864d98d9b40fe
+imbalanced-learn==0.14.0 \
+    --hash=sha256:8a8700c02ca185e113064815513f990fbf84eb4e7701f1d4e944ce67fb259a60
 importlib-metadata==8.7.0 \
     --hash=sha256:e5dd1551894c77868a30651cef00984d50e1002d06942a7101d34870c5f02afd
 inflection==0.5.1 \
@@ -512,8 +512,8 @@ pandocfilters==1.5.1 \
     --hash=sha256:93be382804a9cdb0a7267585f157e5d1731bbe5545a85b268d6f5fe6232de2bc
 papermill==2.6.0 \
     --hash=sha256:0f09da6ef709f3f14dde77cb1af052d05b14019189869affff374c9e612f2dd5
-parso==0.8.4 \
-    --hash=sha256:a418670a20291dacd2dddc80c377c5c3791378ee1e8d12bffc35420643d43f18
+parso==0.8.5 \
+    --hash=sha256:646204b5ee239c396d040b90f9e272e9a8017c630092bf59980beb62fd033887
 partd==1.4.2 \
     --hash=sha256:978e4ac767ec4ba5b86c6eaa52e5a2a3bc748a2ca839e8cc798f1cc6ce6efb0f
 pathspec==0.12.1 \
@@ -692,6 +692,8 @@ pyuca==1.2 \
     --hash=sha256:abaa12e1bd2c7c68ca8396ff8383bc0654a739cef3ae68fd7af58bf29af0a91e
 pyusb==1.3.1 \
     --hash=sha256:bf9b754557af4717fe80c2b07cc2b923a9151f5c08d17bdb5345dac09d6a0430
+pyvisa==1.15.0 \
+    --hash=sha256:e3ac8d9e863fbdbbe7e6d4d91401bceb7914d1c4a558a89b2cc755789f1e8309
 pywavelets==1.8.0 \
     --hash=sha256:4dbebcfd55ea8a85b7fc8802d411e75337170422abf6e96019d7e46c394e80e5
 pywin32==310 \
@@ -730,8 +732,8 @@ redis==5.2.1 \
     --hash=sha256:ee7e1056b9aea0f04c6c2ed59452947f34c4940ee025f5dd83e6a6418b6989e4
 referencing==0.36.2 \
     --hash=sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0
-regex==2024.11.6 \
-    --hash=sha256:2b3361af3198667e99927da8b84c1b010752fa4b1115ee30beaa332cabc3ef1a
+regex==2025.7.34 \
+    --hash=sha256:9d644de5520441e5f7e2db63aec2748948cc39ed4d7a87fd5db578ea4043d997
 reportlab==4.4.2 \
     --hash=sha256:58e11be387457928707c12153b7e41e52533a5da3f587b15ba8f8fd0805c6ee2
 requests==2.32.4 \
@@ -786,8 +788,6 @@ simpy==4.1.1 \
     --hash=sha256:7c5ae380240fd2238671160e4830956f8055830a8317edf5c05e495b3823cd88
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
-sklearn-compat==0.1.4 \
-    --hash=sha256:52b67b2e6cd3117f690fbfb5a522b633da6c6dd22da54f03b946f2ecc6b146eb
 skrub==0.6.1 \
     --hash=sha256:2badb4e84cdc64820f170135fab404883e282c94ddc7e6177015b3136e8855ca
 smmap==5.0.2 \
@@ -820,8 +820,8 @@ sphinxcontrib-qthelp==2.0.0 \
     --hash=sha256:b18a828cdba941ccd6ee8445dbe72ffa3ef8cbe7505d8cd1fa0d42d3f2d5f3eb
 sphinxcontrib-serializinghtml==2.0.0 \
     --hash=sha256:6e2cb0eef194e10c27ec0023bfeb25badbbb5868244cf5bc5bdc04e4464bf331
-spyder==6.0.7 \
-    --hash=sha256:b725569bb8ddc7b0aab73d747d85312dc0456978370cc0f9b1a101c0fe4f076b
+spyder==6.0.8 \
+    --hash=sha256:bf7778e5d8271eabee1bd2764735b22d233afe01a50aee95f0afdf4d789dba05
 spyder-kernels==3.0.5 \
     --hash=sha256:9cc808e0ec4426b9ba911128e221fa2234e6c8d6e08526132e90112ff9c2bb7c
 sqlalchemy==2.0.41 \

@@ -773,14 +773,14 @@ sha256 = "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
 
 [[packages]]
 name = "cython"
-version = "3.1.3"
+version = "3.1.4"
 
 [[packages.wheels]]
-name = "cython-3.1.3-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/74/09/100c0727d0fc8e4d7134c44c12b8c623e40f309401af56b7f6faf795c4bb/cython-3.1.3-cp313-cp313-win_amd64.whl"
+name = "cython-3.1.4-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/89/ef/f179b5a46185bc5550c07b328d687ee32251963a3a93e869b75fbf97181c/cython-3.1.4-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "00264cafcc451dcefc01eaf29ed5ec150fb73af21d4d21105d97e9d829a53e99"
+sha256 = "f2ee2bb77943044f301cec04d0b51d8e3810507c9c250d6cd079a3e2d6ba88f2"
 
 [[packages]]
 name = "cytoolz"
@@ -982,14 +982,14 @@ sha256 = "dafca5b9e384f0e419294eb4d2ff9fa826435bf15f15b7bd45723e8ad76811b2"
 
 [[packages]]
 name = "duckdb"
-version = "1.3.2"
+version = "1.4.0"
 
 [[packages.wheels]]
-name = "duckdb-1.3.2-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/51/c9/2fcd86ab7530a5b6caff42dbe516ce7a86277e12c499d1c1f5acd266ffb2/duckdb-1.3.2-cp313-cp313-win_amd64.whl"
+name = "duckdb-1.4.0-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/21/b2/98fb89ae81611855f35984e96f648d871f3967bb3f524b51d1372d052f0c/duckdb-1.4.0-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "cd3d717bf9c49ef4b1016c2216517572258fa645c2923e91c5234053defa3fb5"
+sha256 = "07fcc612ea5f0fe6032b92bcc93693034eb00e7a23eb9146576911d5326af4f7"
 
 [[packages]]
 name = "entrypoints"
@@ -1642,14 +1642,14 @@ sha256 = "0d8d18d08f840c19d0ee7ca1fd82490fdc3729b7ac93f49870406ddde8ef8d8b"
 
 [[packages]]
 name = "imbalanced-learn"
-version = "0.13.0"
+version = "0.14.0"
 
 [[packages.wheels]]
-name = "imbalanced_learn-0.13.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/9d/41/721fec82606242a2072ee909086ff918dfad7d0199a9dfd4928df9c72494/imbalanced_learn-0.13.0-py3-none-any.whl"
+name = "imbalanced_learn-0.14.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/65/60/103dc71019ec2fa987f42f9dbe88641a74edc57f8499fac8896955b66065/imbalanced_learn-0.14.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "7eb5859f7827cb3babfa5789978c22fe36e56527d9c9768df2d864d98d9b40fe"
+sha256 = "8a8700c02ca185e113064815513f990fbf84eb4e7701f1d4e944ce67fb259a60"
 
 [[packages]]
 name = "importlib-metadata"
@@ -2984,14 +2984,14 @@ sha256 = "e3a4ca7f3d7610615129a55dbde2e90eb67d11cef70936487b0a59717dba0bdc"
 
 [[packages]]
 name = "parso"
-version = "0.8.4"
+version = "0.8.5"
 
 [[packages.wheels]]
-name = "parso-0.8.4-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/c6/ac/dac4a63f978e4dcb3c6d3a78c4d8e0192a113d288502a1216950c41b1027/parso-0.8.4-py2.py3-none-any.whl"
+name = "parso-0.8.5-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/16/32/f8e3c85d1d5250232a5d3477a2a28cc291968ff175caeadaf3cc19ce0e4a/parso-0.8.5-py2.py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a418670a20291dacd2dddc80c377c5c3791378ee1e8d12bffc35420643d43f18"
+sha256 = "646204b5ee239c396d040b90f9e272e9a8017c630092bf59980beb62fd033887"
 
 [[packages]]
 name = "partd"
@@ -3973,6 +3973,17 @@ url = "https://files.pythonhosted.org/packages/28/b8/27e6312e86408a44fe16bd28ee1
 sha256 = "bf9b754557af4717fe80c2b07cc2b923a9151f5c08d17bdb5345dac09d6a0430"
 
 [[packages]]
+name = "pyvisa"
+version = "1.15.0"
+
+[[packages.wheels]]
+name = "pyvisa-1.15.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/a1/12/4979772f36acceb57664bde282fc7bd3e67f8d0ce85f2a521a05e90baaa5/pyvisa-1.15.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "e3ac8d9e863fbdbbe7e6d4d91401bceb7914d1c4a558a89b2cc755789f1e8309"
+
+[[packages]]
 name = "pyviz-comms"
 version = "3.0.4"
 
@@ -4194,14 +4205,14 @@ sha256 = "e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0"
 
 [[packages]]
 name = "regex"
-version = "2024.11.6"
+version = "2025.7.34"
 
 [[packages.wheels]]
-name = "regex-2024.11.6-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/45/94/bc295babb3062a731f52621cdc992d123111282e291abaf23faa413443ea/regex-2024.11.6-cp313-cp313-win_amd64.whl"
+name = "regex-2025.7.34-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/be/fa/917d64dd074682606a003cba33585c28138c77d848ef72fc77cbb1183849/regex-2025.7.34-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "2b3361af3198667e99927da8b84c1b010752fa4b1115ee30beaa332cabc3ef1a"
+sha256 = "9d644de5520441e5f7e2db63aec2748948cc39ed4d7a87fd5db578ea4043d997"
 
 [[packages]]
 name = "reportlab"
@@ -4501,17 +4512,6 @@ url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496a
 sha256 = "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
 
 [[packages]]
-name = "sklearn-compat"
-version = "0.1.4"
-
-[[packages.wheels]]
-name = "sklearn_compat-0.1.4-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/00/64/346871fcba54a80cab40179d1b2703a16ef685ad6c3ec6272a3fa03bc934/sklearn_compat-0.1.4-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "52b67b2e6cd3117f690fbfb5a522b633da6c6dd22da54f03b946f2ecc6b146eb"
-
-[[packages]]
 name = "skrub"
 version = "0.6.1"
 
@@ -4689,14 +4689,14 @@ sha256 = "6e2cb0eef194e10c27ec0023bfeb25badbbb5868244cf5bc5bdc04e4464bf331"
 
 [[packages]]
 name = "spyder"
-version = "6.0.7"
+version = "6.0.8"
 
 [[packages.wheels]]
-name = "spyder-6.0.7-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ee/c8/1568fa96351ddad878d42e7487d9637604c7f34030171acf810f47914d9d/spyder-6.0.7-py3-none-any.whl"
+name = "spyder-6.0.8-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/33/a4/c6d8b5d6793687dfddca051fafbb0632bee8c5dce6007c830841b97d4250/spyder-6.0.8-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "b725569bb8ddc7b0aab73d747d85312dc0456978370cc0f9b1a101c0fe4f076b"
+sha256 = "bf7778e5d8271eabee1bd2764735b22d233afe01a50aee95f0afdf4d789dba05"
 
 [[packages]]
 name = "spyder-kernels"
