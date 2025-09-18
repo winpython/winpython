@@ -392,8 +392,8 @@ langsmith==0.4.16 \
     --hash=sha256:9ba95ed09b057dfe227e882f5446e1824bfc9f2c89de542ee6f0f8d90ab953a7
 lazy-loader==0.4 \
     --hash=sha256:342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc
-llvmlite==0.45.0rc2 \
-    --hash=sha256:7a9ab05d1bd9f807e59b007da29d3c922f1fe5b7071773645ed867e1524ded58
+llvmlite==0.45.0 \
+    --hash=sha256:f68890ceb662e874933103e91e239389ff7275c4befba8e43ccd46ae3231b89e
 lmfit==1.3.3 \
     --hash=sha256:a9e9ec7d0d0ec962cc6c078ad1ec6c8311d3ac0e5f0947a00a91f5509dacc2b2
 locket==1.0.0 \
@@ -478,8 +478,8 @@ notebook==7.4.5 \
     --hash=sha256:351635461aca9dad08cf8946a4216f963e2760cc1bf7b1aaaecb23afc33ec046
 notebook-shim==0.2.4 \
     --hash=sha256:411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef
-numba==0.62.0rc2 \
-    --hash=sha256:b2beb701c28416804fcdb5d7c0a1b218621b966389435edcaef6402e22c84a5f
+numba==0.62.0 \
+    --hash=sha256:591a9c485904f219a129b0493f89d27de24286fb66dd5a577b11edc62fc78db4
 numpy==2.3.3 \
     --hash=sha256:f0dadeb302887f07431910f67a14d57209ed91130be0adea2f9793f1a4f817cf
 numpydoc==1.8.0 \

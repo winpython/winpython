@@ -2236,14 +2236,14 @@ sha256 = "6bcbc417b0ac14323382aef5c5192c0075bf8a9d6b41820a2b66371eac6b6d79"
 
 [[packages]]
 name = "llvmlite"
-version = "0.45.0rc2"
+version = "0.45.0"
 
 [[packages.wheels]]
-name = "llvmlite-0.45.0rc2-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/48/ed/5a3acc6b26c7e8eaad765371fe23527a2391bb45ad7213c2d37e5a92813d/llvmlite-0.45.0rc2-cp313-cp313-win_amd64.whl"
+name = "llvmlite-0.45.0-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/21/16/bac6a35ae77d6f881d2c6b54cbb2df2b07e030e1a66da8041359d09b0d87/llvmlite-0.45.0-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "7a9ab05d1bd9f807e59b007da29d3c922f1fe5b7071773645ed867e1524ded58"
+sha256 = "f68890ceb662e874933103e91e239389ff7275c4befba8e43ccd46ae3231b89e"
 
 [[packages]]
 name = "lmfit"
@@ -2775,14 +2775,14 @@ sha256 = "411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef"
 
 [[packages]]
 name = "numba"
-version = "0.62.0rc2"
+version = "0.62.0"
 
 [[packages.wheels]]
-name = "numba-0.62.0rc2-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/8c/86/b7b659da190bf8319cae0916a66373c265e0c0b937eafbc144f318628cb8/numba-0.62.0rc2-cp313-cp313-win_amd64.whl"
+name = "numba-0.62.0-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/98/a2/3a9eb747d77693054504540e9da0640c169dd97e3e268c1150bf55a22b97/numba-0.62.0-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "b2beb701c28416804fcdb5d7c0a1b218621b966389435edcaef6402e22c84a5f"
+sha256 = "591a9c485904f219a129b0493f89d27de24286fb66dd5a577b11edc62fc78db4"
 
 [[packages]]
 name = "numpy"
