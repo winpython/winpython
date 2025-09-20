@@ -137,6 +137,7 @@ jobs:
             echo "WINPYVERSION=${{ matrix.flavor.WINPYVERSION_313 }}" >> $GITHUB_ENV
             echo "WINPYVER2=${{ matrix.flavor.WINPYVER2_313 }}" >> $GITHUB_ENV
             echo "build_location=${{ matrix.flavor.build_location_313 }}" >> $GITHUB_ENV
+            echo "destwheelhouse=${{ matrix.flavor_config.build_location_313 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           else
             echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
             echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
@@ -146,6 +147,7 @@ jobs:
             echo "WINPYVERSION=${{ matrix.flavor.WINPYVERSION_314 }}" >> $GITHUB_ENV
             echo "WINPYVER2=${{ matrix.flavor.WINPYVER2_314 }}" >> $GITHUB_ENV
             echo "build_location=${{ matrix.flavor.build_location_314 }}" >> $GITHUB_ENV
+            echo "destwheelhouse=${{ matrix.flavor_config.build_location_314 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           fi
           echo "WINPYARCH=${{ matrix.flavor.WINPYARCH }}" >> $GITHUB_ENV
           echo "WINPYFLAVOR=$FLAVOR" >> $GITHUB_ENV
@@ -156,7 +158,6 @@ jobs:
           echo "my_release_level=${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
   
           echo "dotwheelhouse=dotpython\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-          echo "destwheelhouse=${{ matrix.flavor_config.build_location }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           echo "pandoc_source=https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip" >> $GITHUB_ENV
           echo "pandoc_sha256=11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"  >> $GITHUB_ENV
           echo "WINPYVER=${{ matrix.flavor_config.WINPYVER2 }}${{ matrix.flavor_config.FLAVOR }}${{ matrix.flavor_config.my_release_level }}" >> $GITHUB_ENV
