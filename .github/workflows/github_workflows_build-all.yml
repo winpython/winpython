@@ -418,5 +418,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.build_location }}
+          path: publish_output
           retention-days: 66  # keeps artifact for 66 days
