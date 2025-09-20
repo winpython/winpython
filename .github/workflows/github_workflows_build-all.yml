@@ -137,7 +137,7 @@ jobs:
             echo "WINPYVERSION=${{ matrix.flavor.WINPYVERSION_313 }}" >> $GITHUB_ENV
             echo "WINPYVER2=${{ matrix.flavor.WINPYVER2_313 }}" >> $GITHUB_ENV
             echo "build_location=${{ matrix.flavor.build_location_313 }}" >> $GITHUB_ENV
-            echo "destwheelhouse=${{ matrix.flavor_config.build_location_313 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+            echo "destwheelhouse=${{ matrix.flavor.build_location_313 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           else
             echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
             echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
@@ -147,7 +147,7 @@ jobs:
             echo "WINPYVERSION=${{ matrix.flavor.WINPYVERSION_314 }}" >> $GITHUB_ENV
             echo "WINPYVER2=${{ matrix.flavor.WINPYVER2_314 }}" >> $GITHUB_ENV
             echo "build_location=${{ matrix.flavor.build_location_314 }}" >> $GITHUB_ENV
-            echo "destwheelhouse=${{ matrix.flavor_config.build_location_314 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+            echo "destwheelhouse=${{ matrix.flavor.build_location_314 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           fi
           echo "WINPYARCH=${{ matrix.flavor.WINPYARCH }}" >> $GITHUB_ENV
           echo "WINPYFLAVOR=$FLAVOR" >> $GITHUB_ENV
