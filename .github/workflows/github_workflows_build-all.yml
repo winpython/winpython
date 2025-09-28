@@ -409,7 +409,7 @@ jobs:
     
           #7z a -sfx $destfile7z $sourceDir
           #7z a -t7z -sfx7z.sfx $destfile7z $sourceDir
-          7z a -t7z -sfx$SFXModulePath $destfile7z $sourceDir
+          7z a -t7z -sfx"$SFXModulePath" $destfile7z $sourceDir
 
       - name: generate hashes wppm style
         if: env.ARTIFACT_NAME != ''
