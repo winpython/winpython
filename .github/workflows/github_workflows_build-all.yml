@@ -400,7 +400,7 @@ jobs:
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $sourceDir = "$env:build_location"
-          7z a -sfx7z.sfx $destfile7z $sourceDir
+          7z a -sfx $destfile7z $sourceDir
 
       - name: generate hashes wppm style
         if: env.ARTIFACT_NAME != ''
