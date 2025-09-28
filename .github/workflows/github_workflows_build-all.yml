@@ -400,8 +400,15 @@ jobs:
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $sourceDir = "$env:build_location"
+
+          # Define the standard 7-Zip installation path (adjust if using a custom install)
+          $SevenZipDir = "C:\Program Files\7-Zip" 
+          # Use the full path to the SFX module
+          $SFXModulePath = "$SevenZipDir\7z.sfx"
+    
           #7z a -sfx $destfile7z $sourceDir
-          7z a -t7z -sfx7z.sfx $destfile7z $sourceDir
+          #7z a -t7z -sfx7z.sfx $destfile7z $sourceDir
+          7z a -t7z -sfx$SFXModulePath $destfile7z $sourceDir
 
       - name: generate hashes wppm style
         if: env.ARTIFACT_NAME != ''
