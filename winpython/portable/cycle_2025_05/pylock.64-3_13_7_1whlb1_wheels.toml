@@ -3039,14 +3039,25 @@ sha256 = "096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce"
 
 [[packages]]
 name = "polars"
-version = "1.33.1"
+version = "1.34.0"
 
 [[packages.wheels]]
-name = "polars-1.33.1-cp39-abi3-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/06/a6/dc535da476c93b2efac619e04ab81081e004e4b4553352cd10e0d33a015d/polars-1.33.1-cp39-abi3-win_amd64.whl"
+name = "polars-1.34.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/6b/80/1791ac226bb989bef30fe8fde752b2021b6ec5dfd6e880262596aedf4c05/polars-1.34.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c9781c704432a2276a185ee25898aa427f39a904fbe8fde4ae779596cdbd7a9e"
+sha256 = "40d2f357b4d9e447ad28bd2c9923e4318791a7c18eb68f31f1fbf11180f41391"
+
+[[packages]]
+name = "polars-runtime-32"
+version = "1.34.0"
+
+[[packages.wheels]]
+name = "polars_runtime_32-1.34.0-cp39-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e2/75/c30049d45ea1365151f86f650ed5354124ff3209f0abe588664c8eb13a31/polars_runtime_32-1.34.0-cp39-abi3-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "2501d6b29d9001ea5ea2fd9b598787e10ddf45d8c4a87c2bead75159e8a15711"
 
 [[packages]]
 name = "prettytable"
