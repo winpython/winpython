@@ -233,7 +233,7 @@ jobs:
       - name: Write env.ini file
         shell: pwsh
         run: |
-          $destDir = "$env:build_location\python\scripts"
+          $destDir = "$env:build_location\scripts"
           echo "WINPYthon_exe=$env:WINPYthon_exe" > env.ini
           echo "WINPYthon_subdirectory_name=$env:WINPYthon_subdirectory_name" >> env.ini
           echo "WINPYVER=$env:WINPYVER" >> env.ini
