@@ -241,6 +241,7 @@ jobs:
         shell: pwsh
         run: |
           Get-ChildItem dotpython
+          Get-ChildItem dotpython\python
 
       - name: Prepare WinPython target structure
         if: env.ARTIFACT_NAME != ''
