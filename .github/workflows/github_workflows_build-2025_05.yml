@@ -37,10 +37,10 @@ jobs:
             PANDOC: "0"
             ARTIFACT_NAME_313: "publish_313dot"
             ARTIFACT_NAME_314: "publish_314dot"
-            python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.13.7+20250902-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            python_sha256f_313: "ffd3dd92f60041db8a9c24a5d84b915ece8ad4202cfd401b46bafaa4c8dab324"
-            python_sourcef_314: "https://github.com/astral-sh/python-build-standalone/releases/download/20250918/cpython-3.14.0rc3+20250918-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            python_sha256f_314: "05e593a278c1b6d3c872d909e8031eaedf7bd8e7df9de2bfea857b7230f0b4c5"
+            python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20251007/cpython-3.13.8+20251007-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            python_sha256f_313: "470ca31c7debaacbb00904f697cf813cc4c033692c4b6119e385aaea69348466"
+            python_sourcef_314: "https://github.com/astral-sh/python-build-standalone/releases/download/20251007/cpython-3.14.0+20251007-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            python_sha256f_314: "42befa2b63b34948e74e2e10aed1b3dd85402e70244840fecde8a93acc1c3eff"
             WINPYARCH: "64"
             WINPYVERSION_313: "313"
             WINPYVERSION_314: "314"
@@ -60,8 +60,8 @@ jobs:
             PANDOC: "1"
             ARTIFACT_NAME_313: "publish_313slim"
             ARTIFACT_NAME_314: ""
-            python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.13.7+20250902-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            python_sha256f_313: "ffd3dd92f60041db8a9c24a5d84b915ece8ad4202cfd401b46bafaa4c8dab324"
+            python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20251007/cpython-3.13.8+20251007-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            python_sha256f_313: "470ca31c7debaacbb00904f697cf813cc4c033692c4b6119e385aaea69348466"
             python_sourcef_314: ""
             python_sha256f_314: ""
             WINPYARCH: "64"
@@ -83,8 +83,8 @@ jobs:
             PANDOC: "0"
             ARTIFACT_NAME_313: "publish_313whl"
             ARTIFACT_NAME_314: ""
-            python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20250902/cpython-3.13.7+20250902-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            python_sha256f_313: "ffd3dd92f60041db8a9c24a5d84b915ece8ad4202cfd401b46bafaa4c8dab324"
+            python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20251007/cpython-3.13.8+20251007-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            python_sha256f_313: "470ca31c7debaacbb00904f697cf813cc4c033692c4b6119e385aaea69348466"
             python_sourcef_314: ""
             python_sha256f_314: ""
             WINPYARCH: "64"
@@ -108,8 +108,8 @@ jobs:
             ARTIFACT_NAME_314: "publish_314free"
             python_sourcef_313: ""
             python_sha256f_313: ""
-            python_sourcef_314: "https://github.com/winpython/winpy.github.io/releases/download/20250918/cpython-3.14.0rc3+20250918-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
-            python_sha256f_314: "4cd678c30a3dfe4d21b017be2d7871797dc01cae023d4797ec0ada19f0bca346"
+            python_sourcef_314: "https://github.com/astral-sh/python-build-standalone/releases/download/20251007/cpython-3.14.0+20251007-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst"
+            python_sha256f_314: "7ce62b9445d6d8a8518963e43eb655f5b9f7d08d084d7efc7164b1212fe13d16"
             WINPYARCH: "64"
             WINPYVERSION_313: ""
             WINPYVERSION_314: "314"
@@ -220,8 +220,14 @@ jobs:
         if: env.ARTIFACT_NAME != ''
         shell: bash
         run: |
-          mkdir dotpython
-          tar -xf python-3-embed.tar.gz -C dotpython
+          mkdir -p dotpythonpre
+          mkdir -p dotpython/python
+          tar -xf python-3-embed.tar.gz -C dotpythonpre
+          if [ -d predotpython/python/install ]; then
+              mv predotpython/python/install/* dotpython/python/
+          elif [ -d predotpython/python ]; then
+              mv predotpython/python dotpython/
+          fi
     
       - name: Copy launchers_final files to dotpython
         if: env.ARTIFACT_NAME != ''
