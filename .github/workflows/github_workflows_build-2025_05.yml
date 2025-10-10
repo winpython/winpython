@@ -224,10 +224,10 @@ jobs:
           mkdir -p dotpython
           mkdir -p dotpython/python
           tar -xf python-3-embed.tar.gz -C dotpythonpre
-          if [ -d predotpython/python/install ]; then
-              mv predotpython/python/install/* dotpython/python/
-          elif [ -d predotpython/python ]; then
-              mv predotpython/python/* dotpython/python/
+          if [ -d dotpythonpre/python/install ]; then
+              mv dotpythonpre/python/install/* dotpython/python/
+          elif [ -d dotpythonpre/python ]; then
+              mv dotpythonpre/python/* dotpython/python/
           fi
     
       - name: Copy launchers_final files to dotpython
