@@ -333,14 +333,14 @@ sha256 = "771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea"
 
 [[packages]]
 name = "ipykernel"
-version = "6.30.1"
+version = "7.0.1"
 
 [[packages.wheels]]
-name = "ipykernel-6.30.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/fc/c7/b445faca8deb954fe536abebff4ece5b097b923de482b26e78448c89d1dd/ipykernel-6.30.1-py3-none-any.whl"
+name = "ipykernel-7.0.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/b8/f7/761037905ffdec673533bfa43af8d4c31c859c778dfc3bbb71899875ec18/ipykernel-7.0.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "aa6b9fb93dca949069d8b85b6c79b2518e32ac583ae9c7d37c51d119e18b3fb4"
+sha256 = "87182a8305e28954b6721087dec45b171712610111d494c17bb607befa1c4000"
 
 [[packages]]
 name = "ipython"
