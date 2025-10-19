@@ -391,22 +391,22 @@ name = "cython"
 version = "3.1.4"
 
 [[packages.wheels]]
-name = "cython-3.1.4-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/04/57/7af75a803d55610d570d7b7a0fdc2bfd82fae030c728089cc628562d67f9/cython-3.1.4-cp314-cp314-win_amd64.whl"
+name = "cython-3.1.4-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7c/24/f7351052cf9db771fe4f32fca47fd66e6d9b53d8613b17faf7d130a9d553/cython-3.1.4-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "acb99ddec62ba1ea5de0e0087760fa834ec42c94f0488065a4f1995584e8e94e"
+sha256 = "d194d95e4fa029a3f6c7d46bdd16d973808c7ea4797586911fdb67cb98b1a2c6"
 
 [[packages]]
 name = "debugpy"
 version = "1.8.17"
 
 [[packages.wheels]]
-name = "debugpy-1.8.17-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/b0/26/394276b71c7538445f29e792f589ab7379ae70fd26ff5577dfde71158e96/debugpy-1.8.17-cp314-cp314-win_amd64.whl"
+name = "debugpy-1.8.17-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/b0/d0/89247ec250369fc76db477720a26b2fce7ba079ff1380e4ab4529d2fe233/debugpy-1.8.17-py2.py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "893cba7bb0f55161de4365584b025f7064e1f88913551bcd23be3260b231429c"
+sha256 = "60c7dca6571efe660ccb7a9508d73ca14b8796c4ed484c2002abba714226cfef"
 
 [[packages]]
 name = "decorator"
@@ -2332,17 +2332,6 @@ url = "https://files.pythonhosted.org/packages/0b/2c/87f3254fd8ffd29e4c02732eee6
 
 [packages.wheels.hashes]
 sha256 = "708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248"
-
-[[packages]]
-name = "wppm"
-version = "17.2.20250823"
-
-[[packages.wheels]]
-name = "wppm-17.2.20250823-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ae/a9/2581cc7f91354eada41367bf68b91b1b7fba6cb6fb469f500dbaf6191539/wppm-17.2.20250823-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "0945411b12eaf6da134a9d8662a4afb2b25e129dd34fc2f6ef76ee62d61411c3"
 
 [[packages]]
 name = "wrapt"

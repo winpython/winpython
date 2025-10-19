@@ -58,8 +58,8 @@ httpx==0.28.1 \
     --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
 idna==3.11 \
     --hash=sha256:771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea
-ipykernel==6.30.1 \
-    --hash=sha256:aa6b9fb93dca949069d8b85b6c79b2518e32ac583ae9c7d37c51d119e18b3fb4
+ipykernel==7.0.1 \
+    --hash=sha256:87182a8305e28954b6721087dec45b171712610111d494c17bb607befa1c4000
 ipython==9.6.0 \
     --hash=sha256:5f77efafc886d2f023442479b8149e7d86547ad0a979e9da9f045d252f648196
 ipython-pygments-lexers==1.1.1 \
