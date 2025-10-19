@@ -937,6 +937,17 @@ url = "https://files.pythonhosted.org/packages/28/e0/a9a90416fce5c0be25742729c2e
 sha256 = "0763515d4df10edf6d06a3c19734e2566368980d21ebec439f33f9eb936c07b7"
 
 [[packages]]
+name = "llvmlite"
+version = "0.46.0b1"
+
+[[packages.wheels]]
+name = "llvmlite-0.46.0b1-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/2c/00/b709b8ce575f8d8c2b14dc2bad9d9650f7ec48f5732fcab196ba39b97904/llvmlite-0.46.0b1-cp314-cp314-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "44dbad743b6e41e413085e7b56b82272f51d4994ba36c3633c8b8eb632db6990"
+
+[[packages]]
 name = "lsprotocol"
 version = "2023.0.1"
 
@@ -1111,6 +1122,17 @@ url = "https://files.pythonhosted.org/packages/f9/33/bd5b9137445ea4b680023eb0469
 
 [packages.wheels.hashes]
 sha256 = "411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef"
+
+[[packages]]
+name = "numba"
+version = "0.63.0b1"
+
+[[packages.wheels]]
+name = "numba-0.63.0b1-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/7a/d1/0b0321717d71d24f326224128639c115bb7cdf8a1bb957472419dd2e42e4/numba-0.63.0b1-cp314-cp314-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "a54b9c32a4d4b652df57d539ecf1cd8e5f860b40655fd36b6f8d391e95a7ae41"
 
 [[packages]]
 name = "numpy"
