@@ -768,8 +768,8 @@ rich==14.1.0 \
     --hash=sha256:536f5f1785986d6dbdea3c75205c473f970777b4a0d6c6dd1b696aa05a3fa04f
 roman-numerals-py==3.1.0 \
     --hash=sha256:9da2ad2fb670bcf24e81070ceb3be72f6c11c440d73bd579fbeca1e9f330954c
-rope==1.13.0 \
-    --hash=sha256:b435a0c0971244fdcd8741676a9fae697ae614c20cc36003678a7782f25c0d6c
+rope==1.14.0 \
+    --hash=sha256:00a7ea8c0c376fc0b053b2f2f8ef3bfb8b50fecf1ebf3eb80e4f8bd7f1941918
 rpds-py==0.27.1 \
     --hash=sha256:f9025faafc62ed0b75a53e541895ca272815bec18abe2249ff6501c8f2e12b83
 rsa==4.9.1 \

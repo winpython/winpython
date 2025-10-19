@@ -168,6 +168,8 @@ keyring==25.6.0 \
     --hash=sha256:552a3f7af126ece7ed5c89753650eec89c7eaae8617d0aa4d9ad2b75111266bd
 kiwisolver==1.4.9 \
     --hash=sha256:0763515d4df10edf6d06a3c19734e2566368980d21ebec439f33f9eb936c07b7
+llvmlite==0.46.0b1 \
+    --hash=sha256:44dbad743b6e41e413085e7b56b82272f51d4994ba36c3633c8b8eb632db6990
 lsprotocol==2023.0.1 \
     --hash=sha256:c75223c9e4af2f24272b14c6375787438279369236cd568f596d4951052a60f2
 markdown-it-py==4.0.0 \
@@ -200,6 +202,8 @@ nest-asyncio==1.6.0 \
     --hash=sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c
 notebook-shim==0.2.4 \
     --hash=sha256:411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef
+numba==0.63.0b1 \
+    --hash=sha256:a54b9c32a4d4b652df57d539ecf1cd8e5f860b40655fd36b6f8d391e95a7ae41
 numpy==2.3.3 \
     --hash=sha256:691808c2b26b0f002a032c73255d0bd89751425f379f7bcd22d140db593a96e8
 numpydoc==1.8.0 \
@@ -322,8 +326,8 @@ rich==14.1.0 \
     --hash=sha256:536f5f1785986d6dbdea3c75205c473f970777b4a0d6c6dd1b696aa05a3fa04f
 roman-numerals-py==3.1.0 \
     --hash=sha256:9da2ad2fb670bcf24e81070ceb3be72f6c11c440d73bd579fbeca1e9f330954c
-rope==1.13.0 \
-    --hash=sha256:b435a0c0971244fdcd8741676a9fae697ae614c20cc36003678a7782f25c0d6c
+rope==1.14.0 \
+    --hash=sha256:00a7ea8c0c376fc0b053b2f2f8ef3bfb8b50fecf1ebf3eb80e4f8bd7f1941918
 rpds-py==0.27.1 \
     --hash=sha256:a6e57b0abfe7cc513450fcf529eb486b6e4d3f8aee83e92eb5f1ef848218d456
 rtree==1.4.0 \
