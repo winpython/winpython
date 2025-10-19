@@ -59,7 +59,7 @@ jobs:
             EXE: "1"
             PANDOC: "1"
             ARTIFACT_NAME_313: "publish_313slim"
-            ARTIFACT_NAME_314: ""
+            ARTIFACT_NAME_314: "publish_314slim"
             python_sourcef_313: "https://github.com/astral-sh/python-build-standalone/releases/download/20251014/cpython-3.13.9+20251014-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
             python_sha256f_313: "76e0a9749c4deeb975a4b6b36d54be4e43f0c2a4c654bedab5d2e4d62dbc3006"
             python_sourcef_314: "https://github.com/astral-sh/python-build-standalone/releases/download/20251014/cpython-3.14.0+20251014-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
