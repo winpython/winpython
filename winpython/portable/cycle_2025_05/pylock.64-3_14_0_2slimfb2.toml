@@ -652,14 +652,14 @@ sha256 = "411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef"
 
 [[packages]]
 name = "numpy"
-version = "2.3.2"
+version = "2.3.3"
 
 [[packages.wheels]]
-name = "numpy-2.3.2-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/eb/46/3dbaf0ae7c17cdc46b9f662c56da2054887b8d9e737c1476f335c83d33db/numpy-2.3.2-cp314-cp314t-win_amd64.whl"
+name = "numpy-2.3.3-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/47/c7/b0f6b5b67f6788a0725f744496badbb604d226bf233ba716683ebb47b570/numpy-2.3.3-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "087ffc25890d89a43536f75c5fe8770922008758e8eeeef61733957041ed2f9b"
+sha256 = "b37a0b2e5935409daebe82c1e42274d30d9dd355852529eab91dab8dcca7419f"
 
 [[packages]]
 name = "packaging"
@@ -707,14 +707,14 @@ sha256 = "905b0365b210c73afb0ebe9101a32572152dfd1c144c7e28968a331b9217b94a"
 
 [[packages]]
 name = "platformdirs"
-version = "4.3.7"
+version = "4.5.0"
 
 [[packages.wheels]]
-name = "platformdirs-4.3.7-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/6d/45/59578566b3275b8fd9157885918fcd0c4d74162928a5310926887b856a51/platformdirs-4.3.7-py3-none-any.whl"
+name = "platformdirs-4.5.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/73/cb/ac7874b3e5d58441674fb70742e6c374b28b0c7cb988d37d991cde47166c/platformdirs-4.5.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a03875334331946f13c549dbd8f4bac7a13a50a895a0eb1e8c6a8ace80d40a94"
+sha256 = "e578a81bb873cbb89a41fcc904c7ef523cc18284b7e3b3ccf06aca1403b7ebd3"
 
 [[packages]]
 name = "prometheus-client"
@@ -740,14 +740,14 @@ sha256 = "9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955"
 
 [[packages]]
 name = "psutil"
-version = "7.1.0"
+version = "7.1.1"
 
 [packages.sdist]
-name = "psutil-7.1.0.tar.gz"
-url = "https://files.pythonhosted.org/packages/b3/31/4723d756b59344b643542936e37a31d1d3204bcdc42a7daa8ee9eb06fb50/psutil-7.1.0.tar.gz"
+name = "psutil-7.1.1.tar.gz"
+url = "https://files.pythonhosted.org/packages/89/fc/889242351a932d6183eec5df1fc6539b6f36b6a88444f1e63f18668253aa/psutil-7.1.1.tar.gz"
 
 [packages.sdist.hashes]
-sha256 = "655708b3c069387c8b77b072fc429a57d0e214221d01c0a772df7dfedcb3bcd2"
+sha256 = "092b6350145007389c1cfe5716050f02030a05219d90057ea867d18fe8d372fc"
 
 [[packages]]
 name = "pure-eval"
@@ -762,14 +762,14 @@ sha256 = "1db8e35b67b3d218d818ae653e27f06c3aa420901fa7b081ca98cbedc874e0d0"
 
 [[packages]]
 name = "pycparser"
-version = "2.22"
+version = "2.23"
 
 [[packages.wheels]]
-name = "pycparser-2.22-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/13/a3/a812df4e2dd5696d1f351d58b8fe16a405b234ad2886a0dab9183fb78109/pycparser-2.22-py3-none-any.whl"
+name = "pycparser-2.23-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/a0/e3/59cd50310fc9b59512193629e1984c1f95e5c8ae6e5d8c69532ccc65a7fe/pycparser-2.23-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"
+sha256 = "e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934"
 
 [[packages]]
 name = "pygments"

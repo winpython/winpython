@@ -1675,14 +1675,14 @@ sha256 = "55962bd71bb8b51a58ea3986139e8d517e4d7afc0722f86829f549a9e5c979b6"
 
 [[packages]]
 name = "ipykernel"
-version = "6.30.1"
+version = "6.31.0"
 
 [[packages.wheels]]
-name = "ipykernel-6.30.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/fc/c7/b445faca8deb954fe536abebff4ece5b097b923de482b26e78448c89d1dd/ipykernel-6.30.1-py3-none-any.whl"
+name = "ipykernel-6.31.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/f6/d8/502954a4ec0efcf264f99b65b41c3c54e65a647d9f0d6f62cd02227d242c/ipykernel-6.31.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "aa6b9fb93dca949069d8b85b6c79b2518e32ac583ae9c7d37c51d119e18b3fb4"
+sha256 = "abe5386f6ced727a70e0eb0cf1da801fa7c5fa6ff82147747d5a0406cd8c94af"
 
 [[packages]]
 name = "ipyleaflet"
@@ -2984,14 +2984,14 @@ sha256 = "74889622db9d7fb9acd45aacdfec42baa29e0d3ebc806d4315812bacdf44e9e1"
 
 [[packages]]
 name = "platformdirs"
-version = "4.3.7"
+version = "4.5.0"
 
 [[packages.wheels]]
-name = "platformdirs-4.3.7-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/6d/45/59578566b3275b8fd9157885918fcd0c4d74162928a5310926887b856a51/platformdirs-4.3.7-py3-none-any.whl"
+name = "platformdirs-4.5.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/73/cb/ac7874b3e5d58441674fb70742e6c374b28b0c7cb988d37d991cde47166c/platformdirs-4.5.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a03875334331946f13c549dbd8f4bac7a13a50a895a0eb1e8c6a8ace80d40a94"
+sha256 = "e578a81bb873cbb89a41fcc904c7ef523cc18284b7e3b3ccf06aca1403b7ebd3"
 
 [[packages]]
 name = "plotly"
@@ -3149,14 +3149,14 @@ sha256 = "426f59d2964864a1a366254fa703b8632dcec0790d8862d30034d8245e1cd447"
 
 [[packages]]
 name = "psutil"
-version = "7.1.0"
+version = "7.1.1"
 
 [[packages.wheels]]
-name = "psutil-7.1.0-cp37-abi3-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/bf/e9/b44c4f697276a7a95b8e94d0e320a7bf7f3318521b23de69035540b39838/psutil-7.1.0-cp37-abi3-win_amd64.whl"
+name = "psutil-7.1.1-cp37-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/be/f3/11fd213fff15427bc2853552138760c720fd65032d99edfb161910d04127/psutil-7.1.1-cp37-abi3-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "57f5e987c36d3146c0dd2528cd42151cf96cd359b9d67cfff836995cc5df9a3d"
+sha256 = "9b4f17c5f65e44f69bd3a3406071a47b79df45cf2236d1f717970afcb526bcd3"
 
 [[packages]]
 name = "psycopg2"
@@ -3270,14 +3270,14 @@ sha256 = "949a39f6b86c3e1515ba1787c2022131d165a8ad271b11370a8819aa070269e4"
 
 [[packages]]
 name = "pycparser"
-version = "2.22"
+version = "2.23"
 
 [[packages.wheels]]
-name = "pycparser-2.22-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/13/a3/a812df4e2dd5696d1f351d58b8fe16a405b234ad2886a0dab9183fb78109/pycparser-2.22-py3-none-any.whl"
+name = "pycparser-2.23-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/a0/e3/59cd50310fc9b59512193629e1984c1f95e5c8ae6e5d8c69532ccc65a7fe/pycparser-2.23-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"
+sha256 = "e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934"
 
 [[packages]]
 name = "pydantic"

@@ -312,8 +312,8 @@ invoke==2.2.0 \
     --hash=sha256:6ea924cc53d4f78e3d98bc436b08069a03077e6f85ad1ddaa8a116d7dad15820
 ipycanvas==0.14.1 \
     --hash=sha256:55962bd71bb8b51a58ea3986139e8d517e4d7afc0722f86829f549a9e5c979b6
-ipykernel==6.30.1 \
-    --hash=sha256:aa6b9fb93dca949069d8b85b6c79b2518e32ac583ae9c7d37c51d119e18b3fb4
+ipykernel==6.31.0 \
+    --hash=sha256:abe5386f6ced727a70e0eb0cf1da801fa7c5fa6ff82147747d5a0406cd8c94af
 ipyleaflet==0.20.0 \
     --hash=sha256:b4c20ddc0b17d68e226cd3367ca2215a4db7e2b14374468c0eeaa54b53e4d173
 ipympl==0.9.8 \
@@ -566,8 +566,8 @@ pillow==11.3.0 \
     --hash=sha256:0bce5c4fd0921f99d2e858dc4d4d64193407e1b99478bc5cacecba2311abde51
 pipdeptree==2.29.0 \
     --hash=sha256:74889622db9d7fb9acd45aacdfec42baa29e0d3ebc806d4315812bacdf44e9e1
-platformdirs==4.3.7 \
-    --hash=sha256:a03875334331946f13c549dbd8f4bac7a13a50a895a0eb1e8c6a8ace80d40a94
+platformdirs==4.5.0 \
+    --hash=sha256:e578a81bb873cbb89a41fcc904c7ef523cc18284b7e3b3ccf06aca1403b7ebd3
 plotly==6.3.0 \
     --hash=sha256:7ad806edce9d3cdd882eaebaf97c0c9e252043ed1ed3d382c3e3520ec07806d4
 plotnine==0.13.6 \
@@ -596,8 +596,8 @@ propcache==0.3.1 \
     --hash=sha256:813fbb8b6aea2fc9659815e585e548fe706d6f663fa73dff59a1677d4595a037
 protobuf==6.31.1 \
     --hash=sha256:426f59d2964864a1a366254fa703b8632dcec0790d8862d30034d8245e1cd447
-psutil==7.1.0 \
-    --hash=sha256:57f5e987c36d3146c0dd2528cd42151cf96cd359b9d67cfff836995cc5df9a3d
+psutil==7.1.1 \
+    --hash=sha256:9b4f17c5f65e44f69bd3a3406071a47b79df45cf2236d1f717970afcb526bcd3
 psycopg2==2.9.11 \
     --hash=sha256:8dc379166b5b7d5ea66dcebf433011dfc51a7bb8a5fc12367fa05668e5fc53c8
 psygnal==0.14.0 \
@@ -618,8 +618,8 @@ pybind11==3.0.0 \
     --hash=sha256:7c5cac504da5a701b5163f0e6a7ba736c713a096a5378383c5b4b064b753f607
 pycodestyle==2.12.0 \
     --hash=sha256:949a39f6b86c3e1515ba1787c2022131d165a8ad271b11370a8819aa070269e4
-pycparser==2.22 \
-    --hash=sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc
+pycparser==2.23 \
+    --hash=sha256:e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934
 pyct==0.5.0 \
     --hash=sha256:a4038a8885059ab8cac6f946ea30e0b5e6bdbe0b92b6723f06737035f9d65e8c
 pydantic==2.11.9 \
