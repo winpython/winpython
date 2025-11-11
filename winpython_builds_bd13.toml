@@ -1,8 +1,8 @@
 [pythons]
 "311" = { python_target_release = "3119", release = "2", my_release_level = "b3" }
 "312" = { python_target_release = "31210", release = "2", my_release_level = "b3" }
-"313" = { python_target_release = "3137", release = "0", my_release_level = "" }
-"314" = { python_target_release = "3140", release = "1", my_release_level = "" }
+"313" = { python_target_release = "3138", release = "0", my_release_level = "b3" }
+"314" = { python_target_release = "3140", release = "2", my_release_level = "b3" }
 
 
 [[builds]]
@@ -19,7 +19,7 @@ requirements = "C:\\Winp\\bd313\\dot_requirements.txt"
 source_dirs = "C:\\Winp\\bd313\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
-install_options = "--no-index --pre --trusted-host=None"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
 [[builds]]
@@ -36,7 +36,7 @@ requirements = "C:\\Winp\\bd313\\requirements64_slim.txt"
 source_dirs = "C:\\Winp\\bd313\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\tools64_pandoc_alone"
-install_options = "--no-index --pre --trusted-host=None" 
+install_options = "--no-index --pre --trusted-host=None --upgrade" 
 
 
 [[builds]]
@@ -53,5 +53,5 @@ requirements = "C:\\Winp\\bd313\\dot_requirements.txt"
 source_dirs = "C:\\Winp\\bd313\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
-install_options = "--no-index --pre --trusted-host=None"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 wheelhousereq = "C:\\Winp\\bd313\\requirements64_whl.txt"

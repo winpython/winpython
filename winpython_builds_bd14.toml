@@ -1,8 +1,11 @@
 [pythons]
 "311" = { python_target_release = "3119", release = "2", my_release_level = "b3" }
 "312" = { python_target_release = "31210", release = "2", my_release_level = "b3" }
-"313" = { python_target_release = "3137", release = "0", my_release_level = "" }
-"314" = { python_target_release = "3140", release = "1", my_release_level = "" }
+"313" = { python_target_release = "3138", release = "0", my_release_level = "b3" }
+"314" = { python_target_release = "3140", release = "2", my_release_level = "b3" }
+
+
+
 
 
 [[builds]]
@@ -19,7 +22,7 @@ requirements = "C:\\Winp\\bd314\\dot_requirements.txt"
 source_dirs = "C:\\Winp\\bd314\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
-install_options = "--no-index --pre --trusted-host=None"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
 [[builds]]
@@ -36,7 +39,7 @@ requirements = "C:\\Winp\\bd314\\dot_requirements.txt"
 source_dirs = "C:\\Winp\\bd314\\packages.win-amd64t"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
-install_options = "--no-index --pre --trusted-host=None"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
 
@@ -51,10 +54,10 @@ create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd314\\requirements_slim.txt"
-source_dirs = "C:\\Winp\\bd314\\packages.win-amd64t"
+source_dirs = "C:\\Winp\\bd314\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
-install_options = "--no-index --pre --trusted-host=None"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
 
@@ -72,5 +75,22 @@ requirements = "C:\\Winp\\bd314\\requirements_slimf.txt"
 source_dirs = "C:\\Winp\\bd314\\packages.win-amd64t"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
-install_options = "--no-index --pre --trusted-host=None"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 
+
+[[builds]]
+name = "whl"
+root_dir_for_builds = "C:\\Winp"
+python_target = "314"
+pyver = "3.14"
+flavor = "whl"
+arch = "64"
+create_installer = ".7z-mx9"
+preclear_build_directory = "Yes"
+mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
+requirements = "C:\\Winp\\bd314\\dot_requirements.txt"
+source_dirs = "C:\\Winp\\bd314\\packages.win-amd64"
+find_links = "C:\\Winp\\packages.srcreq"
+toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
+wheelhousereq = "C:\\Winp\\bd314\\requirements_slim.txt"
