@@ -765,11 +765,11 @@ name = "debugpy"
 version = "1.8.17"
 
 [[packages.wheels]]
-name = "debugpy-1.8.17-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/b0/26/394276b71c7538445f29e792f589ab7379ae70fd26ff5577dfde71158e96/debugpy-1.8.17-cp314-cp314-win_amd64.whl"
+name = "debugpy-1.8.17-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/b0/d0/89247ec250369fc76db477720a26b2fce7ba079ff1380e4ab4529d2fe233/debugpy-1.8.17-py2.py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "893cba7bb0f55161de4365584b025f7064e1f88913551bcd23be3260b231429c"
+sha256 = "60c7dca6571efe660ccb7a9508d73ca14b8796c4ed484c2002abba714226cfef"
 
 [[packages]]
 name = "decorator"
@@ -2750,6 +2750,17 @@ url = "https://files.pythonhosted.org/packages/2b/24/b350c31543fb0107ab2599464d7
 
 [packages.wheels.hashes]
 sha256 = "8dc232e39d409036af549c86f24aed8273a40ffa459981146829a324e0848b4b"
+
+[[packages]]
+name = "pip"
+version = "25.3"
+
+[[packages.wheels]]
+name = "pip-25.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/44/3c/d717024885424591d5376220b5e836c2d5293ce2011523c9de23ff7bf068/pip-25.3-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "9655943313a94722b7774661c21049070f6bbb0a1516bf02f7c8d5d9201514cd"
 
 [[packages]]
 name = "pipdeptree"
@@ -4840,17 +4851,6 @@ url = "https://files.pythonhosted.org/packages/ca/51/5447876806d1088a0f8f71e1654
 
 [packages.wheels.hashes]
 sha256 = "4875a9eaf72fbf5079dc372a51a9f268fc38d46f767cbf85c43a36da5cb9b575"
-
-[[packages]]
-name = "wppm"
-version = "17.2.20250823"
-
-[[packages.wheels]]
-name = "wppm-17.2.20250823-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ae/a9/2581cc7f91354eada41367bf68b91b1b7fba6cb6fb469f500dbaf6191539/wppm-17.2.20250823-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "0945411b12eaf6da134a9d8662a4afb2b25e129dd34fc2f6ef76ee62d61411c3"
 
 [[packages]]
 name = "wrapt"
