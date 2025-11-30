@@ -6,6 +6,7 @@ name: Build WinPython for 2025-05 Cycle
 # 2025-08-25b: move up all parameters  
 # 2025-09-07: one single workflow to reduce code duplication 
 # 2025-11-30: centralize links in one place, add 3.15, classify as b4
+# 2025-11-30: reduce repetition of parameters
 
 on:
   workflow_dispatch:
@@ -39,9 +40,6 @@ jobs:
             SEVEN_Z: "0"
             EXE: "1"
             PANDOC: "0"
-            ARTIFACT_NAME_313: "publish_313dot"
-            ARTIFACT_NAME_314: "publish_314dot"
-            ARTIFACT_NAME_315: "publish_315dot"
             WINPYARCH: "64"
             WINPYARCHDET: "64"
             my_release_level: "b4"
@@ -56,9 +54,6 @@ jobs:
             SEVEN_Z: "1"
             EXE: "1"
             PANDOC: "1"
-            ARTIFACT_NAME_313: "publish_313slim"
-            ARTIFACT_NAME_314: "publish_314slim"
-            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
             WINPYARCHDET: "64"
             my_release_level: "b4"
@@ -73,9 +68,6 @@ jobs:
             SEVEN_Z: "1"
             EXE: "0"
             PANDOC: "0"
-            ARTIFACT_NAME_313: "publish_313whl"
-            ARTIFACT_NAME_314: "publish_314whl"
-            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
             WINPYARCHDET: "64"
             my_release_level: "b4"
@@ -90,9 +82,6 @@ jobs:
             SEVEN_Z: "0"
             EXE: "1"
             PANDOC: "0"
-            ARTIFACT_NAME_313: ""
-            ARTIFACT_NAME_314: "publish_314free"
-            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
             WINPYARCHDET: "64F"
             my_release_level: "b4"
@@ -107,9 +96,6 @@ jobs:
             SEVEN_Z: "0"
             EXE: "1"
             PANDOC: "0"
-            ARTIFACT_NAME_313: ""
-            ARTIFACT_NAME_314: "publish_314slimf"
-            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
             WINPYARCHDET: "64F"
             my_release_level: "b4"
@@ -128,35 +114,38 @@ jobs:
 
           # Populate generic per-flavor / per-version selections
           if [ "$PYTHON_VERSION" = "3.13" ]; then
-            echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
-            echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
-            echo "ARTIFACT_NAME=${{ matrix.flavor.ARTIFACT_NAME_313 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${FLAVOR}" >> $GITHUB_ENV
             echo "WINPYVERSION=313" >> $GITHUB_ENV
-            echo "WINPYVER2=3.13.8.0" >> $GITHUB_ENV
+            WINPYVER2="3.13.8.0"
+            echo "WINPYVER2=$WINPYVER2" >> $GITHUB_ENV
             BUILD_LOCATION="WPy64-31380"
             echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
             echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-            echo "WINPYVER=${{ matrix.flavor.WINPYVER2_313 }}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
+            echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
           elif [ "$PYTHON_VERSION" = "3.14" ]; then
-            echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
-            echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
-            echo "ARTIFACT_NAME=${{ matrix.flavor.ARTIFACT_NAME_314 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${FLAVOR}" >> $GITHUB_ENV
             echo "WINPYVERSION=314" >> $GITHUB_ENV
-            echo "WINPYVER2=3.14.0.2" >> $GITHUB_ENV
+            WINPYVER2="3.14.0.2"
+            echo "WINPYVER2=$WINPYVER2" >> $GITHUB_ENV
             BUILD_LOCATION="WPy64-31380"
             echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
             echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-            echo "WINPYVER=${{ matrix.flavor.WINPYVER2_314 }}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
+            echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
           elif [ "$PYTHON_VERSION" = "3.15" ]; then
-            echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
-            echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
-            echo "ARTIFACT_NAME=${{ matrix.flavor.ARTIFACT_NAME_315 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${FLAVOR}" >> $GITHUB_ENV
             echo "WINPYVERSION=315" >> $GITHUB_ENV
-            echo "WINPYVER2=3.15.0.0" >> $GITHUB_ENV
+            WINPYVER2="3.15.0.0"
+            echo "WINPYVER2=$WINPYVER2" >> $GITHUB_ENV
             BUILD_LOCATION="WPy64-31500"
             echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
             echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-            echo "WINPYVER=${{ matrix.flavor.WINPYVER2_315 }}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
+            echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
            fi
 
           # write common flavor env vars
@@ -203,14 +192,14 @@ jobs:
           fi
 
       - name: See variables
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           Write-Output "PYTHON_VERSION is $env:PYTHON_VERSION" 
           Write-Output "WINPYFLAVOR is $env:WINPYFLAVOR"  
 
-          Write-Output "WINPYrequirements is $env:WINPYrequirements"
-          Write-Output "WINPYrequirementswhl is $env:WINPYrequirementswhl"
+          Write-Output "WINPYREQUIREMENTS is $env:WINPYREQUIREMENTS"
+          Write-Output "WINPYREQUIREMENTSwhl is $env:WINPYREQUIREMENTSwhl"
           Write-Output "ARTIFACT_NAME is $env:ARTIFACT_NAME"  
 
           Write-Output "python_source is $env:python_source"
@@ -235,7 +224,7 @@ jobs:
           Write-Output "WINPYVER is $env:WINPYVER"
 
       - name: Download python-3 standalone
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           Write-Output "python_source used is $env:python_source"
@@ -257,7 +246,7 @@ jobs:
           }
 
       - name: Extract python-3-embed.tar.gz to dotpython
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: bash
         run: |
           mkdir -p dotpythonpre
@@ -271,28 +260,28 @@ jobs:
           fi
     
       - name: Copy launchers_final files to dotpython
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: bash
         run: |
           cp -r winpython/portable/launchers_final/* dotpython/
           mkdir $env:dotwheelhouse
 
       - name: List dotpython contents (for debugging)
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           Get-ChildItem dotpython
           Get-ChildItem dotpython\python
 
       - name: Prepare WinPython target structure
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path $env:build_location
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
 
       - name: Download and integrate pandoc binary
-        if: env.ARTIFACT_NAME != '' && env.PANDOC == '1'
+        if: env.WINPYREQUIREMENTS != '' && env.PANDOC == '1'
         shell: pwsh
         run: |
           $pandocZipPath = "pandoc.zip"
@@ -348,7 +337,7 @@ jobs:
           
 
       - name: Upgrade pip and patch launchers
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade pip
@@ -356,7 +345,7 @@ jobs:
           & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
 
       - name: Write env.ini file
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           $destDir = "$env:build_location\scripts"
@@ -369,30 +358,30 @@ jobs:
           Copy-Item -Path "env.ini" -Destination "$destDir\env.ini"
 
       - name: Download main requirements to $env:dotwheelhouse
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
 
-          & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYrequirements
+          & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
 
       - name: Download additional wheelhouse requirements
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
-          if ($env:WINPYrequirementswhl -eq "") {
+          if ($env:WINPYREQUIREMENTSwhl -eq "") {
               Write-Output "No additional wheelhouse requirements."
           } else {
-            & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYrequirementswhl
+            & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
           }
 
       - name: Install requirements
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
-          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYrequirements
+          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYREQUIREMENTS
 
       - name: Generate Markdown content and pylock file
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           mkdir publish_output
@@ -412,11 +401,11 @@ jobs:
           $outreq = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').txt"
           & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylock', r'$outreq')"
 
-          if ($env:WINPYrequirementswhl -eq "") {
+          if ($env:WINPYREQUIREMENTSwhl -eq "") {
               Write-Output "No additional wheelhouse requirements."
           } else {
           $destfile_pylockwheel = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_')_wheels.toml"
-          & "$env:build_location\python\python.exe" -m pip lock --no-deps --require-hashes -r $env:WINPYrequirementswhl -o $destfile_pylockwheel
+          & "$env:build_location\python\python.exe" -m pip lock --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl -o $destfile_pylockwheel
 
           $outreqwheel = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_')_wheels.txt"
           & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylockwheel', r'$outreqwheel')"
@@ -426,14 +415,14 @@ jobs:
           }
 
       - name: Zip the result
-        if: env.ARTIFACT_NAME != '' && env.WINPYZIP == '1'
+        if: env.WINPYREQUIREMENTS != '' && env.WINPYZIP == '1'
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip" 
           Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
 
       - name: 7z archive the result
-        if: env.ARTIFACT_NAME != '' && env.WINPY7Z == '1'
+        if: env.WINPYREQUIREMENTS != '' && env.WINPY7Z == '1'
         shell: pwsh
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
@@ -441,7 +430,7 @@ jobs:
           7z a $destfile7z $sourceDir
 
       - name: 7z executable archive the result
-        if: env.ARTIFACT_NAME != '' && env.WINPYEXE == '1'
+        if: env.WINPYREQUIREMENTS != '' && env.WINPYEXE == '1'
         shell: pwsh
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
@@ -458,7 +447,7 @@ jobs:
           7z a -t7z -sfx"$SFXModulePath" $destfile7z $sourceDir
 
       - name: generate hashes wppm style
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
           $DESTFILE="./publish_output/hashes.md" 
@@ -470,7 +459,7 @@ jobs:
 
       # Example artifact upload step (optional)
       - name: Upload artifacts
-        if: env.ARTIFACT_NAME != ''
+        if: env.WINPYREQUIREMENTS != ''
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
