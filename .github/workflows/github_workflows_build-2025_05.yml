@@ -173,7 +173,7 @@ jobs:
           # SHA not provided here: fill the correct SHA for security, otherwise the workflow will skip SHA check.
           if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "64F" ]; then
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.14.0+20251031-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_ENV
-            echo "python_sha256=b81de5fc9e783ea6dfcf1098c28a278c874999c71afbb0309f6a8b4276c769d0"
+            echo "python_sha256=b81de5fc9e783ea6dfcf1098c28a278c874999c71afbb0309f6a8b4276c769d0" >> $GITHUB_ENV
           fi
 
           # 3.15 X64 (GIL)
