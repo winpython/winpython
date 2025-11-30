@@ -140,6 +140,7 @@ jobs:
           echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
  
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
           echo "WINPYARCH=$WINPYARCH" >> $GITHUB_ENV
           echo "WINPYARCHDET=$WINPYARCHDET" >> $GITHUB_ENV
           echo "WINPYFLAVOR=$FLAVOR" >> $GITHUB_ENV
