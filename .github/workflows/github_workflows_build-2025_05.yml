@@ -5,18 +5,20 @@ name: Build WinPython for 2025-05 Cycle
 # 2025-08-25a: will use manual uploaded free-threading, as astral doesn't provide
 # 2025-08-25b: move up all parameters  
 # 2025-09-07: one single workflow to reduce code duplication 
+# 2025-11-30: centralize links in one place, add 3.15, classify as b4
 
 on:
   workflow_dispatch:
     inputs:
       python_version:
-        description: 'Python version to build (3.13 or 3.14)'
+        description: 'Python version to build (3.13, 3.14 or 3.15)'
         required: true
         default: '3.14'
         type: choice
         options:
           - '3.13'
           - '3.14'
+          - '3.15'
 
 jobs:
   build-winpython:
@@ -29,98 +31,133 @@ jobs:
           - name: "dot"
             REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0dotb3.txt"
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2dotb3.txt"
+            REQUIREMENTS_315: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2dotb3.txt"
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
+            REQUIREMENTS_WHL_315: ""
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
             PANDOC: "0"
             ARTIFACT_NAME_313: "publish_313dot"
             ARTIFACT_NAME_314: "publish_314dot"
+            ARTIFACT_NAME_315: "publish_315dot"
             WINPYARCH: "64"
+            WINPYARCHDET: "64"
             WINPYVERSION_313: "313"
             WINPYVERSION_314: "314"
+            WINPYVERSION_315: "315"
             WINPYVER2_313: "3.13.8.0"
             WINPYVER2_314: "3.14.0.2"
-            my_release_level: "b3"
+            WINPYVER2_315: "3.15.0.0"
+            my_release_level: "b4"
             build_location_313: "WPy64-31380"
             build_location_314: "WPy64-31402"
+            build_location_315: "WPy64-31500"
           - name: "slim"
             REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0slimb3.txt"
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2slimb3.txt"
+            REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
+            REQUIREMENTS_WHL_315: ""
             ZIP: "0"
             SEVEN_Z: "1"
             EXE: "1"
             PANDOC: "1"
             ARTIFACT_NAME_313: "publish_313slim"
             ARTIFACT_NAME_314: "publish_314slim"
+            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
+            WINPYARCHDET: "64"
             WINPYVERSION_313: "313"
             WINPYVERSION_314: "314"
+            WINPYVERSION_315: ""
             WINPYVER2_313: "3.13.8.0"
             WINPYVER2_314: "3.14.0.2"
-            my_release_level: "b3"
+            WINPYVER2_315: ""
+            my_release_level: "b4"
             build_location_313: "WPy64-31380"
             build_location_314: "WPy64-31402"
+            build_location_315: ""
           - name: "whl"
             REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0dotb3.txt"
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2dotb3.txt"
+            REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0whlb3_wheels.txt"
             REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2whlb3_wheels.txt"
+            REQUIREMENTS_WHL_315: ""
             ZIP: "0"
             SEVEN_Z: "1"
             EXE: "0"
             PANDOC: "0"
             ARTIFACT_NAME_313: "publish_313whl"
             ARTIFACT_NAME_314: "publish_314whl"
+            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
+            WINPYARCHDET: "64"
             WINPYVERSION_313: "313"
             WINPYVERSION_314: "314"
+            WINPYVERSION_315: ""
             WINPYVER2_313: "3.13.8.0"
             WINPYVER2_314: "3.14.0.2"
-            my_release_level: "b3"
+            WINPYVER2_315: ""
+            my_release_level: "b4"
             build_location_313: "WPy64-31380"
             build_location_314: "WPy64-31402"
+            build_location_315: ""
           - name: "free"
             REQUIREMENTS_313: ""
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2freeb3.txt"
+            REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
+            REQUIREMENTS_WHL_315: ""
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
             PANDOC: "0"
             ARTIFACT_NAME_313: ""
             ARTIFACT_NAME_314: "publish_314free"
+            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
+            WINPYARCHDET: "64F"
             WINPYVERSION_313: ""
             WINPYVERSION_314: "314"
+            WINPYVERSION_315: ""
             WINPYVER2_313: ""
             WINPYVER2_314: "3.14.0.2"
-            my_release_level: "b3"
+            WINPYVER2_315: ""
+            my_release_level: "b4"
             build_location_313: ""
             build_location_314: "WPy64-31402"
+            build_location_315: ""
           - name: "slimf"
             REQUIREMENTS_313: ""
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2slimfb3.txt"
+            REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
+            REQUIREMENTS_WHL_315: ""
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
             PANDOC: "0"
             ARTIFACT_NAME_313: ""
             ARTIFACT_NAME_314: "publish_314slimf"
+            ARTIFACT_NAME_315: ""
             WINPYARCH: "64"
+            WINPYARCHDET: "64F"
             WINPYVERSION_313: ""
             WINPYVERSION_314: "314"
+            WINPYVERSION_315: ""
             WINPYVER2_313: ""
             WINPYVER2_314: "3.14.0.2"
-            my_release_level: "b3"
+            WINPYVER2_315: ""
+            my_release_level: "b4"
             build_location_313: ""
             build_location_314: "WPy64-31402"
+            build_location_315: ""
 
     steps:
       - name: Checkout repository
@@ -152,8 +189,19 @@ jobs:
             echo "build_location=${{ matrix.flavor.build_location_314 }}" >> $GITHUB_ENV
             echo "destwheelhouse=${{ matrix.flavor.build_location_314 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
             echo "WINPYVER=${{ matrix.flavor.WINPYVER2_314 }}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
-          fi
+          elif [ "$PYTHON_VERSION" = "3.15" ]; then            echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
+            echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
+            echo "ARTIFACT_NAME=${{ matrix.flavor.ARTIFACT_NAME_315 }}" >> $GITHUB_ENV
+            echo "WINPYVERSION=${{ matrix.flavor.WINPYVERSION_315 }}" >> $GITHUB_ENV
+            echo "WINPYVER2=${{ matrix.flavor.WINPYVER2_315 }}" >> $GITHUB_ENV
+            echo "build_location=${{ matrix.flavor.build_location_315 }}" >> $GITHUB_ENV
+            echo "destwheelhouse=${{ matrix.flavor.build_location_315 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+            echo "WINPYVER=${{ matrix.flavor.WINPYVER2_315 }}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
+           fi
+
+          # write common flavor env vars
           echo "WINPYARCH=$WINPYARCH" >> $GITHUB_ENV
+          echo "WINPYARCHDET=$WINPYARCHDET" >> $GITHUB_ENV
           echo "WINPYFLAVOR=$FLAVOR" >> $GITHUB_ENV
           echo "WINPYZIP=${{ matrix.flavor.ZIP }}" >> $GITHUB_ENV
           echo "WINPY7Z=${{ matrix.flavor.SEVEN_Z }}" >> $GITHUB_ENV
@@ -168,25 +216,31 @@ jobs:
 
           # Centralized mapping of python binaries and SHAs by version and arch.
           # NOTE: fill the 3.15 URLs and SHA values when available.
-          # 3.13 x64 (example)
-          if [ "$PYTHON_VERSION" = "3.13" ] && [ "$WINPYARCH" = "64" ]; then
+          # 3.13 x64 (GIL)
+          if [ "$PYTHON_VERSION" = "3.13" ] && [ "$WINPYARCHDET" = "64" ]; then
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.13.9+20251031-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
             echo "python_sha256=3cdf2ad27fdeea2592b63e5a658aa65733b028a55332fa1aa27be4ce8aef96c0" >> $GITHUB_ENV
           fi
 
-          # 3.14 x64 (existing)
-          if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCH" = "64" ]; then
+          # 3.14 x64 (GIL)
+          if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "64" ]; then
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.14.0+20251031-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
             echo "python_sha256=a64800cbfbf1c384b9ac7eb5964a9a4c37537791e7ac80eb66b03ccb6f2c2e80" >> $GITHUB_ENV
           fi
 
-          # 3.14 i686 - user provided URL (example for preparing i686 builds).
+          # 3.14 X64 (free-threading)
           # SHA not provided here: fill the correct SHA for security, otherwise the workflow will skip SHA check.
-          if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCH" = "32" ]; then
-            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251120/cpython-3.14.0+20251120-i686-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-            echo "python_sha256=" >> $GITHUB_ENV
+          if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCH" = "64F" ]; then
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.14.0+20251031-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_ENV
+            echo "python_sha256=b81de5fc9e783ea6dfcf1098c28a278c874999c71afbb0309f6a8b4276c769d0"
           fi
 
+          # 3.15 X64 (GIL)
+          if [ "$PYTHON_VERSION" = "3.15" ] && [ "$WINPYARCHDET" = "64" ]; then
+            # Example placeholders -- replace with real URLs and shas when available
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251120/cpython-3.15.0a2+20251120-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            echo "python_sha256=50e8d463a7838c36e01b053a8d01d5c58519e530098d52c7456660a76f3f35f7" >> $GITHUB_ENV
+          fi
 
       - name: See variables
         if: env.ARTIFACT_NAME != ''
@@ -207,6 +261,7 @@ jobs:
           Write-Output "build_location is $env:build_location"
 
           Write-Output "WINPYARCH is $env:WINPYARCH"
+          Write-Output "WINPYARCHDET is $env:WINPYARCHDET"
           Write-Output "WINPYZIP is $env:WINPYZIP"
           Write-Output "WINPY7Z is $env:WINPY7Z"
           Write-Output "WINPYEXE is $env:WINPYEXE"
