@@ -169,6 +169,7 @@ jobs:
           PYTHON_VERSION="${{ github.event.inputs.python_version }}"
           FLAVOR="${{ matrix.flavor.name }}"
           WINPYARCH="${{ matrix.flavor.WINPYARCH }}"
+          WINPYARCHDET="${{ matrix.flavor.WINPYARCHDET }}"
 
           # Populate generic per-flavor / per-version selections
           if [ "$PYTHON_VERSION" = "3.13" ]; then
@@ -189,7 +190,8 @@ jobs:
             echo "build_location=${{ matrix.flavor.build_location_314 }}" >> $GITHUB_ENV
             echo "destwheelhouse=${{ matrix.flavor.build_location_314 }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
             echo "WINPYVER=${{ matrix.flavor.WINPYVER2_314 }}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
-          elif [ "$PYTHON_VERSION" = "3.15" ]; then            echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
+          elif [ "$PYTHON_VERSION" = "3.15" ]; then
+            echo "WINPYrequirements=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
             echo "WINPYrequirementswhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
             echo "ARTIFACT_NAME=${{ matrix.flavor.ARTIFACT_NAME_315 }}" >> $GITHUB_ENV
             echo "WINPYVERSION=${{ matrix.flavor.WINPYVERSION_315 }}" >> $GITHUB_ENV
@@ -230,7 +232,7 @@ jobs:
 
           # 3.14 X64 (free-threading)
           # SHA not provided here: fill the correct SHA for security, otherwise the workflow will skip SHA check.
-          if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCH" = "64F" ]; then
+          if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "64F" ]; then
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.14.0+20251031-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_ENV
             echo "python_sha256=b81de5fc9e783ea6dfcf1098c28a278c874999c71afbb0309f6a8b4276c769d0"
           fi
