@@ -33,7 +33,6 @@ jobs:
             PANDOC: "0"
             WINPYARCH: "64"
             WINPYARCHDET: "64"
-            my_release_level: "b4"
           - name: "slim"
             REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0slimb4.txt"
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slimb4.txt"
@@ -47,7 +46,6 @@ jobs:
             PANDOC: "1"
             WINPYARCH: "64"
             WINPYARCHDET: "64"
-            my_release_level: "b4"
           - name: "whl"
             REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dotb4.txt"
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dotb4.txt"
@@ -61,7 +59,6 @@ jobs:
             PANDOC: "0"
             WINPYARCH: "64"
             WINPYARCHDET: "64"
-            my_release_level: "b4"
           - name: "free"
             REQUIREMENTS_313: ""
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0freeb4.txt"
@@ -75,7 +72,6 @@ jobs:
             PANDOC: "0"
             WINPYARCH: "64"
             WINPYARCHDET: "64F"
-            my_release_level: "b4"
           - name: "slimf"
             REQUIREMENTS_313: ""
             REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slimfb4.txt"
@@ -89,12 +85,18 @@ jobs:
             PANDOC: "1"
             WINPYARCH: "64"
             WINPYARCHDET: "64F"
-            my_release_level: "b4"
 
     env:
       PYTHON_VERSION: ${{ github.event.inputs.python_version }}
-      FLAVOR: ${{ matrix.flavor.name }}
+      WINPYFLAVOR: ${{ matrix.flavor.name }}
+      PANDOC: ${{ matrix.flavor.PANDOC }}
+      WINPYZIP: ${{ matrix.flavor.ZIP }}
+      WINPY7Z: ${{ matrix.flavor.SEVEN_Z }}
+      WINPYEXE: ${{ matrix.flavor.EXE }}
+      WINPYARCH: ${{ matrix.flavor.WINPYARCH }}
+      WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
       # constants
+      my_release_level: "b4"
       dotwheelhouse: dotpython\\wheelhouse\\included.wheels
       pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
       pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
@@ -106,10 +108,8 @@ jobs:
       - name: Set static and matrix variables based on selected Python version
         shell: bash
         run: |
-          PYTHON_VERSION="${{ github.event.inputs.python_version }}"
-          FLAVOR="${{ matrix.flavor.name }}"
-          WINPYARCH="${{ matrix.flavor.WINPYARCH }}"
-          WINPYARCHDET="${{ matrix.flavor.WINPYARCHDET }}"
+          PYTHON_VERSION="${{ env.PYTHON_VERSION }}"
+          WINPYARCHDET="${{ env.WINPYARCHDET }}"
 
           # Populate generic per-flavor / per-version selections
           if [ "$PYTHON_VERSION" = "3.13" ]; then
@@ -134,19 +134,10 @@ jobs:
 
           # write common flavor env vars
           echo "WINPYVER2=$WINPYVER2" >> $GITHUB_ENV
-          echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${FLAVOR}" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${{ matrix.flavor.name }}" >> $GITHUB_ENV
           echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
           echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-          echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
- 
-          echo "WINPYARCH=$WINPYARCH" >> $GITHUB_ENV
-          echo "WINPYARCHDET=$WINPYARCHDET" >> $GITHUB_ENV
-          echo "WINPYFLAVOR=$FLAVOR" >> $GITHUB_ENV
-          echo "WINPYZIP=${{ matrix.flavor.ZIP }}" >> $GITHUB_ENV
-          echo "WINPY7Z=${{ matrix.flavor.SEVEN_Z }}" >> $GITHUB_ENV
-          echo "WINPYEXE=${{ matrix.flavor.EXE }}" >> $GITHUB_ENV
-          echo "PANDOC=${{ matrix.flavor.PANDOC }}" >> $GITHUB_ENV
-          echo "my_release_level=${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
+          echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ env.my_release_level }}" >> $GITHUB_ENV
 
           # Centralized mapping of python binaries and SHAs by version and arch.
           # NOTE: fill the 3.15 URLs and SHA values when available.
@@ -163,7 +154,6 @@ jobs:
           fi
 
           # 3.14 X64 (free-threading)
-          # SHA not provided here: fill the correct SHA for security, otherwise the workflow will skip SHA check.
           if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "64F" ]; then
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_ENV
             echo "python_sha256=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61" >> $GITHUB_ENV
@@ -171,38 +161,9 @@ jobs:
 
           # 3.15 X64 (GIL)
           if [ "$PYTHON_VERSION" = "3.15" ] && [ "$WINPYARCHDET" = "64" ]; then
-            # Example placeholders -- replace with real URLs and shas when available
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.15.0a2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
             echo "python_sha256=0ae8237881058aafb4bdf8ae9468e4791a5f3fd277a99bd90b7cb1175b96f0cb" >> $GITHUB_ENV
           fi
-
-      - name: See variables
-        if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          Write-Output "PYTHON_VERSION is $env:PYTHON_VERSION" 
-          Write-Output "WINPYFLAVOR is $env:WINPYFLAVOR"  
-
-          Write-Output "WINPYREQUIREMENTS is $env:WINPYREQUIREMENTS"
-          Write-Output "WINPYREQUIREMENTSwhl is $env:WINPYREQUIREMENTSwhl"
-          Write-Output "ARTIFACT_NAME is $env:ARTIFACT_NAME"  
-
-          Write-Output "python_source is $env:python_source"
-          Write-Output "python_sha256 is $env:python_sha256"
-
-          Write-Output "WINPYVERSION is $env:WINPYVERSION" 
-          Write-Output "WINPYVER2 is $env:WINPYVER2"
-          Write-Output "build_location is $env:build_location"
-
-          Write-Output "WINPYARCH is $env:WINPYARCH"
-          Write-Output "WINPYARCHDET is $env:WINPYARCHDET"
-          Write-Output "WINPYZIP is $env:WINPYZIP"
-          Write-Output "WINPY7Z is $env:WINPY7Z"
-          Write-Output "WINPYEXE is $env:WINPYEXE"
-          Write-Output "PANDOC is $env:PANDOC"
-          Write-Output "destwheelhouse is $env:destwheelhouse"
-
-          Write-Output "WINPYVER is $env:WINPYVER"
 
       - name: Download python-3 standalone
         if: env.WINPYREQUIREMENTS != ''
