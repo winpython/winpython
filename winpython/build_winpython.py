@@ -185,10 +185,10 @@ def main():
 
     # Logs termination and version naming
     if len(args.release_level) > 0:
-        z = Path(winpydirbase).name[(4+len(args.arch)):-len(args.release_level)]
+        z = Path(winpydirbase).name[(4+len(args.arch)):-len(args.release_level)-len(args.release)]
     else:
-        z = Path(winpydirbase).name[(4+len(args.arch)):]
-    tada = f"{z[:1]}_{z[1:3]}_{z[3]}_{args.release}"
+        z = Path(winpydirbase).name[(4+len(args.arch)):-len(args.release)]
+    tada = f"{z[:1]}_{z[1:3]}_{z[3:]}_{args.release}"
     winpyver2 = tada.replace('_', '.')
     winpyver = f"{winpyver2}{args.flavor}{args.release_level}"
     file_postfix = f"{args.arch}-{tada}{args.flavor}{args.release_level}"
