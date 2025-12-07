@@ -164,36 +164,29 @@ jobs:
             echo "python_sha256=0ae8237881058aafb4bdf8ae9468e4791a5f3fd277a99bd90b7cb1175b96f0cb" >> $GITHUB_ENV
           fi
 
-      - name: Download python-3 standalone
+      - name: Download, verify and extract python standalone
         if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
-          Write-Output "python_source used is $env:python_source"
+          Write-Output "Downloading, hash-checking, and extracting  $env:python_source"
           curl.exe -L -o "python-3-embed.tar.gz" $env:python_source
-          # Calculate SHA256 hash
+
           $expectedHash = $env:python_sha256
-          $actualHash = (Get-FileHash -Path "python-3-embed.tar.gz" -Algorithm SHA256).Hash.ToLower()
+          $actualHash = (Get-FileHash -Path "python-3-embed.tar.gz" -Algorithm SHA256).Hash.ToLower()          $actualHash = $hashObject.Hash.ToLower()
+          if ($actualHash -ne $expectedHash.ToLower()) {
+            Write-Error "SHA mismatch: Actual $actualHash doesn't match $expectedHash"
+            exit 1
+          } else { Write-Output "Python SHA ok" }
 
-          if ($actualHash -eq $expectedHash.ToLower()) {
-              Write-Output "Hash matches."
-          } else {
-              Write-Error "Hash does NOT match: $actualHash vs expected $expectedHash"
-              exit 1
-          }
-
-      - name: Extract python-3-embed.tar.gz to dotpython
-        if: env.WINPYREQUIREMENTS != ''
-        shell: bash
-        run: |
-          mkdir -p dotpythonpre
-          mkdir -p dotpython
-          mkdir -p dotpython/python
+          mkdir dotpythonpre -Force
+          mkdir dotpython -Force
+          mkdir dotpython/python -Force
           tar -xf python-3-embed.tar.gz -C dotpythonpre
-          if [ -d dotpythonpre/python/install ]; then
-              mv dotpythonpre/python/install/* dotpython/python/
-          elif [ -d dotpythonpre/python ]; then
-              mv dotpythonpre/python/* dotpython/python/
-          fi
+          if (Test-Path dotpythonpre/python/install) {
+            Move-Item -Path dotpythonpre/python/install/* -Destination dotpython/python -Force
+          } elseif (Test-Path dotpythonpre/python) {
+            Move-Item -Path dotpythonpre/python/* -Destination dotpython/python -Force
+          }
     
       - name: Copy launchers_final files to dotpython
         if: env.WINPYREQUIREMENTS != ''
@@ -216,7 +209,7 @@ jobs:
           New-Item -ItemType Directory -Path $env:build_location
           Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
 
-      - name: Download and integrate pandoc binary
+      - name: Download, checking hash and integrating pandoc binary
         if: env.WINPYREQUIREMENTS != '' && env.PANDOC == '1'
         shell: pwsh
         run: |
@@ -229,11 +222,11 @@ jobs:
           Expand-Archive -Path $pandocZipPath -DestinationPath $tempDir -Force
           New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
           
-          Write-Host "Copying pandoc.exe to $targetDir"
+          Write-Output "Copying pandoc.exe to $targetDir"
           Copy-Item -Path (Join-Path $tempDir "pandoc-3.1.9\pandoc.exe") -Destination $targetDir -Force         
 
           # Optional: Verify the contents
-          Write-Host "Listing contents of $targetDir"
+          Write-Output "Listing contents of $targetDir"
           Get-ChildItem -Path $targetDir
 
           $expectedHash = $env:pandoc_sha256.ToLower()
@@ -242,9 +235,9 @@ jobs:
           if ($actualHash -ne $expectedHash) {
               Write-Error "Pandoc SHA mismatch: $actualHash vs expected $expectedHash"
               exit 1
-          } else { Write-Host "Pandoc SHA ok" }
+          } else { Write-Output "Pandoc SHA ok" }
 
-          Write-Host "Cleaning up temporary files..."
+          Write-Output "Cleaning up temporary files..."
           Remove-Item -Path $tempDir -Recurse -Force
           Remove-Item -Path $pandocZipPath -Force
 
