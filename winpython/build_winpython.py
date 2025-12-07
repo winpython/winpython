@@ -94,12 +94,13 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
        print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
 
 # --- Main Logic ---
-def run_make_py(build_python, winpydirbase, args):
+def run_make_py(build_python, winpydirbase, args, winpyver, winpyver2):
     from . import make
     make.make_all(
         args.release, args.release_level, basedir_wpy=winpydirbase,
         verbose=True, flavor=args.flavor,
-        source_dirs=args.source_dirs, toolsdirs=args.tools_dirs
+        source_dirs=args.source_dirs, toolsdirs=args.tools_dirs,
+        winpyver=winpyver, winpyver2=winpyver2
     )
 
 def process_wheelhouse_requirements(target_python: Path, winpydirbase: Path,args: argparse.Namespace,file_postfix: str):
@@ -189,6 +190,7 @@ def main():
         z = Path(winpydirbase).name[(4+len(args.arch)):]
     tada = f"{z[:1]}_{z[1:3]}_{z[3]}_{args.release}"
     winpyver2 = tada.replace('_', '.')
+    winpyver = f"{winpyver2}{args.flavor}{args.release_level}"
     file_postfix = f"{args.arch}-{tada}{args.flavor}{args.release_level}"
 
     log_section(f"Preparing build for Python {args.python_target} ({args.arch}-bit)")
@@ -197,7 +199,7 @@ def main():
     delete_folder_if_exists(winpydirbase.parent, check_flavor=args.flavor) #bu{flavor]}
 
     log_section(f"🙏 Step 2: make.py Python with {str(build_python)} at ({winpydirbase}")
-    run_make_py(str(build_python), winpydirbase, args)
+    run_make_py(str(build_python), winpydirbase, args, winpyver, winpyver2)
 
     check_env_bat(winpydirbase)
 
