@@ -1,12 +1,4 @@
 name: Build WinPython for 2025-05 Cycle
-# matrix allows to avoid duplicated code in github_workflows_build-dot, github_workflows_build-whl, github_workflows_build-slim
-# 2025-08-23a: merged code proposed per Gemini 2.5 flash, it corrected also PYTHONIOENCODING="utf-8" error
-# 2025-08-23b: moved manually to Python-3.14.0rc2
-# 2025-08-25a: will use manual uploaded free-threading, as astral doesn't provide
-# 2025-08-25b: move up all parameters  
-# 2025-09-07: one single workflow to reduce code duplication 
-# 2025-11-30: centralize links in one place, add 3.15, classify as b4
-# 2025-11-30: reduce repetition of parameters
 
 on:
   workflow_dispatch:
@@ -24,15 +16,14 @@ on:
 jobs:
   build-winpython:
     runs-on: windows-latest
-
     strategy:
       fail-fast: true
       matrix:
         flavor:
           - name: "dot"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0dotb4.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2dotb4.txt"
-            REQUIREMENTS_315: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2dotb4.txt"
+            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dotb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0dotb4.txt"
+            REQUIREMENTS_315: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0dotb4.txt"
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
@@ -44,8 +35,8 @@ jobs:
             WINPYARCHDET: "64"
             my_release_level: "b4"
           - name: "slim"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0slimb4.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2slimb4.txt"
+            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0slimb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0slimb4.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -58,11 +49,11 @@ jobs:
             WINPYARCHDET: "64"
             my_release_level: "b4"
           - name: "whl"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0dotb4.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2dotb4.txt"
+            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dotb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0dotb4.txt"
             REQUIREMENTS_315: ""
-            REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_8_0whlb3_wheels.txt"
-            REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2whlb3_wheels.txt"
+            REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0whlb3_wheels.txt"
+            REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0whlb3_wheels.txt"
             REQUIREMENTS_WHL_315: ""
             ZIP: "0"
             SEVEN_Z: "1"
@@ -73,7 +64,7 @@ jobs:
             my_release_level: "b4"
           - name: "free"
             REQUIREMENTS_313: ""
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2freeb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0freeb4.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -87,7 +78,7 @@ jobs:
             my_release_level: "b4"
           - name: "slimf"
             REQUIREMENTS_313: ""
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_0_2slimfb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_1_0slimfb4.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -95,10 +86,18 @@ jobs:
             ZIP: "1"
             SEVEN_Z: "0"
             EXE: "1"
-            PANDOC: "0"
+            PANDOC: "1"
             WINPYARCH: "64"
             WINPYARCHDET: "64F"
             my_release_level: "b4"
+
+    env:
+      PYTHON_VERSION: ${{ github.event.inputs.python_version }}
+      FLAVOR: ${{ matrix.flavor.name }}
+      # constants
+      dotwheelhouse: dotpython\\wheelhouse\\included.wheels
+      pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
+      pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
 
     steps:
       - name: Checkout repository
@@ -117,13 +116,13 @@ jobs:
             echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
             echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
             echo "WINPYVERSION=313" >> $GITHUB_ENV
-            WINPYVER2="3.13.8.0"
-            BUILD_LOCATION="WPy64-31380"
+            WINPYVER2="3.13.11.0"
+            BUILD_LOCATION="WPy64-313110"
           elif [ "$PYTHON_VERSION" = "3.14" ]; then
             echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
             echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
             echo "WINPYVERSION=314" >> $GITHUB_ENV
-            WINPYVER2="3.14.0.2"
+            WINPYVER2="3.14.2.0"
             BUILD_LOCATION="WPy64-31380"
           elif [ "$PYTHON_VERSION" = "3.15" ]; then
             echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
@@ -140,7 +139,6 @@ jobs:
           echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
  
-          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
           echo "WINPYARCH=$WINPYARCH" >> $GITHUB_ENV
           echo "WINPYARCHDET=$WINPYARCHDET" >> $GITHUB_ENV
           echo "WINPYFLAVOR=$FLAVOR" >> $GITHUB_ENV
@@ -150,37 +148,32 @@ jobs:
           echo "PANDOC=${{ matrix.flavor.PANDOC }}" >> $GITHUB_ENV
           echo "my_release_level=${{ matrix.flavor.my_release_level }}" >> $GITHUB_ENV
 
-          # constants
-          echo "dotwheelhouse=dotpython\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-          echo "pandoc_source=https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip" >> $GITHUB_ENV
-          echo "pandoc_sha256=11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"  >> $GITHUB_ENV
-
           # Centralized mapping of python binaries and SHAs by version and arch.
           # NOTE: fill the 3.15 URLs and SHA values when available.
           # 3.13 x64 (GIL)
           if [ "$PYTHON_VERSION" = "3.13" ] && [ "$WINPYARCHDET" = "64" ]; then
-            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.13.9+20251031-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-            echo "python_sha256=3cdf2ad27fdeea2592b63e5a658aa65733b028a55332fa1aa27be4ce8aef96c0" >> $GITHUB_ENV
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            echo "python_sha256=d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3" >> $GITHUB_ENV
           fi
 
           # 3.14 x64 (GIL)
           if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "64" ]; then
-            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.14.0+20251031-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-            echo "python_sha256=a64800cbfbf1c384b9ac7eb5964a9a4c37537791e7ac80eb66b03ccb6f2c2e80" >> $GITHUB_ENV
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            echo "python_sha256=512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4" >> $GITHUB_ENV
           fi
 
           # 3.14 X64 (free-threading)
           # SHA not provided here: fill the correct SHA for security, otherwise the workflow will skip SHA check.
           if [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "64F" ]; then
-            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251031/cpython-3.14.0+20251031-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_ENV
-            echo "python_sha256=b81de5fc9e783ea6dfcf1098c28a278c874999c71afbb0309f6a8b4276c769d0" >> $GITHUB_ENV
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_ENV
+            echo "python_sha256=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61" >> $GITHUB_ENV
           fi
 
           # 3.15 X64 (GIL)
           if [ "$PYTHON_VERSION" = "3.15" ] && [ "$WINPYARCHDET" = "64" ]; then
             # Example placeholders -- replace with real URLs and shas when available
-            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251120/cpython-3.15.0a2+20251120-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-            echo "python_sha256=50e8d463a7838c36e01b053a8d01d5c58519e530098d52c7456660a76f3f35f7" >> $GITHUB_ENV
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.15.0a2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            echo "python_sha256=0ae8237881058aafb4bdf8ae9468e4791a5f3fd277a99bd90b7cb1175b96f0cb" >> $GITHUB_ENV
           fi
 
       - name: See variables
@@ -207,11 +200,7 @@ jobs:
           Write-Output "WINPY7Z is $env:WINPY7Z"
           Write-Output "WINPYEXE is $env:WINPYEXE"
           Write-Output "PANDOC is $env:PANDOC"
-          Write-Output "dotwheelhouse is $env:dotwheelhouse"
           Write-Output "destwheelhouse is $env:destwheelhouse"
-
-          Write-Output "pandoc_source is $env:pandoc_source" 
-          Write-Output "pandoc_sha256 is $env:pandoc_sha256"  
 
           Write-Output "WINPYVER is $env:WINPYVER"
 
@@ -222,18 +211,13 @@ jobs:
           Write-Output "python_source used is $env:python_source"
           curl.exe -L -o "python-3-embed.tar.gz" $env:python_source
           # Calculate SHA256 hash
-          $filePath = "python-3-embed.tar.gz"
           $expectedHash = $env:python_sha256
-
-          $hashObject = Get-FileHash -Path $filePath -Algorithm SHA256
-          $actualHash = $hashObject.Hash.ToLower()
+          $actualHash = (Get-FileHash -Path "python-3-embed.tar.gz" -Algorithm SHA256).Hash.ToLower()
 
           if ($actualHash -eq $expectedHash.ToLower()) {
               Write-Output "Hash matches."
           } else {
-              Write-Output "Hash does NOT match."
-              Write-Output "Actual: $actualHash"
-              Write-Output "Expected: $expectedHash"
+              Write-Error "Hash does NOT match: $actualHash vs expected $expectedHash"
               exit 1
           }
 
@@ -278,27 +262,21 @@ jobs:
         run: |
           $pandocZipPath = "pandoc.zip"
           $tempDir = "pandoc_temp"
-          $targetDir = "$env:build_location\t"
-          
-          # Download the zip file
+          $targetDir = Join-Path $env:build_location "t"
           Write-Host "Downloading Pandoc from $env:pandoc_source"
           curl.exe -L -o $pandocZipPath $env:pandoc_source
           
-          # Create a temporary directory for extraction
           Write-Host "Creating temporary directory for extraction"
           mkdir -p $tempDir
           
-          # Unzip the contents to the temporary directory
           Write-Host "Extracting archive to temporary directory"
           Expand-Archive -Path $pandocZipPath -DestinationPath $tempDir
           
-          # Create the final target directory
           Write-Host "Creating final target directory: $targetDir"
           if (-not (Test-Path -Path $targetDir)) {
               mkdir -p $targetDir
           }
           
-          # Find and copy only the pandoc.exe file
           Write-Host "Copying pandoc.exe to $targetDir"
           Copy-Item -Path (Join-Path $tempDir "pandoc-3.1.9\pandoc.exe") -Destination $targetDir -Force         
 
@@ -307,26 +285,20 @@ jobs:
           Get-ChildItem -Path $targetDir
 
           # Calculate SHA256 hash
-          $filePath = $pandocZipPath
-          $expectedHash = $env:pandoc_sha256
+          $expectedHash = $env:pandoc_sha256.ToLower()
 
-          $hashObject = Get-FileHash -Path $filePath -Algorithm SHA256
+          $hashObject = Get-FileHash -Path $pandocZipPath -Algorithm SHA256
           $actualHash = $hashObject.Hash.ToLower()
 
-          if ($actualHash -eq $expectedHash.ToLower()) {
-              Write-Output "Hash matches."
-          } else {
-              Write-Output "Hash does NOT match."
-              Write-Output "Actual: $actualHash"
-              Write-Output "Expected: $expectedHash"
+          if ($actualHash -ne $expectedHash) {
+              Write-Error "Pandoc SHA mismatch: $actualHash vs expected $expectedHash"
               exit 1
-          }
+          } else { Write-Host "Pandoc SHA ok" }
 
           # Optional: Clean up temporary files
           Write-Host "Cleaning up temporary files..."
           Remove-Item -Path $tempDir -Recurse -Force
           Remove-Item -Path $pandocZipPath -Force
-          
 
       - name: Upgrade pip and patch launchers
         if: env.WINPYREQUIREMENTS != ''
@@ -357,14 +329,10 @@ jobs:
           & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
 
       - name: Download additional wheelhouse requirements
-        if: env.WINPYREQUIREMENTS != ''
+        if: env.WINPYREQUIREMENTSwhl != ''
         shell: pwsh
         run: |
-          if ($env:WINPYREQUIREMENTSwhl -eq "") {
-              Write-Output "No additional wheelhouse requirements."
-          } else {
-            & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
-          }
+          & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
 
       - name: Install requirements
         if: env.WINPYREQUIREMENTS != ''
@@ -418,25 +386,15 @@ jobs:
         shell: pwsh
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
-          $sourceDir = "$env:build_location"
-          7z a $destfile7z $sourceDir
+          7z a $destfile7z $env:build_location
 
       - name: 7z executable archive the result
         if: env.WINPYREQUIREMENTS != '' && env.WINPYEXE == '1'
         shell: pwsh
         run: |
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
-          $sourceDir = "$env:build_location"
-
-          # Define the standard 7-Zip installation path (adjust if using a custom install)
-          $SevenZipDir = "C:\Program Files\7-Zip" 
-          Get-ChildItem $SevenZipDir
-          # Use the full path to the SFX module
           $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-    
-          #7z a -sfx $destfile7z $sourceDir
-          #7z a -t7z -sfx7z.sfx $destfile7z $sourceDir
-          7z a -t7z -sfx"$SFXModulePath" $destfile7z $sourceDir
+          7z a -t7z -sfx"$SFXModulePath" $destfile7z $env:build_location
 
       - name: generate hashes wppm style
         if: env.WINPYREQUIREMENTS != ''
