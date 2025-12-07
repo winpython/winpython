@@ -1047,6 +1047,17 @@ url = "https://files.pythonhosted.org/packages/18/ea/e6b9ac610451ee9f04477c311ad
 sha256 = "67d841aa272be5500de7f447c40d1d8452783af33b4c3599899319f6ef9ad3c1"
 
 [[packages]]
+name = "foundry-local-sdk"
+version = "0.5.1"
+
+[[packages.wheels]]
+name = "foundry_local_sdk-0.5.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ed/6b/76a7fe8f9f4c52cc84eaa1cd1b66acddf993496d55d6ea587bf0d0854d1c/foundry_local_sdk-0.5.1-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "f3639a3666bc3a94410004a91671338910ac2e1b8094b1587cc4db0f4a7df07e"
+
+[[packages]]
 name = "fqdn"
 version = "1.5.1"
 
@@ -1452,6 +1463,17 @@ url = "https://files.pythonhosted.org/packages/ff/62/85c4c919272577931d407be5ba5
 
 [packages.wheels.hashes]
 sha256 = "0d8d18d08f840c19d0ee7ca1fd82490fdc3729b7ac93f49870406ddde8ef8d8b"
+
+[[packages]]
+name = "imbalanced-learn"
+version = "0.14.0"
+
+[[packages.wheels]]
+name = "imbalanced_learn-0.14.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/65/60/103dc71019ec2fa987f42f9dbe88641a74edc57f8499fac8896955b66065/imbalanced_learn-0.14.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "8a8700c02ca185e113064815513f990fbf84eb4e7701f1d4e944ce67fb259a60"
 
 [[packages]]
 name = "importlib-metadata"
@@ -2147,6 +2169,17 @@ url = "https://files.pythonhosted.org/packages/7a/f0/8282d9641415e9e33df17351622
 sha256 = "93691da911e5d9d2e23bc54472892aff676df27a75274962ff9edc210364266d"
 
 [[packages]]
+name = "mlxtend"
+version = "0.23.4"
+
+[[packages.wheels]]
+name = "mlxtend-0.23.4-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/4c/43/2fc7f76c8891aef148901f1ba3dee65c1cbac00a85ae5ee0dabc2b861256/mlxtend-0.23.4-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "8675456e2b71841116e5317f6d7aa568848ea2546865eb5eca7192e9b7f395f4"
+
+[[packages]]
 name = "more-itertools"
 version = "10.7.0"
 
@@ -2390,14 +2423,14 @@ sha256 = "72024c7fd5e17375dec3608a27c03303e8ad00c81292667955c6fea7a3ccf541"
 
 [[packages]]
 name = "openai"
-version = "2.8.1"
+version = "2.9.0"
 
 [[packages.wheels]]
-name = "openai-2.8.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/55/4f/dbc0c124c40cb390508a82770fb9f6e3ed162560181a85089191a851c59a/openai-2.8.1-py3-none-any.whl"
+name = "openai-2.9.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/59/fd/ae2da789cd923dd033c99b8d544071a827c92046b150db01cfa5cea5b3fd/openai-2.9.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c6c3b5a04994734386e8dad3c00a393f56d3b68a27cd2e8acae91a59e4122463"
+sha256 = "0d168a490fbb45630ad508a6f3022013c155a68fd708069b6a1a01a5e8f0ffad"
 
 [[packages]]
 name = "openpyxl"
@@ -2860,6 +2893,17 @@ url = "https://files.pythonhosted.org/packages/36/ea/99ddefac41971acad68f14114f3
 
 [packages.wheels.hashes]
 sha256 = "118762d452a49d6b05e194ef344a55822987a462831ade91ec5c06fd2169d019"
+
+[[packages]]
+name = "pydot"
+version = "4.0.1"
+
+[[packages.wheels]]
+name = "pydot-4.0.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7e/32/a7125fb28c4261a627f999d5fb4afff25b523800faed2c30979949d6facd/pydot-4.0.1-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "869c0efadd2708c0be1f916eb669f3d664ca684bc57ffb7ecc08e70d5e93fee6"
 
 [[packages]]
 name = "pyflakes"
@@ -3544,6 +3588,17 @@ url = "https://files.pythonhosted.org/packages/e2/a9/efeaeca4928a9a56d04d609b573
 sha256 = "922c5f4edb3aa1beaa47bf61d65d5380011ff6adcd527f26377d05cb73ed8ec8"
 
 [[packages]]
+name = "scikit-learn"
+version = "1.8.0rc1"
+
+[[packages.wheels]]
+name = "scikit_learn-1.8.0rc1-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/d7/2c/00b89fbd3569ae558d7168ecfc4ca9eb9af3070ecfc5b68491f2d44aaa2d/scikit_learn-1.8.0rc1-cp314-cp314t-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "0e1580866ef0015b07460487ba40e00abd655300ea9a253f6968250920c1b927"
+
+[[packages]]
 name = "scipy"
 version = "1.16.3"
 
@@ -3663,6 +3718,17 @@ url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496a
 
 [packages.wheels.hashes]
 sha256 = "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
+
+[[packages]]
+name = "skrub"
+version = "0.6.2"
+
+[[packages.wheels]]
+name = "skrub-0.6.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/12/c9/5c73686480c7cd84400c27f7120ebb378caf94beaaf26ba56471625e1c66/skrub-0.6.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "c4478caf511f128ff60469e77e4f1b3a20f9b391b69765ad73f28d794256270f"
 
 [[packages]]
 name = "smmap"
@@ -3919,14 +3985,14 @@ sha256 = "d5558e0c25a4cb0853cddad3d77da9891a08cb85dd9f9f91b9f8cd66e511e695"
 
 [[packages]]
 name = "starlette"
-version = "0.47.2"
+version = "0.50.0"
 
 [[packages.wheels]]
-name = "starlette-0.47.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/f7/1f/b876b1f83aef204198a42dc101613fefccb32258e5428b5f9259677864b4/starlette-0.47.2-py3-none-any.whl"
+name = "starlette-0.50.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d9/52/1064f510b141bd54025f9b55105e26d1fa970b9be67ad766380a3c9b74b0/starlette-0.50.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c5847e96134e5c5371ee9fac6fdf1a67336d5815e09eb2a01fdb57a351ef915b"
+sha256 = "9e5391843ec9b6e472eed1365a78c8098cfceb7a74bfd4d6b1c0c0095efb3bca"
 
 [[packages]]
 name = "sv-ttk"
@@ -4026,6 +4092,17 @@ url = "https://files.pythonhosted.org/packages/82/4f/1695e70ceb3604f19eda9908e28
 
 [packages.wheels.hashes]
 sha256 = "59729b33556850b90e1093c4cf9e618af6f2e4c985df193fdf3c5b5cf02ca481"
+
+[[packages]]
+name = "threadpoolctl"
+version = "3.6.0"
+
+[[packages.wheels]]
+name = "threadpoolctl-3.6.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/32/d5/f9a850d79b0851d1d4ef6456097579a9005b31fea68726a4ae5f2d82ddd9/threadpoolctl-3.6.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb"
 
 [[packages]]
 name = "three-merge"
