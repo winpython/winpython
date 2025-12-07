@@ -42,7 +42,8 @@ class WinPythonDistributionBuilder:
 
     def __init__(self, build_number: int, release_level: str, basedir_wpy: Path,
                  source_dirs: Path, tools_directories: list[Path] = None,
-                 verbose: bool = False, flavor: str = ""):
+                 verbose: bool = False, flavor: str = "",
+                 winpyver: str = "", winpyver2: str = ""):
         """
         Initializes the WinPythonDistributionBuilder.
         Args:
@@ -66,6 +67,8 @@ class WinPythonDistributionBuilder:
         self.python_zip_file: Path = self._get_python_zip_file()
         self.python_name = self.python_zip_file.stem
         self.python_directory_name = "python"
+        self.winpyver = winpyver
+        self.winpyver2 = winpyver2
 
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
@@ -112,8 +115,8 @@ class WinPythonDistributionBuilder:
         config = {
             "WINPYthon_exe": executable_name,
             "WINPYthon_subdirectory_name": self.python_directory_name,
-            "WINPYVER": self.winpython_version_name,
-            "WINPYVER2": f"{self.python_full_version}.{self.build_number}",
+            "WINPYVER": self.winpyver,  # self.winpython_version_name,
+            "WINPYVER2": self.winpyver2,  # f"{self.python_full_version}.{self.build_number}",
             "WINPYFLAVOR": self.flavor,
             "WINPYARCH": self.distribution.architecture if self.distribution else 64,
         }
@@ -138,7 +141,8 @@ class WinPythonDistributionBuilder:
 
 def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
              source_dirs: Path = None, toolsdirs: str | list[Path] = None,
-             verbose: bool = False, flavor: str = ""):
+             verbose: bool = False, flavor: str = "",
+             winpyver: str = "", winpyver2: str = ""):
     """
     Make a WinPython distribution for a given set of parameters:
     Args:
@@ -159,7 +163,8 @@ def make_all(build_number: int, release_level: str, basedir_wpy: Path = None,
     builder = WinPythonDistributionBuilder(
         build_number, release_level, Path(basedir_wpy), 
         verbose=verbose, flavor=flavor,
-        source_dirs=source_dirs, tools_directories=tools_directories)
+        source_dirs=source_dirs, tools_directories=tools_directories,
+        winpyver=winpyver, winpyver2=winpyver2)
     builder.build()
 
 if __name__ == "__main__":
@@ -171,4 +176,6 @@ if __name__ == "__main__":
         flavor="dot",
         source_dirs=r"D:\WinPython\bd314\packages.win-amd64",
         toolsdirs=r"D:\WinPython\bd314\t.Slim",
+        winpyver=r"3.14.0.1dotb3",
+        winpyver2=r"3.14.0.1"        
     )

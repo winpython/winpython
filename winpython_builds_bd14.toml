@@ -1,8 +1,8 @@
 [pythons]
-"311" = { python_target_release = "3119", release = "2", my_release_level = "b3" }
-"312" = { python_target_release = "31210", release = "2", my_release_level = "b3" }
-"313" = { python_target_release = "3138", release = "0", my_release_level = "b3" }
-"314" = { python_target_release = "3140", release = "2", my_release_level = "b3" }
+"311" = { python_target_release = "3119", release = "2", my_release_level = "b4" }
+"312" = { python_target_release = "31210", release = "2", my_release_level = "b4" }
+"313" = { python_target_release = "31311", release = "0", my_release_level = "b4" }
+"314" = { python_target_release = "3142", release = "0", my_release_level = "b4" }
 
 
 
@@ -56,7 +56,7 @@ mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd314\\requirements_slim.txt"
 source_dirs = "C:\\Winp\\bd314\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
-toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
+toolsdirs = "C:\\Winp\\bdTools\\tools64_pandoc_alone"
 install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
@@ -93,4 +93,4 @@ source_dirs = "C:\\Winp\\bd314\\packages.win-amd64"
 find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
 install_options = "--no-index --pre --trusted-host=None --upgrade"
-wheelhousereq = "C:\\Winp\\bd314\\requirements_slim.txt"
+wheelhousereq = "C:\\Winp\\bd314\\requirements_whl.txt"
