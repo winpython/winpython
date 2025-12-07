@@ -498,14 +498,14 @@ sha256 = "ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc"
 
 [[packages]]
 name = "bokeh"
-version = "3.8.1"
+version = "3.8.0"
 
 [[packages.wheels]]
-name = "bokeh-3.8.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/5d/e7/b18bee0772d49c0f78d57f15a68e85257abf7224d9b910706abe8bd1dc0f/bokeh-3.8.1-py3-none-any.whl"
+name = "bokeh-3.8.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/96/9a/8e641b5415e12036d8a206147b8229d917a767b7d939521458d90feddcf5/bokeh-3.8.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "89a66cb8bfe85e91bce144e3ccf3c4a6f0f1347e7006282972568ea0ecacbb00"
+sha256 = "117c5e559231ad39fef87891a1a1b62b3bfefbaa47d536023537338f46015841"
 
 [[packages]]
 name = "branca"
@@ -762,14 +762,14 @@ sha256 = "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
 
 [[packages]]
 name = "cython"
-version = "3.2.1"
+version = "3.2.2"
 
 [[packages.wheels]]
-name = "cython-3.2.1-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/86/dc/d72dbb2f8e7ca95d2d18fd86f32b2e385996576230e7ecddd7d250786825/cython-3.2.1-cp314-cp314-win_amd64.whl"
+name = "cython-3.2.2-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/b6/07/1e3e4faf6f785d5ba053e9d6320b3f338162dc122c27a7c540b49615fc39/cython-3.2.2-cp314-cp314-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "4960e26cd34c1385f21646339f2e0361fcdd2ed3c01cdb50fe734add577ec56a"
+sha256 = "fed44d0ab2d36f1b0301c770b0dafec23bcb9700d58e7769cd6d9136b3304c11"
 
 [[packages]]
 name = "cytoolz"
@@ -1188,6 +1188,17 @@ url = "https://files.pythonhosted.org/packages/d8/74/55e5c57c414fa3965fee5fc036e
 
 [packages.wheels.hashes]
 sha256 = "9cde8b6a6b05f68516573523f2013a3574cb2c75299d7d500f44de82ba947b80"
+
+[[packages]]
+name = "foundry-local-sdk"
+version = "0.5.1"
+
+[[packages.wheels]]
+name = "foundry_local_sdk-0.5.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ed/6b/76a7fe8f9f4c52cc84eaa1cd1b66acddf993496d55d6ea587bf0d0854d1c/foundry_local_sdk-0.5.1-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "f3639a3666bc3a94410004a91671338910ac2e1b8094b1587cc4db0f4a7df07e"
 
 [[packages]]
 name = "fqdn"
@@ -1763,14 +1774,14 @@ sha256 = "4a03612f77d92c9e2160c9e0d2a80b277e30387126399088f780dba9622247be"
 
 [[packages]]
 name = "ipython"
-version = "9.7.0"
+version = "9.8.0"
 
 [[packages.wheels]]
-name = "ipython-9.7.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/05/aa/62893d6a591d337aa59dcc4c6f6c842f1fe20cd72c8c5c1f980255243252/ipython-9.7.0-py3-none-any.whl"
+name = "ipython-9.8.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/f1/df/8ee1c5dd1e3308b5d5b2f2dfea323bb2f3827da8d654abb6642051199049/ipython-9.8.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "bce8ac85eb9521adc94e1845b4c03d88365fd6ac2f4908ec4ed1eb1b0a065f9f"
+sha256 = "ebe6d1d58d7d988fbf23ff8ff6d8e1622cfdb194daf4b7b73b792c4ec3b85385"
 
 [[packages]]
 name = "ipython-genutils"
@@ -2819,14 +2830,14 @@ sha256 = "72024c7fd5e17375dec3608a27c03303e8ad00c81292667955c6fea7a3ccf541"
 
 [[packages]]
 name = "openai"
-version = "2.8.1"
+version = "2.9.0"
 
 [[packages.wheels]]
-name = "openai-2.8.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/55/4f/dbc0c124c40cb390508a82770fb9f6e3ed162560181a85089191a851c59a/openai-2.8.1-py3-none-any.whl"
+name = "openai-2.9.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/59/fd/ae2da789cd923dd033c99b8d544071a827c92046b150db01cfa5cea5b3fd/openai-2.9.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c6c3b5a04994734386e8dad3c00a393f56d3b68a27cd2e8acae91a59e4122463"
+sha256 = "0d168a490fbb45630ad508a6f3022013c155a68fd708069b6a1a01a5e8f0ffad"
 
 [[packages]]
 name = "openpyxl"
@@ -2929,14 +2940,14 @@ sha256 = "93be382804a9cdb0a7267585f157e5d1731bbe5545a85b268d6f5fe6232de2bc"
 
 [[packages]]
 name = "panel"
-version = "1.8.3"
+version = "1.8.4"
 
 [[packages.wheels]]
-name = "panel-1.8.3-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/59/f6/6dd8932f59f0e1e2649a2b2ae4a9e849218aa3d6ae8fdbbd01f5457b3b9b/panel-1.8.3-py3-none-any.whl"
+name = "panel-1.8.4-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/27/39/796ffe83cf6a1a6458f42db0a5c2ea7671478651e8945386e89625af5fdc/panel-1.8.4-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "0e435406c608c382dd3378251d16db4d8189ca44ca508c281e1bfd6c80f47689"
+sha256 = "d0e0f316c78159c87544a403d4600f7f056a6cafdc035df5b13c9c8667c36c96"
 
 [[packages]]
 name = "papermill"
@@ -2951,14 +2962,14 @@ sha256 = "0f09da6ef709f3f14dde77cb1af052d05b14019189869affff374c9e612f2dd5"
 
 [[packages]]
 name = "param"
-version = "2.2.1"
+version = "2.3.1"
 
 [[packages.wheels]]
-name = "param-2.2.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/6a/57/2b46b199482bbaaade2f978164577cf7c2fdc2782a7caf29fabd5265a84f/param-2.2.1-py3-none-any.whl"
+name = "param-2.3.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/11/da/9d476e9aadfa854719f3cb917e3f7a170a657a182d8d1d6e546594a4872b/param-2.3.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "e3a4ca7f3d7610615129a55dbde2e90eb67d11cef70936487b0a59717dba0bdc"
+sha256 = "886b19031438719bbecfd15044dcdd9ed3cb9edb199191294f75600c7081d163"
 
 [[packages]]
 name = "parso"
@@ -3160,14 +3171,14 @@ sha256 = "b5eccfabb82222f5aa46b798ff02a8452cf530a352c31bddfa29be41242863aa"
 
 [[packages]]
 name = "prince"
-version = "0.16.0"
+version = "0.16.2"
 
 [[packages.wheels]]
-name = "prince-0.16.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/18/d5/b4480a0f381cbbcfad31f4d118732ab717216857508a730938ee615669a1/prince-0.16.0-py3-none-any.whl"
+name = "prince-0.16.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/93/fe/92068ae56c8a88ee9123234014233561917dcd5c56c26a2c99f014444d36/prince-0.16.2-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "7e21a78d4dd06ca3ec526ee714a50b349f26de3fca6b79664150a951b31688f3"
+sha256 = "75c03afae5600c0b0f1bfd6e79d33ee8884fca198825d4242ba34efe9a43d848"
 
 [[packages]]
 name = "priority"
@@ -3215,14 +3226,14 @@ sha256 = "5a103c3eb905fcea0ab98be99c3a9a5ab2de60228aa5aceedc614c0281cf6153"
 
 [[packages]]
 name = "protobuf"
-version = "6.31.1"
+version = "6.33.1"
 
 [[packages.wheels]]
-name = "protobuf-6.31.1-cp310-abi3-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/44/3a/b15c4347dd4bf3a1b0ee882f384623e2063bb5cf9fa9d57990a4f7df2fb6/protobuf-6.31.1-cp310-abi3-win_amd64.whl"
+name = "protobuf-6.33.1-cp310-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/a6/79/8780a378c650e3df849b73de8b13cf5412f521ca2ff9b78a45c247029440/protobuf-6.33.1-cp310-abi3-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "426f59d2964864a1a366254fa703b8632dcec0790d8862d30034d8245e1cd447"
+sha256 = "923aa6d27a92bf44394f6abf7ea0500f38769d4b07f4be41cb52bd8b1123b9ed"
 
 [[packages]]
 name = "psutil"
@@ -4392,14 +4403,14 @@ sha256 = "922c5f4edb3aa1beaa47bf61d65d5380011ff6adcd527f26377d05cb73ed8ec8"
 
 [[packages]]
 name = "scikit-learn"
-version = "1.7.2"
+version = "1.8.0rc1"
 
 [[packages.wheels]]
-name = "scikit_learn-1.7.2-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/8e/87/24f541b6d62b1794939ae6422f8023703bbf6900378b2b34e0b4384dfefd/scikit_learn-1.7.2-cp314-cp314-win_amd64.whl"
+name = "scikit_learn-1.8.0rc1-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/af/8d/c66a0fb90b46fb1607190a1de8de61eb470451f854429c44f424a544dfbd/scikit_learn-1.8.0rc1-cp314-cp314-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "bb24510ed3f9f61476181e4db51ce801e2ba37541def12dc9333b946fc7a9cf8"
+sha256 = "b2999249f85219080cc20f6a2cdd5b6b72501e469fff579f4189cb97a0036efd"
 
 [[packages]]
 name = "scipy"
@@ -4422,6 +4433,17 @@ url = "https://files.pythonhosted.org/packages/d9/9f/8b2f2749ccfbe4fcef08650896a
 
 [packages.wheels.hashes]
 sha256 = "50e37c464fc67f37994e35bee4151e3d8f9320e9c204fca83a5d313c121bbbe7"
+
+[[packages]]
+name = "scs"
+version = "3.2.9"
+
+[[packages.wheels]]
+name = "scs-3.2.9-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/03/76/3733c2bf1c2022d6bad92ed2a0146e2129ef992afa87708d20b1b36c5a1d/scs-3.2.9-cp314-cp314-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "feb0a7e29bd26285270a9882d1bdd4b1e981a4e9cdb8eaee5f967a47bb2882ff"
 
 [[packages]]
 name = "seaborn"
@@ -4821,14 +4843,14 @@ sha256 = "d5558e0c25a4cb0853cddad3d77da9891a08cb85dd9f9f91b9f8cd66e511e695"
 
 [[packages]]
 name = "starlette"
-version = "0.47.2"
+version = "0.50.0"
 
 [[packages.wheels]]
-name = "starlette-0.47.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/f7/1f/b876b1f83aef204198a42dc101613fefccb32258e5428b5f9259677864b4/starlette-0.47.2-py3-none-any.whl"
+name = "starlette-0.50.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d9/52/1064f510b141bd54025f9b55105e26d1fa970b9be67ad766380a3c9b74b0/starlette-0.50.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c5847e96134e5c5371ee9fac6fdf1a67336d5815e09eb2a01fdb57a351ef915b"
+sha256 = "9e5391843ec9b6e472eed1365a78c8098cfceb7a74bfd4d6b1c0c0095efb3bca"
 
 [[packages]]
 name = "statsmodels"
@@ -4840,6 +4862,28 @@ url = "https://files.pythonhosted.org/packages/8b/c0/b28d0fd0347ea38d3610052f479
 
 [packages.wheels.hashes]
 sha256 = "95af7a9c4689d514f4341478b891f867766f3da297f514b8c4adf08f4fa61d03"
+
+[[packages]]
+name = "streamlit"
+version = "1.52.1"
+
+[[packages.wheels]]
+name = "streamlit-1.52.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d0/d4/cdafd4cc940937410f465ca7a77dd34237182c2ddece624e08db959496f8/streamlit-1.52.1-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "97fee2c3421d350fd65548e45a20f506ec1b651d78f95ecacbc0c2f9f838081c"
+
+[[packages]]
+name = "streamlit-bokeh"
+version = "3.8.0"
+
+[[packages.wheels]]
+name = "streamlit_bokeh-3.8.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/4b/a7/13e3fd79e08ffa4618d034c998335936788d9804c50c8ebafdd4557e8ece/streamlit_bokeh-3.8.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "26a6a220162c21a0e2fb368d6f98096b9fb5b3fa403358368da7ca77a7f8a6ec"
 
 [[packages]]
 name = "superqt"
