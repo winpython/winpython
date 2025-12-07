@@ -132,8 +132,8 @@ cryptography==46.0.3 \
     --hash=sha256:a9a3008438615669153eb86b26b61e09993921ebdd75385ddd748702c5adfddb
 cycler==0.12.1 \
     --hash=sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30
-cython==3.2.1 \
-    --hash=sha256:4960e26cd34c1385f21646339f2e0361fcdd2ed3c01cdb50fe734add577ec56a
+cython==3.2.2 \
+    --hash=sha256:fed44d0ab2d36f1b0301c770b0dafec23bcb9700d58e7769cd6d9136b3304c11
 cytoolz==1.1.0 \
     --hash=sha256:472c1c9a085f5ad973ec0ad7f0b9ba0969faea6f96c9e397f6293d386f3a25ec
 datasette==0.65.2 \
@@ -296,8 +296,8 @@ ipyleaflet==0.20.0 \
     --hash=sha256:b4c20ddc0b17d68e226cd3367ca2215a4db7e2b14374468c0eeaa54b53e4d173
 ipympl==0.9.8 \
     --hash=sha256:4a03612f77d92c9e2160c9e0d2a80b277e30387126399088f780dba9622247be
-ipython==9.7.0 \
-    --hash=sha256:bce8ac85eb9521adc94e1845b4c03d88365fd6ac2f4908ec4ed1eb1b0a065f9f
+ipython==9.8.0 \
+    --hash=sha256:ebe6d1d58d7d988fbf23ff8ff6d8e1622cfdb194daf4b7b73b792c4ec3b85385
 ipython-genutils==0.2.0 \
     --hash=sha256:72dd37233799e619666c9f639a9da83c34013a73e8bbc79a7a6348d93c61fab8
 ipython-pygments-lexers==1.1.1 \
@@ -478,8 +478,8 @@ numpy==2.3.5 \
     --hash=sha256:e6a0bc88393d65807d751a614207b7129a310ca4fe76a74e5c7da5fa5671417e
 numpydoc==1.8.0 \
     --hash=sha256:72024c7fd5e17375dec3608a27c03303e8ad00c81292667955c6fea7a3ccf541
-openai==2.8.1 \
-    --hash=sha256:c6c3b5a04994734386e8dad3c00a393f56d3b68a27cd2e8acae91a59e4122463
+openai==2.9.0 \
+    --hash=sha256:0d168a490fbb45630ad508a6f3022013c155a68fd708069b6a1a01a5e8f0ffad
 openpyxl==3.1.5 \
     --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2
 opentelemetry-api==1.34.1 \
@@ -538,8 +538,8 @@ polars-runtime-32==1.35.2 \
     --hash=sha256:ddc015fac39735592e2e7c834c02193ba4d257bb4c8c7478b9ebe440b0756b84
 prettytable==3.16.0 \
     --hash=sha256:b5eccfabb82222f5aa46b798ff02a8452cf530a352c31bddfa29be41242863aa
-prince==0.16.0 \
-    --hash=sha256:7e21a78d4dd06ca3ec526ee714a50b349f26de3fca6b79664150a951b31688f3
+prince==0.16.2 \
+    --hash=sha256:75c03afae5600c0b0f1bfd6e79d33ee8884fca198825d4242ba34efe9a43d848
 priority==2.0.0 \
     --hash=sha256:6f8eefce5f3ad59baf2c080a664037bb4725cd0a790d53d59ab4059288faf6aa
 prometheus-client==0.21.1 \
@@ -750,8 +750,8 @@ ruff==0.14.7 \
     --hash=sha256:e17a20ad0d3fad47a326d773a042b924d3ac31c6ca6deb6c72e9e6b5f661a7c6
 rx==3.2.0 \
     --hash=sha256:922c5f4edb3aa1beaa47bf61d65d5380011ff6adcd527f26377d05cb73ed8ec8
-scikit-learn==1.7.2 \
-    --hash=sha256:bb24510ed3f9f61476181e4db51ce801e2ba37541def12dc9333b946fc7a9cf8
+scikit-learn==1.8.0rc1 \
+    --hash=sha256:b2999249f85219080cc20f6a2cdd5b6b72501e469fff579f4189cb97a0036efd
 scipy==1.16.3 \
     --hash=sha256:e5d42a9472e7579e473879a1990327830493a7047506d58d73fc429b84c1d49d
 scramp==1.4.5 \
@@ -828,8 +828,8 @@ sspilib==0.4.0 \
     --hash=sha256:432076f90099eb3ca339795af709afe755e85b039fb5b86fac7e906e2a84fb94
 stack-data==0.6.3 \
     --hash=sha256:d5558e0c25a4cb0853cddad3d77da9891a08cb85dd9f9f91b9f8cd66e511e695
-starlette==0.47.2 \
-    --hash=sha256:c5847e96134e5c5371ee9fac6fdf1a67336d5815e09eb2a01fdb57a351ef915b
+starlette==0.50.0 \
+    --hash=sha256:9e5391843ec9b6e472eed1365a78c8098cfceb7a74bfd4d6b1c0c0095efb3bca
 statsmodels==0.14.5 \
     --hash=sha256:95af7a9c4689d514f4341478b891f867766f3da297f514b8c4adf08f4fa61d03
 superqt==0.7.6 \
