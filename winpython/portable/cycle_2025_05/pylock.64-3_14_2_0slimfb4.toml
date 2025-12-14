@@ -4227,14 +4227,14 @@ sha256 = "292c8f1c4e7516bf9086f8850935c799a874039c8bcf959d47b600e4c44a6236"
 
 [[packages]]
 name = "tornado"
-version = "6.5.2"
+version = "6.5.3"
 
 [packages.sdist]
-name = "tornado-6.5.2.tar.gz"
-url = "https://files.pythonhosted.org/packages/09/ce/1eb500eae19f4648281bb2186927bb062d2438c2e5093d1360391afd2f90/tornado-6.5.2.tar.gz"
+name = "tornado-6.5.3.tar.gz"
+url = "https://files.pythonhosted.org/packages/7f/2e/3d22d478f27cb4b41edd4db7f10cd7846d0a28ea443342de3dba97035166/tornado-6.5.3.tar.gz"
 
 [packages.sdist.hashes]
-sha256 = "ab53c8f9a0fa351e2c0741284e06c7a45da86afb544133201c5cc8578eb076a0"
+sha256 = "16abdeb0211796ffc73765bc0a20119712d68afeeaf93d1a3f2edf6b3aee8d5a"
 
 [[packages]]
 name = "tqdm"
