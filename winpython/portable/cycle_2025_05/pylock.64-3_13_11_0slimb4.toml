@@ -1224,14 +1224,14 @@ sha256 = "f0bc2a92acde20bca56367aa5c1c376c433f450608d058daebab2fc9bf8198bf"
 
 [[packages]]
 name = "fonttools"
-version = "4.59.2"
+version = "4.61.0"
 
 [[packages.wheels]]
-name = "fonttools-4.59.2-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/ea/a9/be7219fc64a6026cc0aded17fa3720f9277001c185434230bd351bf678e6/fonttools-4.59.2-cp313-cp313-win_amd64.whl"
+name = "fonttools-4.61.0-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e9/1f/116013b200fbeba871046554d5d2a45fefa69a05c40e9cdfd0d4fff53edc/fonttools-4.61.0-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "a72155928d7053bbde499d32a9c77d3f0f3d29ae72b5a121752481bcbd71e50f"
+sha256 = "c53b47834ae41e8e4829171cc44fec0fdf125545a15f6da41776b926b9645a9a"
 
 [[packages]]
 name = "foundry-local-sdk"
@@ -2345,6 +2345,17 @@ url = "https://files.pythonhosted.org/packages/83/60/d497a310bde3f01cb805196ac61
 sha256 = "342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc"
 
 [[packages]]
+name = "librt"
+version = "0.6.2"
+
+[[packages.wheels]]
+name = "librt-0.6.2-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/14/c0/c81266c308e1449ed9197b059feea91205832a1cd37e12443c0f7d3e0743/librt-0.6.2-cp313-cp313-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "778667b8688bbacba06739eb5b0b78d99d2c65a99262dac5ab25eba473b34d5f"
+
+[[packages]]
 name = "linkify-it-py"
 version = "2.0.3"
 
@@ -2632,14 +2643,14 @@ sha256 = "93691da911e5d9d2e23bc54472892aff676df27a75274962ff9edc210364266d"
 
 [[packages]]
 name = "mizani"
-version = "0.11.4"
+version = "0.14.3"
 
 [[packages.wheels]]
-name = "mizani-0.11.4-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/2a/11/f3777ad46c5d92e3ead121c22ea45fafb6c3b2c1edca0c0c6494969c125c/mizani-0.11.4-py3-none-any.whl"
+name = "mizani-0.14.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/5c/d2/4ffcaa27c8a4b4f9ad456da4821c76dfbdfada23e8210cd4d80e1eb3236a/mizani-0.14.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "5b6271dc3da2c88694dca2e0e0a7e1879f0e2fb046c789776f54d090a5243735"
+sha256 = "6d2ca9b1b8366ff85668f0cc1b6095f1e702e26e66f132c4f02a949efa32a688"
 
 [[packages]]
 name = "ml-dtypes"
@@ -2753,14 +2764,14 @@ sha256 = "0c53cd8b077546da4e48869f49b13164bebafd0c2a5afceb6bb6a316e7fb46e4"
 
 [[packages]]
 name = "mypy"
-version = "1.18.2"
+version = "1.19.0"
 
 [[packages.wheels]]
-name = "mypy-1.18.2-cp313-cp313-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/71/cf/ac0f2c7e9d0ea3c75cd99dff7aec1c9df4a1376537cb90e4c882267ee7e9/mypy-1.18.2-cp313-cp313-win_amd64.whl"
+name = "mypy-1.19.0-cp313-cp313-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/f8/56/53a8f70f562dfc466c766469133a8a4909f6c0012d83993143f2a9d48d2d/mypy-1.19.0-cp313-cp313-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "0e2785a84b34a72ba55fb5daf079a1003a34c05b22238da94fcae2bbe46f3544"
+sha256 = "cabbee74f29aa9cd3b444ec2f1e4fa5a9d0d746ce7567a6a609e224429781f53"
 
 [[packages]]
 name = "mypy-extensions"
@@ -3248,14 +3259,14 @@ sha256 = "5ac851e100367735250206788a2b1325412aa4a4917a4fe3e6f0bc5aa6f3d90a"
 
 [[packages]]
 name = "plotnine"
-version = "0.13.6"
+version = "0.15.2"
 
 [[packages.wheels]]
-name = "plotnine-0.13.6-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/93/b1/e1c84e68cf24e83c4d251122e04c48840be203dafb4727e738381cdefa74/plotnine-0.13.6-py3-none-any.whl"
+name = "plotnine-0.15.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/58/27/4e6ffe2f095fbfd6285343aa6114903a4cf011564b4f1f2bb706341472df/plotnine-0.15.2-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "4acc1af29fa4e91e726b67d49277e8368f62e1c817f01bf14ecd8ca5e83bfaea"
+sha256 = "7dc508bc51625b9b9f945e274d8ee4463cf30b280749190a5b707e6828003fa6"
 
 [[packages]]
 name = "plotpy"
