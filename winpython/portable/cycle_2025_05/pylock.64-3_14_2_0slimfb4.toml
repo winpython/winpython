@@ -652,14 +652,14 @@ sha256 = "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
 
 [[packages]]
 name = "cython"
-version = "3.2.2"
+version = "3.2.3"
 
 [[packages.wheels]]
-name = "cython-3.2.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/76/f2/98fd8d0b514622a789fd2824b59bd6041b799aaeeba14a8d92d52f6654dd/cython-3.2.2-py3-none-any.whl"
+name = "cython-3.2.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/e5/41/54fd429ff8147475fc24ca43246f85d78fb4e747c27f227e68f1594648f1/cython-3.2.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "13b99ecb9482aff6a6c12d1ca6feef6940c507af909914b49f568de74fa965fb"
+sha256 = "06a1317097f540d3bb6c7b81ed58a0d8b9dbfa97abf39dfd4c22ee87a6c7241e"
 
 [[packages]]
 name = "cytoolz"
@@ -894,14 +894,14 @@ sha256 = "760643d3452b4d777d295bb167ccc74c64a81df23fb5e08eff250c425a4b2017"
 
 [[packages]]
 name = "faker"
-version = "37.12.0"
+version = "38.2.0"
 
 [[packages.wheels]]
-name = "faker-37.12.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/8e/98/2c050dec90e295a524c9b65c4cb9e7c302386a296b2938710448cbd267d5/faker-37.12.0-py3-none-any.whl"
+name = "faker-38.2.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/17/93/00c94d45f55c336434a15f98d906387e87ce28f9918e4444829a8fda432d/faker-38.2.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "afe7ccc038da92f2fbae30d8e16d19d91e92e242f8401ce9caf44de892bab4c4"
+sha256 = "35fe4a0a79dee0dc4103a6083ee9224941e7d3594811a50e3969e547b0d2ee65"
 
 [[packages]]
 name = "fasta2a"
@@ -916,14 +916,14 @@ sha256 = "23d49307f6a372e07b9ec9a21187a0864429145e8ded4a41262bd33e2ecaee4c"
 
 [[packages]]
 name = "fastapi"
-version = "0.122.0"
+version = "0.123.9"
 
 [[packages.wheels]]
-name = "fastapi-0.122.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/7a/93/aa8072af4ff37b795f6bbf43dcaf61115f40f49935c7dbb180c9afc3f421/fastapi-0.122.0-py3-none-any.whl"
+name = "fastapi-0.123.9-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/db/15/a785e992a27620e022d0bc61b6c897ec14cff07c5ab7ff9f27651a21570b/fastapi-0.123.9-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a456e8915dfc6c8914a50d9651133bd47ec96d331c5b44600baa635538a30d67"
+sha256 = "f54c69f23db14bd3dbcdfaf3fdce0483ca5f499512380c8e379a70cda30aa920"
 
 [[packages]]
 name = "fastjsonschema"
@@ -1180,14 +1180,14 @@ sha256 = "af628ba6fa493f75c7e9dbe9373d148ca9f4399b5ea29976519e0a3848eddd16"
 
 [[packages]]
 name = "google-genai"
-version = "1.50.1"
+version = "1.55.0"
 
 [[packages.wheels]]
-name = "google_genai-1.50.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/30/6b/78a7588d9a4f6c8c8ed326a32385d0566a3262c91c3f7a005e4231207894/google_genai-1.50.1-py3-none-any.whl"
+name = "google_genai-1.55.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/3e/86/a5a8e32b2d40b30b5fb20e7b8113fafd1e38befa4d1801abd5ce6991065a/google_genai-1.55.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "15ae694b080269c53d325dcce94622f33e94cf81bd2123f029ab77e6b8f09eab"
+sha256 = "98c422762b5ff6e16b8d9a1e4938e8e0ad910392a5422e47f5301498d7f373a1"
 
 [[packages]]
 name = "graphene"
@@ -1235,14 +1235,14 @@ sha256 = "0e9d52832cccf0f7188cfe585ba962d2674b241c01916d780925df34873bceb0"
 
 [[packages]]
 name = "groq"
-version = "0.36.0"
+version = "0.37.1"
 
 [[packages.wheels]]
-name = "groq-0.36.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/27/79/28f295d5064750674014f50e3c2daf8dc233964c904d357ac2bd0e33fc31/groq-0.36.0-py3-none-any.whl"
+name = "groq-0.37.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/5f/d6/645a081750e43f858b7d09dce5d8e1e76cf11e7e4bdba81252e04f78963d/groq-0.37.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "ac7eeae31a5c2e76d30ea678f0b1a9168ff906c4440f5ec3a42ac74d5b4fdb3c"
+sha256 = "b49f8c8898c55eaec9f71f1342f3fcacc9560d67a08ce5f35fbfb84e8dacd3da"
 
 [[packages]]
 name = "h11"
@@ -1290,14 +1290,14 @@ sha256 = "210d577732b519ac6ede149d2f2f34049d44e8622bf14eb3d63bbcd2d4b332dc"
 
 [[packages]]
 name = "holoviews"
-version = "1.22.0"
+version = "1.22.1"
 
 [[packages.wheels]]
-name = "holoviews-1.22.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/9f/3d/e60b64b6d8af103739914e1d3e1e4bb3b464a4ec6435aa146ff63a24dc3c/holoviews-1.22.0-py3-none-any.whl"
+name = "holoviews-1.22.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/4f/ab/a6aa43d45ceb88adc0e8c1358fa6935c6e6a5895537431dec67524ca2ccd/holoviews-1.22.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "452f8822c0abb9c8a443d6410d3e6c4c86d8fc7dd5c2ae244ff194a321b1a863"
+sha256 = "6f4f0656336035cde1d8103ac6461d7c8ac9a60c4a6d883785cc81f2cc5b8702"
 
 [[packages]]
 name = "hpack"
@@ -1356,14 +1356,14 @@ sha256 = "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad"
 
 [[packages]]
 name = "huggingface-hub"
-version = "1.1.6"
+version = "1.2.3"
 
 [[packages.wheels]]
-name = "huggingface_hub-1.1.6-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/c2/3c/168062db8c0068315ed3f137db450869eb14d98f00144234c118f294b461/huggingface_hub-1.1.6-py3-none-any.whl"
+name = "huggingface_hub-1.2.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/df/8d/7ca723a884d55751b70479b8710f06a317296b1fa1c1dec01d0420d13e43/huggingface_hub-1.2.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "09726c4fc4c0dc5d83568234daff1ccb815c39b310784359c9d8b5906f679de2"
+sha256 = "c9b7a91a9eedaa2149cdc12bdd8f5a11780e10de1f1024718becf9e41e5a4642"
 
 [[packages]]
 name = "hupper"
@@ -1411,14 +1411,14 @@ sha256 = "b03380493a519fce58ea5af42e4a42317bf9bd425596f7a0835ffce80f1a42e5"
 
 [[packages]]
 name = "hypothesis"
-version = "6.138.13"
+version = "6.148.7"
 
 [[packages.wheels]]
-name = "hypothesis-6.138.13-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/cc/82/823c202c8b349ff31a0718e46ff98074bebfb3aa20813091cea07821c25f/hypothesis-6.138.13-py3-none-any.whl"
+name = "hypothesis-6.148.7-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/e9/55/fa5607e4a4af96dfa0e7efd81bbd130735cedd21aac70b25e06191bff92f/hypothesis-6.148.7-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "09f1130deb08e5d12fb3b59b55c113fd79debaaab9b224ffac17be8341de4326"
+sha256 = "94dbd58ebf259afa3bafb1d3bf5761ac1bde6f1477de494798cbf7960aabbdee"
 
 [[packages]]
 name = "id"
@@ -1532,14 +1532,14 @@ sha256 = "2413bc441b376e5cd3f55bb5d364f973ad8bdd7bf87e53c79de3c11bf3feecc8"
 
 [[packages]]
 name = "ipycanvas"
-version = "0.14.2"
+version = "0.14.3"
 
 [[packages.wheels]]
-name = "ipycanvas-0.14.2-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/fb/c1/5bee6c4952f2d7cb0d0f3a6ce3574680937ce75a3f46abc2c19cf2685c38/ipycanvas-0.14.2-py2.py3-none-any.whl"
+name = "ipycanvas-0.14.3-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/11/37/c6880bd16093793dcb4c005011cf968f45fd815b7b5094fa8374524add26/ipycanvas-0.14.3-py2.py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "94e3498251033d489f4d91cae074a8a8d91e65b5809767dfd6ee903df6ae4bc3"
+sha256 = "8a2f48e1e079355d3e7d5683e5c6e7684a87c15c3750c8d8cd2289c95383ee3e"
 
 [[packages]]
 name = "ipykernel"
@@ -1949,6 +1949,17 @@ url = "https://files.pythonhosted.org/packages/0c/28/4b2e5c47a0da96896fdfdb00634
 sha256 = "1fa333e8b2ce4d9660f2cda9c0e1b6bafcfb2457a9d259faa82289e73ec24891"
 
 [[packages]]
+name = "lazy-loader"
+version = "0.4"
+
+[[packages.wheels]]
+name = "lazy_loader-0.4-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/83/60/d497a310bde3f01cb805196ac61b7ad6dc5dcf8dce66634dc34364b20b4f/lazy_loader-0.4-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "342aa8e14d543a154047afb4ba8ef17f5563baad3fc610d7b15b213b0f119efc"
+
+[[packages]]
 name = "librt"
 version = "0.6.2"
 
@@ -2060,14 +2071,14 @@ sha256 = "4faffd047e07c38848ce017e8725090413cd80cbc23d86e55c587bf979e579c9"
 
 [[packages]]
 name = "matplotlib"
-version = "3.10.7"
+version = "3.10.8"
 
 [[packages.wheels]]
-name = "matplotlib-3.10.7-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/39/69/9684368a314f6d83fe5c5ad2a4121a3a8e03723d2e5c8ea17b66c1bad0e7/matplotlib-3.10.7-cp314-cp314t-win_amd64.whl"
+name = "matplotlib-3.10.8-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/7c/e6/76f2813d31f032e65f6f797e3f2f6e4aab95b65015924b1c51370395c28a/matplotlib-3.10.8-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "f79d5de970fc90cd5591f60053aecfce1fcd736e0303d9f0bf86be649fa68fb8"
+sha256 = "25d380fe8b1dc32cf8f0b1b448470a77afb195438bafdf1d858bfb876f3edf7b"
 
 [[packages]]
 name = "matplotlib-inline"
@@ -2346,14 +2357,14 @@ sha256 = "87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c"
 
 [[packages]]
 name = "networkx"
-version = "3.6"
+version = "3.6.1"
 
 [[packages.wheels]]
-name = "networkx-3.6-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/07/c7/d64168da60332c17d24c0d2f08bdf3987e8d1ae9d84b5bbd0eec2eb26a55/networkx-3.6-py3-none-any.whl"
+name = "networkx-3.6.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "cdb395b105806062473d3be36458d8f1459a4e4b98e236a66c3a48996e07684f"
+sha256 = "d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762"
 
 [[packages]]
 name = "nh3"
@@ -2423,14 +2434,14 @@ sha256 = "72024c7fd5e17375dec3608a27c03303e8ad00c81292667955c6fea7a3ccf541"
 
 [[packages]]
 name = "openai"
-version = "2.9.0"
+version = "2.11.0"
 
 [[packages.wheels]]
-name = "openai-2.9.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/59/fd/ae2da789cd923dd033c99b8d544071a827c92046b150db01cfa5cea5b3fd/openai-2.9.0-py3-none-any.whl"
+name = "openai-2.11.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/e5/f1/d9251b565fce9f8daeb45611e3e0d2f7f248429e40908dcee3b6fe1b5944/openai-2.11.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "0d168a490fbb45630ad508a6f3022013c155a68fd708069b6a1a01a5e8f0ffad"
+sha256 = "21189da44d2e3d027b08c7a920ba4454b8b7d6d30ae7e64d9de11dbe946d4faa"
 
 [[packages]]
 name = "openpyxl"
@@ -2904,6 +2915,17 @@ url = "https://files.pythonhosted.org/packages/7e/32/a7125fb28c4261a627f999d5fb4
 
 [packages.wheels.hashes]
 sha256 = "869c0efadd2708c0be1f916eb669f3d664ca684bc57ffb7ecc08e70d5e93fee6"
+
+[[packages]]
+name = "pydub"
+version = "0.25.1"
+
+[[packages.wheels]]
+name = "pydub-0.25.1-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/a6/53/d78dc063216e62fc55f6b2eebb447f6a4b0a59f55c8406376f76bf959b08/pydub-0.25.1-py2.py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6"
 
 [[packages]]
 name = "pyflakes"
@@ -3588,15 +3610,26 @@ url = "https://files.pythonhosted.org/packages/e2/a9/efeaeca4928a9a56d04d609b573
 sha256 = "922c5f4edb3aa1beaa47bf61d65d5380011ff6adcd527f26377d05cb73ed8ec8"
 
 [[packages]]
-name = "scikit-learn"
-version = "1.8.0rc1"
+name = "scikit-image"
+version = "0.26.0rc1"
 
 [[packages.wheels]]
-name = "scikit_learn-1.8.0rc1-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/d7/2c/00b89fbd3569ae558d7168ecfc4ca9eb9af3070ecfc5b68491f2d44aaa2d/scikit_learn-1.8.0rc1-cp314-cp314t-win_amd64.whl"
+name = "scikit_image-0.26.0rc1-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/77/56/bbc37b5c7299b43f4692d686064412a07fac46e585cb15c602e4dfdd5f36/scikit_image-0.26.0rc1-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "0e1580866ef0015b07460487ba40e00abd655300ea9a253f6968250920c1b927"
+sha256 = "89249aa0fb336de32b216cbcc6359dd8364af0824578854edcdca8b2dda673a2"
+
+[[packages]]
+name = "scikit-learn"
+version = "1.8.0"
+
+[[packages.wheels]]
+name = "scikit_learn-1.8.0-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/35/4d/748c9e2872637a57981a04adc038dacaa16ba8ca887b23e34953f0b3f742/scikit_learn-1.8.0-cp314-cp314t-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "00d6f1d66fbcf4eba6e356e1420d33cc06c70a45bb1363cd6f6a8e4ebbbdece2"
 
 [[packages]]
 name = "scipy"
@@ -4114,6 +4147,17 @@ url = "https://files.pythonhosted.org/packages/23/be/a52588102605ec52b4e88340d65
 
 [packages.wheels.hashes]
 sha256 = "dd219f4696aa0bbec6099ac3528b4de0450ff9bde862dd8f6d6f52e745f83464"
+
+[[packages]]
+name = "tifffile"
+version = "2025.3.30"
+
+[[packages.wheels]]
+name = "tifffile-2025.3.30-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/6e/be/10d23cfd4078fbec6aba768a357eff9e70c0b6d2a07398425985c524ad2a/tifffile-2025.3.30-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "0ed6eee7b66771db2d1bfc42262a51b01887505d35539daef118f4ff8c0f629c"
 
 [[packages]]
 name = "tiktoken"
