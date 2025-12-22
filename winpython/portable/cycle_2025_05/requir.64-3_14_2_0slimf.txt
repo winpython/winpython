@@ -322,8 +322,8 @@ jinja2==3.1.6 \
     --hash=sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
 jiter==0.11.1 \
     --hash=sha256:f4db07d127b54c4a2d43b4cf05ff0193e4f73e0dd90c74037e16df0b29f666e1
-joblib==1.5.2 \
-    --hash=sha256:4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241
+joblib==1.5.3 \
+    --hash=sha256:5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713
 json5==0.12.1 \
     --hash=sha256:d9c9b3bc34a5f54d43c35e11ef7cb87d8bdd098c6ace87117a7b7e83e705c1d5
 jsonpatch==1.33 \
@@ -520,6 +520,8 @@ ply==3.11 \
     --hash=sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce
 prettytable==3.16.0 \
     --hash=sha256:b5eccfabb82222f5aa46b798ff02a8452cf530a352c31bddfa29be41242863aa
+prince==0.16.3 \
+    --hash=sha256:99b41bd2a3acfc8020edfc912da69b9459f974712771d53adb6923afdb880856
 priority==2.0.0 \
     --hash=sha256:6f8eefce5f3ad59baf2c080a664037bb4725cd0a790d53d59ab4059288faf6aa
 prometheus-client==0.21.1 \
@@ -880,6 +882,8 @@ wheel==0.45.1 \
     --hash=sha256:708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248
 widgetsnbextension==4.0.15 \
     --hash=sha256:8156704e4346a571d9ce73b84bee86a29906c9abfd7223b7228a28899ccf3366
+wordcloud==1.9.5 \
+    --hash=sha256:e19c3883165967ad4e0cb7baa9208fdca758cfd0f75d68743a9390269180d47a
 wppm==17.2.20250823 \
     --hash=sha256:0945411b12eaf6da134a9d8662a4afb2b25e129dd34fc2f6ef76ee62d61411c3
 wrapt==2.0.1 \
