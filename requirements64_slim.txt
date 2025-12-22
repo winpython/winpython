@@ -190,15 +190,12 @@ pybind11
 #SLIM_2024 pygame
 plotnine
 
-mpl_scatter_density
-
-
 
 
 #SLIM_2024 moviepy
 
 
-streamz
+#no download streamz
 
 
 # Tensorflow_world
@@ -265,6 +262,7 @@ simpy
 
 trio
 
+#dead2025-07-13: imbalanced-learn then rewaken ?
 imbalanced-learn
 
 tzlocal
@@ -392,8 +390,8 @@ orjson
 #2023-08-22 fuzz replacements
 rapidfuzz
 
-## waiting pyarrow on 3.11 oct 23th
 streamlit
+streamlit-bokeh
 
 ## 2024-09-08 until plotly at least updates its lumnio thing https://github.com/plotly/plotly.py/pull/4685
 # dash
@@ -447,7 +445,7 @@ azure-core
 # write & read QRcode
 python-barcode
 qrcode
-opencv-python
+#not compatible with numpy-2.3 2025-09-14: opencv-python
 
 #llm follow-up
 # llm
@@ -494,8 +492,8 @@ adbc_driver_manager
 #cartopy 2024-12-26 use geopandas more popular (that include gdal via pyogrio)
 
 #2024-12-26 agent ai things
-pydantic_ai
-#skrub replaces dirty_cat, seems needing torch
+pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,mistral,openai,vertexai]
+skrub
 termcolor
 tiktoken
 
@@ -508,3 +506,19 @@ prince
 faker
 
 pyusb
+
+sv-ttk
+typer
+
+onnxruntime
+markitdown
+pyvisa
+
+soundfile
+psycopg2
+pipdeptree
+
+ipykernel!=7.0.0,!=7.0.1
+
+foundry-local-sdk
+
