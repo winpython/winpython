@@ -21,9 +21,9 @@ jobs:
       matrix:
         flavor:
           - name: "dot"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dotb4.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dotb4.txt"
-            REQUIREMENTS_315: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dotb4.txt"
+            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dot.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dot.txt"
+            REQUIREMENTS_315: "winpython\\portable\\cycle_2025_05\\requir.64-3_15_0_0dot.txt"
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
@@ -34,8 +34,8 @@ jobs:
             WINPYARCH: "64"
             WINPYARCHDET: "64"
           - name: "slim"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0slimb4.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slimb4.txt"
+            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0slim.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slim.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -47,11 +47,11 @@ jobs:
             WINPYARCH: "64"
             WINPYARCHDET: "64"
           - name: "whl"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dotb4.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dotb4.txt"
+            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dot.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dot.txt"
             REQUIREMENTS_315: ""
-            REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0whlb4_wheels.txt"
-            REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0whlb4_wheels.txt"
+            REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0whl_wheels.txt"
+            REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0whl_wheels.txt"
             REQUIREMENTS_WHL_315: ""
             ZIP: "0"
             SEVEN_Z: "1"
@@ -61,7 +61,7 @@ jobs:
             WINPYARCHDET: "64"
           - name: "free"
             REQUIREMENTS_313: ""
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0freeb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0free.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -74,7 +74,7 @@ jobs:
             WINPYARCHDET: "64F"
           - name: "slimf"
             REQUIREMENTS_313: ""
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slimfb4.txt"
+            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slimf.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -96,7 +96,7 @@ jobs:
       WINPYARCH: ${{ matrix.flavor.WINPYARCH }}
       WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
       # constants
-      my_release_level: "b4"
+      my_release_level: ""
       dotwheelhouse: dotpython\\wheelhouse\\included.wheels
       pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
       pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
@@ -160,8 +160,8 @@ jobs:
 
           # 3.15 X64 (GIL)
           if [ "$PYTHON_VERSION" = "3.15" ] && [ "$WINPYARCHDET" = "64" ]; then
-            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.15.0a2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-            echo "python_sha256=0ae8237881058aafb4bdf8ae9468e4791a5f3fd277a99bd90b7cb1175b96f0cb" >> $GITHUB_ENV
+            echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
+            echo "python_sha256=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7b" >> $GITHUB_ENV
           fi
 
       - name: Download, verify and extract python standalone
