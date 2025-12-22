@@ -16,8 +16,8 @@ alabaster==1.0.0 \
     --hash=sha256:fc6786402dc3fcb2de3cabd5fe455a2db534b371124f1f21de8731783dec828b
 alembic==1.17.2 \
     --hash=sha256:f483dd1fe93f6c5d49217055e4d15b905b425b6af906746abb35b69c1996c4e6
-altair==5.5.0 \
-    --hash=sha256:91a310b926508d560fe0148d02a194f38b824122641ef528113d029fcd129f8c
+altair==6.0.0 \
+    --hash=sha256:09ae95b53d5fe5b16987dccc785a7af8588f2dca50de1e7a156efa8a461515f8
 annotated-doc==0.0.3 \
     --hash=sha256:348ec6664a76f1fd3be81f43dffbee4c7e8ce931ba71ec67cc7f4ade7fbbb580
 annotated-types==0.7.0 \
@@ -346,8 +346,8 @@ jinja2==3.1.6 \
     --hash=sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
 jiter==0.11.1 \
     --hash=sha256:f773f84080b667c69c4ea0403fc67bb08b07e2b7ce1ef335dea5868451e60fed
-joblib==1.5.2 \
-    --hash=sha256:4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241
+joblib==1.5.3 \
+    --hash=sha256:5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713
 json5==0.12.1 \
     --hash=sha256:d9c9b3bc34a5f54d43c35e11ef7cb87d8bdd098c6ace87117a7b7e83e705c1d5
 jsonpatch==1.33 \
@@ -574,8 +574,8 @@ polars-runtime-32==1.36.1 \
     --hash=sha256:cc17101f28c9a169ff8b5b8d4977a3683cd403621841623825525f440b564cf0
 prettytable==3.16.0 \
     --hash=sha256:b5eccfabb82222f5aa46b798ff02a8452cf530a352c31bddfa29be41242863aa
-prince==0.16.2 \
-    --hash=sha256:75c03afae5600c0b0f1bfd6e79d33ee8884fca198825d4242ba34efe9a43d848
+prince==0.16.3 \
+    --hash=sha256:99b41bd2a3acfc8020edfc912da69b9459f974712771d53adb6923afdb880856
 priority==2.0.0 \
     --hash=sha256:6f8eefce5f3ad59baf2c080a664037bb4725cd0a790d53d59ab4059288faf6aa
 prometheus-client==0.21.1 \

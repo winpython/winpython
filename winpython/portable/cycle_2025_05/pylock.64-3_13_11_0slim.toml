@@ -102,14 +102,14 @@ sha256 = "f483dd1fe93f6c5d49217055e4d15b905b425b6af906746abb35b69c1996c4e6"
 
 [[packages]]
 name = "altair"
-version = "5.5.0"
+version = "6.0.0"
 
 [[packages.wheels]]
-name = "altair-5.5.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/aa/f3/0b6ced594e51cc95d8c1fc1640d3623770d01e4969d29c0bd09945fafefa/altair-5.5.0-py3-none-any.whl"
+name = "altair-6.0.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/db/33/ef2f2409450ef6daa61459d5de5c08128e7d3edb773fefd0a324d1310238/altair-6.0.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "91a310b926508d560fe0148d02a194f38b824122641ef528113d029fcd129f8c"
+sha256 = "09ae95b53d5fe5b16987dccc785a7af8588f2dca50de1e7a156efa8a461515f8"
 
 [[packages]]
 name = "annotated-doc"
@@ -1994,14 +1994,14 @@ sha256 = "f773f84080b667c69c4ea0403fc67bb08b07e2b7ce1ef335dea5868451e60fed"
 
 [[packages]]
 name = "joblib"
-version = "1.5.2"
+version = "1.5.3"
 
 [[packages.wheels]]
-name = "joblib-1.5.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/1e/e8/685f47e0d754320684db4425a0967f7d3fa70126bffd76110b7009a0090f/joblib-1.5.2-py3-none-any.whl"
+name = "joblib-1.5.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7b/91/984aca2ec129e2757d1e4e3c81c3fcda9d0f85b74670a094cc443d9ee949/joblib-1.5.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241"
+sha256 = "5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713"
 
 [[packages]]
 name = "json5"
@@ -3336,14 +3336,14 @@ sha256 = "b5eccfabb82222f5aa46b798ff02a8452cf530a352c31bddfa29be41242863aa"
 
 [[packages]]
 name = "prince"
-version = "0.16.2"
+version = "0.16.3"
 
 [[packages.wheels]]
-name = "prince-0.16.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/93/fe/92068ae56c8a88ee9123234014233561917dcd5c56c26a2c99f014444d36/prince-0.16.2-py3-none-any.whl"
+name = "prince-0.16.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/76/86/8dd61a7715d39fe1051af1df350f99222935e17a7c7400a361dc54bd98b0/prince-0.16.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "75c03afae5600c0b0f1bfd6e79d33ee8884fca198825d4242ba34efe9a43d848"
+sha256 = "99b41bd2a3acfc8020edfc912da69b9459f974712771d53adb6923afdb880856"
 
 [[packages]]
 name = "priority"
