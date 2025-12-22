@@ -161,7 +161,7 @@ jobs:
           # 3.15 X64 (GIL)
           if [ "$PYTHON_VERSION" = "3.15" ] && [ "$WINPYARCHDET" = "64" ]; then
             echo "python_source=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_ENV
-            echo "python_sha256=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7b" >> $GITHUB_ENV
+            echo "python_sha256=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7" >> $GITHUB_ENV
           fi
 
       - name: Download, verify and extract python standalone
