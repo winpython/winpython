@@ -1,0 +1,40 @@
+name: 'WinPython Pandoc Setup'
+description: 'Downloads and integrates Pandoc into the WinPython structure'
+inputs:
+  pandoc_source:
+    description: 'Pandoc download URL'
+    required: true
+  pandoc_sha256:
+    description: 'Expected SHA256 for Pandoc'
+    required: true
+  build_location:
+    description: 'The target WinPython folder'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download and Integrate Pandoc
+      shell: pwsh
+      run: |
+        $zipPath = "pandoc.zip"
+        $tempDir = "pandoc_temp"
+        $targetDir = Join-Path "${{ inputs.build_location }}" "t"
+        
+        Write-Host "Downloading Pandoc..."
+        curl.exe -L -o $zipPath "${{ inputs.pandoc_source }}"
+        
+        $actualHash = (Get-FileHash -Path $zipPath -Algorithm SHA256).Hash.ToLower()
+        if ($actualHash -ne "${{ inputs.pandoc_sha256 }}".ToLower()) {
+            Write-Error "Pandoc SHA mismatch!"
+            exit 1
+        }
+
+        Expand-Archive -Path $zipPath -DestinationPath $tempDir -Force
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+        
+        # Move only the executable (adjusting for the internal folder name in the zip)
+        Get-ChildItem -Path "$tempDir\pandoc-*\pandoc.exe" | Copy-Item -Destination $targetDir -Force
+        
+        Remove-Item $tempDir -Recurse -Force
+        Remove-Item $zipPath -Force

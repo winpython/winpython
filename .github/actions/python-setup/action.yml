@@ -1,0 +1,51 @@
+name: 'WinPython Standalone Setup'
+description: 'Downloads, verifies, and extracts Python Build Standalone'
+inputs:
+  python_source:
+    description: 'URL of the python tar.gz'
+    required: true
+  python_sha256:
+    description: 'Expected SHA256'
+    required: true
+  build_location:
+    description: 'Target directory name'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download and Extract python
+      shell: pwsh
+      run: |
+        $archive = "python-3-embed.tar.gz"
+        Write-Host "Downloading: ${{ inputs.python_source }}"
+        curl.exe -L -o $archive "${{ inputs.python_source }}"
+
+        # Hash Verification
+        $actualHash = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLower()
+        if ($actualHash -ne "${{ inputs.python_sha256 }}".ToLower()) {
+          Write-Error "SHA mismatch: $actualHash"
+          exit 1
+        }
+
+        # Setup Folders
+        mkdir "dotpythonpre" -Force
+        mkdir "dotpython/python" -Force
+        
+        # Extract
+        tar -xf $archive -C "dotpythonpre"
+        
+        # Handle different internal structures (install vs root)
+        if (Test-Path "dotpythonpre/python/install") {
+          Move-Item -Path "dotpythonpre/python/install/*" -Destination "dotpython/python" -Force
+        } else {
+          Move-Item -Path "dotpythonpre/python/*" -Destination "dotpython/python" -Force
+        }
+
+        # Move to final location
+        mkdir "${{ inputs.build_location }}" -Force
+        Move-Item -Path "dotpython/*" -Destination "${{ inputs.build_location }}" -Force
+        
+        # Cleanup
+        Remove-Item "dotpythonpre" -Recurse -Force
+        Remove-Item $archive -Force
