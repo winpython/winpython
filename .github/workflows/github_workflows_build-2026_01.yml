@@ -162,27 +162,11 @@ jobs:
 
       - name: Download, verify and extract python standalone
         if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          Write-Output "Downloading, hash-checking, and extracting  $env:python_source"
-          curl.exe -L -o "python-3-embed.tar.gz" $env:python_source
-
-          $expectedHash = $env:python_sha256
-          $actualHash = (Get-FileHash -Path "python-3-embed.tar.gz" -Algorithm SHA256).Hash.ToLower()
-          if ($actualHash -ne $expectedHash.ToLower()) {
-            Write-Error "SHA mismatch: Actual $actualHash doesn't match $expectedHash"
-            exit 1
-          } else { Write-Output "Python SHA ok" }
-
-          mkdir dotpythonpre -Force
-          mkdir dotpython -Force
-          mkdir dotpython/python -Force
-          tar -xf python-3-embed.tar.gz -C dotpythonpre
-          if (Test-Path dotpythonpre/python/install) {
-            Move-Item -Path dotpythonpre/python/install/* -Destination dotpython/python -Force
-          } elseif (Test-Path dotpythonpre/python) {
-            Move-Item -Path dotpythonpre/python/* -Destination dotpython/python -Force
-          }
+        uses: ./.github/actions/python-setup
+        with:
+          python_source: ${{ env.python_source }}
+          python_sha256: ${{ env.python_sha256 }}
+          build_location: ${{ env.build_location }}
     
       - name: Copy launchers_final files to dotpython
         if: env.WINPYREQUIREMENTS != ''
@@ -207,34 +191,11 @@ jobs:
 
       - name: Download, checking hash and integrating pandoc binary
         if: env.WINPYREQUIREMENTS != '' && env.PANDOC == '1'
-        shell: pwsh
-        run: |
-          $pandocZipPath = "pandoc.zip"
-          $tempDir = "pandoc_temp"
-          $targetDir = Join-Path $env:build_location "t"
-          Write-Host "Downloading Pandoc from $env:pandoc_source"
-          curl.exe -L -o $pandocZipPath $env:pandoc_source
-          
-          $expectedHash = $env:pandoc_sha256.ToLower()
-          $actualHash = (Get-FileHash -Path $pandocZipPath -Algorithm SHA256).Hash.ToLower()
-
-          if ($actualHash -ne $expectedHash) {
-              Write-Error "Pandoc SHA mismatch: $actualHash vs expected $expectedHash"
-              exit 1
-          } else { Write-Output "Pandoc SHA ok" }
-
-          Expand-Archive -Path $pandocZipPath -DestinationPath $tempDir -Force
-          New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-          
-          Write-Output "Copying pandoc.exe to $targetDir"
-          Copy-Item -Path (Join-Path $tempDir "pandoc-3.1.9\pandoc.exe") -Destination $targetDir -Force         
-
-          Write-Output "Showing the content of $targetDir"
-          Get-ChildItem -Path $targetDir
-
-          Write-Output "Cleaning up temporary files..."
-          Remove-Item -Path $tempDir -Recurse -Force
-          Remove-Item -Path $pandocZipPath -Force
+        uses: ./.github/actions/pandoc-setup
+        with:
+          pandoc_source: ${{ env.pandoc_source }}
+          pandoc_sha256: ${{ env.pandoc_sha256 }}
+          build_location: ${{ env.build_location }}
 
       - name: Upgrade pip and patch launchers
         if: env.WINPYREQUIREMENTS != ''
