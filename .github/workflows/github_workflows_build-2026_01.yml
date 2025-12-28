@@ -121,7 +121,6 @@ jobs:
           elif [ "$PYTHON_VERSION" = "3.15" ]; then
             echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
             echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
-            echo "WINPYVERSION=315" >> $GITHUB_ENV
             WINPYVER2="3.15.0.1"
           fi
 
@@ -263,7 +262,7 @@ jobs:
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
-          if (env.WINPYREQUIREMENTSwhl -ne '') {
+          if ($env.WINPYREQUIREMENTSwhl -ne '') {
               & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
           }
 
