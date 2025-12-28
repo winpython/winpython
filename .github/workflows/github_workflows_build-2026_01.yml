@@ -262,9 +262,12 @@ jobs:
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
-          if ($env.WINPYREQUIREMENTSwhl -ne "") {
-              & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
-          }
+
+      - name: Download requirements to $env:dotwheelhouse
+        if: env.WINPYREQUIREMENTSwhl != ''
+        shell: pwsh
+        run: |
+          & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
 
       - name: Install requirements
         if: env.WINPYREQUIREMENTS != ''
