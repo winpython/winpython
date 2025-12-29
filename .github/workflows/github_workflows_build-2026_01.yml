@@ -253,18 +253,18 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          Write-Output "env.WINPYZIP: $env.WINPYZIP   and destfile: $destfile"
-          if ($env.WINPYZIP -eq '1') {
+          Write-Output $env.WINPYZIP
+          if ( $env.WINPYZIP -eq '1') {
               Write-Output "WINPYZIPing"
               Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
               }
 
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
-          if ($env.WINPY7Z -eq '1') { 7z a $destfile7z $env:build_location }
+          if ( $env.WINPY7Z -eq '1') { 7z a $destfile7z $env:build_location }
 
           $destfileexe = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-          if ($env.WINPYEXE -eq '1') { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
+          if ( $env.WINPYEXE -eq '1') { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
 
       - name: generate hashes wppm style
         if: env.WINPYREQUIREMENTS != ''
