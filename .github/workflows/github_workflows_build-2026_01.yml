@@ -253,12 +253,7 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          $WINPYZIP="$env:WINPYZIP"
-          Write-Output "$WINPYZIP $destfile"
-          if ( $WINPYZIP -eq '1') {
-              Write-Output "WINPYZIPing"
-              Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
-              }
+          if ( $env:WINPYZIP -eq '1') { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile}
 
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
           if ( $env:WINPY7Z -eq '1') { 7z a $destfile7z $env:build_location }
