@@ -168,27 +168,6 @@ jobs:
           python_sha256: ${{ env.python_sha256 }}
           build_location: ${{ env.build_location }}
     
-      - name: Copy launchers_final files to dotpython
-        if: env.WINPYREQUIREMENTS != ''
-        shell: bash
-        run: |
-          cp -r winpython/portable/launchers_final/* dotpython/
-          mkdir $env:dotwheelhouse
-
-      - name: List dotpython contents (for debugging)
-        if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          Get-ChildItem dotpython
-          Get-ChildItem dotpython\python
-
-      - name: Prepare WinPython target structure
-        if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Path $env:build_location
-          Get-ChildItem -Path dotpython -Force | Move-Item -Destination $env:build_location -Force
-
       - name: Download, checking hash and integrating pandoc binary
         if: env.WINPYREQUIREMENTS != '' && env.PANDOC == '1'
         uses: ./.github/actions/pandoc-setup

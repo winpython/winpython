@@ -42,6 +42,13 @@ runs:
           Move-Item -Path "dotpythonpre/python/*" -Destination "dotpython/python" -Force
         }
 
+        # Copy launchers_final files to dotpython
+        Copy-Item -Path "winpython/portable/launchers_final/*" -Destination "dotpython/" -Recurse -Force
+        New-Item -Path $env:dotwheelhouse -ItemType Directory -Force
+
+        Get-ChildItem dotpython
+        Get-ChildItem dotpython\python
+
         # Move to final location
         mkdir "${{ inputs.build_location }}" -Force
         Move-Item -Path "dotpython/*" -Destination "${{ inputs.build_location }}" -Force
