@@ -253,8 +253,9 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          Write-Output $env.WINPYZIP
-          if ( $env.WINPYZIP -eq '1') {
+          $WINPYZIP="$env.WINPYZIP"
+          Write-Output "$WINPYZIP $destfile"
+          if ( $WINPYZIP -eq '1') {
               Write-Output "WINPYZIPing"
               Compress-Archive -Path "$env:build_location" -DestinationPath $destfile
               }
