@@ -244,7 +244,7 @@ jobs:
         if: env.WINPYREQUIREMENTS != ''
         shell: pwsh
         run: |
-          & "$env:build_location\python\python.exe" -m pip install --upgrade pip
+          & "$env:build_location\python\python.exe" -m pip install --upgrade --force-reinstall pip
           & "$env:build_location\python\python.exe" -m pip install --upgrade packaging==25.0
           & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
 
