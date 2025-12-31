@@ -27,9 +27,7 @@ jobs:
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
-            ZIP: "1"
-            SEVEN_Z: "0"
-            EXE: "1"
+            formats: { zip: true, 7z: false, exe: true }
             PANDOC: "0"
             WINPYARCHDET: "64"
           - name: "slim"
@@ -39,9 +37,7 @@ jobs:
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
-            ZIP: "0"
-            SEVEN_Z: "1"
-            EXE: "1"
+            formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64"
           - name: "whl"
@@ -51,9 +47,7 @@ jobs:
             REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0whl_wheels.txt"
             REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0whl_wheels.txt"
             REQUIREMENTS_WHL_315: ""
-            ZIP: "0"
-            SEVEN_Z: "1"
-            EXE: "0"
+            formats: { zip: false, 7z: true, exe: false }
             PANDOC: "0"
             WINPYARCHDET: "64"
           - name: "free"
@@ -63,9 +57,7 @@ jobs:
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
-            ZIP: "1"
-            SEVEN_Z: "0"
-            EXE: "1"
+            formats: { zip: true, 7z: false, exe: true }
             PANDOC: "0"
             WINPYARCHDET: "64F"
           - name: "slimf"
@@ -75,9 +67,7 @@ jobs:
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
-            ZIP: "0"
-            SEVEN_Z: "1"
-            EXE: "1"
+            formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64F"
 
@@ -253,14 +243,14 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          if ( $env:WINPYZIP -eq '1') { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile}
+          if ("${{ matrix.flavor.formats.zip }}" -eq "true") { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile}
 
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
-          if ( $env:WINPY7Z -eq '1') { 7z a $destfile7z $env:build_location }
+          if ("${{ matrix.flavor.formats.7z }}" -eq "true") { 7z a $destfile7z $env:build_location }
 
           $destfileexe = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-          if ( $env:WINPYEXE -eq '1') { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
+          if ("${{ matrix.flavor.formats.exe }}" -eq "true") { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
 
       - name: generate hashes wppm style
         if: env.WINPYREQUIREMENTS != ''
