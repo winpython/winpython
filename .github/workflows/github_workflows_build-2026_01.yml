@@ -75,9 +75,6 @@ jobs:
       PYTHON_VERSION: ${{ github.event.inputs.python_version }}
       WINPYFLAVOR: ${{ matrix.flavor.name }}
       PANDOC: ${{ matrix.flavor.PANDOC }}
-      WINPYZIP: ${{ matrix.flavor.ZIP }}
-      WINPY7Z: ${{ matrix.flavor.SEVEN_Z }}
-      WINPYEXE: ${{ matrix.flavor.EXE }}
       WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
       # constants
       WINPYARCH: "64"
@@ -243,14 +240,14 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          if ("${{ matrix.flavor.formats.zip }}" -eq "true") { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile}
+          if ("${{ matrix.flavor.formats['zip'] }}" -eq "true") { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile}
 
           $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
-          if ("${{ matrix.flavor.formats.7z }}" -eq "true") { 7z a $destfile7z $env:build_location }
+          if ("${{ matrix.flavor.formats['7z']  }}" -eq "true") { 7z a $destfile7z $env:build_location }
 
           $destfileexe = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-          if ("${{ matrix.flavor.formats.exe }}" -eq "true") { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
+          if ("${{ matrix.flavor.formats['exe']  }}" -eq "true") { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
 
       - name: generate hashes wppm style
         if: env.WINPYREQUIREMENTS != ''
