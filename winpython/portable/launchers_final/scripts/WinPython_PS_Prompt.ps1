@@ -4,7 +4,7 @@ $env:WINPYDIRBASE = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.D
 # get a normalize path
 $env:WINPYDIRBASE = [System.IO.Path]::GetFullPath( $env:WINPYDIRBASE )
 
-$env:WINPYDIR = $env:WINPYDIRBASE+ "\" +$env:WINPYthon_subdirectory_name
+$env:WINPYDIR = $env:WINPYDIRBASE+ "\python" 
 # 2019-08-25 pyjulia needs absolutely a variable PYTHON=%WINPYDIR%python.exe
 $env:PYTHON = $env:WINPYDIRBASE+ "\python\python.exe" 
 
