@@ -12,12 +12,12 @@ $env:PYTHON = $env:WINPYDIRBASE+ "\python\python.exe"
 $env:PYTHONIOENCODING = "utf-8"
 
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
-  $env:PATH = "$env:WINPYDIR\\Lib\site-packages\PyQt5;$env:WINPYDIR\\;$env:WINPYDIR\\DLLs;$env:WINPYDIR\\Scripts;$env:WINPYDIR\\..\t;$env:WINPYDIR\\..\n;$env:path" }
+  $env:PATH = "$env:WINPYDIR\Lib\site-packages\PyQt5;$env:WINPYDIR\;$env:WINPYDIR\DLLs;$env:WINPYDIR\Scripts;$env:WINPYDIR\..\t;$env:WINPYDIR\..\n;$env:path" }
 
 #rem force default pyqt5 kit for Spyder if PyQt5 module is there
 if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API = "pyqt5" } 
 
-$output = & 'python.exe' ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
+$output = & $env:PYTHON ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
 $pairs = $output -split '&&'
 $pair = $pair -replace '^(?i)set\s+',''
 foreach ($pair in $pairs) {
@@ -55,4 +55,23 @@ foreach ($pair in $pairs) {
     }
 
     #Write-Host "Set `$${name} = $value"
+}
+
+# directory of the running script (fallback to MyInvocation for older hosts)
+$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
+
+# emulate %__CD% and build scripts\ path
+$envCD = Normalize-DirPath $env:__CD__
+$scriptsPath = if ($envCD) { Join-Path $envCD 'scripts' } else { $null }
+
+# target to change into (environment variable WINPYWORKDIR1)
+$target = $WINPYWORKDIR1
+
+if ($target) {
+    if ($scriptsPath -and $scriptDir -and ($scriptsPath -eq $scriptDir)) {
+        Set-Location -LiteralPath $target
+    }
+    elseif ($envCD -and $scriptDir -and ($envCD -eq $scriptDir)) {
+        Set-Location -LiteralPath $target
+    }
 }
