@@ -6,6 +6,7 @@ winpython_inidefault = r'''
 [debug]
 state = disabled
 [env.bat]
+PYTHONIOENCODING = utf-8
 #see https://github.com/winpython/winpython/issues/839
 #USERPROFILE = %HOME%
 SPYDER_CONFDIR = %HOME%\settings\.spyder-py3
@@ -33,7 +34,7 @@ USERPROFILE = %HOME%
 
 class WinPythonEnv:
     editable_sections = {
-        "env.ini", "environment", "debug",
+        "env.ini", "env.bat", "environment", "debug",
         "active_environment_per_user", "active_environment_common"
     }
     

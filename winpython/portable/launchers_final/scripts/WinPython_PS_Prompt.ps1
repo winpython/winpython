@@ -32,8 +32,15 @@ $env:PYTHONIOENCODING = "utf-8"
 
 $env:HOME = "$env:WINPYDIRBASE\settings"
 
-$env:WINPYDIRBASE = ""
 $env:JUPYTER_DATA_DIR = "$env:HOME"
+
+# keep Variables alive !
+Set-Variable -Name "WINPYDIRBASE" -Value $env:WINPYDIRBASE -Scope Global
+Set-Variable -Name "WINPYDIR" -Value $env:WINPYDIR -Scope Global
+Set-Variable -Name "PYTHON" -Value $env:PYTHON -Scope Global
+Set-Variable -Name "PYTHONIOENCODING" -Value $env:PYTHONIOENCODING -Scope Global
+#Set-Variable -Name "HOME" -Value $env:HOME -Scope Global
+Set-Variable -Name "JUPYTER_DATA_DIR" -Value $env:JUPYTER_DATA_DIR -Scope Global
 
 if (-not $env:PATH.ToLower().Contains(";"+ $env:WINPYDIR.ToLower()+ ";"))  {
   $env:PATH = "$env:WINPYDIR\\Lib\site-packages\PyQt5;$env:WINPYDIR\\;$env:WINPYDIR\\DLLs;$env:WINPYDIR\\Scripts;$env:WINPYDIR\\..\t;$env:WINPYDIR\\..\n;$env:path" }
@@ -44,7 +51,50 @@ if (Test-Path "$env:WINPYDIR\Lib\site-packages\PyQt5\__init__.py") { $env:QT_API
 
 # PyQt5 qt.conf creation and winpython.ini creation done via Winpythonini.py (called per env_for_icons.bat for now)
 # Start-Process -FilePath $env:PYTHON -ArgumentList ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
+$output = & 'python.exe' ($env:WINPYDIRBASE + '\scripts\WinPythonIni.py')
+$pairs = $output -split '&&'
+$pair = $pair -replace '^(?i)set\s+',''
+foreach ($pair in $pairs) {
+    $pair = $pair.Trim()
+    if ($pair -eq '') { continue }
 
+    # Remove leading "set " (case-insensitive)
+    $pair = $pair -replace '^(?i)set\s+',''
+
+    # Find first '=' so values can contain '='
+    $idx = $pair.IndexOf('=')
+    if ($idx -lt 0) {
+        Write-Warning "Skipping invalid pair (no '='): '$pair'"
+        continue
+    }
+
+    $name  = $pair.Substring(0, $idx).Trim()
+    $value = $pair.Substring($idx + 1).Trim()
+
+    # Unquote a quoted value (single or double quotes)
+    if ($value -match '^(["''])(.*)\1$') { $value = $Matches[2] }
+
+    # Basic validation for variable name (optional)
+    if ($name -notmatch '^[a-zA-Z_][a-zA-Z0-9_]*$') {
+        Write-Warning "Variable name '$name' is unusual. Still setting it, but consider sanitizing."
+    }
+
+    # Set as a PowerShell global variable
+    Set-Variable -Name $name -Value $value -Scope Global -Force
+
+    # Also set as environment variable for child processes
+    $env:name = $value
+
+    # If running in GH Actions, also append to GITHUB_ENV so future steps see it
+    if ($env:GITHUB_ENV) {
+        # Use Add-Content to append "NAME=value" to the GITHUB_ENV file
+        # Escape any newlines in $value to avoid breaking the file format
+        $escapedValue = $value -replace "`n", '%0A' -replace "`r", ''
+        Add-Content -Path $env:GITHUB_ENV -Value "$name=$escapedValue"
+    }
+
+    #Write-Host "Set `$${name} = $value"
+}
 
 ### Set-WindowSize
 
