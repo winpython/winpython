@@ -61,7 +61,7 @@ foreach ($pair in $pairs) {
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Definition }
 
 # emulate %__CD% and build scripts\ path
-$envCD = Normalize-DirPath $env:__CD__
+$envCD = $env:__CD__
 $scriptsPath = if ($envCD) { Join-Path $envCD 'scripts' } else { $null }
 
 # target to change into (environment variable WINPYWORKDIR1)
