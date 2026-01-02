@@ -25,22 +25,9 @@ foreach ($tmp_pair in ($tmp_output -split '&&')) {
     # Unquote a quoted value (single or double quotes)
     if ($tmp_value -match '^(["''])(.*)\1$') { $tmp_value = $Matches[2] }
 
-    # Set as a PowerShell global variable
-    if ($tmp_name -ne "HOME") { Set-Variable -Name $tmp_name -Value $tmp_value }
-    Set-Variable -Name $tmp_name -Value $tmp_value -Scope Global -Force
-    # set as environment variable for child processes
+    # set as environment variable for child processes like python
     Set-Item -Path "Env:\$tmp_name" -Value $tmp_value
-    # Write-Host $tmp_name   " = "  $tmp_value
-
-    # If running in GH Actions, also append to GITHUB_ENV so future steps see it
-    if ($env:GITHUB_ENV) {
-        # Use Add-Content to append "NAME=value" to the GITHUB_ENV file
-        # Escape any newlines in $tmp_value to avoid breaking the file format
-        $tmp_escapedValue = $tmp_value -replace "`n", '%0A' -replace "`r", ''
-        Add-Content -Path $env:GITHUB_ENV -Value "$tmp_name=$tmp_escapedValue"
-    }
-
-    #Write-Host "Set `$${name} = $tmp_value"
+    #Write-Host $tmp_name   " = "  $tmp_value
 }
 
 # emulate %__CD%
