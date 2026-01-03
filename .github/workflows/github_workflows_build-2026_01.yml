@@ -215,7 +215,7 @@ jobs:
           dotwheelhouse: ${{ env.dotwheelhouse }}
           winpy_requirements_whl: ${{ env.WINPYREQUIREMENTSwhl }}
           format_zip: ${{ matrix.flavor.formats.zip }}
-          format_7z: ${{ matrix.flavor.formats.7z }}
+          format_7z: ${{ matrix.flavor.formats['7z'] }}
           format_exe: ${{ matrix.flavor.formats.exe }}
 
       - name: Upload artifacts
