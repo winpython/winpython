@@ -1,0 +1,89 @@
+name: 'WinPython Publish Action'
+description: 'Generates metadata, pylock files, compresses artifacts, and calculates hashes'
+
+inputs:
+  build_location:
+    required: true
+    description: 'Path to the build folder'
+  winpy_flavor:
+    required: true
+  winpy_arch:
+    required: true
+  winpy_ver:
+    required: true
+  winpy_ver2:
+    required: true
+  dotwheelhouse:
+    required: true
+  winpy_requirements_whl:
+    required: false
+    default: ""
+  format_zip:
+    required: true
+  format_7z:
+    required: true
+  format_exe:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate Metadata and Pylock
+      shell: pwsh
+      run: |
+        mkdir -Force publish_output
+        $env:PYTHONIOENCODING="utf-8"
+        $pythonExe = Join-Path "${{ inputs.build_location }}" "python\python.exe"
+
+        # Markdown Metadata
+        $destfile_md = "publish_output\WinPython${{ inputs.winpy_flavor }}-${{ inputs.winpy_arch }}bit-${{ inputs.winpy_ver2 }}.md" 
+        & $pythonExe -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8
+        gc $destfile_md
+
+        # Pylock and Requirements
+        & $pythonExe -m pip freeze | Out-File -FilePath dotpython\freeze.txt
+        $verClean = "${{ inputs.winpy_ver }}" -replace '\.', '_'
+        $destfile_pylock = "publish_output\pylock.${{ inputs.winpy_arch }}-$verClean.toml"
+        & $pythonExe -m pip lock --no-deps --find-links="${{ inputs.dotwheelhouse }}" -r dotpython\freeze.txt -o $destfile_pylock
+
+        $outreq = "publish_output\requir.${{ inputs.winpy_arch }}-$verClean.txt"
+        & $pythonExe -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylock', r'$outreq')"
+
+        # Handle Optional Wheelhouse
+        if ("${{ inputs.winpy_requirements_whl }}" -ne "") {
+            $destfile_pylockwheel = "publish_output\pylock.${{ inputs.winpy_arch }}-${verClean}_wheels.toml"
+            & $pythonExe -m pip lock --no-deps --require-hashes -r "${{ inputs.winpy_requirements_whl }}" -o $destfile_pylockwheel
+
+            $outreqwheel = "publish_output\requir.${{ inputs.winpy_arch }}-${verClean}_wheels.txt"
+            & $pythonExe -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylockwheel', r'$outreqwheel')"
+            
+            $whPath = Join-Path "${{ inputs.build_location }}" "wheelhouse"
+            Copy-Item -Path $outreqwheel -Destination $whPath -Force
+            Copy-Item -Path $destfile_pylockwheel -Destination $whPath -Force
+        }
+
+    - name: Compress Build
+      shell: pwsh
+      run: |
+        $baseName = "publish_output\WinPython${{ inputs.winpy_arch }}-${{ inputs.winpy_ver }}"
+        
+        if ("${{ inputs.format_zip }}" -eq "true") { 
+            Compress-Archive -Path "${{ inputs.build_location }}" -DestinationPath "$baseName.zip" -Force
+        }
+        if ("${{ inputs.format_7z }}" -eq "true") { 
+            7z a "$baseName.7z" "${{ inputs.build_location }}"
+        }
+        if ("${{ inputs.format_exe }}" -eq "true") { 
+            $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
+            7z a -t7z -sfx"$SFXModulePath" "$baseName.exe" "${{ inputs.build_location }}"
+        }
+
+    - name: Generate Hashes
+      shell: pwsh
+      run: |
+        $pythonExe = Join-Path "${{ inputs.build_location }}" "python\python.exe"
+        $DESTFILE = "./publish_output/hashes.md"
+        $filesToHash = Get-ChildItem -Path ".\publish_output\*64*.*"
+        & $pythonExe -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
+        gc $DESTFILE
+        

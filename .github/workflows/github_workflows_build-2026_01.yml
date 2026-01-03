@@ -203,63 +203,20 @@ jobs:
         run: |
           & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYREQUIREMENTS
 
-      - name: Generate Markdown content and pylock file
+      - name: Generate Assets and Hashes
         if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          mkdir publish_output
-
-          # Ensure unicode for wppm output
-          $env:PYTHONIOENCODING="utf-8"
-
-          $destfile_md = "publish_output\WinPython$env:WINPYFLAVOR-$($env:WINPYARCH)bit-$env:WINPYVER2.md" 
-          & "$env:build_location\python\python.exe" -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8 
-
-          gc $destfile_md
-
-          & "$env:build_location\python\python.exe" -m pip freeze | Out-File -FilePath  dotpython\freeze.txt
-          $destfile_pylock = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').toml"
-          & "$env:build_location\python\python.exe" -m pip lock --no-deps --find-links=$env:dotwheelhouse -r dotpython\freeze.txt -o $destfile_pylock
-
-          $outreq = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_').txt"
-          & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylock', r'$outreq')"
-
-          if ($env:WINPYREQUIREMENTSwhl -eq "") {
-              Write-Output "No additional wheelhouse requirements."
-          } else {
-          $destfile_pylockwheel = "publish_output\pylock.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_')_wheels.toml"
-          & "$env:build_location\python\python.exe" -m pip lock --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl -o $destfile_pylockwheel
-
-          $outreqwheel = "publish_output\requir.$env:WINPYARCH-$($env:WINPYVER -replace '\.', '_')_wheels.txt"
-          & "$env:build_location\python\python.exe" -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req(r'$destfile_pylockwheel', r'$outreqwheel')"
-          Copy-Item -Path $outreqwheel -Destination (Join-Path  $env:build_location "wheelhouse") -Force         
-          Copy-Item -Path $destfile_pylockwheel -Destination (Join-Path  $env:build_location "wheelhouse") -Force         
-          }
-
-      - name: compress the result (zip / 7z / self-extracting.exe)
-        if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          if ("${{ matrix.flavor.formats['zip'] }}" -eq "true") { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile }
-
-          $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
-          if ("${{ matrix.flavor.formats['7z']  }}" -eq "true") { 7z a $destfile $env:build_location }
-
-          $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
-          $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-          if ("${{ matrix.flavor.formats['exe']  }}" -eq "true") { 7z a -t7z -sfx"$SFXModulePath" $destfile $env:build_location }
-
-      - name: generate hashes wppm style
-        if: env.WINPYREQUIREMENTS != ''
-        shell: pwsh
-        run: |
-          $DESTFILE="./publish_output/hashes.md" 
-          Get-ChildItem -Path ".\publish_output\*.*"
-          # Get the list of files matching the pattern and pass them as arguments
-          $filesToHash = Get-ChildItem -Path ".\publish_output\*64*.*"
-          & "$env:build_location\python\python.exe" -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
-          gc $DESTFILE
+        uses: ./.github/actions/publish-winpython
+        with:
+          build_location: ${{ env.build_location }}
+          winpy_flavor: ${{ env.WINPYFLAVOR }}
+          winpy_arch: ${{ env.WINPYARCH }}
+          winpy_ver: ${{ env.WINPYVER }}
+          winpy_ver2: ${{ env.WINPYVER2 }}
+          dotwheelhouse: ${{ env.dotwheelhouse }}
+          winpy_requirements_whl: ${{ env.WINPYREQUIREMENTSwhl }}
+          format_zip: ${{ matrix.flavor.formats.zip }}
+          format_7z: ${{ matrix.flavor.formats.7z }}
+          format_exe: ${{ matrix.flavor.formats.exe }}
 
       - name: Upload artifacts
         if: env.WINPYREQUIREMENTS != ''
