@@ -1,5 +1,5 @@
 name: 'WinPython Publish Action'
-description: 'Generates metadata, pylock files, compresses artifacts, and calculates hashes'
+description: 'Generates env.ini, metadata, pylock files, compresses artifacts, and calculates hashes'
 
 inputs:
   build_location:
@@ -28,6 +28,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Write env.ini file
+      shell: pwsh
+      run: |
+        $destDir = Join-Path "${{ inputs.build_location }}" "scripts"
+        if (!(Test-Path $destDir)) { mkdir -Force $destDir }
+        
+        # Create the ini content
+        $iniContent = @(
+            "WINPYVER=${{ inputs.winpy_ver }}"
+            "WINPYVER2=${{ inputs.winpy_ver2 }}"
+            "WINPYFLAVOR=${{ inputs.winpy_flavor }}"
+            "WINPYARCH=${{ inputs.winpy_arch }}"
+        )
+        $iniContent | Out-File -FilePath "env.ini" -Encoding ascii
+        Copy-Item -Path "env.ini" -Destination "$destDir\env.ini" -Force
+
     - name: Generate Metadata and Pylock
       shell: pwsh
       run: |
