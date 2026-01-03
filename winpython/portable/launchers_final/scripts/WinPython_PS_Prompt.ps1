@@ -32,7 +32,6 @@ foreach ($tmp_pair in ($tmp_output -split '&&')) {
 
 # emulate %__CD%
 $tmp_envCD = $env:__CD__.TrimEnd('\')
-$tmp_envCDscript = ( Join-Path $tmp_envCD 'scripts' )
 if (($tmp_dp0 -eq $tmp_envCD ) -or ($tmp_dp0 -eq ( Join-Path $tmp_envCD 'scripts' )  )) {
         Set-Location -LiteralPath $env:WINPYWORKDIR1
 }

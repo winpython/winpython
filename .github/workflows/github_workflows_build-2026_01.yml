@@ -12,6 +12,13 @@ on:
           - '3.13'
           - '3.14'
           - '3.15'
+env:
+  # === Global Configuration ===
+  WINPYARCH: "64"
+  my_release_level: "b0"
+  dotwheelhouse: dotpython\\wheelhouse\\included.wheels
+  pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
+  pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
 
 jobs:
   build-winpython:
@@ -76,12 +83,6 @@ jobs:
       WINPYFLAVOR: ${{ matrix.flavor.name }}
       PANDOC: ${{ matrix.flavor.PANDOC }}
       WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
-      # constants
-      WINPYARCH: "64"
-      my_release_level: "b0"
-      dotwheelhouse: dotpython\\wheelhouse\\included.wheels
-      pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
-      pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
 
     steps:
       - name: Checkout repository
@@ -240,14 +241,14 @@ jobs:
         shell: pwsh
         run: |
           $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.zip"
-          if ("${{ matrix.flavor.formats['zip'] }}" -eq "true") { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile}
+          if ("${{ matrix.flavor.formats['zip'] }}" -eq "true") { Compress-Archive -Path "$env:build_location" -DestinationPath $destfile }
 
-          $destfile7z = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
-          if ("${{ matrix.flavor.formats['7z']  }}" -eq "true") { 7z a $destfile7z $env:build_location }
+          $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.7z"
+          if ("${{ matrix.flavor.formats['7z']  }}" -eq "true") { 7z a $destfile $env:build_location }
 
-          $destfileexe = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
+          $destfile = "publish_output\WinPython$env:WINPYARCH-$env:WINPYVER.exe"
           $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-          if ("${{ matrix.flavor.formats['exe']  }}" -eq "true") { 7z a -t7z -sfx"$SFXModulePath" $destfileexe $env:build_location }
+          if ("${{ matrix.flavor.formats['exe']  }}" -eq "true") { 7z a -t7z -sfx"$SFXModulePath" $destfile $env:build_location }
 
       - name: generate hashes wppm style
         if: env.WINPYREQUIREMENTS != ''
