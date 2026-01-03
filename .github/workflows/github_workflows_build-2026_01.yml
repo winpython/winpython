@@ -172,17 +172,15 @@ jobs:
           & "$env:build_location\python\python.exe" -m pip install --upgrade packaging==25.0
           & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
 
-      - name: Download requirements to $env:dotwheelhouse
-        if: env.WINPYREQUIREMENTS != ''
+      - name: Download all requirements
+        if: ${{ env.WINPYREQUIREMENTS != '' }}
         shell: pwsh
         run: |
-          & "$env:build_location\python\python.exe" -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
-
-      - name: Download requirements to $env:dotwheelhouse
-        if: env.WINPYREQUIREMENTSwhl != ''
-        shell: pwsh
-        run: |
-          & "$env:build_location\python\python.exe" -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
+          $py = "$env:build_location\python\python.exe"
+          & $py -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
+          if ($env:WINPYREQUIREMENTSwhl -ne '') {
+              & $py -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
+          }
 
       - name: Install requirements
         if: env.WINPYREQUIREMENTS != ''
