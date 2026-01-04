@@ -13,11 +13,12 @@ on:
           - '3.14'
           - '3.14F'
           - '3.15'
+
 env:
   # === Global Configuration ===
   WINPYARCH: "64"
   my_release_level: "b0"
-  dotwheelhouse: dotpython\\wheelhouse\\included.wheels
+  dotwheelhouse: "dotpython\\wheelhouse\\included.wheels"
   pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
   pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
 
@@ -78,36 +79,37 @@ jobs:
             formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64F"
-      # Use the workflow input as the single python_versionf matrix value
-      python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
-      include:
-        # Configuration for 3.13
-        - python_versionf: "3.13"
-          ver2: "3.13.11.1"
-          v_tag: "3_13_11_"
-          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-          sha: "d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3"
-        # Configuration for 3.14 (Standard)
-        - python_versionf: "3.14"
-          ver2: "3.14.2.1"
-          v_tag: "3_14_2_"
-          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-          sha: "512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4"
-        # Configuration for 3.14 (Free-threading override of flavor)
-        - python_versionf: "3.14F"
-          ver2: "3.14.2.1"
-          v_tag: "3_14_2_"
-          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst"
-          sha: "536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61"
-        # Configuration for 3.15
-        - python_versionf: "3.15"
-          ver2: "3.15.0.1"
-          v_tag: "3_15_0_"
-          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-          sha: "4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7"
+        # Use the workflow input as the single python_versionf matrix value
+        python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
+        include:
+          # Configuration for 3.13
+          - python_versionf: "3.13"
+            ver2: "3.13.11.1"
+            v_tag: "3_13_11_"
+            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            sha: "d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3"
+          # Configuration for 3.14 (Standard)
+          - python_versionf: "3.14"
+            ver2: "3.14.2.1"
+            v_tag: "3_14_2_"
+            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            sha: "512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4"
+          # Configuration for 3.14F (Free-threading)
+          - python_versionf: "3.14F"
+            ver2: "3.14.2.1"
+            v_tag: "3_14_2_"
+            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst"
+            sha: "536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61"
+          # Configuration for 3.15
+          - python_versionf: "3.15"
+            ver2: "3.15.0.1"
+            v_tag: "3_15_0_"
+            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+            sha: "4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7"
 
+    # Keep job env minimal: avoid complex expression functions here (compute them in a step)
     env:
-      PYTHON_VERSIONF: ${{ github.event.inputs.python_versionf }}
+      PYTHON_VERSIONF: ${{ matrix.python_versionf }}
       WINPYFLAVOR: ${{ matrix.flavor.name }}
       PANDOC: ${{ matrix.flavor.PANDOC }}
       WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
@@ -119,26 +121,28 @@ jobs:
 
       - name: Set static and matrix variables based on selected Python version
         shell: bash
+        env:
+          # pass the relevant matrix/job env values into the step
+          PYTHON_VERSIONF: ${{ env.PYTHON_VERSIONF }}
+          WINPYARCHDET: ${{ env.WINPYARCHDET }}
+          WINPYVER2: ${{ env.WINPYVER2 }}
+          FLAVOR_NAME: ${{ matrix.flavor.name }}
         run: |
-          PYTHON_VERSION="${{ env.PYTHON_VERSION }}"
-          WINPYARCHDET="${{ env.WINPYARCHDET }}"
+          PYTHON_VERSION="${PYTHON_VERSIONF%F}"   # remove trailing F if present
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
+
           # Compute detected arch from the input (3.14F -> 64F)
           detected_arch="64"
           if [[ "$PYTHON_VERSIONF" == *F ]]; then
             detected_arch="64F"
           fi
-          WINPYVER2="${{ env.WINPYVER2 }}"
 
-          PYTHON_VERSION="${PYTHON_VERSIONF%F}"   # remove trailing F if present
-          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
-          
-          WINPYVERSION=${PYTHON_VERSION//./}
-          echo "WINPYVERSION=$WINPYVERSION" >> $GITHUB_ENV
-
+          # compute build_location from WINPYVER2 (remove dots)
+          WINPYVER2="${WINPYVER2:-}"
           BUILD_LOCATION="WPy64-${WINPYVER2//./}"
           echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
 
-          # Populate generic per-flavor / per-version selections
+          # Populate generic per-flavor / per-version selections using matrix-expanded values
           if [ "$PYTHON_VERSION" = "3.13" ]; then
             echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
             echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
@@ -150,10 +154,13 @@ jobs:
             echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
           fi
 
-          # write common flavor env vars
-          echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${{ matrix.flavor.name }}" >> $GITHUB_ENV
+          # write common flavor env vars derived here rather than in the job env block
+          ARTIFACT_NAME="publish_${PYTHON_VERSION}${FLAVOR_NAME}"
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
+
           echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-          echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ env.my_release_level }}" >> $GITHUB_ENV
+          WINPYVER="${WINPYVER2}${FLAVOR_NAME}${{ env.my_release_level }}"
+          echo "WINPYVER=$WINPYVER" >> $GITHUB_ENV
 
       - name: Download, verify and extract python standalone
         if: env.WINPYREQUIREMENTS != ''
