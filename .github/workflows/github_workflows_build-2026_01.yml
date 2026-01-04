@@ -147,27 +147,32 @@ jobs:
           BUILD_LOCATION="WPy64-${WINPYVER2//./}"
           echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
 
-          WINPYREQUIREMENTS = "$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME" + "$my_release_level" + ".txt"
-          WINPYREQUIREMENTSwhl = "$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME"  + "_wheels" + "$my_release_level" + ".txt"
-          echo "searching  $WINPYREQUIREMENTS $WINPYREQUIREMENTSwhl"
-          if [[ -f "$WINPYREQUIREMENTS" ]]; then
-            echo "WINPYREQUIREMENTS=$WINPYREQUIREMENTS">> $GITHUB_ENV
+          WINPYREQUIREMENTS=""
+          WINPYREQUIREMENTSwhl=""
+          testreq="$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME" + "$my_release_level" + ".txt"
+          testwhl="$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME"  + "_wheels" + "$my_release_level" + ".txt"
+          echo "searching  $testreq $testwhl"
+          if [[ -f "$testreq" ]]; then
+            WINPYREQUIREMENTS="$testreq"
             echo "Found $WINPYREQUIREMENTS"
-            if [[ -f "$WINPYREQUIREMENTSwhl" ]]; then
-              echo "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl">> $GITHUB_ENV
-              echo "Found also $WINPYREQUIREMENTSwhl"
-          #fi
-          # Populate generic per-flavor / per-version selections using matrix-expanded values
-          elif [ "$PYTHON_VERSION" = "3.13" ]; then
-            echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
-            echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
-          elif [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "$detected_arch" ]; then
-            echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
-            echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
-          elif [ "$PYTHON_VERSION" = "3.15" ]; then
-            echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
-            echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
           fi
+            if [[ -f "$testwhl" ]]; then
+              "WINPYREQUIREMENTSwhl=$testwhl"
+              echo "Found also $WINPYREQUIREMENTSwhl"
+          fi
+          echo "WINPYREQUIREMENTS=$WINPYREQUIREMENTS" >> $GITHUB_ENV
+          echo "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl" >> $GITHUB_ENV
+          # Populate generic per-flavor / per-version selections using matrix-expanded values
+          #elif [ "$PYTHON_VERSION" = "3.13" ]; then
+          #  echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
+          #  echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
+          #elif [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "$detected_arch" ]; then
+          #  echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
+          #  echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
+          #elif [ "$PYTHON_VERSION" = "3.15" ]; then
+          #  echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
+          #  echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
+          #fi
 
           # write common flavor env vars derived here rather than in the job env block
           ARTIFACT_NAME="publish_${PYTHON_VERSION}${FLAVOR_NAME}"
