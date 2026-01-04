@@ -78,6 +78,7 @@ jobs:
             formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64F"
+        # Use the workflow input as the single python_versionf matrix value
         python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
         include:
           # Configuration for 3.13
@@ -107,13 +108,10 @@ jobs:
 
     env:
       PYTHON_VERSIONF: ${{ github.event.inputs.python_versionf }}
-      PYTHON_VERSION: ${{ replace(matrix.python_versionf, 'F', '') }}
-      detected_arch: ${{ contains(matrix.python_versionf, 'F') && '64F' || '64' }}
       WINPYFLAVOR: ${{ matrix.flavor.name }}
       PANDOC: ${{ matrix.flavor.PANDOC }}
       WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
       WINPYVER2: ${{ matrix.ver2 }}
-      build_location: WPy64-${{ replace(matrix.ver2, '.', '') }}
 
     steps:
       - name: Checkout repository
@@ -124,11 +122,21 @@ jobs:
         run: |
           PYTHON_VERSION="${{ env.PYTHON_VERSION }}"
           WINPYARCHDET="${{ env.WINPYARCHDET }}"
-          detected_arch="${{ env.detected_arch }}"
+          # Compute detected arch from the input (3.14F -> 64F)
+          detected_arch="64"
+          if [[ "$PYTHON_VERSIONF" == *F ]]; then
+            detected_arch="64F"
+          fi
           WINPYVER2="${{ env.WINPYVER2 }}"
+
+          PYTHON_VERSION="${PYTHON_VERSIONF%F}"   # remove trailing F if present
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
           
           WINPYVERSION=${PYTHON_VERSION//./}
           echo "WINPYVERSION=$WINPYVERSION" >> $GITHUB_ENV
+
+          BUILD_LOCATION="WPy64-${WINPYVER2//./}"
+          echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
 
           # Populate generic per-flavor / per-version selections
           if [ "$PYTHON_VERSION" = "3.13" ]; then
@@ -144,7 +152,7 @@ jobs:
 
           # write common flavor env vars
           echo "ARTIFACT_NAME=publish_${PYTHON_VERSION}${{ matrix.flavor.name }}" >> $GITHUB_ENV
-          echo "destwheelhouse=${{ env.build_location }}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
+          echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
           echo "WINPYVER=${WINPYVER2}${{ matrix.flavor.name }}${{ env.my_release_level }}" >> $GITHUB_ENV
 
       - name: Download, verify and extract python standalone
