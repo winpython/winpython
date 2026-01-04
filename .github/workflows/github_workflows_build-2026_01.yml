@@ -151,14 +151,14 @@ jobs:
           WINPYREQUIREMENTSwhl=""
           testreq="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}${my_release_level}.txt"
           testwhl="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}_wheels${my_release_level}.txt"
-          echo "searching  $testreq $testwhl"
-          if [[ -f "$testreq" ]]; then
+          echo "is $WINPYARCHDET=$detected_arch , search  $testreq $testwhl $detected_arch"
+          if [ "$WINPYARCHDET" = "$detected_arch" ] && [[ -f "$testreq" ]] && ; then
             WINPYREQUIREMENTS="$testreq"
             echo "Found $WINPYREQUIREMENTS"
-          fi
             if [[ -f "$testwhl" ]]; then
               "WINPYREQUIREMENTSwhl=$testwhl"
               echo "Found also $WINPYREQUIREMENTSwhl"
+            fi
           fi
           echo "WINPYREQUIREMENTS=$WINPYREQUIREMENTS" >> $GITHUB_ENV
           echo "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl" >> $GITHUB_ENV
