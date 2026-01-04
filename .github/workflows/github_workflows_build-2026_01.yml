@@ -79,53 +79,54 @@ jobs:
             formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64F"
-        # Use the workflow input as the single python_versionf matrix value
-        python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
-        include:
-          # Configuration for 3.13
-          - python_versionf: "3.13"
-            ver2: "3.13.11.1"
-            v_tag: "3_13_11_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            sha: "d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3"
-          # Configuration for 3.14 (Standard)
-          - python_versionf: "3.14"
-            ver2: "3.14.2.1"
-            v_tag: "3_14_2_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            sha: "512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4"
-          # Configuration for 3.14F (Free-threading)
-          - python_versionf: "3.14F"
-            ver2: "3.14.2.1"
-            v_tag: "3_14_2_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst"
-            sha: "536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61"
-          # Configuration for 3.15
-          - python_versionf: "3.15"
-            ver2: "3.15.0.1"
-            v_tag: "3_15_0_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            sha: "4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7"
 
-    # Keep job env minimal: avoid complex expression functions here (compute them in a step)
     env:
-      PYTHON_VERSIONF: ${{ matrix.python_versionf }}
+      PYTHON_VERSIONF: ${{ github.event.inputs.python_versionf }}
       WINPYFLAVOR: ${{ matrix.flavor.name }}
       PANDOC: ${{ matrix.flavor.PANDOC }}
       WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
-      WINPYVER2: ${{ matrix.ver2 }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set Python version configuration
+        id: python_config
+        shell: bash
+        run: |
+          case "${{ github.event.inputs.python_versionf }}" in
+            "3.13")
+              echo "ver2=3.13.11.1" >> $GITHUB_OUTPUT
+              echo "v_tag=3_13_11_" >> $GITHUB_OUTPUT
+              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
+              echo "sha=d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3" >> $GITHUB_OUTPUT
+              ;;
+            "3.14")
+              echo "ver2=3.14.2.1" >> $GITHUB_OUTPUT
+              echo "v_tag=3_14_2_" >> $GITHUB_OUTPUT
+              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
+              echo "sha=512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4" >> $GITHUB_OUTPUT
+              ;;
+            "3.14F")
+              echo "ver2=3.14.2.1" >> $GITHUB_OUTPUT
+              echo "v_tag=3_14_2_" >> $GITHUB_OUTPUT
+              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_OUTPUT
+              echo "sha=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61" >> $GITHUB_OUTPUT
+              ;;
+            "3.15")
+              echo "ver2=3.15.0.1" >> $GITHUB_OUTPUT
+              echo "v_tag=3_15_0_" >> $GITHUB_OUTPUT
+              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
+              echo "sha=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
       - name: Set static and matrix variables based on selected Python version
         shell: bash
         env:
-          # pass the relevant matrix/job env values into the step
           PYTHON_VERSIONF: ${{ env.PYTHON_VERSIONF }}
           WINPYARCHDET: ${{ env.WINPYARCHDET }}
-          WINPYVER2: ${{ env.WINPYVER2 }}
+          WINPYVER2: ${{ steps.python_config.outputs.ver2 }}
           FLAVOR_NAME: ${{ matrix.flavor.name }}
         run: |
           PYTHON_VERSION="${PYTHON_VERSIONF%F}"   # remove trailing F if present
@@ -162,12 +163,15 @@ jobs:
           WINPYVER="${WINPYVER2}${FLAVOR_NAME}${{ env.my_release_level }}"
           echo "WINPYVER=$WINPYVER" >> $GITHUB_ENV
 
+          # Store WINPYVER2 in env for later steps
+          echo "WINPYVER2=$WINPYVER2" >> $GITHUB_ENV
+
       - name: Download, verify and extract python standalone
         if: env.WINPYREQUIREMENTS != ''
         uses: ./.github/actions/python-setup
         with:
-          python_source: ${{ matrix.src }}
-          python_sha256: ${{ matrix.sha }}
+          python_source: ${{ steps.python_config.outputs.src }}
+          python_sha256: ${{ steps.python_config.outputs.sha }}
           build_location: ${{ env.build_location }}
     
       - name: Download, checking hash and integrating pandoc binary
