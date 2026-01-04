@@ -149,8 +149,8 @@ jobs:
 
           WINPYREQUIREMENTS=""
           WINPYREQUIREMENTSwhl=""
-          testreq="$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME" + "$my_release_level" + ".txt"
-          testwhl="$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME"  + "_wheels" + "$my_release_level" + ".txt"
+          testreq="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}${my_release_level}.txt"
+          testwhl="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}_wheels${my_release_level}.txt"
           echo "searching  $testreq $testwhl"
           if [[ -f "$testreq" ]]; then
             WINPYREQUIREMENTS="$testreq"
