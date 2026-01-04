@@ -152,7 +152,7 @@ jobs:
           testreq="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}${my_release_level}.txt"
           testwhl="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}_wheels${my_release_level}.txt"
           echo "is $WINPYARCHDET=$detected_arch , search  $testreq $testwhl $detected_arch"
-          if [ "$WINPYARCHDET" = "$detected_arch" ] && [[ -f "$testreq" ]] && ; then
+          if [ "$WINPYARCHDET" = "$detected_arch" ] && [[ -f "$testreq" ]] ; then
             WINPYREQUIREMENTS="$testreq"
             echo "Found $WINPYREQUIREMENTS"
             if [[ -f "$testwhl" ]]; then
