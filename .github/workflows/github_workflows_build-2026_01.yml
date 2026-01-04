@@ -78,33 +78,33 @@ jobs:
             formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64F"
-        # Use the workflow input as the single python_versionf matrix value
-        python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
-        include:
-          # Configuration for 3.13
-          - python_versionf: "3.13"
-            ver2: "3.13.11.1"
-            v_tag: "3_13_11_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            sha: "d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3"
-          # Configuration for 3.14 (Standard)
-          - python_versionf: "3.14"
-            ver2: "3.14.2.1"
-            v_tag: "3_14_2_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            sha: "512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4"
-          # Configuration for 3.14 (Free-threading override of flavor)
-          - python_versionf: "3.14F"
-            ver2: "3.14.2.1"
-            v_tag: "3_14_2_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst"
-            sha: "536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61"
-          # Configuration for 3.15
-          - python_versionf: "3.15"
-            ver2: "3.15.0.1"
-            v_tag: "3_15_0_"
-            src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-            sha: "4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7"
+      # Use the workflow input as the single python_versionf matrix value
+      python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
+      include:
+        # Configuration for 3.13
+        - python_versionf: "3.13"
+          ver2: "3.13.11.1"
+          v_tag: "3_13_11_"
+          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+          sha: "d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3"
+        # Configuration for 3.14 (Standard)
+        - python_versionf: "3.14"
+          ver2: "3.14.2.1"
+          v_tag: "3_14_2_"
+          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+          sha: "512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4"
+        # Configuration for 3.14 (Free-threading override of flavor)
+        - python_versionf: "3.14F"
+          ver2: "3.14.2.1"
+          v_tag: "3_14_2_"
+          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst"
+          sha: "536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61"
+        # Configuration for 3.15
+        - python_versionf: "3.15"
+          ver2: "3.15.0.1"
+          v_tag: "3_15_0_"
+          src: "https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+          sha: "4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7"
 
     env:
       PYTHON_VERSIONF: ${{ github.event.inputs.python_versionf }}
