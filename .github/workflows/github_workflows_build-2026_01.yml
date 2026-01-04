@@ -17,6 +17,7 @@ on:
 env:
   # === Global Configuration ===
   WINPYARCH: "64"
+  my_cycle: "winpython/portable/cycle_2026_01"
   my_release_level: "b0"
   dotwheelhouse: "dotpython\\wheelhouse\\included.wheels"
   pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
@@ -30,9 +31,9 @@ jobs:
       matrix:
         flavor:
           - name: "dot"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dot.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dot.txt"
-            REQUIREMENTS_315: "winpython\\portable\\cycle_2025_05\\requir.64-3_15_0_0dot.txt"
+            REQUIREMENTS_313: "requir.64-3_13_11_1dotb0.txt"
+            REQUIREMENTS_314: "requir.64-3_14_2_1dotb0.txt"
+            REQUIREMENTS_315: "requir.64-3_15_0_1dotb0.txt"
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
             REQUIREMENTS_WHL_315: ""
@@ -40,8 +41,8 @@ jobs:
             PANDOC: "0"
             WINPYARCHDET: "64"
           - name: "slim"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0slim.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slim.txt"
+            REQUIREMENTS_313: "requir.64-3_13_11_1slimb0.txt"
+            REQUIREMENTS_314: "requir.64-3_14_2_1slimb0.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -50,18 +51,18 @@ jobs:
             PANDOC: "1"
             WINPYARCHDET: "64"
           - name: "whl"
-            REQUIREMENTS_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0dot.txt"
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0dot.txt"
+            REQUIREMENTS_313: "requir.64-3_13_11_1dotb0.txt"
+            REQUIREMENTS_314: "requir.64-3_14_2_1dotb0.txt"
             REQUIREMENTS_315: ""
-            REQUIREMENTS_WHL_313: "winpython\\portable\\cycle_2025_05\\requir.64-3_13_11_0whl_wheels.txt"
-            REQUIREMENTS_WHL_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0whl_wheels.txt"
+            REQUIREMENTS_WHL_313: "requir.64-3_13_11_1whl_wheelsb0.txt"
+            REQUIREMENTS_WHL_314: "requir.64-3_14_2_1whl_wheelsb0.txt"
             REQUIREMENTS_WHL_315: ""
             formats: { zip: false, 7z: true, exe: false }
             PANDOC: "0"
             WINPYARCHDET: "64"
           - name: "free"
             REQUIREMENTS_313: ""
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0free.txt"
+            REQUIREMENTS_314: "requir.64-3_14_2_1freeb0.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -71,7 +72,7 @@ jobs:
             WINPYARCHDET: "64F"
           - name: "slimf"
             REQUIREMENTS_313: ""
-            REQUIREMENTS_314: "winpython\\portable\\cycle_2025_05\\requir.64-3_14_2_0slimf.txt"
+            REQUIREMENTS_314: "requir.64-3_14_2_1slimfb0.txt"
             REQUIREMENTS_315: ""
             REQUIREMENTS_WHL_313: ""
             REQUIREMENTS_WHL_314: ""
@@ -97,25 +98,25 @@ jobs:
           case "${{ github.event.inputs.python_versionf }}" in
             "3.13")
               echo "ver2=3.13.11.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_13_11_" >> $GITHUB_OUTPUT
+              echo "v_tag=3_13_11_1" >> $GITHUB_OUTPUT
               echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
               echo "sha=d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3" >> $GITHUB_OUTPUT
               ;;
             "3.14")
               echo "ver2=3.14.2.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_14_2_" >> $GITHUB_OUTPUT
+              echo "v_tag=3_14_2_1" >> $GITHUB_OUTPUT
               echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
               echo "sha=512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4" >> $GITHUB_OUTPUT
               ;;
             "3.14F")
               echo "ver2=3.14.2.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_14_2_" >> $GITHUB_OUTPUT
+              echo "v_tag=3_14_2_1" >> $GITHUB_OUTPUT
               echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_OUTPUT
               echo "sha=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61" >> $GITHUB_OUTPUT
               ;;
             "3.15")
               echo "ver2=3.15.0.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_15_0_" >> $GITHUB_OUTPUT
+              echo "v_tag=3_15_0_1" >> $GITHUB_OUTPUT
               echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
               echo "sha=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7" >> $GITHUB_OUTPUT
               ;;
@@ -127,6 +128,8 @@ jobs:
           PYTHON_VERSIONF: ${{ env.PYTHON_VERSIONF }}
           WINPYARCHDET: ${{ env.WINPYARCHDET }}
           WINPYVER2: ${{ steps.python_config.outputs.ver2 }}
+          my_cycle: ${{ env.my_cycle }}
+          V_TAG: ${{ steps.python_config.outputs.v_tag }}
           FLAVOR_NAME: ${{ matrix.flavor.name }}
         run: |
           PYTHON_VERSION="${PYTHON_VERSIONF%F}"   # remove trailing F if present
@@ -145,14 +148,19 @@ jobs:
 
           # Populate generic per-flavor / per-version selections using matrix-expanded values
           if [ "$PYTHON_VERSION" = "3.13" ]; then
-            echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
-            echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_313 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_313 }}" >> $GITHUB_ENV
           elif [ "$PYTHON_VERSION" = "3.14" ] && [ "$WINPYARCHDET" = "$detected_arch" ]; then
-            echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
-            echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_314 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_314 }}" >> $GITHUB_ENV
           elif [ "$PYTHON_VERSION" = "3.15" ]; then
-            echo "WINPYREQUIREMENTS=${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
-            echo "WINPYREQUIREMENTSwhl=${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
+            echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
+            $test = "$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME" + ".txt"
+            echo "WINPYREQUIREMENTS=$test"
+            if [[ -f "$test" ]]; then
+               echo "Found $test"
+            fi   
           fi
 
           # write common flavor env vars derived here rather than in the job env block
