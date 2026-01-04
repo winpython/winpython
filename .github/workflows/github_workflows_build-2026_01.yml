@@ -156,7 +156,7 @@ jobs:
           elif [ "$PYTHON_VERSION" = "3.15" ]; then
             echo "WINPYREQUIREMENTS=$my_cycle/${{ matrix.flavor.REQUIREMENTS_315 }}" >> $GITHUB_ENV
             echo "WINPYREQUIREMENTSwhl=$my_cycle/${{ matrix.flavor.REQUIREMENTS_WHL_315 }}" >> $GITHUB_ENV
-            $test = "$my_cycle/requir.64-$vtag" + "$FLAVOR_NAME" + ".txt"
+            test="$my_cycle/requir.64-${v_tag}${FLAVOR_NAME}.txt"
             echo "WINPYREQUIREMENTS=$test"
             if [[ -f "$test" ]]; then
                echo "Found $test"
