@@ -78,7 +78,6 @@ jobs:
             formats: { zip: false, 7z: true, exe: true }
             PANDOC: "1"
             WINPYARCHDET: "64F"
-        # use the workflow input as the python_version matrix (single value)
         python_versionf: [ ${{ github.event.inputs.python_versionf }} ]
         include:
           # Configuration for 3.13
