@@ -762,14 +762,14 @@ sha256 = "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
 
 [[packages]]
 name = "cython"
-version = "3.2.3"
+version = "3.2.4"
 
 [[packages.wheels]]
-name = "cython-3.2.3-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/73/14/0871a0b407fa50257a79c57a608903ed50032c7619d9531451f7090a5ee3/cython-3.2.3-cp314-cp314-win_amd64.whl"
+name = "cython-3.2.4-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/79/2e/1388fc0243240cd54994bb74f26aaaf3b2e22f89d3a2cf8da06d75d46ca2/cython-3.2.4-cp314-cp314-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "84330e7c8bf220a82b633678b9f99e10227c8f4c406d67c5552449ab2afedef8"
+sha256 = "983f9d2bb8a896e16fa68f2b37866ded35fa980195eefe62f764ddc5f9f5ef8e"
 
 [[packages]]
 name = "cytoolz"
