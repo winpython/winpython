@@ -113,7 +113,7 @@ jobs:
           $WINPYREQUIREMENTSwhl = ''
 
           # 2. Generate requirement files expected names dynamically
-          $V_TAG = $env:WINPYVER2 -replace '\.', '-'
+          $V_TAG = $env:WINPYVER2 -replace '\.', '_'
           $testreq = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).txt"
           $testwhl = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)_wheels$($env:my_release_level).txt"
 
