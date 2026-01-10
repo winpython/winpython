@@ -63,37 +63,37 @@ jobs:
 
       - name: Set Python version configuration
         id: python_config
-        shell: bash
+        shell: pwsh
         run: |
-          case "${{ github.event.inputs.python_versionf }}" in
-            "3.13")
-              echo "ver2=3.13.11.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_13_11_1" >> $GITHUB_OUTPUT
-              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
-              echo "sha=d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3" >> $GITHUB_OUTPUT
-              ;;
-            "3.14")
-              echo "ver2=3.14.2.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_14_2_1" >> $GITHUB_OUTPUT
-              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
-              echo "sha=512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4" >> $GITHUB_OUTPUT
-              ;;
-            "3.14F")
-              echo "ver2=3.14.2.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_14_2_1" >> $GITHUB_OUTPUT
-              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst" >> $GITHUB_OUTPUT
-              echo "sha=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61" >> $GITHUB_OUTPUT
-              ;;
-            "3.15")
-              echo "ver2=3.15.0.1" >> $GITHUB_OUTPUT
-              echo "v_tag=3_15_0_1" >> $GITHUB_OUTPUT
-              echo "src=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz" >> $GITHUB_OUTPUT
-              echo "sha=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7" >> $GITHUB_OUTPUT
-              ;;
-          esac
+          switch ($env:PYTHON_VERSIONF) {
+            '3.13' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.13.11.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_13_11_1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3'
+            }
+            '3.14' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.2.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_14_2_1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4'
+            }
+            '3.14F' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.2.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_14_2_1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61'
+            }
+            '3.15' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_15_0_1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7'
+            }
+          }
 
       - name: Set static and matrix variables based on selected Python version
-        shell: bash
+        shell: pwsh
         env:
           PYTHON_VERSIONF: ${{ env.PYTHON_VERSIONF }}
           WINPYARCHDET: ${{ env.WINPYARCHDET }}
@@ -103,46 +103,47 @@ jobs:
           V_TAG: ${{ steps.python_config.outputs.v_tag }}
           FLAVOR_NAME: ${{ matrix.flavor.name }}
         run: |
-          PYTHON_VERSION="${PYTHON_VERSIONF%F}"   # remove trailing F if present
-          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
+          # Normalize PYTHON_VERSION by removing trailing 'F' if present
+          $PYTHON_VERSION = $env:PYTHON_VERSIONF -replace 'F$',''
+          Add-Content -Path $env:GITHUB_ENV -Value "PYTHON_VERSION=$PYTHON_VERSION"
 
-          # Compute detected arch from the input (3.14F -> 64F)
-          detected_arch="64"
-          if [[ "$PYTHON_VERSIONF" == *F ]]; then
-            detected_arch="64F"
-          fi
+          # Detect architecture (64 or 64F)
+          $detected_arch = if ($env:PYTHON_VERSIONF -like '*F') { '64F' } else { '64' }
 
-          # compute build_location from WINPYVER2 (remove dots)
-          WINPYVER2="${WINPYVER2:-}"
-          BUILD_LOCATION="WPy64-${WINPYVER2//./}"
-          echo "build_location=$BUILD_LOCATION" >> $GITHUB_ENV
+          $WINPYVER2 = $env:WINPYVER2
+          $BUILD_LOCATION = "WPy64-" + ($WINPYVER2 -replace '\\.', '')
+          Add-Content -Path $env:GITHUB_ENV -Value "build_location=$BUILD_LOCATION"
 
-          WINPYREQUIREMENTS=""
-          WINPYREQUIREMENTSwhl=""
-          testreq="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}${my_release_level}.txt"
-          testwhl="${my_cycle}/requir.64-${V_TAG}${FLAVOR_NAME}_wheels${my_release_level}.txt"
-          echo "if $WINPYARCHDET=$detected_arch , search  $testreq $testwhl $detected_arch"
-          if [ "$WINPYARCHDET" = "$detected_arch" ] && [[ -f "$testreq" ]] ; then
-            WINPYREQUIREMENTS="$testreq"
-            echo "Found $WINPYREQUIREMENTS"
-            if [[ -f "$testwhl" ]]; then
-              "WINPYREQUIREMENTSwhl=$testwhl"
-              echo "Found also $WINPYREQUIREMENTSwhl"
-            fi
-          fi
-          echo "WINPYREQUIREMENTS=$WINPYREQUIREMENTS" >> $GITHUB_ENV
-          echo "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl" >> $GITHUB_ENV
+          $WINPYREQUIREMENTS = ''
+          $WINPYREQUIREMENTSwhl = ''
+          $testreq = "$($env:my_cycle)/requir.64-$($env:V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).txt"
+          $testwhl = "$($env:my_cycle)/requir.64-$($env:V_TAG)$($env:FLAVOR_NAME)_wheels$($env:my_release_level).txt"
 
-          # write common flavor env vars derived here rather than in the job env block
-          ARTIFACT_NAME="publish_${PYTHON_VERSION}${FLAVOR_NAME}"
-          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
+          Write-Host "Checking for requirements files: $testreq and $testwhl (expected arch $detected_arch)"
 
-          echo "destwheelhouse=${BUILD_LOCATION}\\wheelhouse\\included.wheels" >> $GITHUB_ENV
-          WINPYVER="${WINPYVER2}${FLAVOR_NAME}${{ env.my_release_level }}"
-          echo "WINPYVER=$WINPYVER" >> $GITHUB_ENV
+          if ($env:WINPYARCHDET -eq $detected_arch -and (Test-Path $testreq)) {
+            $WINPYREQUIREMENTS = $testreq
+            Write-Host "Found $WINPYREQUIREMENTS"
+            if (Test-Path $testwhl) {
+              $WINPYREQUIREMENTSwhl = $testwhl
+              Write-Host "Found also $WINPYREQUIREMENTSwhl"
+            }
+          }
+
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTS=$WINPYREQUIREMENTS"
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl"
+
+          $ARTIFACT_NAME = "publish_${PYTHON_VERSION}$($env:FLAVOR_NAME)"
+          Add-Content -Path $env:GITHUB_ENV -Value "ARTIFACT_NAME=$ARTIFACT_NAME"
+
+          $destwheelhouse = "$BUILD_LOCATION\wheelhouse\included.wheels"
+          Add-Content -Path $env:GITHUB_ENV -Value "destwheelhouse=$destwheelhouse"
+
+          $WINPYVER = "${WINPYVER2}$($env:FLAVOR_NAME)$($env:my_release_level)"
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER=$WINPYVER"
 
           # Store WINPYVER2 in env for later steps
-          echo "WINPYVER2=$WINPYVER2" >> $GITHUB_ENV
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER2=$WINPYVER2"
 
       - name: Download, verify and extract python standalone
         if: env.WINPYREQUIREMENTS != ''
