@@ -68,25 +68,21 @@ jobs:
           switch ($env:PYTHON_VERSIONF) {
             '3.13' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.13.11.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_13_11_1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.13.11+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=d8a2b5e05ef71fc71f048a6f409d69b940bc5d33da8b112611cfba68fc5b86c3'
             }
             '3.14' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.2.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_14_2_1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=512744d8a86dc6042a712035ada5d87c5e2ce4218f5dbdc74d039cee46e76fb4'
             }
             '3.14F' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.2.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_14_2_1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251205/cpython-3.14.2+20251205-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=536cf813857ea566fcfae18a1b7dbcd185385f1dc1f04d5a0951bad235c8fc61'
             }
             '3.15' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'v_tag=3_15_0_1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20251217/cpython-3.15.0a3+20251217-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=4cac37170050bb402eaabad84e7ceb4679ec8ffaf43fbea71d62651ca761dcd7'
             }
@@ -100,7 +96,6 @@ jobs:
           WINPYVER2: ${{ steps.python_config.outputs.ver2 }}
           my_cycle: ${{ env.my_cycle }}
           my_release_level: ${{ env.my_release_level }}
-          V_TAG: ${{ steps.python_config.outputs.v_tag }}
           FLAVOR_NAME: ${{ matrix.flavor.name }}
         run: |
           # Normalize PYTHON_VERSION by removing trailing 'F' if present
@@ -116,8 +111,11 @@ jobs:
 
           $WINPYREQUIREMENTS = ''
           $WINPYREQUIREMENTSwhl = ''
-          $testreq = "$($env:my_cycle)/requir.64-$($env:V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).txt"
-          $testwhl = "$($env:my_cycle)/requir.64-$($env:V_TAG)$($env:FLAVOR_NAME)_wheels$($env:my_release_level).txt"
+
+          # 2. Generate requirement files expected names dynamically
+          $V_TAG = $env:WINPYVER2 -replace '\.', '-'
+          $testreq = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).txt"
+          $testwhl = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)_wheels$($env:my_release_level).txt"
 
           Write-Host "Checking for requirements files: $testreq and $testwhl (expected arch $detected_arch)"
 
