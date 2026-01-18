@@ -25,14 +25,14 @@ sha256 = "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
 
 [[packages]]
 name = "packaging"
-version = "26.0rc2"
+version = "26.0rc3"
 
 [[packages.wheels]]
-name = "packaging-26.0rc2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/60/eb/1f8f5e3b10748612b075b2b991d6c4342d993008d2aa05f5c872a4e7bfa5/packaging-26.0rc2-py3-none-any.whl"
+name = "packaging-26.0rc3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/76/9d/57d703323d41548e014e5e33191cdf117e690f48889809cf4e07d09238e2/packaging-26.0rc3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "885e01b9dbe4913e5080fa516b8550d43ef38549088c63e6e8bb51cd25adea4a"
+sha256 = "7b933851b1b13c75261dd365feb7ca91db8446fa35418b648ff8b79cabcd762d"
 
 [[packages]]
 name = "pyproject-hooks"
