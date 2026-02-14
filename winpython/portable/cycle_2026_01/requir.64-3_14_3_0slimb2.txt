@@ -258,8 +258,8 @@ griffe==1.14.0 \
     --hash=sha256:0e9d52832cccf0f7188cfe585ba962d2674b241c01916d780925df34873bceb0
 groq==1.0.0 \
     --hash=sha256:6e22bf92ffad988f01d2d4df7729add66b8fd5dbfb2154b5bbf3af245b72c731
-guidata==3.13.4 \
-    --hash=sha256:ee5660a2dbee1fc1e738fc41f0a3dd68bc240ca4bc92a696e95232f2cc8999a7
+guidata==3.14.1 \
+    --hash=sha256:d99283b1e423679aad3220f33faf2cb5fdf99e4e1db38c980e412eae62cf439b
 h11==0.16.0 \
     --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
 h2==4.2.0 \
@@ -600,6 +600,8 @@ plotly==6.5.1 \
     --hash=sha256:5adad4f58c360612b6c5ce11a308cdbc4fd38ceb1d40594a614f0062e227abe1
 plotnine==0.15.3 \
     --hash=sha256:39fd2ab8b6465275c8a283ce20d4b743dd865e94c74ae7d7d6f21a7eb31f62c1
+plotpy==2.8.4 \
+    --hash=sha256:fdb8cadbd1a44cf5cdc8320b707d6a424d24c9ddf66c62862fa8c86a994128f0
 pluggy==1.6.0 \
     --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746
 ply==3.11 \

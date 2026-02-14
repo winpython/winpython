@@ -1433,14 +1433,14 @@ sha256 = "6e22bf92ffad988f01d2d4df7729add66b8fd5dbfb2154b5bbf3af245b72c731"
 
 [[packages]]
 name = "guidata"
-version = "3.13.4"
+version = "3.14.1"
 
 [[packages.wheels]]
-name = "guidata-3.13.4-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/e3/e4/4adcf39f557dae5dfad2d184fa887ee2343cb8c042c7d2f4099030b5bb3a/guidata-3.13.4-py3-none-any.whl"
+name = "guidata-3.14.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/5d/b3/5bea189ac5ce2e8ca46d0d218a3ee7f19a7cca10fdc81356ebb0e884a4eb/guidata-3.14.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "ee5660a2dbee1fc1e738fc41f0a3dd68bc240ca4bc92a696e95232f2cc8999a7"
+sha256 = "d99283b1e423679aad3220f33faf2cb5fdf99e4e1db38c980e412eae62cf439b"
 
 [[packages]]
 name = "h11"
@@ -3311,6 +3311,17 @@ url = "https://files.pythonhosted.org/packages/d8/79/eb59d10e13b151a514a8af3b1dc
 
 [packages.wheels.hashes]
 sha256 = "39fd2ab8b6465275c8a283ce20d4b743dd865e94c74ae7d7d6f21a7eb31f62c1"
+
+[[packages]]
+name = "plotpy"
+version = "2.8.4"
+
+[[packages.wheels]]
+name = "plotpy-2.8.4-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/d3/35/e281f435a29767b7fd0d0628032675bb56ba7cc15cbcefd0961cb0427f33/plotpy-2.8.4-cp314-cp314-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "fdb8cadbd1a44cf5cdc8320b707d6a424d24c9ddf66c62862fa8c86a994128f0"
 
 [[packages]]
 name = "pluggy"
