@@ -82,7 +82,7 @@ jobs:
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dac2dc871cc9d170a9930985269b6f3e9e2fc364a6c8eb3c2e8b61f204a67f2c'
             }
             '3.15' {
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.1.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.15.0a6+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dff60468871dd808defc3040b7f4c7dfb4a9f3075273646a8c966aea86fd65fa'
             }
