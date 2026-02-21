@@ -82,7 +82,7 @@ jobs:
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dac2dc871cc9d170a9930985269b6f3e9e2fc364a6c8eb3c2e8b61f204a67f2c'
             }
             '3.15' {
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.1.1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.15.0a6+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dff60468871dd808defc3040b7f4c7dfb4a9f3075273646a8c966aea86fd65fa'
             }
@@ -97,6 +97,7 @@ jobs:
           my_cycle: ${{ env.my_cycle }}
           my_release_level: ${{ env.my_release_level }}
           FLAVOR_NAME: ${{ matrix.flavor.name }}
+          python_source: ${{ steps.python_config.outputs.src }}
         run: |
           # Normalize PYTHON_VERSION by removing trailing 'F' if present
           $PYTHON_VERSION = $env:PYTHON_VERSIONF -replace 'F$',''
@@ -108,6 +109,15 @@ jobs:
           $WINPYVER2 = $env:WINPYVER2
           $BUILD_LOCATION = "WPy64-" + ($WINPYVER2 -replace '\\.', '')
           Add-Content -Path $env:GITHUB_ENV -Value "build_location=$BUILD_LOCATION"
+
+          # check consistency of parametrizing:
+          $python_version=([version]$WINPYVER2).ToString(3)
+          if ($env:python_source.Contains($python_version)) {
+            Write-Host "Success: Found '$python_version' in $env:python_source"
+          } else {
+            Write-Error "Error: '$python_version' not found in $env:python_source !"
+            exit 1
+          }
 
           $WINPYREQUIREMENTS = ''
           $WINPYREQUIREMENTSwhl = ''
