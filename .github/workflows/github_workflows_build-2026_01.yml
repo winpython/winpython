@@ -13,6 +13,7 @@ on:
           - '3.14'
           - '3.14F'
           - '3.15'
+          - '3.15F'
 
 env:
   # === Global Configuration ===
