@@ -18,7 +18,7 @@ env:
   # === Global Configuration ===
   WINPYARCH: "64"
   my_cycle: "winpython/portable/cycle_2026_01"
-  my_release_level: "b2"
+  my_release_level: "b3"
   dotwheelhouse: "dotpython\\wheelhouse\\included.wheels"
   pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
   pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
@@ -85,6 +85,11 @@ jobs:
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.1'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.15.0a6+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dff60468871dd808defc3040b7f4c7dfb4a9f3075273646a8c966aea86fd65fa'
+            }
+            '3.15F' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.15.0a6+20260211-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=b89ec64a4bb8394c118de3d7d521ea83f6d7106e40186de90e152b3ec0108ed1'
             }
           }
 
