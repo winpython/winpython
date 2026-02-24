@@ -80,14 +80,14 @@ sha256 = "4319c52edf2e14732fe84bdc9788e26f9e9a1ad79451ec0f89f0120ffc8105d9"
 
 [[packages]]
 name = "wheel"
-version = "0.45.1"
+version = "0.46.3"
 
 [[packages.wheels]]
-name = "wheel-0.45.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/0b/2c/87f3254fd8ffd29e4c02732eee68a83a1d3c346ae39bc6822dcbcb697f2b/wheel-0.45.1-py3-none-any.whl"
+name = "wheel-0.46.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/87/22/b76d483683216dde3d67cba61fb2444be8d5be289bf628c13fc0fd90e5f9/wheel-0.46.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248"
+sha256 = "4b399d56c9d9338230118d705d9737a2a468ccca63d5e813e2a4fc7815d8bc4d"
 
 [[packages]]
 name = "wppm"
