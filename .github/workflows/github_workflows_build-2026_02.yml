@@ -113,7 +113,7 @@ jobs:
           $detected_arch = if ($env:PYTHON_VERSIONF -like '*F') { '64F' } else { '64' }
 
           $WINPYVER2 = $env:WINPYVER2
-          $BUILD_LOCATION = "WPy64-" + ($WINPYVER2 -replace '\\.', '')
+          $BUILD_LOCATION = "WPy64-" + ($WINPYVER2 -replace '[.]', "")
           Add-Content -Path $env:GITHUB_ENV -Value "build_location=$BUILD_LOCATION"
 
           # check consistency of parametrizing:
