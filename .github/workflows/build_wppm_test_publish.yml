@@ -29,11 +29,11 @@ jobs:
         os: [windows-latest]
   
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         name: Install Python
         with:
           python-version: ${{ env.python-version }}
@@ -66,7 +66,7 @@ jobs:
         run: |
           ls -1 wheelhouse
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: artifacts-${{ matrix.os }}
           path: ./dist/wppm*.whl
@@ -80,7 +80,7 @@ jobs:
       # This permission is required for pypi's "trusted publisher" feature
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           pattern: artifacts-*
           path: dist
