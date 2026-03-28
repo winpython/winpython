@@ -1,0 +1,223 @@
+name: Build WinPython for 2026-01 Cycle
+
+on:
+  workflow_dispatch:
+    inputs:
+      python_versionf:
+        description: 'Python version to build (3.13, 3.14, 3.14F or 3.15)'
+        required: true
+        default: '3.14'
+        type: choice
+        options:
+          - '3.13'
+          - '3.14'
+          - '3.14F'
+          - '3.15'
+          - '3.15F'
+
+env:
+  # === Global Configuration ===
+  WINPYARCH: "64"
+  my_cycle: "winpython/portable/cycle_2026_02"
+  my_release_level: "b0"
+  dotwheelhouse: "dotpython\\wheelhouse\\included.wheels"
+  pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
+  pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
+
+jobs:
+  build-winpython:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        flavor:
+          - name: "dot"
+            formats: { zip: true, 7z: false, exe: true }
+            PANDOC: "0"
+            WINPYARCHDET: "64"
+          - name: "slim"
+            formats: { zip: false, 7z: true, exe: true }
+            PANDOC: "1"
+            WINPYARCHDET: "64"
+          - name: "whl"
+            formats: { zip: false, 7z: true, exe: false }
+            PANDOC: "0"
+            WINPYARCHDET: "64"
+          - name: "free"
+            formats: { zip: true, 7z: false, exe: true }
+            PANDOC: "0"
+            WINPYARCHDET: "64F"
+          - name: "slimf"
+            formats: { zip: false, 7z: true, exe: true }
+            PANDOC: "1"
+            WINPYARCHDET: "64F"
+
+    env:
+      PYTHON_VERSIONF: ${{ github.event.inputs.python_versionf }}
+      WINPYFLAVOR: ${{ matrix.flavor.name }}
+      PANDOC: ${{ matrix.flavor.PANDOC }}
+      WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set Python version configuration
+        id: python_config
+        shell: pwsh
+        run: |
+          switch ($env:PYTHON_VERSIONF) {
+            '3.13' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.13.12.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.13.12+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=b73415a86dcf298a2f4a585c5371fb1cf003576d2bdc2b80a34d5321284b2ed4'
+            }
+            '3.14' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.3.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.14.3+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dc5feea0e16807e7c7b2d20af3f2c18c7153f9cbd4b54063172553fda60c5a1f'
+            }
+            '3.14F' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.3.1'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.14.3+20260211-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dac2dc871cc9d170a9930985269b6f3e9e2fc364a6c8eb3c2e8b61f204a67f2c'
+            }
+            '3.15' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.2'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260325/cpython-3.15.0a7+20260325-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=821afdd65034ddd053bf0dacd4b26a098d2907da013dd0adeb42570585fb427d'
+            }
+            '3.15F' {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.2'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260325/cpython-3.15.0a7+20260325-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=fe650dd998ee9c1a23624fc1607032b8b46efc68c8d6e8d5ba50509f349fdcad'
+            }
+          }
+
+      - name: Set static and matrix variables based on selected Python version
+        shell: pwsh
+        env:
+          PYTHON_VERSIONF: ${{ env.PYTHON_VERSIONF }}
+          WINPYARCHDET: ${{ env.WINPYARCHDET }}
+          WINPYVER2: ${{ steps.python_config.outputs.ver2 }}
+          my_cycle: ${{ env.my_cycle }}
+          my_release_level: ${{ env.my_release_level }}
+          FLAVOR_NAME: ${{ matrix.flavor.name }}
+          python_source: ${{ steps.python_config.outputs.src }}
+        run: |
+          # Normalize PYTHON_VERSION by removing trailing 'F' if present
+          $PYTHON_VERSION = $env:PYTHON_VERSIONF -replace 'F$',''
+          Add-Content -Path $env:GITHUB_ENV -Value "PYTHON_VERSION=$PYTHON_VERSION"
+
+          # Detect architecture (64 or 64F)
+          $detected_arch = if ($env:PYTHON_VERSIONF -like '*F') { '64F' } else { '64' }
+
+          $WINPYVER2 = $env:WINPYVER2
+          $BUILD_LOCATION = "WPy64-" + ($WINPYVER2 -replace '\\.', '')
+          Add-Content -Path $env:GITHUB_ENV -Value "build_location=$BUILD_LOCATION"
+
+          # check consistency of parametrizing:
+          $python_version=([version]$WINPYVER2).ToString(3)
+          if ($env:python_source.Contains($python_version)) {
+            Write-Host "Success: Found '$python_version' in $env:python_source"
+          } else {
+            Write-Error "Error: '$python_version' not found in $env:python_source !"
+            exit 1
+          }
+
+          $WINPYREQUIREMENTS = ''
+          $WINPYREQUIREMENTSwhl = ''
+
+          # 2. Generate requirement files expected names dynamically
+          $V_TAG = $env:WINPYVER2 -replace '\.', '_'
+          $testreq = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).txt"
+          $testwhl = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level)_wheels.txt"
+
+          Write-Host "Checking for requirements files: $testreq and $testwhl (expected arch $detected_arch)"
+
+          if ($env:WINPYARCHDET -eq $detected_arch -and (Test-Path $testreq)) {
+            $WINPYREQUIREMENTS = $testreq
+            Write-Host "Found $WINPYREQUIREMENTS"
+            if (Test-Path $testwhl) {
+              $WINPYREQUIREMENTSwhl = $testwhl
+              Write-Host "Found also $WINPYREQUIREMENTSwhl"
+            }
+          }
+
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTS=$WINPYREQUIREMENTS"
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl"
+
+          $ARTIFACT_NAME = "publish_${PYTHON_VERSION}$($env:FLAVOR_NAME)"
+          Add-Content -Path $env:GITHUB_ENV -Value "ARTIFACT_NAME=$ARTIFACT_NAME"
+
+          $destwheelhouse = "$BUILD_LOCATION\wheelhouse\included.wheels"
+          Add-Content -Path $env:GITHUB_ENV -Value "destwheelhouse=$destwheelhouse"
+
+          $WINPYVER = "${WINPYVER2}$($env:FLAVOR_NAME)$($env:my_release_level)"
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER=$WINPYVER"
+
+          # Store WINPYVER2 in env for later steps
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER2=$WINPYVER2"
+
+      - name: Download, verify and extract python standalone
+        if: env.WINPYREQUIREMENTS != ''
+        uses: ./.github/actions/python-setup
+        with:
+          python_source: ${{ steps.python_config.outputs.src }}
+          python_sha256: ${{ steps.python_config.outputs.sha }}
+          build_location: ${{ env.build_location }}
+    
+      - name: Download, checking hash and integrating pandoc binary
+        if: env.WINPYREQUIREMENTS != '' && env.PANDOC == '1'
+        uses: ./.github/actions/pandoc-setup
+        with:
+          pandoc_source: ${{ env.pandoc_source }}
+          pandoc_sha256: ${{ env.pandoc_sha256 }}
+          build_location: ${{ env.build_location }}
+
+      - name: Upgrade pip and patch launchers
+        if: env.WINPYREQUIREMENTS != ''
+        shell: pwsh
+        run: |
+          & "$env:build_location\python\python.exe" -m pip install --upgrade --force-reinstall pip
+          & "$env:build_location\python\python.exe" -m pip install packaging
+          & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
+
+      - name: Download all requirements
+        if: ${{ env.WINPYREQUIREMENTS != '' }}
+        shell: pwsh
+        run: |
+          $py = "$env:build_location\python\python.exe"
+          & $py -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
+          if ($env:WINPYREQUIREMENTSwhl -ne '') {
+              & $py -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
+          }
+
+      - name: Install requirements
+        if: env.WINPYREQUIREMENTS != ''
+        shell: pwsh
+        run: |
+          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYREQUIREMENTS
+
+      - name: Generate Assets and Hashes
+        if: env.WINPYREQUIREMENTS != ''
+        uses: ./.github/actions/publish-winpython
+        with:
+          build_location: ${{ env.build_location }}
+          winpy_flavor: ${{ env.WINPYFLAVOR }}
+          winpy_arch: ${{ env.WINPYARCH }}
+          winpy_ver: ${{ env.WINPYVER }}
+          winpy_ver2: ${{ env.WINPYVER2 }}
+          dotwheelhouse: ${{ env.dotwheelhouse }}
+          winpy_requirements_whl: ${{ env.WINPYREQUIREMENTSwhl }}
+          format_zip: ${{ matrix.flavor.formats.zip }}
+          format_7z: ${{ matrix.flavor.formats['7z'] }}
+          format_exe: ${{ matrix.flavor.formats.exe }}
+
+      - name: Upload artifacts
+        if: env.WINPYREQUIREMENTS != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: publish_output
+          retention-days: 66  # keeps artifact for 66 days
