@@ -69,18 +69,18 @@ jobs:
           switch ($env:PYTHON_VERSIONF) {
             '3.13' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.13.12.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.13.12+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=b73415a86dcf298a2f4a585c5371fb1cf003576d2bdc2b80a34d5321284b2ed4'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260325/cpython-3.13.12+20260325-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=34bb9427d022c2810387e1376c6e184d3f3fdd0984b28519ac58295b0ba1adde'
             }
             '3.14' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.3.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.14.3+20260211-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dc5feea0e16807e7c7b2d20af3f2c18c7153f9cbd4b54063172553fda60c5a1f'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260325/cpython-3.14.3+20260325-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=0cecd031831c1a9607bab3646b241c17ac627ff48a01ddf388dded692a44a9e5'
             }
             '3.14F' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.3.1'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260211/cpython-3.14.3+20260211-x86_64-pc-windows-msvc-freethreaded+pgo-full.tar.zst'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=dac2dc871cc9d170a9930985269b6f3e9e2fc364a6c8eb3c2e8b61f204a67f2c'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260325/cpython-3.14.3+20260325-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=34c808480ca7e6f508f2ebcb10cf71f804e866c61d2e09660e9f08332645e89a'
             }
             '3.15' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.2'

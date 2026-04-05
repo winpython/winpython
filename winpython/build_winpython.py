@@ -49,7 +49,7 @@ def pip_install(python_exe: Path, req_file: str, constraints: str, find_links: s
             str(python_exe), "-m", "pip", "install",
             "-r", req_file, "-c", constraints,
             "--pre", "--no-index", f"--find-links={find_links}",
-            "--upgrade"
+            "--upgrade", "--no-warn-script-location"
         ]
         log_section(f"Pip-install {label}")
         run_command(cmd)
