@@ -102,14 +102,14 @@ sha256 = "f483dd1fe93f6c5d49217055e4d15b905b425b6af906746abb35b69c1996c4e6"
 
 [[packages]]
 name = "altair"
-version = "6.0.0"
+version = "6.1.0"
 
 [[packages.wheels]]
-name = "altair-6.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/db/33/ef2f2409450ef6daa61459d5de5c08128e7d3edb773fefd0a324d1310238/altair-6.0.0-py3-none-any.whl"
+name = "altair-6.1.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ce/63/5dacc8d8306c715088b897a479e551bc0779fd2f0f26c97fec5e36542b4e/altair-6.1.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "09ae95b53d5fe5b16987dccc785a7af8588f2dca50de1e7a156efa8a461515f8"
+sha256 = "fdf5fd939512e5b2fc4441c82dfd2635e706defbd037db0ac429ef5ddce66c3b"
 
 [[packages]]
 name = "annotated-doc"
@@ -135,14 +135,14 @@ sha256 = "1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"
 
 [[packages]]
 name = "anthropic"
-version = "0.91.0"
+version = "0.97.0"
 
 [[packages.wheels]]
-name = "anthropic-0.91.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ea/1e/7f06da237fde2d7f760a1b61a554c0e780dffe1d264e5aacd0287a7a142b/anthropic-0.91.0-py3-none-any.whl"
+name = "anthropic-0.97.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/53/b6/8e851369fa661ad0fef2ae6266bf3b7d52b78ccf011720058f4adaca59e2/anthropic-0.97.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "b8672878642774198aa6272f40eb526b9ca11c2a72d4a935d867d445c7371f68"
+sha256 = "8a1a472dfabcfc0c52ff6a3eecf724ac7e07107a2f6e2367be55ceb42f5d5613"
 
 [[packages]]
 name = "anyio"
@@ -564,14 +564,14 @@ sha256 = "e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970"
 
 [[packages]]
 name = "charset-normalizer"
-version = "3.4.4"
+version = "3.4.6"
 
 [[packages.wheels]]
-name = "charset_normalizer-3.4.4-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/0a/4c/925909008ed5a988ccbb72dcc897407e5d6d3bd72410d69e051fc0c14647/charset_normalizer-3.4.4-py3-none-any.whl"
+name = "charset_normalizer-3.4.6-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/5d/7a/d269d834cb3a76291651256f3b9a5945e81d0a49ab9f4a498964e83c0416/charset_normalizer-3.4.6-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "7a32c560861a02ff789ad905a2fe94e3f840803362c84fecf1851cb4cf3dc37f"
+sha256 = "cd5e2801c89992ed8c0a3f0293ae83c159a60d9a5d685005383ef4caca77f2c4"
 
 [[packages]]
 name = "click"
@@ -674,14 +674,14 @@ sha256 = "a54a8e37995e4ed963b3e82831072d1ad4b005af736bb17b99c2cbd9d41b6e2d"
 
 [[packages]]
 name = "cryptography"
-version = "46.0.3"
+version = "46.0.7"
 
 [[packages.wheels]]
-name = "cryptography-46.0.3-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/f6/30/640f34ccd4d2a1bc88367b54b926b781b5a018d65f404d409aba76a84b1c/cryptography-46.0.3-cp314-cp314t-win_amd64.whl"
+name = "cryptography-46.0.7-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/32/a8/9f0e4ed57ec9cebe506e58db11ae472972ecb0c659e4d52bbaee80ca340a/cryptography-46.0.7-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "760f83faa07f8b64e9c33fc963d790a2edb24efb479e3520c14a45741cd9b2db"
+sha256 = "e06acf3c99be55aa3b516397fe42f5855597f430add9c17fa46bf2e0fb34c9bb"
 
 [[packages]]
 name = "cycler"
@@ -1301,14 +1301,14 @@ sha256 = "6f6762661949411031f5fcda9593f586e6ce8340f0ba88921a0f2ef7a81eb9a3"
 
 [[packages]]
 name = "groq"
-version = "1.0.0"
+version = "1.2.0"
 
 [[packages.wheels]]
-name = "groq-1.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/4a/88/3175759d2ef30406ea721f4d837bfa1ba4339fde3b81ba8c5640a96ed231/groq-1.0.0-py3-none-any.whl"
+name = "groq-1.2.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/0c/82/748639c95c60ad8846c65b167ca611c815d06d5f67a9e73b23486dce4fdf/groq-1.2.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "6e22bf92ffad988f01d2d4df7729add66b8fd5dbfb2154b5bbf3af245b72c731"
+sha256 = "1002060a743b27c8f86765e1bc9749c98498e961d9fe2e4902bf7804a71c3c84"
 
 [[packages]]
 name = "h11"
@@ -1444,14 +1444,14 @@ sha256 = "0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc"
 
 [[packages]]
 name = "huggingface-hub"
-version = "1.9.0"
+version = "1.12.0"
 
 [[packages.wheels]]
-name = "huggingface_hub-1.9.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/73/37/0d15d16150e1829f3e90962c99f28257f6de9e526a680b4c6f5acdb54fd2/huggingface_hub-1.9.0-py3-none-any.whl"
+name = "huggingface_hub-1.12.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7e/2b/ef03ddb96bd1123503c2bd6932001020292deea649e9bf4caa2cb65a85bf/huggingface_hub-1.12.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "2999328c058d39fd19ab748dd09bd4da2fbaa4f4c1ddea823eab103051e14a1f"
+sha256 = "d74939969585ee35748bd66de09baf84099d461bda7287cd9043bfb99b0e424d"
 
 [[packages]]
 name = "hupper"
@@ -2082,14 +2082,14 @@ sha256 = "be4a0b195f149690c166e850609a477c532ddbfbaed96a404d4e43f8d5e2689f"
 
 [[packages]]
 name = "kiwisolver"
-version = "1.4.9"
+version = "1.5.0"
 
 [[packages.wheels]]
-name = "kiwisolver-1.4.9-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/0c/28/4b2e5c47a0da96896fdfdb006340ade064afa1e63675d01ea5ac222b6d52/kiwisolver-1.4.9-cp314-cp314t-win_amd64.whl"
+name = "kiwisolver-1.5.0-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/3b/b5/98222136d839b8afabcaa943b09bd05888c2d36355b7e448550211d1fca4/kiwisolver-1.5.0-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "1fa333e8b2ce4d9660f2cda9c0e1b6bafcfb2457a9d259faa82289e73ec24891"
+sha256 = "1dd9b0b119a350976a6d781e7278ec7aca0b201e1a9e2d23d9804afecb6ca681"
 
 [[packages]]
 name = "lazy-loader"
@@ -2203,14 +2203,14 @@ sha256 = "baef24a52fc4fc514a0887ac600f9f1cff3d82c61d4d700a1fa84d597b88db59"
 
 [[packages]]
 name = "markdown"
-version = "3.10"
+version = "3.10.2"
 
 [[packages.wheels]]
-name = "markdown-3.10-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/70/81/54e3ce63502cd085a0c556652a4e1b919c45a446bd1e5300e10c44c8c521/markdown-3.10-py3-none-any.whl"
+name = "markdown-3.10.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/de/1f/77fa3081e4f66ca3576c896ae5d31c3002ac6607f9747d2e3aa49227e464/markdown-3.10.2-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "b5b99d6951e2e4948d939255596523444c0e677c669700b1d17aa4a8a464cb7c"
+sha256 = "e91464b71ae3ee7afd3017d9f358ef0baf158fd9a298db92f1d4761133824c36"
 
 [[packages]]
 name = "markdown-it-py"
@@ -2533,14 +2533,14 @@ sha256 = "e2012a474502f1e2251267062aae3114611f07df4224b6e06334c57b0f2ce87c"
 
 [[packages]]
 name = "narwhals"
-version = "2.18.1"
+version = "2.19.0"
 
 [[packages.wheels]]
-name = "narwhals-2.18.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/3f/c3/06490e98393dcb4d6ce2bf331a39335375c300afaef526897881fbeae6ab/narwhals-2.18.1-py3-none-any.whl"
+name = "narwhals-2.19.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/37/72/e61e3091e0e00fae9d3a8ef85ece9d2cd4b5966058e1f2901ce42679eebf/narwhals-2.19.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a0a8bb80205323851338888ba3a12b4f65d352362c8a94be591244faf36504ad"
+sha256 = "1f8dfa4a33a6dbff878c3e9be4c3b455dfcaf2a9322f1357db00e4e92e95b84b"
 
 [[packages]]
 name = "nbclient"
@@ -2643,14 +2643,14 @@ sha256 = "411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef"
 
 [[packages]]
 name = "numba"
-version = "0.65.0"
+version = "0.65.1"
 
 [[packages.wheels]]
-name = "numba-0.65.0-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/f5/21/1e73fa16bf0393ebb74c5bb208d712152ffdfc84600a8e93a3180317856e/numba-0.65.0-cp314-cp314t-win_amd64.whl"
+name = "numba-0.65.1-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/32/36/8be7118ffd4c8440881046eac3d0982cc5ab42909508cf5d67024d62a2e4/numba-0.65.1-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "46fd679ae4f68c7a5d5721efbd29ecee0b0f3013211591891d79b51bfdf73113"
+sha256 = "20609346e3bd75204950dcbbfe383a8d7dbf4902f442aedbf00f97fef4aa8f38"
 
 [[packages]]
 name = "numpy"
@@ -3226,14 +3226,14 @@ sha256 = "cfaded7289fca72ddf6579b81459e3ec8db323a508e61c49aa318ee3cd6ff160"
 
 [[packages]]
 name = "pydantic"
-version = "2.12.5"
+version = "2.13.3"
 
 [[packages.wheels]]
-name = "pydantic-2.12.5-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/5a/87/b70ad306ebb6f9b585f114d0ac2137d792b48be34d732d60e597c2f8465a/pydantic-2.12.5-py3-none-any.whl"
+name = "pydantic-2.13.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/f3/0a/fd7d723f8f8153418fb40cf9c940e82004fce7e987026b08a68a36dd3fe7/pydantic-2.13.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "e561593fccf61e8a20fc46dfc2dfe075b8be7d0188df33f221ad1f0139180f9d"
+sha256 = "6db14ac8dfc9a1e57f87ea2c0de670c251240f43cb0c30a5130e9720dc612927"
 
 [[packages]]
 name = "pydantic-ai-slim"
@@ -3248,14 +3248,14 @@ sha256 = "3007c93e4c0b28f6bd87ebe0eec3cc27b2c7639a26d806ab09d9a6944ec5872a"
 
 [[packages]]
 name = "pydantic-core"
-version = "2.41.5"
+version = "2.46.3"
 
 [[packages.wheels]]
-name = "pydantic_core-2.41.5-cp314-cp314t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/22/ed/182129d83032702912c2e2d8bbe33c036f342cc735737064668585dac28f/pydantic_core-2.41.5-cp314-cp314t-win_amd64.whl"
+name = "pydantic_core-2.46.3-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/b8/2a/c79cf53fd91e5a87e30d481809f52f9a60dd221e39de66455cf04deaad37/pydantic_core-2.46.3-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "80aa89cad80b32a912a65332f64a4450ed00966111b6615ca6816153d3585a8c"
+sha256 = "706d9d0ce9cf4593d07270d8e9f53b161f90c57d315aeec4fb4fd7a8b10240d8"
 
 [[packages]]
 name = "pydantic-evals"
@@ -4733,14 +4733,14 @@ sha256 = "15ccc861ac51c53696de0a5d6d4607f99c210739caf987b5d2054f3efed429d8"
 
 [[packages]]
 name = "tornado"
-version = "6.5.4"
+version = "6.5.5"
 
 [packages.sdist]
-name = "tornado-6.5.4.tar.gz"
-url = "https://files.pythonhosted.org/packages/37/1d/0a336abf618272d53f62ebe274f712e213f5a03c0b2339575430b8362ef2/tornado-6.5.4.tar.gz"
+name = "tornado-6.5.5.tar.gz"
+url = "https://files.pythonhosted.org/packages/f8/f1/3173dfa4a18db4a9b03e5d55325559dab51ee653763bb8745a75af491286/tornado-6.5.5.tar.gz"
 
 [packages.sdist.hashes]
-sha256 = "a22fa9047405d03260b483980635f0b041989d8bcc9a313f8fe18b411d84b1d7"
+sha256 = "192b8f3ea91bd7f1f50c06955416ed76c6b72f96779b962f07f911b91e8d30e9"
 
 [[packages]]
 name = "tqdm"
@@ -4941,15 +4941,26 @@ url = "https://files.pythonhosted.org/packages/39/08/aaaad47bc4e9dc8c725e68f9d04
 sha256 = "bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4"
 
 [[packages]]
-name = "uvicorn"
-version = "0.41.0"
+name = "uuid-utils"
+version = "0.15.0a3"
 
 [[packages.wheels]]
-name = "uvicorn-0.41.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/83/e4/d04a086285c20886c0daad0e026f250869201013d18f81d9ff5eada73a88/uvicorn-0.41.0-py3-none-any.whl"
+name = "uuid_utils-0.15.0a3-cp314-cp314t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/62/82/d54aa76727bda1b95d9773b3ea0cf4679d07a60977f92aef16e60bbd293e/uuid_utils-0.15.0a3-cp314-cp314t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "29e35b1d2c36a04b9e180d4007ede3bcb32a85fbdfd6c6aeb3f26839de088187"
+sha256 = "0b95578a3960b926e675dab1bd3d72dea1ca78c7a98f4139b9aaa0b6efc78798"
+
+[[packages]]
+name = "uvicorn"
+version = "0.46.0"
+
+[[packages.wheels]]
+name = "uvicorn-0.46.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/31/a3/5b1562db76a5a488274b2332a97199b32d0442aca0ed193697fd47786316/uvicorn-0.46.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "bbebbcbed972d162afca128605223022bedd345b7bc7855ce66deb31487a9048"
 
 [[packages]]
 name = "vega-datasets"
