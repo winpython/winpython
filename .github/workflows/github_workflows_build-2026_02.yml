@@ -19,7 +19,7 @@ env:
   # === Global Configuration ===
   WINPYARCH: "64"
   my_cycle: "winpython/portable/cycle_2026_02"
-  my_release_level: "b1"
+  my_release_level: "b2"
   dotwheelhouse: "dotpython\\wheelhouse\\included.wheels"
   pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
   pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
@@ -219,7 +219,7 @@ jobs:
         shell: pwsh
         run: |
           # & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYREQUIREMENTS --no-warn-script-location
-          & "$env:build_location\python\python.exe" -m pip install --no-deps  -r $env:WINPYLOCKFILE --no-warn-script-location
+          & "$env:build_location\python\python.exe" -m pip install --no-deps --require-hashes -r $env:WINPYLOCKFILE --no-warn-script-location
 
       - name: Generate Assets and Hashes
         if: env.WINPYLOCKFILE != ''
