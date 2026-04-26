@@ -147,6 +147,28 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTS=$WINPYREQUIREMENTS"
           Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl"
 
+          $WINPYLOCKFILE = ''
+          $WINPYLOCKFILEwhl = ''
+
+          # 2. Generate pylock files expected names dynamically
+          $V_TAG = $env:WINPYVER2 -replace '\.', '_'
+          $testreq = "$($env:my_cycle)/pylock.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).toml"
+          $testwhl = "$($env:my_cycle)/pylock.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level)_wheels.toml"
+
+          Write-Host "Checking for pylock files: $testreq and $testwhl (expected arch $detected_arch)"
+
+          if ($env:WINPYARCHDET -eq $detected_arch -and (Test-Path $testreq)) {
+            $WINPYLOCKFILE = $testreq
+            Write-Host "Found $WINPYLOCKFILE"
+            if (Test-Path $testwhl) {
+              $WINPYLOCKFILEwhl = $testwhl
+              Write-Host "Found also $WINPYLOCKFILEwhl"
+            }
+          }
+
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYLOCKFILE=$WINPYLOCKFILE"
+          Add-Content -Path $env:GITHUB_ENV -Value "WINPYLOCKFILEwhl=$WINPYLOCKFILEwhl"
+
           $ARTIFACT_NAME = "publish_${PYTHON_VERSION}$($env:FLAVOR_NAME)"
           Add-Content -Path $env:GITHUB_ENV -Value "ARTIFACT_NAME=$ARTIFACT_NAME"
 
@@ -160,7 +182,7 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER2=$WINPYVER2"
 
       - name: Download, verify and extract python standalone
-        if: env.WINPYREQUIREMENTS != ''
+        if: env.WINPYLOCKFILE != ''
         uses: ./.github/actions/python-setup
         with:
           python_source: ${{ steps.python_config.outputs.src }}
@@ -168,7 +190,7 @@ jobs:
           build_location: ${{ env.build_location }}
     
       - name: Download, checking hash and integrating pandoc binary
-        if: env.WINPYREQUIREMENTS != '' && env.PANDOC == '1'
+        if: env.WINPYLOCKFILE != '' && env.PANDOC == '1'
         uses: ./.github/actions/pandoc-setup
         with:
           pandoc_source: ${{ env.pandoc_source }}
@@ -176,30 +198,31 @@ jobs:
           build_location: ${{ env.build_location }}
 
       - name: Upgrade pip and patch launchers
-        if: env.WINPYREQUIREMENTS != ''
+        if: env.WINPYLOCKFILE != ''
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade --force-reinstall pip --no-warn-script-location 
           & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
 
       - name: Download all requirements
-        if: ${{ env.WINPYREQUIREMENTS != '' }}
+        if: ${{ env.WINPYLOCKFILE != '' }}
         shell: pwsh
         run: |
           $py = "$env:build_location\python\python.exe"
-          & $py -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTS
-          if ($env:WINPYREQUIREMENTSwhl -ne '') {
-              & $py -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYREQUIREMENTSwhl
+          & $py -m pip download --dest $env:dotwheelhouse --no-deps --require-hashes -r $env:WINPYLOCKFILE
+          if ($env:WINPYLOCKFILEwhl -ne '') {
+              & $py -m pip download --dest $env:destwheelhouse --no-deps --require-hashes -r $env:WINPYLOCKFILEwhl
           }
 
-      - name: Install requirements
-        if: env.WINPYREQUIREMENTS != ''
+      - name: Install lockfile
+        if: env.WINPYLOCKFILE != ''
         shell: pwsh
         run: |
-          & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYREQUIREMENTS --no-warn-script-location
+          # & "$env:build_location\python\python.exe" -m pip install --no-deps --no-index --trusted-host=None --find-links=$env:dotwheelhouse --require-hashes -r $env:WINPYREQUIREMENTS --no-warn-script-location
+          & "$env:build_location\python\python.exe" -m pip install --no-deps  -r $env:WINPYLOCKFILE --no-warn-script-location
 
       - name: Generate Assets and Hashes
-        if: env.WINPYREQUIREMENTS != ''
+        if: env.WINPYLOCKFILE != ''
         uses: ./.github/actions/publish-winpython
         with:
           build_location: ${{ env.build_location }}
@@ -214,7 +237,7 @@ jobs:
           format_exe: ${{ matrix.flavor.formats.exe }}
 
       - name: Upload artifacts
-        if: env.WINPYREQUIREMENTS != ''
+        if: env.WINPYLOCKFILE != ''
         uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT_NAME }}
