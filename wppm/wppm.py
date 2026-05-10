@@ -18,7 +18,7 @@ from . import utils, piptree, diff, __version__
 from . import wheelhouse as wh
 from operator import itemgetter
 # Workaround for installing PyVISA on Windows from source:
-os.environ["HOME"] = os.environ["USERPROFILE"]
+# 2026-05-10 not helping oin non WinPython: os.environ["HOME"] = os.environ["USERPROFILE"]
 
 class Package:
     """Standardize a Package from filename or pip list."""
