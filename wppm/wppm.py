@@ -14,7 +14,7 @@ import subprocess
 import json
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
-from . import utils, piptree, associate, diff, __version__
+from . import utils, piptree, diff, __version__
 from . import wheelhouse as wh
 from operator import itemgetter
 # Workaround for installing PyVISA on Windows from source:
@@ -340,6 +340,7 @@ def main(test=False):
         print("continue ? Y/N")
         theAnswer = input()
         if theAnswer == "Y":
+            import associate
             associate.register(dist.target, verbose=args.verbose)
             sys.exit()
     if args.unregisterWinPython:
@@ -352,6 +353,7 @@ def main(test=False):
         print("continue ? Y/N")
         theAnswer = input()
         if theAnswer == "Y":
+            import associate
             associate.unregister(dist.target, verbose=args.verbose)
             sys.exit()
     if utils.is_python_distribution(args.target):
