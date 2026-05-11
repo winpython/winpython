@@ -130,7 +130,7 @@ class PipData:
                 if req_marker != "":
                     req_add["req_marker"] = req_marker
                 requires.append(req_add)
-        return requires
+        return sorted(requires, key=lambda x: x["req_key"])
 
     def _get_provides(self, package: Distribution) -> Dict[str, None]:
         """Extract provided extras from package requirements."""
