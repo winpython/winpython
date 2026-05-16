@@ -244,22 +244,22 @@ class PipData:
         """Generate upward dependency tree as formatted string."""
         pp = ppw[:-1] if ppw.endswith('!') else ppw
         ppend = "!" if ppw.endswith('!') else "" #show only downward limiting dependancies
+        ppp = [pp] if pp in self.distro else ()
         if pp == ".":
-            results = [aa for p in sorted(self.distro) if '[requires' in (aa:=self.up(p + ppend, extra, depth, indent, version_req, verbose))]
-            return '\n'.join(filter(None, results))
+           ppp = [p for p in self.distro]
+        results = []
+        for p in sorted(ppp):
+            if extra == ".":
+                extras = set(self.distro[p]["provided"]).union(set(self.distro[p]["provides"]))
+                for e in sorted(extras):
+                    a = self._get_dependency_tree(p, e, version_req, depth, verbose=verbose, upward=True)
+                    results += a if (len(a[0])>1 or ppend=="") else []
+            else:
+                a = self._get_dependency_tree(p, extra, version_req, depth, verbose=verbose, upward=True)
+                results += a if (len(a[0])>1 or extra=="") else []
 
-        if extra == ".":
-            if pp in self.distro:
-                extras = set(self.distro[pp]["provided"]).union(set(self.distro[pp]["provides"]))
-                results = [self.up(pp + ppend, e, depth, indent, version_req, verbose=verbose) for e in sorted(extras)]
-                return '\n'.join(filter(None, results))
-            return ""
-
-        if pp not in self.distro:
-            return ""
-
-        rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose, upward=True), indent=indent)
-        lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2   and ( ppend=="" or not "[requires:" in l)]
+        rawtext = json.dumps(results, indent=indent)
+        lines = [l[2*indent:] for l in rawtext.split("\n") if len(l.strip()) > 2   and ( ppend=="" or not "[requires:" in l)]
         return "\n".join(filter(None, lines)).replace('"', "").replace('[requires :', '[requires:')
 
     def description(self, pp: str) -> None:
