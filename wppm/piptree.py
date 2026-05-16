@@ -226,22 +226,18 @@ class PipData:
 
     def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
         """Generate downward dependency tree as formatted string."""
+        ppp = [pp] if pp in self.distro else ()
         if pp == ".":
-            results = [self.down(p, extra, depth, indent, version_req, verbose=verbose) for p in sorted(self.distro)]
-            return '\n'.join(filter(None, results))
-
-        if extra == ".":
-            if pp in self.distro:
-                results = [self.down(pp, one_extra, depth, indent, version_req, verbose=verbose)
-                           for one_extra in sorted(self.distro[pp]["provides"])]
-                return '\n'.join(filter(None, results))
-            return ""
-
-        if pp not in self.distro:
-            return ""
-
-        rawtext = json.dumps(self._get_dependency_tree(pp, extra, version_req, depth, verbose=verbose), indent=indent)
-        lines = [l for l in rawtext.split("\n") if len(l.strip()) > 2]
+           ppp = [p for p in self.distro]
+        results = []
+        for p in sorted(ppp):
+            if extra == ".":
+                for one_extra in sorted(self.distro[p]["provides"]):
+                    results +=  self._get_dependency_tree(p, one_extra, version_req, depth, verbose=verbose)
+            else:
+                results += self._get_dependency_tree(p, extra, version_req, depth, verbose=verbose)
+        rawtext = json.dumps(results, indent=indent)
+        lines = [l[2*indent:] for l in rawtext.split("\n") if len(l.strip()) > 2]
         return "\n".join(lines).replace('"', "")
 
     def up(self, ppw: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
