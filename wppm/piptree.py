@@ -157,7 +157,7 @@ class PipData:
                             self.distro[target_key]["provided"][req["req_marker"].split('extra == ')[1].translate(remove_list)] = None
                     self.distro[target_key]["reverse_dependencies"].append(rev_dep)
 
-    def _get_dependency_tree(self, package_name: str, extra: str = "", version_req: str = "", depth: int = 20, path: Optional[List[str]] = None, verbose: bool = False, upward: bool = False) -> List[List[str]]:
+    def _get_dependency_tree(self, package_name: str, extra: str = "", version_req: str = "", depth: int = 20, path: Optional[List[str]] = None, verbose: bool = False, upward: bool = False, ppend: str="") -> List[List[str]]:
         """Recursive function to build dependency tree."""
         path = path or []
         extras = extra.split(",")
@@ -199,17 +199,18 @@ class PipData:
                                     # IA risk error: # dask[array] go upwards as dask[dataframe], so {"extra": up_req} , not {"extra": extra}
                                     #tag downward limiting dependancies
                                     wall = " " if dependency["req_version"][:1] == "~" or dependency["req_version"].startswith("==") or "<" in dependency["req_version"] else ""
-                                    ret += self._get_dependency_tree(
-                                        dependency["req_key"],
-                                        up_req,
-                                        f"[requires{wall}: {package_name}"
-                                        + (f"[{dependency['req_extra']}]" if dependency["req_extra"] != "" else "")
-                                        + f'{dependency["req_version"]}]',
-                                        depth,
-                                        next_path,
-                                        verbose=verbose,
-                                        upward=upward,
-                                    )
+                                    if ppend=="" or wall==" ":
+                                        ret += self._get_dependency_tree(
+                                            dependency["req_key"],
+                                            up_req,
+                                            f"[requires: {package_name}"
+                                            + (f"[{dependency['req_extra']}]" if dependency["req_extra"] != "" else "")
+                                            + f'{dependency["req_version"]}]',
+                                            depth,
+                                            next_path,
+                                            verbose=verbose,
+                                            upward=upward,
+                                        )
                         elif not dependency.get("req_marker") or Marker(dependency["req_marker"]).evaluate(environment=environment):
                             ret += self._get_dependency_tree(
                                 dependency["req_key"],
@@ -252,15 +253,15 @@ class PipData:
             if extra == ".":
                 extras = set(self.distro[p]["provided"]).union(set(self.distro[p]["provides"]))
                 for e in sorted(extras):
-                    a = self._get_dependency_tree(p, e, version_req, depth, verbose=verbose, upward=True)
+                    a = self._get_dependency_tree(p, e, version_req, depth, verbose=verbose, upward=True, ppend=ppend)
                     results += a if (len(a[0])>1 or ppend=="") else []
             else:
-                a = self._get_dependency_tree(p, extra, version_req, depth, verbose=verbose, upward=True)
+                a = self._get_dependency_tree(p, extra, version_req, depth, verbose=verbose, upward=True, ppend=ppend)
                 results += a if (len(a[0])>1 or extra=="") else []
 
         rawtext = json.dumps(results, indent=indent)
-        lines = [l[2*indent:] for l in rawtext.split("\n") if len(l.strip()) > 2   and ( ppend=="" or not "[requires:" in l)]
-        return "\n".join(filter(None, lines)).replace('"', "").replace('[requires :', '[requires:')
+        lines = [l[2*indent:] for l in rawtext.split("\n") if len(l.strip()) > 2]
+        return "\n".join(filter(None, lines)).replace('"', "")
 
     def description(self, pp: str) -> None:
         """Return package description or None if not found."""
