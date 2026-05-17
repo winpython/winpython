@@ -1,4 +1,25 @@
-### WinPython 2026-02 rc (May 13th, 2026)
+### WinPython 2026-02 (May 17th, 2026) 
+
+MD5                              | SHA-1                                    | SHA-256                                                          | Binary                            | Size                 | blake2b-256                                                     
+---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|----------------------|-----------------------------------------------------------------
+413800959c1010a2c715a1b51c53a0a1 | e6027b0d4cef4b822a48bd30268590eae6e3c4c5 | c6ada5d0a2fef7dc7ae79e4f9c046a55f98e7221a221a250e34dfcab02f384d1 | WinPython64-3.13.13.0dot.zip      |     27 697 763 Bytes | 02985641aa7524c3cad556aabb536671bf3006406d448d3a3733f2a9e5edead1
+eafcd0228b52f2757acf7f71534b8276 | 6d00e9643755ee872f83f6a44b8d806f18dadd43 | 6acc720fbbdcb22f983dac8ba75f2596c48894e7058f10171b9dc3866fafb5fe | WinPython64-3.13.13.0slim.7z      |    665 574 926 Bytes | db7750860cc089cda824556e2af347cd32bcdcd06cbcc442a5b2911b0e8bf762
+e82528c82ef7a67b95c3fd9e7fa67a2f | 5444d248e230bb64cd9c9c91b668fedf94a6b238 | 6ff50da18d7545d28ec64aff8e731ab4c382ee6f9de13b1732dbbaf88520c875 | WinPython64-3.13.13.0whl.7z       |    685 140 383 Bytes | aa2adf78f8bf8fad7afd9ce1befab9240008d61ae071a41c303792270dbcc217
+076f76bddc1b94552ec2e00b0d964e5b | bed1c4a783ddffb9ed966fecd9e73b385bfbf9c7 | f3ee735d12563c7d691ce345e265f43341c7dd4ef8dcd0e6c23415a8c666462b | WinPython64-3.14.5.0dot.zip       |     28 341 113 Bytes | a568041835daba395e85df8553abd1ab199482dcf43e443b620d066b92091c4a
+5dcd253d451c9a445ef9144bf72cd19f | aca79dc87c95e7fefe3005a98ba541dd1f90689b | 117a5d66b58d341addefe5839e213364b4c97cee3448962257c32d503333d4d8 | WinPython64-3.14.5.0free.exe      |     17 563 207 Bytes | 3514f3b9f475cccb6422fb087eb04111e403eaecde42773c2ad91895a7df02a2
+e5c612639aee691234656ba6a37c1ff0 | 3bf076dde33b644b9e1bd0f882517a4e6260ca09 | 22dc2c00af0f7d502b81e95adb5ef0ce3598924c46b06b59538c1414953a3460 | WinPython64-3.14.5.0free.zip      |     28 535 117 Bytes | 605936836b02cedf0fb11edc502f180d8bb18876ea717bfb2d10b0cf858cd005
+aeec7d4d1aa1f3fa94e921d75852f722 | dc8506c4483b7ca7bea8f7475bb0ea067e07450c | e54363cf3a0679bd75d4e345753304cac8f0be63d22b2bdfbcb238570b5786de | WinPython64-3.14.5.0slim.7z       |    671 275 189 Bytes | 70c6799533fb283719c6145ce70b07054789367ecc7c3fde086fa2693e56e4f4
+4cfe23e9787dfe97f97f8726226451e4 | 4824d837a8ba24d80cf425812ebc20c15aaaecda | ec316e930e0631687c2bdc953424ace24756fd67030520abb88f74521276ed38 | WinPython64-3.14.5.0slim.exe      |    671 488 532 Bytes | e47ca03c58b16b2176d58893ee3fdbe10d3679379060c57a622786b06ce20095
+eea10f6597b8e1647538deeae983b558 | 0d03ccddf7edf5a9d62f004cd846ed2ac7c909b7 | 366412b692a8749028345560c12a6985ec330ea422f45bd61a934f279ba880ad | WinPython64-3.14.5.0slimf.7z      |    445 784 045 Bytes | c4e2ebd14a7e05366d315101e73888ac36f144f756e8ed9cce91399c876a4b12
+379ad5120099153b6d155ff4c6a68eab | c1d0c13031ed15dc1dfc96d2d1da349cc1eef065 | d296af485102cf20fa7a11020d2087e70bf96310ff1d0a657014420e93f03540 | WinPython64-3.14.5.0slimf.exe     |    445 998 619 Bytes | 53f04a0badf4775b626bd1c404555a03068767b203b38a5ea215d1735e1d423e
+60317698a6176bd1c3a8f83e9590cded | cbaf971d1d0e2680dde999e3a97ab2814b8301b4 | 03ad02d9404fe9d1b2c81b013b8b76dd2516a4a31c9c118c77bd67e7bcc78a09 | WinPython64-3.14.5.0whl.7z        |    688 816 827 Bytes | 2475d8f6e603afbc7b10042a6583b6648a718235b9edff0dad4266817c35a795
+4d69ded0dcb26bc80aa150fec2286ee4 | 18b69c04a2a4bbbe792e547c39e16c64d7b968ee | 2a74351572ed0ca851b257c952aa704c091d74b4e629049e6136a7ce08c689e8 | WinPython64-3.15.0.2dot.exe       |     18 208 448 Bytes | dfa8bf546370de688f3ab5ab2b07b64aa3dd3a5f65b825c879b55572208bed83
+14b17f47039a855011f70279bb8d3fb5 | b8bc6c02c30ad0fa8e3331c6a880d7d1fc77034f | 8f88a3e57371378c82362313be129b41b7e4f9e96b529f3cea78d8901cb0b0dc | WinPython64-3.15.0.2dot.zip       |     29 372 514 Bytes | 29779e20d55b5bf4a2269720ab9e492f4260b36d45e1def89b3dbfa3f18b62ee
+8804015b27992db5c158aedce4fb3918 | 43e3fa60f2bbf782ef1b10a30fdf9d7b3b57cfa5 | 6c1b7c72929b965fb5e2979759a193d9afd380c0eb92ee77e45aa2b70718d22d | WinPython64-3.15.0.2free.exe      |     18 257 265 Bytes | 02473ef68b4e51bdf8c878ab05e8f69392fe3ef1a95adff423d826b370ad9708
+d118d1bd53c6321f50fee828e79c6715 | f316b1d5ae825b400af0a4cd5d73525f7866fe87 | 98322b88ff90386e8bb8e906010f37f4f0d7889c214536112a6667504bb89594 | WinPython64-3.15.0.2free.zip      |     29 497 456 Bytes | 4473e3c311bc327e92e9c63158cdd6512d7aab4ee73d5b5dbec483fd5a49d033
+
+
+### WinPython 2026-02 rc (May 13th, 2026) 
 
 MD5                              | SHA-1                                    | SHA-256                                                          | Binary                            | Size                 | blake2b-256                                                     
 ---------------------------------|------------------------------------------|------------------------------------------------------------------|-----------------------------------|----------------------|-----------------------------------------------------------------
