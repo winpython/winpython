@@ -225,7 +225,7 @@ class PipData:
                 ret_all.append(ret)
         return ret_all
 
-    def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
+    def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False) -> str:
         """Generate downward dependency tree as formatted string."""
         ppp = [pp] if pp in self.distro else ()
         if pp == ".":
@@ -241,7 +241,7 @@ class PipData:
         lines = [l[2*indent:] for l in rawtext.split("\n") if len(l.strip()) > 2]
         return "\n".join(lines).replace('"', "")
 
-    def up(self, ppw: str, extra: str = "", depth: int = 20, indent: int = 5, version_req: str = "", verbose: bool = False) -> str:
+    def up(self, ppw: str, extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False) -> str:
         """Generate upward dependency tree as formatted string."""
         pp = ppw[:-1] if ppw.endswith('!') else ppw
         ppend = "!" if ppw.endswith('!') else "" #show only downward limiting dependancies
