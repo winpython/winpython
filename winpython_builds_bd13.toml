@@ -1,8 +1,5 @@
 [pythons]
-"311" = { python_target_release = "3119", release = "2", my_release_level = "b4" }
-"312" = { python_target_release = "31210", release = "2", my_release_level = "b4" }
-"313" = { python_target_release = "31311", release = "0", my_release_level = "b4" }
-"314" = { python_target_release = "3142", release = "0", my_release_level = "b4" }
+"313" = { python_target_release = "31313", release = "1", my_release_level = "b0" }
 
 
 [[builds]]
@@ -12,7 +9,7 @@ python_target = "313"
 pyver = "3.13"
 flavor = "dot"
 arch = "64"
-create_installer = "7zip.zip"
+create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd313\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd313\\dot_requirements.txt"
@@ -29,7 +26,7 @@ python_target = "313"
 pyver = "3.13"
 flavor = "slim"
 arch = "64"
-create_installer = "7zip.7z"
+create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd313\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd313\\requirements64_slim.txt"
@@ -39,14 +36,14 @@ toolsdirs = "C:\\Winp\\bdTools\\tools64_pandoc_alone"
 install_options = "--no-index --pre --trusted-host=None --upgrade" 
 
 
-[[builds]]
+[[builds_nomore]]
 name = "whl"
 root_dir_for_builds = "C:\\Winp"
 python_target = "313"
 pyver = "3.13"
 flavor = "whl"
 arch = "64"
-create_installer = ".7z-mx9"
+create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd313\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd313\\dot_requirements.txt"
