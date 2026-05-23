@@ -14,7 +14,7 @@ import logging
 from functools import lru_cache
 from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple, Union
-from pip._vendor.packaging.markers import Marker
+from packaging.markers import Marker
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
 from . import utils

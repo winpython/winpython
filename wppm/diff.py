@@ -10,7 +10,7 @@ import re
 import sys
 import shutil
 from pathlib import Path
-from pip._vendor.packaging import version
+from packaging import version
 from . import utils
 
 CHANGELOGS_DIR = Path(__file__).parent.parent / "changelogs"
