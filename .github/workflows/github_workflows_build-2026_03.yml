@@ -1,4 +1,4 @@
-name: Build WinPython for 2026-02 Cycle
+name: Build WinPython for 2026-03 Cycle
 
 on:
   workflow_dispatch:
