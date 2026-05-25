@@ -5690,14 +5690,14 @@ sha256 = "3d3c5b0b5f66a385300dacb5ba2c2dba67c18c332b934fdac08261c1c7ee7d7a"
 
 [[packages]]
 name = "wppm"
-version = "17.5.20260524"
+version = "17.5.20260525"
 
 [[packages.wheels]]
-name = "wppm-17.5.20260524-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/33/e8/170d6887297fc74df23e6b55b4ed51794d126196efe236f641f72f559f43/wppm-17.5.20260524-py3-none-any.whl"
+name = "wppm-17.5.20260525-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/b3/99/abfd00918f0510d8cf0bcdf627d99794938ece80782259f987b0e7468776/wppm-17.5.20260525-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "1330f1e8731e6c56adcf0bdce412afed92ad0e9612439f4be88f6cb88d15c644"
+sha256 = "c46a2b03a94d65fbb158a26d481ad862cf4e4351a2f62469602cd50307b0a951"
 
 [[packages]]
 name = "wsproto"
