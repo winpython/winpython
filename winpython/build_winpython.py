@@ -88,14 +88,14 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
     # check equality
     web, local = "", "local"
     if not cmp(winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt"):
-       print("⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️differences in ", winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
-       raise os.error
+        print("⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️differences in ", winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
+        raise os.error
     else:
-       print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
-       print ("💖 housekeeping, removing local files 💖 ",  winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
-       os.remove (winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
-       os.remove (winpydirbase.parent / f"pylock.{file_postfix}{local}.toml")
-       os.remove (winpydirbase.parent / f"requirement_temp.txt")
+        print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
+        print ("💖 housekeeping, removing local files 💖 ",  winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
+        os.remove (winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
+        os.remove (winpydirbase.parent / f"pylock.{file_postfix}{local}.toml")
+        os.remove (winpydirbase.parent / f"requirement_temp.txt")
 
 # --- Main Logic ---
 def run_make_py(build_python, winpydirbase, args, winpyver, winpyver2):
