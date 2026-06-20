@@ -98,7 +98,7 @@ runs:
       shell: pwsh
       run: |
         $pythonExe = Join-Path "${{ inputs.build_location }}" "python\python.exe"
-        $DESTFILE = "./publish_output/hashes.md"
+        $DESTFILE = Join-Path ".\publish_output" "hashes_${{ inputs.winpy_ver }}.md"
         $filesToHash = Get-ChildItem -Path ".\publish_output\*64*.*"
         & $pythonExe -c "import sys;from wppm import hash; hash.print_hashes(sys.argv[1:])" @($filesToHash.FullName) | Out-File -FilePath $DESTFILE
         gc $DESTFILE
