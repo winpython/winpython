@@ -96,6 +96,10 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
         os.remove (winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
         os.remove (winpydirbase.parent / f"pylock.{file_postfix}{local}.toml")
         os.remove (winpydirbase.parent / f"requirement_temp.txt")
+        if (winpydirbase.parent / f"requir.{file_postfix}_wheelslocal.txt").is_file():
+            os.remove (winpydirbase.parent / f"requir.{file_postfix}_wheelslocal.txt")
+        if (winpydirbase.parent / f"pylock.{file_postfix}_wheelslocal.toml").is_file():
+            os.remove (winpydirbase.parent / f"pylock.{file_postfix}_wheelslocal.toml")
 
 # --- Main Logic ---
 def run_make_py(build_python, winpydirbase, args, winpyver, winpyver2):
