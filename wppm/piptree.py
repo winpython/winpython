@@ -166,6 +166,7 @@ class PipData:
         extras = extra.split(",")
         pkg_key = self.normalize(package_name)
         ret_all = []
+        wall_hit = ""
 
         full_name = f"{package_name}[{extra}]" if extra else package_name
         if full_name in path:
@@ -200,8 +201,9 @@ class PipData:
                                     extra + ',' in dependency["req_extra"] + ',' and \
                                     Marker(dependency["req_marker"]).evaluate(environment=environment | {"extra": up_req})):
                                     # IA risk error: # dask[array] go upwards as dask[dataframe], so {"extra": up_req} , not {"extra": extra}
-                                    #tag downward limiting dependancies
+                                    #tag upward limiting dependancies
                                     wall = " " if dependency["req_version"][:1] == "~" or dependency["req_version"].startswith("==") or "<" in dependency["req_version"] else ""
+                                    wall_hit += wall
                                     if ppend=="" or wall==" ":
                                         ret += self._get_dependency_tree(
                                             dependency["req_key"],
@@ -215,21 +217,33 @@ class PipData:
                                             upward=upward,
                                         )
                         elif not dependency.get("req_marker") or Marker(dependency["req_marker"]).evaluate(environment=environment):
-                            ret += self._get_dependency_tree(
-                                dependency["req_key"],
-                                dependency["req_extra"],
-                                dependency["req_version"],
-                                depth,
-                                next_path,
-                                verbose=verbose,
-                                upward=upward,
-                            )
+                            #tag downward missing dependancies
+                            wall = ""
+                            if ppend=="" or wall==" ":
+                                ret += self._get_dependency_tree(
+                                    dependency["req_key"],
+                                    dependency["req_extra"],
+                                    dependency["req_version"],
+                                    depth,
+                                    next_path,
+                                    verbose=verbose,
+                                    upward=upward,
+                                )
+                    elif not upward and (not dependency.get("req_marker") or Marker(dependency["req_marker"]).evaluate(environment=environment)):
+                        # not there but was required
+                        wall_hit += " "
+                        ret += [[f'{dependency["req_key"]}==? {dependency["req_version"]}']]
 
                 ret_all.append(ret)
-        return ret_all
+        if ppend=="" or wall_hit != "":
+            return ret_all
+        else:
+            return [""]
 
-    def down(self, pp: str = "", extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False) -> str:
+    def down(self, ppw: str = "", extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False) -> str:
         """Generate downward dependency tree as formatted string."""
+        pp = ppw[:-1] if ppw.endswith('!') else ppw
+        ppend = "!" if ppw.endswith('!') else "" #show only downward missing dependancies
         ppp = [pp] if pp in self.distro else ()
         if pp == ".":
            ppp = [p for p in self.distro]
@@ -237,9 +251,10 @@ class PipData:
         for p in sorted(ppp):
             if extra == ".":
                 for one_extra in sorted(self.distro[p]["provides"]):
-                    results +=  self._get_dependency_tree(p, one_extra, version_req, depth, verbose=verbose)
+                    a =  self._get_dependency_tree(p, one_extra, version_req, depth, verbose=verbose, ppend=ppend)
             else:
-                results += self._get_dependency_tree(p, extra, version_req, depth, verbose=verbose)
+                a = self._get_dependency_tree(p, extra, version_req, depth, verbose=verbose, ppend=ppend)
+            results += a if (len(a[0])>1 or ppend=="") else []    
         rawtext = json.dumps(results, indent=indent)
         lines = [l[2*indent:] for l in rawtext.split("\n") if len(l.strip()) > 2]
         return "\n".join(lines).replace('"', "")
