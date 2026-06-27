@@ -1,5 +1,5 @@
 [pythons]
-"315" = { python_target_release = "3150", release = "3", my_release_level = "b0" }
+"315" = { python_target_release = "3150", release = "3", my_release_level = "b2" }
 
 
 

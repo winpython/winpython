@@ -1,5 +1,5 @@
 [pythons]
-"314" = { python_target_release = "3145", release = "1", my_release_level = "b0" }
+"314" = { python_target_release = "3146", release = "0", my_release_level = "b2" }
 
 
 
@@ -73,7 +73,7 @@ toolsdirs = "C:\\Winp\\bdTools\\tools64_pandoc_alone"
 install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
-[[builds_nopore]]
+[[builds]]
 name = "whl"
 root_dir_for_builds = "C:\\Winp"
 python_target = "314"
