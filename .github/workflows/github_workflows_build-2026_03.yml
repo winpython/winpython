@@ -19,7 +19,7 @@ env:
   # === Global Configuration ===
   WINPYARCH: "64"
   my_cycle: "winpython/portable/cycle_2026_03"
-  my_release_level: "b1"
+  my_release_level: "b2"
   dotwheelhouse: "dotpython\\wheelhouse\\included.wheels"
   pandoc_source: "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
   pandoc_sha256: "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
@@ -69,28 +69,28 @@ jobs:
           switch ($env:PYTHON_VERSIONF) {
             '3.13' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.13.14.0'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.13.14+20260610-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=2933d50847057b9131ff89578a220b9206c40fd6bc34d0c12afb716bd9bf8fc9'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260623/cpython-3.13.14+20260623-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=7c3159205dda0289a47e6dd1226c4e5800b1f99a03146cdc25a41fed8ef74f5a'
             }
             '3.14' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.6.0'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.14.6+20260610-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=49f0c7e8d1c2eaba70c5516ca6c01b6b766f6ff473f1209a76fd01783e7c75ae'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260623/cpython-3.14.6+20260623-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=ec05b628ad749682d06d225780fbc02e7bbb5ce2146c9bd8e74a3659b14b693a'
             }
             '3.14F' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.14.6.0'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.14.6+20260610-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=565b89180445643af7508283b4321a3ba4df6414aea9383c4f43eeeffe3b2c90'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260623/cpython-3.14.6+20260623-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=684fd81c1f3bb1829871e85ffeb71e2d80791cb68b155e6d50405bd32f632242'
             }
             '3.15' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.3'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.15.0b2+20260610-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=156c1a0cce39020dfc57a6cc7c1f4394eedc0cd01fd47cf31e35d4beb76f028a'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260623/cpython-3.15.0b3+20260623-x86_64-pc-windows-msvc-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=c879c122137c8040e1106362b31ae5e20bd3ecaaf728d2e999332e78951e90b0'
             }
             '3.15F' {
               Add-Content -Path $env:GITHUB_OUTPUT -Value 'ver2=3.15.0.3'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260610/cpython-3.15.0b2+20260610-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz'
-              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=533240800f4f60ae0a01ea19894635678ce5033b8c57c16643e032662b0e115d'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'src=https://github.com/astral-sh/python-build-standalone/releases/download/20260623/cpython-3.15.0b3+20260623-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz'
+              Add-Content -Path $env:GITHUB_OUTPUT -Value 'sha=03e9b659530197bda345a76612034fcc8df36a17e6248e0b4197c180d7dbaa8b'
             }
           }
 
