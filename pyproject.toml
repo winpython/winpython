@@ -23,12 +23,17 @@ classifiers=[
     'Operating System :: Unix',
     'Programming Language :: Python :: 3',
     'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'Intended Audience :: System Administrators',
     'Topic :: Scientific/Engineering',
+    'Topic :: Software Development :: Build Tools',
+    'Topic :: System :: Software Distribution',
     'Topic :: Software Development :: Widget Sets',
 ]
 dynamic = ["version",]
-description="WinPython Package Management"
-keywords = ["Portable","Windows"]
+description="pip companion: extras-aware dependency trees, offline wheelhouses, portable Pythons"
+keywords = ["dependency","dependencies","dependency-tree","pipdeptree","extras","requirements","wheelhouse","pip","sbom","portable","windows"]
 
 [project.urls]
 Documentation = "https://winpython.github.io/"
