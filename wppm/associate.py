@@ -23,28 +23,40 @@ def get_special_folder_path(path_name):
     except OSError:
         print(f"{path_name} is an unknown path ID")
 
-def get_winpython_start_menu_folder(current=True):
-    """Return WinPython Start menu shortcuts folder."""
+def is_winpython_layout(target):
+    """Return True if target is the Python of a WinPython distribution (sibling 'scripts/env.bat')."""
+    return (Path(target).parent / "scripts" / "env.bat").is_file()
+
+def get_start_menu_folder_name(target):
+    """Return the Start menu folder name of a target: 'WinPython' for a WinPython
+    distribution, the target directory name otherwise, so that registering a plain
+    Python never overwrites (nor removes) the menu of another distribution."""
+    if is_winpython_layout(target):
+        return 'WinPython'
+    return Path(target).resolve().name or 'Python'
+
+def get_winpython_start_menu_folder(current=True, folder_name='WinPython'):
+    """Return Start menu shortcuts folder of a distribution."""
     folder = get_special_folder_path("CSIDL_PROGRAMS")
     if not current:
         try:
             folder = get_special_folder_path("CSIDL_COMMON_PROGRAMS")
         except OSError:
             pass
-    return str(Path(folder) / 'WinPython')
+    return str(Path(folder) / folder_name)
 
-def remove_winpython_start_menu_folder(current=True):
-    """Remove WinPython Start menu folder -- remove it if it already exists"""
-    path = get_winpython_start_menu_folder(current=current)
+def remove_winpython_start_menu_folder(current=True, folder_name='WinPython'):
+    """Remove a distribution Start menu folder -- remove it if it already exists"""
+    path = get_winpython_start_menu_folder(current=current, folder_name=folder_name)
     if Path(path).is_dir():
         try:
             shutil.rmtree(path)
         except WindowsError:
             print(f"Directory {path} could not be removed", file=sys.stderr)
 
-def create_winpython_start_menu_folder(current=True):
-    """Create WinPython Start menu folder."""
-    path = get_winpython_start_menu_folder(current=current)
+def create_winpython_start_menu_folder(current=True, folder_name='WinPython'):
+    """Create a distribution Start menu folder."""
+    path = get_winpython_start_menu_folder(current=current, folder_name=folder_name)
     if Path(path).is_dir():
         try:
             shutil.rmtree(path)
@@ -114,31 +126,42 @@ def _has_pywin32():
     return importlib.util.find_spec('pythoncom') is not None
 
 def _remove_start_menu_folder(target, current=True, has_pywin32=False):
-    "remove menu Folder for target WinPython if pywin32 exists"
+    "remove menu Folder of target distribution if pywin32 exists"
     if has_pywin32:
-        remove_winpython_start_menu_folder(current=current)
+        remove_winpython_start_menu_folder(current=current, folder_name=get_start_menu_folder_name(target))
     else:
         print("Skipping start menu removal as pywin32 package is not installed.")
+
+def _get_launchers(target):
+    """Return the executables to give a Start menu shortcut to.
+    A WinPython distribution keeps its launchers (Spyder, Jupyter, ...) next to its
+    Python directory, so all of them are taken. For a plain Python, the neighbours
+    are unrelated files, so only its own interpreters are taken."""
+    if is_winpython_layout(target):
+        wpdir = Path(target).parent
+        return [wpdir / name for name in os.listdir(wpdir) if Path(name).suffix.lower() == ".exe"]
+    return [exe for exe in (Path(target) / "python.exe", Path(target) / "pythonw.exe") if exe.is_file()]
 
 def _get_shortcut_data(target, current=True, has_pywin32=False):
     "get windows menu access data if pywin32 exists, otherwise empty list"
     if not has_pywin32:
         return []
- 
-    wpdir = str(Path(target).parent)
+
+    launchers = _get_launchers(target)
+    if not launchers:
+        return []
+    # create the menu folder once, not once per shortcut
+    menu_folder = create_winpython_start_menu_folder(current=current, folder_name=get_start_menu_folder_name(target))
     data = []
-    for name in os.listdir(wpdir):
-        bname, ext = Path(name).stem, Path(name).suffix
-        if ext.lower() == ".exe":
-            # Path for the shortcut file in the start menu folder
-            shortcut_name = str(Path(create_winpython_start_menu_folder(current=current)) / bname) + '.lnk'
-            data.append(
-                (
-                    str(Path(wpdir) / name), # Target executable path
-                    bname, # Description/Name
-                    shortcut_name, # Shortcut file path
-                )
+    for exe in launchers:
+        bname = exe.stem
+        data.append(
+            (
+                str(exe), # Target executable path
+                bname, # Description/Name
+                str(Path(menu_folder) / bname) + '.lnk', # Shortcut file path
             )
+        )
     return data
 
 # --- PythonCore entries (PEP-0514 and WinPython specific) ---
@@ -240,7 +263,7 @@ def register(target, current=True, reg_type=winreg.REG_SZ, verbose=True):
     # Create start menu entries
     if has_pywin32:
         if verbose:
-            print(f'Creating WinPython menu for all icons in {Path(target).parent}')
+            print(f'Creating "{get_start_menu_folder_name(target)}" start menu shortcuts')
         for path, desc, fname in _get_shortcut_data(target, current=current, has_pywin32=True):
             try:
                 create_shortcut(path, desc, fname, verbose=verbose)
@@ -269,7 +292,7 @@ def unregister(target, current=True, verbose=True):
     # Remove start menu shortcuts
     if has_pywin32:
         if verbose:
-            print(f'Removing WinPython menu for all icons in {Path(target).parent}')
+            print(f'Removing "{get_start_menu_folder_name(target)}" start menu shortcuts')
         _remove_start_menu_folder(target, current=current, has_pywin32=True)
         # The original code had commented out code to delete .lnk files individually.
     else:
