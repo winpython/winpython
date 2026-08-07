@@ -87,11 +87,11 @@ runs:
             Compress-Archive -Path "${{ inputs.build_location }}" -DestinationPath "$baseName.zip" -Force
         }
         if ("${{ inputs.format_7z }}" -eq "true") { 
-            7z a "$baseName.7z" "${{ inputs.build_location }}"
+            7z a -mx7 "$baseName.7z" "${{ inputs.build_location }}"
         }
         if ("${{ inputs.format_exe }}" -eq "true") { 
             $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-            7z a -t7z -sfx"$SFXModulePath" "$baseName.exe" "${{ inputs.build_location }}"
+            7z a -mx7 -t7z -sfx"$SFXModulePath" "$baseName.exe" "${{ inputs.build_location }}"
         }
 
     - name: Generate Hashes
