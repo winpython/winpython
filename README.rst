@@ -3,7 +3,7 @@ WinPython tools
 
 Copyright 2012-2013 Pierre Raybaut
 
-Copyright 2014-2025+ The Winpython development team: https://github.com/winpython/
+Copyright 2014-2026+ The Winpython development team: https://github.com/winpython/
 
 Licensed under the terms of the MIT License
 (see wppm/__init__.py for details)
@@ -25,8 +25,8 @@ WinPython Package Manager (WPPM)
 WinPython build toolchain (historic)
   generate_a_winpython_distropy_meta.bat with a toml file is the toolchain used to build a WinPython distribution from (almost) scratch.
 
-WinPython build toolchain via Github action (news of 2025-08-24)
-  fork the project and run github action like `github_workflows_build-all_3.14.yml` for python-3.14
+WinPython build toolchain via Github action (news of 2026-01-01)
+  fork the project and run github action like `github_workflows_build-YYYY_NN.yml` for WinPython YYYY-NN relase
   you can modify the list of wheels with hash to your preference
 
 
