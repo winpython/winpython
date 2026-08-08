@@ -80,7 +80,9 @@ class PipData:
         if sys.executable == search_path:
             return pm.get_installed_metadata() #Distribution.discover()
         else:
-            return pm.get_installed_metadata(path=[str(Path(search_path).parent / 'lib' / 'site-packages')]) #distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
+            # get_site_packages_path resolves from the distribution root, so it copes
+            # with the venv layout (python.exe in Scripts, site-packages at the root)
+            return pm.get_installed_metadata(path=[utils.get_site_packages_path(search_path)])
 
     def _process_packages(self, packages: List[Distribution]) -> None:
         """Process packages metadata and store them in the distro dictionary."""
