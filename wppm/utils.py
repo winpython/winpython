@@ -23,39 +23,67 @@ SOURCE_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z]*[\-]?[0-9]*)(\.zip|\.ta
 # WHEELBIN_PATTERN defines what an acceptable binary wheel package is
 WHEELBIN_PATTERN = r'([a-zA-Z0-9\-\_\.]*)-([0-9\.\_]*[a-z0-9\+]*[0-9]?)-cp([0-9]*)\-[0-9|c|o|n|e|p|m]*\-(win32|win\_amd64)\.whl'
 
-def get_python_executable(path=None):
-    """Return the path to the Python executable."""
+def get_install_root(path=None):
+    """Return the root directory of the Python installation designated by *path*.
+
+    *path* may be the root itself, a python executable, or the 'Scripts'
+    directory holding one (venv layout: python.exe lives in <root>/Scripts,
+    while Lib/site-packages stays at <root>).
+    """
     python_path = Path(path) if path else Path(sys.executable)
     base_dir = python_path if python_path.is_dir() else python_path.parent
-    python_exe = base_dir / 'python.exe'
-    pypy_exe = base_dir / 'pypy3.exe'  # For PyPy
-    return str(python_exe if python_exe.is_file() else pypy_exe)
+    if base_dir.name.lower() == 'scripts':
+        return base_dir.parent
+    return base_dir
+
+def get_python_executable(path=None):
+    """Return the path to the Python executable.
+
+    Handles the WinPython layout (python.exe at the root) and the venv layout
+    (python.exe in the 'Scripts' sub-directory). Returns <root>/python.exe when
+    no interpreter is found, so callers can test the result with is_file().
+    """
+    root = get_install_root(path)
+    for candidate in (root / 'python.exe', root / 'pypy3.exe',  # PyPy
+                      root / 'Scripts' / 'python.exe', root / 'Scripts' / 'pypy3.exe'):
+        if candidate.is_file():
+            return str(candidate)
+    return str(root / 'python.exe')
 
 def get_site_packages_path(path=None):
     """Return the path to the Python site-packages directory."""
-    python_path = Path(path) if path else Path(sys.executable)
-    base_dir = python_path if python_path.is_dir() else python_path.parent
-    site_packages = base_dir / 'Lib' / 'site-packages'
-    pypy_site_packages = base_dir / 'site-packages'  # For PyPy
+    root = get_install_root(path)
+    site_packages = root / 'Lib' / 'site-packages'
+    pypy_site_packages = root / 'site-packages'  # For PyPy
     return str(pypy_site_packages if pypy_site_packages.is_dir() else site_packages)
+
+def first_line(text, default="?"):
+    """Return the first non-empty line of *text*, or *default* if there is none."""
+    for line in text.splitlines():
+        if line.strip():
+            return line
+    return default
+
+def get_file_version(exe):
+    """Return the Windows FileVersion resource of *exe* ('?' if unavailable)."""
+    return first_line(exec_shell_cmd(f'powershell (Get-Item "{exe}").VersionInfo.FileVersion', Path(exe).parent))
 
 def get_installed_tools(path=None)-> str:
         """Generates Markdown for installed tools section in package index."""
         tool_lines = []
         python_exe = Path(get_python_executable(path))
-        version = exec_shell_cmd(f'powershell (Get-Item {python_exe}).VersionInfo.FileVersion', python_exe.parent).splitlines()[0]
-        tool_lines.append(("Python" ,f"http://www.python.org/", version, "Python programming language with standard library"))
-        if (node_exe := python_exe.parent.parent / "n" / "node.exe").exists():
-            version = exec_shell_cmd(f'powershell (Get-Item {node_exe}).VersionInfo.FileVersion', node_exe.parent).splitlines()[0]
-            tool_lines.append(("Nodejs", "https://nodejs.org", version, "a JavaScript runtime built on Chrome's V8 JavaScript engine"))
+        root = python_exe.parent.parent  # WinPython distribution root, holding the tool dirs
+        tool_lines.append(("Python" ,f"http://www.python.org/", get_file_version(python_exe), "Python programming language with standard library"))
+        if (node_exe := root / "n" / "node.exe").exists():
+            tool_lines.append(("Nodejs", "https://nodejs.org", get_file_version(node_exe), "a JavaScript runtime built on Chrome's V8 JavaScript engine"))
 
-        if (pandoc_exe := python_exe.parent.parent / "t" / "pandoc.exe").exists():
-            version = exec_shell_cmd("pandoc -v", pandoc_exe.parent).splitlines()[0].split(" ")[-1]
+        if (pandoc_exe := root / "t" / "pandoc.exe").exists():
+            # call it by full path: 'pandoc' is only on PATH inside a WinPython shell
+            version = first_line(exec_shell_cmd(f'"{pandoc_exe}" -v', pandoc_exe.parent)).split(" ")[-1]
             tool_lines.append(("Pandoc", "https://pandoc.org", version, "an universal document converter"))
 
-        if (vscode_exe := python_exe.parent.parent / "t" / "VSCode" / "Code.exe").exists():
-            version = exec_shell_cmd(f'powershell (Get-Item {vscode_exe}).VersionInfo.FileVersion', vscode_exe.parent).splitlines()[0]
-            tool_lines.append(("VSCode","https://code.visualstudio.com", version, "a source-code editor developed by Microsoft"))
+        if (vscode_exe := root / "t" / "VSCode" / "Code.exe").exists():
+            tool_lines.append(("VSCode","https://code.visualstudio.com", get_file_version(vscode_exe), "a source-code editor developed by Microsoft"))
         return tool_lines
 
 def onerror(function, path, excinfo):
@@ -82,10 +110,11 @@ def print_box(text):
     print("\n\n" + "\n".join([line0, line1, line0]) + "\n")
 
 def is_python_distribution(path):
-    """Return True if path is a Python distribution."""
+    """Return True if path is a Python distribution (WinPython, plain install or venv)."""
     has_exec = Path(get_python_executable(path)).is_file()
     has_site = Path(get_site_packages_path(path)).is_dir()
-    return has_exec and has_site
+    has_venv_cfg = (get_install_root(path) / 'pyvenv.cfg').is_file()  # canonical venv marker
+    return has_exec and (has_site or has_venv_cfg)
 
 def decode_fs_string(string):
     """Convert string from file system charset to unicode."""
@@ -105,7 +134,10 @@ def exec_run_cmd(args, path=None):
 def python_query(cmd, path):
     """Execute Python command using the Python interpreter located in *path*."""
     the_exe = get_python_executable(path)
-    return exec_shell_cmd(f'"{the_exe}" -c "{cmd}"', path).splitlines()[0]
+    output = exec_shell_cmd(f'"{the_exe}" -c "{cmd}"', path).splitlines()
+    if not output:
+        raise RuntimeError(f"No output from '{the_exe}': not a usable Python interpreter")
+    return output[0]
 
 def python_execmodule(cmd, path):
     """Execute Python command using the Python interpreter located in *path*."""

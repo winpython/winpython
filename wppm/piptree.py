@@ -3,6 +3,12 @@
 piptree.py: inspect and display Python package dependencies,
 supporting both downward and upward dependency trees.
 Requires Python 3.8+ due to importlib.metadata.
+
+Keep this module free of subprocess: it must stay pure importlib.metadata +
+pathlib, so it can run where no process can be spawned -- notably inside
+JupyterLite/Pyodide, where piptree is known to work. The rest of wppm
+(Distribution, -md, -i, -u) does spawn and is Windows-only; piptree is the
+part that travels. See _get_environment() for the one place this bites.
 """
 
 import json
@@ -58,7 +64,21 @@ class PipData:
         return re.sub(r"[-_.]+", "-", name).lower()
 
     def _get_environment(self) -> Dict[str, str]:
-        """Collect system and Python environment details."""
+        """Collect system and Python environment details, for marker evaluation.
+
+        These describe the *running* interpreter, not `target`. So when -t points
+        at another Python, markers can pick the wrong branch: a 3.13 target read
+        from a 3.14 wppm resolves `python_version >= '3.14'` as true. pip_list()
+        is unaffected (it evaluates no marker); down()/up() are.
+
+        Do NOT fix this by asking the target interpreter over subprocess: this
+        runs once per PipData, on the only code path that works without process
+        spawning (see module docstring). Read the target's version from files
+        instead -- `pyvenv.cfg` carries `version = 3.13.7` for a venv, and
+        `python313.dll` at the root gives major.minor for a plain install or
+        WinPython (skip the `...t.dll` free-threaded variant). Both are ordinary
+        reads, and only needed when target is not the running interpreter.
+        """
         return {
             "implementation_name": sys.implementation.name,
             "implementation_version": f"{sys.implementation.version.major}.{sys.implementation.version.minor}.{sys.implementation.version.micro}",
@@ -80,7 +100,9 @@ class PipData:
         if sys.executable == search_path:
             return pm.get_installed_metadata() #Distribution.discover()
         else:
-            return pm.get_installed_metadata(path=[str(Path(search_path).parent / 'lib' / 'site-packages')]) #distributions(path=[str(Path(search_path).parent / 'lib' / 'site-packages')])
+            # get_site_packages_path resolves from the distribution root, so it copes
+            # with the venv layout (python.exe in Scripts, site-packages at the root)
+            return pm.get_installed_metadata(path=[utils.get_site_packages_path(search_path)])
 
     def _process_packages(self, packages: List[Distribution]) -> None:
         """Process packages metadata and store them in the distro dictionary."""

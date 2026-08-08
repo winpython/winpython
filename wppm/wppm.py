@@ -90,7 +90,7 @@ class Distribution:
         my_flavor = flavor or os.getenv("WINPYFLAVOR", "")
         my_release_level = release_level or  os.getenv("WINPYVER", "").replace(my_winpyver2+my_flavor, "")
 
-        tools_list = utils.get_installed_tools(utils.get_python_executable(python_executable_directory))
+        tools_list = utils.get_installed_tools(utils.get_python_executable(python_executable_directory or self.target))
         package_list = [(pkg.name, pkg.url, pkg.version, pkg.description) for pkg in self.get_installed_packages()]
         wheelhouse_list = []
         my_wheeldir = Path(wheeldir) if wheeldir else self.wheelhouse / 'included.wheels'
