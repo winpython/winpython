@@ -38,7 +38,7 @@ WinPython set of Wheel
 Dependencies
 ------------   
 
-* Python3 >= 3.10
+* Python3 >= 3.11
 
 
 Requirements
