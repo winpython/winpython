@@ -37,6 +37,8 @@ def run_build(build, python_versions):
     my_toolsdirs = build.get("toolsdirs", "")
     #my_install_options = build.get("install_options", "")
     wheelhousereq = build.get("wheelhousereq", "")
+    # "pip" (default, what ships) | "none" | "parallel" | "parallel-N"
+    my_bytecode = build.get("bytecode", "pip")
 
     # Get Python release info from TOML [pythons]
     py_target = my_python_target
@@ -77,6 +79,7 @@ def run_build(build, python_versions):
         "--constraints", my_constraints,
         "--find-links", my_find_links,
         "--wheelhousereq", wheelhousereq,
+        "--bytecode", my_bytecode,
         "--create-installer", my_create_installer,
         #"--install-options", env["my_install_options"],
     ]
