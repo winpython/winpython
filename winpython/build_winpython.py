@@ -84,10 +84,17 @@ def compile_bytecode(target_python: Path, jobs: int):
     pip compiles serially while installing; doing it afterwards lets it run
     across cores. Failures stay non-fatal: some packages ship modules that are
     not importable on this Python, and pip tolerates those too.
+
+    -W ignore matches what pip does. pip wraps its own byte-compilation in
+    warnings.filterwarnings("ignore") (see pip/_internal/operations/install/
+    wheel.py), so the SyntaxWarnings that plenty of packages carry -- invalid
+    escape sequences, `is` against a literal -- never reach the build log.
+    Without this, moving the compile out of pip would surface all of them.
     """
     site_packages = target_python.parent / "Lib" / "site-packages"
     log_section(f"Byte-compiling {site_packages} (-j{jobs})")
-    run_command([str(target_python), "-m", "compileall", "-q", f"-j{jobs}", str(site_packages)], check=False)
+    run_command([str(target_python), "-W", "ignore", "-m", "compileall",
+                 "-q", f"-j{jobs}", str(site_packages)], check=False)
 
 
 def patch_winpython(python_exe):
