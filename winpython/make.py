@@ -73,7 +73,7 @@ class WinPythonDistributionBuilder:
     def _get_python_zip_file(self) -> Path:
         """Finds the Python .zip file in the wheels directory."""
         for source_item in self.source_dirs.iterdir():
-            if re.match(r"(pypy3|python-).*\.zip", source_item.name):
+            if re.match(r"python-.*\.zip", source_item.name):
                 return source_item
         raise RuntimeError(f"Could not find Python zip package in {self.source_dirs}")
 

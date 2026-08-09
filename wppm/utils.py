@@ -44,18 +44,14 @@ def get_python_executable(path=None):
     no interpreter is found, so callers can test the result with is_file().
     """
     root = get_install_root(path)
-    for candidate in (root / 'python.exe', root / 'pypy3.exe',  # PyPy
-                      root / 'Scripts' / 'python.exe', root / 'Scripts' / 'pypy3.exe'):
+    for candidate in (root / 'python.exe', root / 'Scripts' / 'python.exe'):
         if candidate.is_file():
             return str(candidate)
     return str(root / 'python.exe')
 
 def get_site_packages_path(path=None):
     """Return the path to the Python site-packages directory."""
-    root = get_install_root(path)
-    site_packages = root / 'Lib' / 'site-packages'
-    pypy_site_packages = root / 'site-packages'  # For PyPy
-    return str(pypy_site_packages if pypy_site_packages.is_dir() else site_packages)
+    return str(get_install_root(path) / 'Lib' / 'site-packages')
 
 def first_line(text, default="?"):
     """Return the first non-empty line of *text*, or *default* if there is none."""
@@ -159,10 +155,7 @@ def get_python_long_version(path):
 def patch_shebang_line(fname, pad=b" ", to_movable=True, targetdir=""):
     """Remove absolute path to python.exe in shebang lines in binary files, or re-add it."""
     target_dir = targetdir if to_movable else os.path.abspath(os.path.join(os.path.dirname(fname), r"..")) + "\\"
-    executable = sys.executable
     shebang_line = re.compile(rb"""(#!.*pythonw?\.exe)"?""")  # Python3+
-    if "pypy3" in sys.executable:
-        shebang_line = re.compile(rb"""(#!.*pypy3w?\.exe)"?""")  # Pypy3+
     target_dir = target_dir.encode("utf-8")
 
     with open(fname, "rb") as fh:
@@ -186,10 +179,8 @@ def patch_shebang_line_py(fname, to_movable=True, targetdir=""):
     """Changes shebang line in '.py' file to relative or absolue path"""
     import fileinput
     exec_path = r'#!.\python.exe' if to_movable else '#!' + sys.executable
-    if 'pypy3' in sys.executable:
-        exec_path = r'#!.\pypy3.exe' if to_movable else exec_path
     for line in fileinput.input(fname, inplace=True):
-        if re.match(r'^#\!.*python\.exe$', line) or re.match(r'^#\!.*pypy3\.exe$', line):
+        if re.match(r'^#\!.*python\.exe$', line):
             print(exec_path)
         else:
             print(line, end='')

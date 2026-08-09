@@ -231,9 +231,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
                 tmp_string = r"""@echo off
 if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
 "%WINPYDIR%\python.exe" "%WINPYDIR%\Lib\site-packages\package.name\uic\pyuic.py" %1 %2 %3 %4 %5 %6 %7 %8 %9"""
-            # PyPy adaption: python.exe or pypy3.exe
-            my_exec = Path(utils.get_python_executable(self.target)).name
-            tmp_string = tmp_string.replace("python.exe", my_exec).replace("package.name", package.name)
+            tmp_string = tmp_string.replace("package.name", package.name)
             self.create_file(package, f"pyuic{package.name[-1]}.bat", "Scripts", tmp_string)
             # Adding missing __init__.py files (fixes Issue 8)
             uic_path = str(Path("Lib") / "site-packages" / package.name / "uic")
@@ -258,7 +256,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         self._print(package, "Uninstalling")
         if package.name != "pip":
             # trick to get true target (if not current)
-            this_exec = utils.get_python_executable(self.target)  # PyPy !
+            this_exec = utils.get_python_executable(self.target)
             subprocess.call([this_exec, "-m", "pip", "uninstall", package.name, "-y"], cwd=self.target)
         self._print_done()
 
@@ -268,7 +266,7 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         try:
             fname = utils.direct_pip_install(
                 package.fname,
-                python_exe=utils.get_python_executable(self.target),  # PyPy !
+                python_exe=utils.get_python_executable(self.target),
                 verbose=self.verbose,
                 install_options=install_options,
             )
