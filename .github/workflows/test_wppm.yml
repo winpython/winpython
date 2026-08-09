@@ -10,12 +10,14 @@ on:
   push:
     paths:
       - 'wppm/**'
+      - 'winpython/**'
       - 'tests/**'
       - 'pyproject.toml'
       - '.github/workflows/test_wppm.yml'
   pull_request:
     paths:
       - 'wppm/**'
+      - 'winpython/**'
       - 'tests/**'
       - 'pyproject.toml'
       - '.github/workflows/test_wppm.yml'

@@ -58,6 +58,38 @@ def pip_install(python_exe: Path, req_file: str, constraints: str, find_links: s
     else:
         log_section(f"No {label} specified/skipped")
 
+def parse_bytecode_mode(value: str):
+    """Interpret --bytecode. Returns (skip pip's inline compile, compileall jobs).
+
+    pip        pip byte-compiles inline as it always has (default, unchanged)
+    none       no .pyc at all -- for throwaway builds: pylock, size pre-check
+    parallel   pip --no-compile, then one compileall pass over every core
+    parallel-N same, capped at N workers
+    """
+    mode = (value or "pip").strip().lower()
+    if mode == "pip":
+        return False, None
+    if mode == "none":
+        return True, None
+    if mode == "parallel":
+        return True, 0  # compileall -j0 = one worker per core
+    if mode.startswith("parallel-") and mode[9:].isdigit():
+        return True, int(mode[9:])
+    raise ValueError(f"--bytecode must be pip, none, parallel or parallel-N (got {value!r})")
+
+
+def compile_bytecode(target_python: Path, jobs: int):
+    """Byte-compile site-packages in one pass, using the *target* interpreter.
+
+    pip compiles serially while installing; doing it afterwards lets it run
+    across cores. Failures stay non-fatal: some packages ship modules that are
+    not importable on this Python, and pip tolerates those too.
+    """
+    site_packages = target_python.parent / "Lib" / "site-packages"
+    log_section(f"Byte-compiling {site_packages} (-j{jobs})")
+    run_command([str(target_python), "-m", "compileall", "-q", f"-j{jobs}", str(site_packages)], check=False)
+
+
 def patch_winpython(python_exe):
     cmd = [
         str(python_exe), "-c",
@@ -176,6 +208,11 @@ def main():
     parser.add_argument('--log-dir', default='WinPython_build_logs', help='Directory for logs')
     parser.add_argument('--mandatory-req', help='Mandatory requirements file')
     parser.add_argument('--wheelhousereq', help='Wheelhouse requirements file')
+    parser.add_argument('--bytecode', default='pip',
+                        help="byte-compilation: 'pip' (inline, the default and what ships), "
+                             "'none' (no .pyc -- for throwaway builds such as pylock generation "
+                             "or a size pre-check), 'parallel' or 'parallel-N' (pip --no-compile, "
+                             "then one compileall pass over N cores)")
     parser.add_argument('--create-installer', default='', help='default installer to create')
     args = parser.parse_args()
 
@@ -214,14 +251,23 @@ def main():
 
     log_section("🙏 Step 3: install requirements")
 
+    no_compile, compile_jobs = parse_bytecode_mode(args.bytecode)
+    pip_options = ["--force-reinstall"] + (["--no-compile"] if no_compile else [])
     for label, req in [
         ("Mandatory", args.mandatory_req),
         ("Main", args.requirements),
     ]:
-        pip_install(target_python, req, args.constraints, args.find_links, label, ["--force-reinstall"])
+        pip_install(target_python, req, args.constraints, args.find_links, label, pip_options)
 
     log_section("🙏 Step 4: Patch Winpython")
     patch_winpython(target_python)
+
+    # after patching, so the patched sources are the ones compiled
+    if compile_jobs is not None:
+        log_section("🙏 Step 4b: byte-compile")
+        compile_bytecode(target_python, compile_jobs)
+    elif no_compile:
+        log_section("🙏 Step 4b: byte-compile skipped (--bytecode none)")
 
     log_section(f"🙏 Step 5: install wheelhouse requirements {args.wheelhousereq}")
     if args.wheelhousereq:
