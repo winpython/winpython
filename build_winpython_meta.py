@@ -1,17 +1,8 @@
 # build_winpython_meta.py
+# Local builds are made with Python 3.11 or later.
 import os
 import sys
-# Use tomllib if available (Python 3.11+), otherwise fall back to tomli
-try:
-    import tomllib  # Python 3.11+
-except ImportError:
-    try:
-        import tomli as tomllib  # For older Python versions
-    except ImportError:
-        print("Please install tomli for Python < 3.11: pip install tomli")
-        sys.exit(1)
-
-#import yaml: we choose toml, more python standard
+import tomllib  # stdlib since 3.11; we choose toml over yaml, more python standard
 import subprocess
 from pathlib import Path
 
