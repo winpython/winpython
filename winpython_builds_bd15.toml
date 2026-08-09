@@ -1,5 +1,5 @@
 [pythons]
-"315" = { python_target_release = "3150", release = "3", my_release_level = "b2" }
+"315" = { python_target_release = "3150", release = "4", my_release_level = "b3" }
 
 
 
@@ -10,7 +10,7 @@ python_target = "315"
 pyver = "3.15"
 flavor = "dot"
 arch = "64"
-create_installer = ".zip"
+create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd315\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd315\\dot_requirements.txt"
@@ -36,4 +36,41 @@ find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
 install_options = "--no-index --pre --trusted-host=None --upgrade"
 
+
+
+[[builds]]
+name = "slim"
+root_dir_for_builds = "C:\\Winp"
+python_target = "315"
+pyver = "3.15"
+flavor = "slim"
+arch = "64"
+bytecode = "none"
+create_installer = "None"
+preclear_build_directory = "Yes"
+mandatory_requirements = "C:\\Winp\\bd315\\mandatory_requirements.txt"
+requirements = "C:\\Winp\\bd315\\requirements_slim.txt"
+source_dirs = "C:\\Winp\\bd315\\packages.win-amd64"
+find_links = "C:\\Winp\\packages.srcreq"
+toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
+
+
+
+[[builds]]
+name = "slimf"
+root_dir_for_builds = "C:\\Winp"
+python_target = "315"
+pyver = "3.15"
+flavor = "slimf"
+arch = "64"
+bytecode = "none"
+create_installer = "None"
+preclear_build_directory = "Yes"
+mandatory_requirements = "C:\\Winp\\bd315\\mandatory_requirements.txt"
+requirements = "C:\\Winp\\bd315\\requirements_slimf.txt"
+source_dirs = "C:\\Winp\\bd315\\packages.win-amd64"
+find_links = "C:\\Winp\\packages.srcreq"
+toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
+install_options = "--no-index --pre --trusted-host=None --upgrade"
 

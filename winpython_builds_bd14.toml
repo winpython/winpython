@@ -1,5 +1,5 @@
 [pythons]
-"314" = { python_target_release = "3146", release = "0", my_release_level = "b2" }
+"314" = { python_target_release = "3147", release = "0", my_release_level = "b3" }
 
 
 
@@ -10,7 +10,7 @@ python_target = "314"
 pyver = "3.14"
 flavor = "dot"
 arch = "64"
-create_installer = "7zip.zip"
+create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd314\\dot_requirements.txt"
@@ -19,7 +19,6 @@ find_links = "C:\\Winp\\packages.srcreq"
 toolsdirs = "C:\\Winp\\bdTools\\Tools.dot"
 install_options = "--no-index --pre --trusted-host=None --upgrade"
 
-
 [[builds]]
 name = "dotf"
 root_dir_for_builds = "C:\\Winp"
@@ -27,7 +26,7 @@ python_target = "314"
 pyver = "3.14"
 flavor = "dotf"
 arch = "64"
-create_installer = "7zip.zip"
+create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd314\\dot_requirements.txt"
@@ -45,7 +44,9 @@ python_target = "314"
 pyver = "3.14"
 flavor = "slim"
 arch = "64"
-create_installer = "None"
+# bytecode = "none"
+create_installer = "none"
+# create_installer = ".7z-mx7"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
 requirements = "C:\\Winp\\bd314\\requirements_slim.txt"
@@ -63,6 +64,7 @@ python_target = "314"
 pyver = "3.14"
 flavor = "slimf"
 arch = "64"
+bytecode = "none"
 create_installer = "None"
 preclear_build_directory = "Yes"
 mandatory_requirements = "C:\\Winp\\bd314\\mandatory_requirements.txt"
@@ -73,7 +75,7 @@ toolsdirs = "C:\\Winp\\bdTools\\tools64_pandoc_alone"
 install_options = "--no-index --pre --trusted-host=None --upgrade"
 
 
-[[builds]]
+[[builds-nomore]]
 name = "whl"
 root_dir_for_builds = "C:\\Winp"
 python_target = "314"
