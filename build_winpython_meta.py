@@ -59,8 +59,6 @@ def run_build(build, python_versions):
     my_archive_dir = os.path.join(os.getcwd(), "WinPython_build_logs")
     os.makedirs(my_archive_dir, exist_ok=True)
 
-    my_requirements_pre = build.get("my_requirements_pre",  mandatory_requirements)
-
     # Build command
     build_cmd = [
         str(my_python_exe),
@@ -75,7 +73,6 @@ def run_build(build, python_versions):
         "--tools_dirs", my_toolsdirs,
         "--log-dir", my_archive_dir,
         "--mandatory-req", mandatory_requirements,
-        "--pre-req", my_requirements_pre,
         "--requirements", my_requirements,
         "--constraints", my_constraints,
         "--find-links", my_find_links,

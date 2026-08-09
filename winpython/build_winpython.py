@@ -175,7 +175,6 @@ def main():
     parser.add_argument('--find-links', default='wheelhouse', help='Path to local wheelhouse')
     parser.add_argument('--log-dir', default='WinPython_build_logs', help='Directory for logs')
     parser.add_argument('--mandatory-req', help='Mandatory requirements file')
-    parser.add_argument('--pre-req', help='Pre requirements file')
     parser.add_argument('--wheelhousereq', help='Wheelhouse requirements file')
     parser.add_argument('--create-installer', default='', help='default installer to create')
     args = parser.parse_args()
@@ -217,7 +216,6 @@ def main():
 
     for label, req in [
         ("Mandatory", args.mandatory_req),
-        ("Pre", args.pre_req),
         ("Main", args.requirements),
     ]:
         pip_install(target_python, req, args.constraints, args.find_links, label, ["--force-reinstall"])
