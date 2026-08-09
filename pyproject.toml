@@ -42,3 +42,8 @@ Issues = "https://github.com/winpython/winpython/issues"
 
 [project.scripts]
 wppm = "wppm.wppm:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "tests"]
+addopts = "-ra"
