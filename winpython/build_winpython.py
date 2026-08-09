@@ -58,13 +58,21 @@ def pip_install(python_exe: Path, req_file: str, constraints: str, find_links: s
     else:
         log_section(f"No {label} specified/skipped")
 
+PARALLEL_DEFAULT_MAX = 4  # bare "parallel" never goes above this
+
+
 def parse_bytecode_mode(value: str):
     """Interpret --bytecode. Returns (skip pip's inline compile, compileall jobs).
 
     pip        pip byte-compiles inline as it always has (default, unchanged)
     none       no .pyc at all -- for throwaway builds: pylock, size pre-check
-    parallel   pip --no-compile, then one compileall pass over every core
-    parallel-N same, capped at N workers
+    parallel   pip --no-compile, then one compileall pass over
+               min(cpu_count, PARALLEL_DEFAULT_MAX) workers
+    parallel-N same, with exactly N workers and no cap
+
+    os.cpu_count() reports logical CPUs, so on a 4-core/8-thread laptop an
+    uncapped default would start 8 workers for a job that measured I/O-bound
+    rather than CPU-bound. Cap the default and let -N override deliberately.
     """
     mode = (value or "pip").strip().lower()
     if mode == "pip":
@@ -72,8 +80,8 @@ def parse_bytecode_mode(value: str):
     if mode == "none":
         return True, None
     if mode == "parallel":
-        return True, 0  # compileall -j0 = one worker per core
-    if mode.startswith("parallel-") and mode[9:].isdigit():
+        return True, min(os.cpu_count() or 1, PARALLEL_DEFAULT_MAX)
+    if mode.startswith("parallel-") and mode[9:].isdigit() and int(mode[9:]) > 0:
         return True, int(mode[9:])
     raise ValueError(f"--bytecode must be pip, none, parallel or parallel-N (got {value!r})")
 
@@ -218,8 +226,10 @@ def main():
     parser.add_argument('--bytecode', default='pip',
                         help="byte-compilation: 'pip' (inline, the default and what ships), "
                              "'none' (no .pyc -- for throwaway builds such as pylock generation "
-                             "or a size pre-check), 'parallel' or 'parallel-N' (pip --no-compile, "
-                             "then one compileall pass over N cores)")
+                             "or a size pre-check), 'parallel' (pip --no-compile, then one "
+                             f"compileall pass over min(cpu_count, {PARALLEL_DEFAULT_MAX}) workers), "
+                             "or 'parallel-N' for exactly N workers. cpu_count is logical CPUs, "
+                             "so on a 4-core/8-thread machine 'parallel' uses 4, not 8")
     parser.add_argument('--create-installer', default='', help='default installer to create')
     args = parser.parse_args()
 
