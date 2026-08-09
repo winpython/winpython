@@ -1,0 +1,55 @@
+name: test_wppm
+# Runs the wppm test suite on every push and pull request touching wppm.
+#
+# Dependencies are hash-pinned, like build_wppm.yml, so a new pytest release
+# cannot change what CI does without a visible commit. To refresh them:
+#   python -m pip lock -r <(printf 'pytest\npackaging\n') -o pylock.wppmtest.toml
+#   python -X utf8 -c "from wppm import wheelhouse as wh; wh.pylock_to_req('pylock.wppmtest.toml', r'tests/requir.wppmtest.txt')"
+
+on:
+  push:
+    paths:
+      - 'wppm/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/test_wppm.yml'
+  pull_request:
+    paths:
+      - 'wppm/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/test_wppm.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+env:
+  PYTHONIOENCODING: utf-8
+
+jobs:
+  pytest:
+    name: pytest on Python ${{ matrix.python-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # the versions WinPython currently ships
+        python-version: ['3.13', '3.14']
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install pinned test dependencies
+        shell: bash
+        run: python -m pip install --no-deps --require-hashes -r tests/requir.wppmtest.txt
+
+      - name: Run the test suite
+        shell: bash
+        run: python -m pytest -q
