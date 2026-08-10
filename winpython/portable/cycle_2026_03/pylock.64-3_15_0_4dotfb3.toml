@@ -3,14 +3,14 @@ created-by = "pip"
 
 [[packages]]
 name = "build"
-version = "1.4.2"
+version = "1.5.0"
 
 [[packages.wheels]]
-name = "build-1.4.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/4a/57/3b7d4dd193ade4641c865bc2b93aeeb71162e81fc348b8dad020215601ed/build-1.4.2-py3-none-any.whl"
+name = "build-1.5.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/0d/fe/6bea5c9162869c5beba5d9c8abbed835ec85bf1ec1fba05a3822325c45f3/build-1.5.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "7a4d8651ea877cb2a89458b1b198f2e69f536c95e89129dbf5d448045d60db88"
+sha256 = "13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f"
 
 [[packages]]
 name = "colorama"
@@ -80,11 +80,11 @@ sha256 = "212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced"
 
 [[packages]]
 name = "wppm"
-version = "17.9.20260805"
+version = "17.10.20260808"
 
 [[packages.wheels]]
-name = "wppm-17.9.20260805-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/0d/c0/993ae8e37c1f14a2267e416bc4c64cec702f545988ff540b3ea3ef555c95/wppm-17.9.20260805-py3-none-any.whl"
+name = "wppm-17.10.20260808-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/b2/9f/bad3e1e5e02dd1c9c67b92091231af2936ae4ee6e72e7dd33344139e0a26/wppm-17.10.20260808-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "cbb16eb098cd7b7e294382831f9fc5b9efd625124737c0d4592e05fdbc46a89d"
+sha256 = "18df2d9fa2ae37081341edbb566476c8ab763663dd6ddad143343ca84f32b6dd"
