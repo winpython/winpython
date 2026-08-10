@@ -136,12 +136,14 @@ def generate_lockfiles(target_python: Path, winpydirbase: Path, constraints: str
         run_command(cmd)
     # check equality
     web, local = "", "local"
-    if not cmp(winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt"):
-        print("⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️differences in ", winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
+    web_file = winpydirbase.parent / f"requir.{file_postfix}{web}.txt"
+    local_file = winpydirbase.parent / f"requir.{file_postfix}{local}.txt"
+    if not cmp(web_file, local_file):
+        logging.info( f"⚠️⚠️⚠️⚠️⚠️⚠️ ALARM ⚠️⚠️⚠️⚠️⚠️⚠️ differences in {web_file} {local_file}")
         raise os.error
     else:
-        print ("💖💖💖 match 💖💖💖 ok ",winpydirbase.parent / f"requir.{file_postfix}{web}.txt", winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
-        print ("💖 housekeeping, removing local files 💖 ",  winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
+        logging.info(f"💖💖💖 match 💖💖💖 ok {web_file} {local_file}")
+        logging.info(f"💖 housekeeping, removing local files 💖 {local_file}")
         os.remove (winpydirbase.parent / f"requir.{file_postfix}{local}.txt")
         os.remove (winpydirbase.parent / f"pylock.{file_postfix}{local}.toml")
         os.remove (winpydirbase.parent / f"requirement_temp.txt")

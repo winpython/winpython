@@ -1,0 +1,222 @@
+lock-version = "1.0"
+created-by = "pip"
+
+[[packages]]
+name = "ast-serialize"
+version = "0.7.0"
+
+[[packages.wheels]]
+name = "ast_serialize-0.7.0-cp315-abi3.abi3t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/ed/cd/6de6248744d30875b875dd8e43a76427b0c2bf42b735ee26149002b9ee04/ast_serialize-0.7.0-cp315-abi3.abi3t-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "537f7a41a7bc1108e60cf8d6f5575beafe5b8a17d1a6ef0e758b4d4e4ad90d18"
+
+[[packages]]
+name = "build"
+version = "1.5.0"
+
+[[packages.wheels]]
+name = "build-1.5.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/0d/fe/6bea5c9162869c5beba5d9c8abbed835ec85bf1ec1fba05a3822325c45f3/build-1.5.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f"
+
+[[packages]]
+name = "cffi"
+version = "2.1.1"
+
+[[packages.wheels]]
+name = "cffi-2.1.1-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e0/31/5158704cc474ab65c1647932e88be78dc0873f47130e253be38bcaf13d01/cffi-2.1.1-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "e6e8cff14d6fb0be70a09c0bdc58096f501952d04624ebf867e0e56da2df8960"
+
+[[packages]]
+name = "colorama"
+version = "0.4.6"
+
+[[packages.wheels]]
+name = "colorama-0.4.6-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
+
+[[packages]]
+name = "cython"
+version = "3.3.0a1"
+
+[[packages.wheels]]
+name = "cython-3.3.0a1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/af/b5/d9c9015fb086d4136d9340468fea3b592fe966c0259ae8b0458ac7b92764/cython-3.3.0a1-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "bcd6d1d6a1ae6b9abdedb83f113999eed4381878be6deb99e03281af9d74b7a6"
+
+[[packages]]
+name = "librt"
+version = "0.14.0"
+
+[[packages.wheels]]
+name = "librt-0.14.0-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/61/66/12b9efe0c391c363e11ae05f2a5ef17c7ae6f3bd53894a787317b35caa7e/librt-0.14.0-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "07f34798827de9a3922ed748ae44cd82292ca7a189dbc480326fa5eb7a2ce18e"
+
+[[packages]]
+name = "mypy"
+version = "2.3.0"
+
+[[packages.wheels]]
+name = "mypy-2.3.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/2c/fa/fdc54fe583ba3cafbcedfb70eeeaf03849f75b1827a07096c7bd996f582d/mypy-2.3.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "6b1cdb579446b60432432b2b2403a6201b4b475a004d7f488511c9ba177c9e88"
+
+[[packages]]
+name = "mypy-extensions"
+version = "1.1.0"
+
+[[packages.wheels]]
+name = "mypy_extensions-1.1.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/79/7b/2c79738432f5c924bef5071f933bcc9efd0473bac3b4aa584a6f7c1c8df8/mypy_extensions-1.1.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505"
+
+[[packages]]
+name = "numpy"
+version = "2.5.2"
+
+[[packages.wheels]]
+name = "numpy-2.5.2-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/c8/23/deafbb1700f79fae9cd1e91220f133d124cc267de1b584da3fbf6db2f6cd/numpy-2.5.2-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "07d4e89f3a9ab0a9ba24264ccdb642b3dd951b2281e8883a5481a4aa79cc31a7"
+
+[[packages]]
+name = "packaging"
+version = "26.2"
+
+[[packages.wheels]]
+name = "packaging-26.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/df/b2/87e62e8c3e2f4b32e5fe99e0b86d576da1312593b39f47d8ceef365e95ed/packaging-26.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e"
+
+[[packages]]
+name = "pathspec"
+version = "1.1.1"
+
+[[packages.wheels]]
+name = "pathspec-1.1.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/f1/d9/7fb5aa316bc299258e68c73ba3bddbc499654a07f151cba08f6153988714/pathspec-1.1.1-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189"
+
+[[packages]]
+name = "pillow"
+version = "12.3.0"
+
+[[packages.wheels]]
+name = "pillow-12.3.0-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/3e/03/1846c49ba3b1d5550392a4bbd06d6fb4578e1cd91a803198b5c90f5f7d53/pillow-12.3.0-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "fa4ecea169a355be7a3ade2c783e2ed12f0e40d2c5621cda8b3297faf7fbb9f5"
+
+[[packages]]
+name = "pycparser"
+version = "3.0"
+
+[[packages.wheels]]
+name = "pycparser-3.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/0c/c3/44f3fbbfa403ea2a7c779186dc20772604442dde72947e7d01069cbe98e3/pycparser-3.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"
+
+[[packages]]
+name = "pyproject-hooks"
+version = "1.2.0"
+
+[[packages.wheels]]
+name = "pyproject_hooks-1.2.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913"
+
+[[packages]]
+name = "pywin32"
+version = "312"
+
+[[packages.wheels]]
+name = "pywin32-312-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/0f/cd/7e1de64a4a6f69c04214169657ccab0d93a670ea50e35eb8f489d7378249/pywin32-312-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "c2f03a0f73f804a13c2735b99392b0cd426bb4f2c4d0178e5ac966a0f21618d5"
+
+[[packages]]
+name = "setuptools"
+version = "83.0.0"
+
+[[packages.wheels]]
+name = "setuptools-83.0.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/5d/40/e1e72872c6354b306daef1703549e8e83b4d43cfea356311bf722a043752/setuptools-83.0.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3"
+
+[[packages]]
+name = "sqlite-bro"
+version = "1.3.2"
+
+[[packages.wheels]]
+name = "sqlite_bro-1.3.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/17/ce/51e2a8e3e11cfd7f8dffcdbbf080721322a1ad62533b58ebc26162a16038/sqlite_bro-1.3.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "0ecda886fbd9c9536cbc7192662be0a0b7d963e9df506dcc788cf1e37e572034"
+
+[[packages]]
+name = "typing-extensions"
+version = "4.16.0"
+
+[[packages.wheels]]
+name = "typing_extensions-4.16.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+
+[[packages]]
+name = "wheel"
+version = "0.47.0"
+
+[[packages.wheels]]
+name = "wheel-0.47.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/87/1b/9e33c09813d65e248f7f773119148a612516a4bea93e9c6f545f78455b7c/wheel-0.47.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced"
+
+[[packages]]
+name = "wppm"
+version = "17.10.20260808"
+
+[[packages.wheels]]
+name = "wppm-17.10.20260808-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/b2/9f/bad3e1e5e02dd1c9c67b92091231af2936ae4ee6e72e7dd33344139e0a26/wppm-17.10.20260808-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "18df2d9fa2ae37081341edbb566476c8ab763663dd6ddad143343ca84f32b6dd"
