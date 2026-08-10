@@ -1,25 +1,25 @@
-ast-serialize==0.7.0 \
-    --hash=sha256:537f7a41a7bc1108e60cf8d6f5575beafe5b8a17d1a6ef0e758b4d4e4ad90d18
+ast-serialize==0.8.0 \
+    --hash=sha256:bd84d60bca7079e741be4ac5dbe237751a59d7f6f9f0126b11880d63822cbe16
 build==1.5.0 \
     --hash=sha256:13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f
 colorama==0.4.6 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
 cython==3.3.0a1 \
     --hash=sha256:bcd6d1d6a1ae6b9abdedb83f113999eed4381878be6deb99e03281af9d74b7a6
-librt==0.14.0 \
-    --hash=sha256:07f34798827de9a3922ed748ae44cd82292ca7a189dbc480326fa5eb7a2ce18e
+librt==0.15.0 \
+    --hash=sha256:dbd605739f228912dc49027cb764456b9757750bdc2b6b7773164db7096c6fd1
 mypy==2.3.0 \
     --hash=sha256:6b1cdb579446b60432432b2b2403a6201b4b475a004d7f488511c9ba177c9e88
 mypy-extensions==1.1.0 \
     --hash=sha256:1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505
 numpy==2.5.2 \
-    --hash=sha256:07d4e89f3a9ab0a9ba24264ccdb642b3dd951b2281e8883a5481a4aa79cc31a7
+    --hash=sha256:e5651f3f87add730ee6608d915009e19c911fba0cb000c7e3ea994b7d768eb12
 packaging==26.2 \
     --hash=sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e
 pathspec==1.1.1 \
     --hash=sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189
 pillow==12.3.0 \
-    --hash=sha256:fa4ecea169a355be7a3ade2c783e2ed12f0e40d2c5621cda8b3297faf7fbb9f5
+    --hash=sha256:8cd2f7bdda092d99c9fc2fb7391354f306d01443d22785d0cbfafa2e2c8bb418
 pyproject-hooks==1.2.0 \
     --hash=sha256:9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913
 setuptools==83.0.0 \

@@ -3,14 +3,14 @@ created-by = "pip"
 
 [[packages]]
 name = "ast-serialize"
-version = "0.7.0"
+version = "0.8.0"
 
 [[packages.wheels]]
-name = "ast_serialize-0.7.0-cp315-abi3.abi3t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/ed/cd/6de6248744d30875b875dd8e43a76427b0c2bf42b735ee26149002b9ee04/ast_serialize-0.7.0-cp315-abi3.abi3t-win_amd64.whl"
+name = "ast_serialize-0.8.0-cp315-abi3.abi3t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/18/1d/84a327c0202a41aa5fdba3ade33904d6d8f3b9e6806fa83568d835395850/ast_serialize-0.8.0-cp315-abi3.abi3t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "537f7a41a7bc1108e60cf8d6f5575beafe5b8a17d1a6ef0e758b4d4e4ad90d18"
+sha256 = "bd84d60bca7079e741be4ac5dbe237751a59d7f6f9f0126b11880d63822cbe16"
 
 [[packages]]
 name = "build"
@@ -58,14 +58,14 @@ sha256 = "bcd6d1d6a1ae6b9abdedb83f113999eed4381878be6deb99e03281af9d74b7a6"
 
 [[packages]]
 name = "librt"
-version = "0.14.0"
+version = "0.15.0"
 
 [[packages.wheels]]
-name = "librt-0.14.0-cp315-cp315-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/61/66/12b9efe0c391c363e11ae05f2a5ef17c7ae6f3bd53894a787317b35caa7e/librt-0.14.0-cp315-cp315-win_amd64.whl"
+name = "librt-0.15.0-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e1/dc/3eb4c5e297343f0620a55532cd7c8d764d3001fa2159212dadf480464827/librt-0.15.0-cp315-cp315-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "07f34798827de9a3922ed748ae44cd82292ca7a189dbc480326fa5eb7a2ce18e"
+sha256 = "b87d67e33afaf265262f2a66db578284b88ee2e6fcd224579cb5c15518677ad8"
 
 [[packages]]
 name = "mypy"
