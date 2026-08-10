@@ -1,5 +1,5 @@
-ast-serialize==0.7.0 \
-    --hash=sha256:537f7a41a7bc1108e60cf8d6f5575beafe5b8a17d1a6ef0e758b4d4e4ad90d18
+ast-serialize==0.8.0 \
+    --hash=sha256:bd84d60bca7079e741be4ac5dbe237751a59d7f6f9f0126b11880d63822cbe16
 build==1.5.0 \
     --hash=sha256:13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f
 cffi==2.1.1 \
@@ -8,8 +8,8 @@ colorama==0.4.6 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
 cython==3.3.0a1 \
     --hash=sha256:bcd6d1d6a1ae6b9abdedb83f113999eed4381878be6deb99e03281af9d74b7a6
-librt==0.14.0 \
-    --hash=sha256:07f34798827de9a3922ed748ae44cd82292ca7a189dbc480326fa5eb7a2ce18e
+librt==0.15.0 \
+    --hash=sha256:b87d67e33afaf265262f2a66db578284b88ee2e6fcd224579cb5c15518677ad8
 mypy==2.3.0 \
     --hash=sha256:6b1cdb579446b60432432b2b2403a6201b4b475a004d7f488511c9ba177c9e88
 mypy-extensions==1.1.0 \

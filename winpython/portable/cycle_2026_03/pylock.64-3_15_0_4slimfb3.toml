@@ -3,14 +3,14 @@ created-by = "pip"
 
 [[packages]]
 name = "ast-serialize"
-version = "0.7.0"
+version = "0.8.0"
 
 [[packages.wheels]]
-name = "ast_serialize-0.7.0-cp315-abi3.abi3t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/ed/cd/6de6248744d30875b875dd8e43a76427b0c2bf42b735ee26149002b9ee04/ast_serialize-0.7.0-cp315-abi3.abi3t-win_amd64.whl"
+name = "ast_serialize-0.8.0-cp315-abi3.abi3t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/18/1d/84a327c0202a41aa5fdba3ade33904d6d8f3b9e6806fa83568d835395850/ast_serialize-0.8.0-cp315-abi3.abi3t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "537f7a41a7bc1108e60cf8d6f5575beafe5b8a17d1a6ef0e758b4d4e4ad90d18"
+sha256 = "bd84d60bca7079e741be4ac5dbe237751a59d7f6f9f0126b11880d63822cbe16"
 
 [[packages]]
 name = "build"
@@ -47,14 +47,14 @@ sha256 = "bcd6d1d6a1ae6b9abdedb83f113999eed4381878be6deb99e03281af9d74b7a6"
 
 [[packages]]
 name = "librt"
-version = "0.14.0"
+version = "0.15.0"
 
 [[packages.wheels]]
-name = "librt-0.14.0-cp315-cp315-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/61/66/12b9efe0c391c363e11ae05f2a5ef17c7ae6f3bd53894a787317b35caa7e/librt-0.14.0-cp315-cp315-win_amd64.whl"
+name = "librt-0.15.0-cp315-cp315t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/6d/4a/1f1978c200f563beda63c36adff2d65bbecb81e365e8e69e572f5f70fbc6/librt-0.15.0-cp315-cp315t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "07f34798827de9a3922ed748ae44cd82292ca7a189dbc480326fa5eb7a2ce18e"
+sha256 = "dbd605739f228912dc49027cb764456b9757750bdc2b6b7773164db7096c6fd1"
 
 [[packages]]
 name = "mypy"
@@ -83,11 +83,11 @@ name = "numpy"
 version = "2.5.2"
 
 [[packages.wheels]]
-name = "numpy-2.5.2-cp315-cp315-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/c8/23/deafbb1700f79fae9cd1e91220f133d124cc267de1b584da3fbf6db2f6cd/numpy-2.5.2-cp315-cp315-win_amd64.whl"
+name = "numpy-2.5.2-cp315-cp315t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/f1/18/195d6b86cd72dbbc501edfa778005fa6b87afd34c153e46028cd3a0938f4/numpy-2.5.2-cp315-cp315t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "07d4e89f3a9ab0a9ba24264ccdb642b3dd951b2281e8883a5481a4aa79cc31a7"
+sha256 = "e5651f3f87add730ee6608d915009e19c911fba0cb000c7e3ea994b7d768eb12"
 
 [[packages]]
 name = "packaging"
@@ -116,11 +116,11 @@ name = "pillow"
 version = "12.3.0"
 
 [[packages.wheels]]
-name = "pillow-12.3.0-cp315-cp315-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/3e/03/1846c49ba3b1d5550392a4bbd06d6fb4578e1cd91a803198b5c90f5f7d53/pillow-12.3.0-cp315-cp315-win_amd64.whl"
+name = "pillow-12.3.0-cp315-cp315t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e4/04/62bcd9f844984c5938d3b05264a61d797a29d3e0812341a8204af70bbdee/pillow-12.3.0-cp315-cp315t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "fa4ecea169a355be7a3ade2c783e2ed12f0e40d2c5621cda8b3297faf7fbb9f5"
+sha256 = "8cd2f7bdda092d99c9fc2fb7391354f306d01443d22785d0cbfafa2e2c8bb418"
 
 [[packages]]
 name = "pyproject-hooks"
