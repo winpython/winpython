@@ -13,6 +13,19 @@ def load_builds(config_file):
     python_versions = config.get("pythons", {})
     return builds, python_versions
 
+def declared_file(build, key, default):
+    """Path named by the build for `key`, else `default`.
+
+    A path a build spells out must exist: pip_install() skips a missing
+    requirements file without failing, which would drop the packages silently.
+    """
+    declared = build.get(key)
+    if declared is None:
+        return str(default)
+    if not Path(declared).exists():
+        raise FileNotFoundError(f"build {build['name']!r} sets {key} = {declared!r}, which does not exist")
+    return str(declared)
+
 def run_build(build, python_versions):
     print(f"\n=== Building WinPython: {build['name']} ===")
     print(build)
@@ -37,8 +50,11 @@ def run_build(build, python_versions):
     my_python_target_release = vinfo.get("python_target_release", "")
     my_release = vinfo.get("release", "")
     my_release_level = vinfo.get("my_release_level", "b0")
-    mandatory_requirements = vinfo.get("mandatory_requirements", os.path.join(os.getcwd(), "mandatory_requirements.txt"))
-    my_constraints = build.get("my_constraints", r"C:\WinP\constraints.txt")
+    # A build may name its own file for a specific problem; otherwise the one
+    # shipped beside this script is used.
+    here = Path(__file__).parent
+    mandatory_requirements = declared_file(build, "mandatory_requirements", here / "mandatory_requirements.txt")
+    my_constraints = declared_file(build, "constraints", here / "constraints.txt")
 
     # Build directory logic
     my_basedir = f"{root_dir_for_builds}\\bd{my_python_target}"
