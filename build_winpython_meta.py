@@ -39,7 +39,6 @@ def run_build(build, python_versions):
     my_source_dirs = build.get("source_dirs", "")
     my_find_links = build.get("find_links", "")
     my_toolsdirs = build.get("toolsdirs", "")
-    #my_install_options = build.get("install_options", "")
     wheelhousereq = build.get("wheelhousereq", "")
     # "pip" (default, what ships) | "none" | "parallel" | "parallel-N"
     my_bytecode = build.get("bytecode", "pip")
@@ -88,7 +87,6 @@ def run_build(build, python_versions):
         "--wheelhousereq", wheelhousereq,
         "--bytecode", my_bytecode,
         "--create-installer", my_create_installer,
-        #"--install-options", env["my_install_options"],
     ]
 
     print("Running build command:")
