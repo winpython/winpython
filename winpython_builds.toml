@@ -1,0 +1,95 @@
+# WinPython local builds - every Python minor in one file.
+#
+# A build is a (python, flavor) pair. Everything else is derived:
+#
+#     basedir       = {root_dir_for_builds}\bd{python}
+#     requirements  = {basedir}\{flavor requirements}
+#     source_dirs   = {basedir}\{flavor source_dirs}
+#     wheelhousereq = {basedir}\{flavor wheelhousereq}
+#     toolsdirs     = {root_dir_for_builds}\{flavor toolsdirs}
+#
+# so a new Python minor is one [pythons."3XX"] block, and its flavors are the
+# names listed in "builds".
+#
+# Requirement files may differ per Python: name them again in
+# [pythons."3XX".overrides.<flavor>], which replaces that flavor's entries for
+# that Python alone. Any other build key goes there too (bytecode, ...).
+#
+# Typical local build:
+#     generate_a_winpython_distropy_meta.bat winpython_builds.toml 315:slim
+#     generate_a_winpython_distropy_meta.bat winpython_builds.toml 315
+#     generate_a_winpython_distropy_meta.bat winpython_builds.toml
+#     ... --dry-run           prints the build commands instead of running them
+
+[defaults]
+root_dir_for_builds = "C:\\Winp"
+find_links = "C:\\Winp\\packages.srcreq"
+arch = "64"
+create_installer = "None"
+# mandatory_requirements.txt and constraints.txt come from beside this file
+# unless a build names its own.
+
+# ---- flavors: what makes a slim a slim --------------------------------------
+
+[flavors.dot]
+requirements = "dot_requirements.txt"
+source_dirs = "packages.win-amd64"
+toolsdirs = "bdTools\\Tools.dot"
+
+[flavors.dotf]
+requirements = "dot_requirements.txt"
+source_dirs = "packages.win-amd64t"
+toolsdirs = "bdTools\\Tools.dot"
+
+[flavors.slim]
+requirements = "requirements_slim.txt"
+source_dirs = "packages.win-amd64"
+toolsdirs = "bdTools\\tools64_pandoc_alone"
+
+[flavors.slimf]
+requirements = "requirements_slimf.txt"
+source_dirs = "packages.win-amd64t"
+toolsdirs = "bdTools\\tools64_pandoc_alone"
+
+# Not built at the moment: no python below lists it.
+[flavors.whl]
+requirements = "dot_requirements.txt"
+source_dirs = "packages.win-amd64"
+toolsdirs = "bdTools\\Tools.dot"
+wheelhousereq = "requirements_whl.txt"
+
+# ---- pythons: what gets built -----------------------------------------------
+
+[pythons."313"]
+python_target_release = "31315"
+release = "0"
+my_release_level = "b3"
+builds = ["dot", "slim"]
+
+# A Python that names a requirements file its own way says so here:
+# [pythons."313".overrides.slim]
+# requirements = "requirements64_slim.txt"
+
+[pythons."314"]
+python_target_release = "3147"
+release = "0"
+my_release_level = "b3"
+builds = ["dot", "dotf", "slim", "slimf"]
+
+[pythons."314".overrides.slimf]
+bytecode = "none"
+
+# [pythons."314".overrides.slim]
+# create_installer = ".7z-mx7"
+
+[pythons."315"]
+python_target_release = "3150"
+release = "4"
+my_release_level = "b3"
+builds = ["dot", "dotf", "slim", "slimf"]
+
+# [pythons."315".overrides.slim]
+# bytecode = "none"
+
+# [pythons."315".overrides.slimf]
+# bytecode = "none"
