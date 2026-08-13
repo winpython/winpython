@@ -97,12 +97,23 @@ $ wppm -p ".[.]" -l9
 
 ## What did you actually ask for?
 
-`-p` and `-r` answer for one package. `-tl` answers for a whole list: it keeps only
-the entries nothing else in that list already pulls in, sorted, and comments out the rest
-with the reason.
+`-p` and `-r` answer for one package. `-tl` answers for a whole list: it keeps only the
+entries nothing else in that list already pulls in. Plainly, it prints that list and
+nothing else -- so the output *is* the new file, and the counts go to stderr where a
+redirection leaves them behind:
 
 ```console
-$ wppm requirements_slim.txt --top-level -v -t D:\WPy64\python
+$ wppm requirements_slim.txt -tl -t D:\WPy64\python > requirements_slim_new.txt
+160 entries -> 112 kept, 48 already pulled in
+8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
+```
+
+The notes the source file carried are kept, since they are its author's. `-v` adds the
+reasoning: where the list came from, and every dropped entry commented out with what
+pulls it in, so re-asking for one is uncommenting it.
+
+```console
+$ wppm requirements_slim.txt -tl -v -t D:\WPy64\python
 # requirements_slim.txt, sorted, with every entry
 # another one already pulls in commented out: 160 entries -> 112.
 
@@ -112,9 +123,8 @@ $ wppm requirements_slim.txt --top-level -v -t D:\WPy64\python
 #whatthepatch  # <- spyder
 ```
 
-Dropped entries come back as comments, so re-asking for one is uncommenting it, and the
-notes in the source file are carried over. With no file, the question becomes "of
-everything installed here, what did anything actually ask for?":
+With no file, the question becomes "of everything installed here, what did anything
+actually ask for?":
 
 ```console
 $ wppm --top-level -t D:\WPy64\python

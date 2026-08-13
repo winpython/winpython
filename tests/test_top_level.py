@@ -133,22 +133,37 @@ class TestMutualDependency:
 
 
 class TestRendering:
-    def test_dropped_entries_come_back_as_comments(self, pip):
-        lines = wppm_module.top_level_as_requirements(pip.top_level(["app", "lib"]))
-        assert "app" in lines
-        assert "#lib" in lines
+    def test_plain_output_is_the_list_and_nothing_else(self, pip):
+        """Redirect it and what lands in the file is the file."""
+        assert wppm_module.top_level_as_requirements(pip.top_level(["app", "lib"])) == ["app"]
 
-    def test_verbose_says_who_pulls_each_one_in(self, pip):
+    def test_verbose_comments_out_what_went_and_why(self, pip):
         lines = wppm_module.top_level_as_requirements(pip.top_level(["app", "lib"]), verbose=True)
+        assert "app" in lines
         assert "#lib  # <- app" in lines
 
-    def test_source_comments_are_preserved(self, pip):
+    def test_verbose_heads_the_list_with_its_counts(self, pip):
+        lines = wppm_module.top_level_as_requirements(pip.top_level(["app", "lib", "orphan"]), verbose=True)
+        assert "3 entries -> 2" in "\n".join(lines[:2])
+
+    def test_source_notes_are_kept_even_plainly(self, pip):
+        """They are the author's own lines, not our commentary."""
         lines = wppm_module.top_level_as_requirements(pip.top_level(["app"]), comments=["# a note"])
         assert "# a note" in lines
 
-    def test_header_counts_the_entries(self, pip):
-        header = "\n".join(wppm_module.top_level_as_requirements(pip.top_level(["app", "lib", "orphan"]))[:2])
-        assert "3 entries -> 2" in header
+
+class TestSummary:
+    def test_counts_what_happened(self, pip):
+        notes = wppm_module.top_level_summary(pip.top_level(["app", "lib", "orphan"]))
+        assert "3 entries -> 2 kept, 1 already pulled in" in notes[0]
+
+    def test_reports_repeats(self, pip):
+        notes = wppm_module.top_level_summary(pip.top_level(["orphan", "orphan"]))
+        assert any("repeated" in note for note in notes)
+
+    def test_reports_what_the_target_lacks(self, pip):
+        notes = wppm_module.top_level_summary(pip.top_level(["orphan", "nosuchpackage"]))
+        assert any("nosuchpackage" in note for note in notes)
 
 
 class TestReadRequirements:
@@ -160,27 +175,41 @@ class TestReadRequirements:
 
 @windows_only
 class TestCli:
-    def wppm(self, *args):
+    def run(self, *args):
         proc = subprocess.run(
             [sys.executable, "-X", "utf8", "-m", "wppm", *args],
             capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=300,
             encoding="utf-8", errors="replace",
         )
         assert proc.returncode == 0, f"exit {proc.returncode}\n{proc.stdout}\n{proc.stderr}"
-        return proc.stdout
+        return proc
+
+    def wppm(self, *args):
+        return self.run(*args).stdout
 
     def test_top_level_of_a_target(self, graph):
-        out = self.wppm("-t", str(graph), "--top-level")
-        assert "app" in out.splitlines()
-        assert "#lib" in out.splitlines()
+        assert self.wppm("-t", str(graph), "--top-level").splitlines() == ["app", "fancylib", "orphan"]
+
+    def test_the_short_flag_does_the_same(self, graph):
+        assert self.wppm("-t", str(graph), "-tl") == self.wppm("-t", str(graph), "--top-level")
+
+    def test_verbose_adds_the_reasoning(self, graph):
+        assert "#lib  # <- app" in self.wppm("-t", str(graph), "--top-level", "-v").splitlines()
 
     def test_top_level_of_a_requirements_file(self, graph, tmp_path):
         req = tmp_path / "req.txt"
         req.write_text("# keep me\nlib\napp\n", encoding="utf-8")
-        out = self.wppm("-t", str(graph), str(req), "--top-level")
-        assert "app" in out.splitlines()
-        assert "#lib" in out.splitlines()
-        assert "# keep me" in out.splitlines()
+        out = self.wppm("-t", str(graph), str(req), "--top-level").splitlines()
+        assert "app" in out
+        assert "#lib" not in out
+        assert "# keep me" in out
+
+    def test_the_counts_go_to_stderr_not_into_the_list(self, graph, tmp_path):
+        req = tmp_path / "req.txt"
+        req.write_text("lib\napp\n", encoding="utf-8")
+        proc = self.run("-t", str(graph), str(req), "--top-level")
+        assert proc.stdout.splitlines() == ["app"]
+        assert "2 entries -> 1 kept" in proc.stderr
 
     def test_json_output_parses(self, graph):
         data = json.loads(self.wppm("-t", str(graph), "--top-level", "-j"))

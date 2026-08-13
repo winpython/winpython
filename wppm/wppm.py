@@ -277,30 +277,43 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         package = Package(fname)
         self._print_done()
 
+def few(names, limit=6):
+    """First few names of a list, and how many more there were."""
+    return ", ".join(names[:limit]) + (f", and {len(names) - limit} more" if len(names) > limit else "")
+
 def top_level_as_requirements(result, comments=(), source=None, verbose=False):
-    """Render piptree.top_level() as a requirements file that says why it is short.
+    """Render piptree.top_level() as the requirements file it proposes.
 
-    Dropped entries stay as comments, so re-asking for one is uncommenting it.
+    Plainly, it is that file and nothing else: the entries, plus the notes the
+    source itself carried, so redirecting the output replaces the source
+    without losing what its author wrote in it. -v adds the reasoning -- where
+    the list came from, and every dropped entry commented out with what pulls
+    it in, so re-asking for one is uncommenting it.
     """
-    def few(names, limit=6):
-        return ", ".join(names[:limit]) + (f", and {len(names) - limit} more" if len(names) > limit else "")
-
     kept, dropped = result["kept"], result["dropped"]
-    lines = [f"# {Path(source).name if source else 'installed packages'}, sorted, with every entry",
-             f"# another one already pulls in commented out: {len(kept) + len(dropped)} entries -> {len(kept)}."]
-    if result["unknown"]:
-        lines.append(f"# {len(result['unknown'])} not installed in the target, so left unresolved: {few(result['unknown'])}")
-    if result["duplicates"]:
-        lines.append(f"# repeated in the source: {few(result['duplicates'], 12)}")
-    lines += [""] + kept
-    if dropped:
+    lines = []
+    if verbose:
+        lines += [f"# {Path(source).name if source else 'installed packages'}, sorted, with every entry",
+                  f"# another one already pulls in commented out: {len(kept) + len(dropped)} entries -> {len(kept)}.",
+                  ""]
+    lines += kept
+    if verbose and dropped:
         lines += ["", "# ---- already pulled in by an entry above ----"]
         for text, pullers in dropped.items():
-            why = f"  # <- {', '.join(pullers[:5])}{', ...' if len(pullers) > 5 else ''}" if verbose else ""
-            lines.append(f"#{text}{why}")
+            lines.append(f"#{text}  # <- {', '.join(pullers[:5])}{', ...' if len(pullers) > 5 else ''}")
     if comments:
         lines += ["", "# ---- notes kept from the source ----"] + list(comments)
     return lines
+
+def top_level_summary(result):
+    """What the caller should know about the answer, rather than of it."""
+    kept, dropped = result["kept"], result["dropped"]
+    notes = [f"{len(kept) + len(dropped)} entries -> {len(kept)} kept, {len(dropped)} already pulled in"]
+    if result["duplicates"]:
+        notes.append(f"{len(result['duplicates'])} repeated, collapsed: {few(result['duplicates'], 12)}")
+    if result["unknown"]:
+        notes.append(f"{len(result['unknown'])} not installed in the target, so left unresolved: {few(result['unknown'])}")
+    return notes
 
 def main(test=False):
     # package summaries may contain characters the console codepage can't encode (emoji): don't crash
@@ -367,6 +380,8 @@ def main(test=False):
             sys.exit()
         for line in top_level_as_requirements(result, comments, source, args.verbose):
             print(line)
+        for note in top_level_summary(result):   # stderr: a redirected list stays a list
+            print(note, file=sys.stderr)
         sys.exit()
     elif args.list:
         pip = piptree.PipData(targetpython, args.wheelsource)
