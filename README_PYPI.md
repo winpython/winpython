@@ -231,7 +231,7 @@ usage: wppm [-h] [-v] [--register] [--unregister] [--fix] [--movable]
             [-tl] [-l LEVELS] [-j] [-t TARGET] [-i] [-u]
             [package(s) or lockfile ...]
 
-WinPython Package Manager: handle a Python distribution (WinPython or not) and its packages (17.10.20260808)
+WinPython Package Manager: handle a Python distribution (WinPython or not) and its packages (17.11.20260813)
 
 positional arguments:
   package(s) or lockfile
