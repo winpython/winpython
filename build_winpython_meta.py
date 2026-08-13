@@ -6,28 +6,76 @@ import tomllib  # stdlib since 3.11; we choose toml over yaml, more python stand
 import subprocess
 from pathlib import Path
 
+# Flavor paths are names, not full paths: these say what they hang from.
+UNDER_BASEDIR = ("requirements", "source_dirs", "wheelhousereq")
+UNDER_ROOT = ("toolsdirs",)
+
 def load_builds(config_file):
     with open(config_file, "rb") as f:
         config = tomllib.load(f)
-    builds = config["builds"]
     python_versions = config.get("pythons", {})
+    # A file may still spell out one [[builds]] block per build; otherwise the
+    # builds are the (python, flavor) pairs [pythons] asks for.
+    builds = config["builds"] if "builds" in config else expand_builds(config)
     return builds, python_versions
 
-def declared_file(build, key, default):
-    """Path named by the build for `key`, else `default`.
+def expand_builds(config):
+    """One build per flavor listed by each [pythons."3XX"], paths derived.
 
-    A path a build spells out must exist: pip_install() skips a missing
-    requirements file without failing, which would drop the packages silently.
+    A flavor names its files relative to the build directory, so a new Python
+    minor is one [pythons] block. Where a Python needs its own file - a
+    requirements list under another name, say - [pythons."3XX".overrides.flavor]
+    replaces that flavor's entries for that Python alone.
     """
-    declared = build.get(key)
-    if declared is None:
-        return str(default)
-    if not Path(declared).exists():
-        raise FileNotFoundError(f"build {build['name']!r} sets {key} = {declared!r}, which does not exist")
-    return str(declared)
+    defaults = config.get("defaults", {})
+    flavors = config.get("flavors", {})
+    builds = []
+    for target, vinfo in config.get("pythons", {}).items():
+        root = Path(vinfo.get("root_dir_for_builds", defaults.get("root_dir_for_builds", "")))
+        basedir = root / f"bd{target}"
+        overrides = vinfo.get("overrides", {})
+        for flavor in vinfo.get("builds", []):
+            if flavor not in flavors:
+                raise KeyError(f"python {target} builds {flavor!r}, which has no [flavors.{flavor}]")
+            build = {**defaults, "name": flavor, "python_target": target, "flavor": flavor}
+            for key, value in {**flavors[flavor], **overrides.get(flavor, {})}.items():
+                if key in UNDER_BASEDIR:
+                    value = str(basedir / value)
+                elif key in UNDER_ROOT:
+                    value = str(root / value)
+                build[key] = value
+            builds.append(build)
+    return builds
 
-def run_build(build, python_versions):
-    print(f"\n=== Building WinPython: {build['name']} ===")
+def select_builds(builds, wanted):
+    """Builds asked for on the command line: "315", "315:slim", ":slim"."""
+    if not wanted:
+        return builds
+    kept = []
+    for spec in wanted:
+        target, _, flavor = spec.partition(":")
+        matching = [b for b in builds
+                    if (not target or b["python_target"] == target)
+                    and (not flavor or b["flavor"] == flavor)]
+        if not matching:
+            raise SystemExit(f"no build matches {spec!r}")
+        kept += [b for b in matching if b not in kept]
+    return kept
+
+def must_exist(path, build, key):
+    """pip_install() skips a missing requirements file without failing, which
+    would drop those packages silently. Say so instead."""
+    if path and not Path(path).exists():
+        raise FileNotFoundError(f"build {build['name']!r} needs {key} = {path!r}, which does not exist")
+    return path
+
+def declared_file(build, key, default):
+    """Path named by the build for `key`, else `default`."""
+    declared = build.get(key)
+    return str(default) if declared is None else must_exist(str(declared), build, key)
+
+def run_build(build, python_versions, dry_run=False):
+    print(f"\n=== Building WinPython: {build['python_target']} {build['name']} ===")
     print(build)
 
     root_dir_for_builds = build["root_dir_for_builds"]
@@ -35,11 +83,11 @@ def run_build(build, python_versions):
     my_flavor = build["flavor"]
     my_arch = str(build["arch"])
     my_create_installer = build.get("create_installer", "True")
-    my_requirements = build.get("requirements", "")
+    my_requirements = must_exist(build.get("requirements", ""), build, "requirements")
     my_source_dirs = build.get("source_dirs", "")
     my_find_links = build.get("find_links", "")
     my_toolsdirs = build.get("toolsdirs", "")
-    wheelhousereq = build.get("wheelhousereq", "")
+    wheelhousereq = must_exist(build.get("wheelhousereq", ""), build, "wheelhousereq")
     # "pip" (default, what ships) | "none" | "parallel" | "parallel-N"
     my_bytecode = build.get("bytecode", "pip")
 
@@ -89,15 +137,18 @@ def run_build(build, python_versions):
         "--create-installer", my_create_installer,
     ]
 
-    print("Running build command:")
+    print("Dry run, build command:" if dry_run else "Running build command:")
     print(" ".join(build_cmd))
-    subprocess.run(build_cmd, cwd=os.getcwd(), check=False)
+    if not dry_run:
+        subprocess.run(build_cmd, check=False)
 
 def main():
-    config_file = sys.argv[1] if len(sys.argv) > 1 else "winpython_buildsNOT.toml"
+    args = [a for a in sys.argv[1:] if a != "--dry-run"]
+    dry_run = len(args) != len(sys.argv) - 1
+    config_file = args[0] if args else "winpython_builds.toml"
     builds, python_versions = load_builds(config_file)
-    for build in builds:
-        run_build(build, python_versions)
+    for build in select_builds(builds, args[1:]):
+        run_build(build, python_versions, dry_run)
 
 if __name__ == "__main__":
     main()
