@@ -5,6 +5,7 @@ Same synthetic site-packages trick as test_piptree.py -- the point is the
 graph, not the packages.
 """
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -142,9 +143,16 @@ class TestRendering:
         assert "app" in lines
         assert "#lib  # <- app" in lines
 
-    def test_verbose_heads_the_list_with_its_counts(self, pip):
-        lines = wppm_module.top_level_as_requirements(pip.top_level(["app", "lib", "orphan"]), verbose=True)
-        assert "3 entries -> 2" in "\n".join(lines[:2])
+    def test_verbose_heads_the_list_with_source_and_time(self, pip):
+        lines = wppm_module.top_level_as_requirements(
+            pip.top_level(["app", "lib"]), source="req.txt", verbose=True)
+        assert re.fullmatch(r"# req\.txt, sorted, \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}", lines[0])
+
+    def test_verbose_heads_the_list_with_the_same_counts_stderr_gives(self, pip):
+        result = pip.top_level(["app", "lib", "orphan"])
+        lines = wppm_module.top_level_as_requirements(result, verbose=True)
+        assert lines[1:2] == wppm_module.top_level_summary(result)[:1]
+        assert lines[1] == "# 3 entries -> 2 kept, 1 already pulled in"
 
     def test_source_notes_are_kept_even_plainly(self, pip):
         """They are the author's own lines, not our commentary."""
@@ -201,6 +209,12 @@ class TestCli:
 
     def test_verbose_adds_the_reasoning(self, graph):
         assert "#lib  # <- app" in self.wppm("-t", str(graph), "--top-level", "-v").splitlines()
+
+    def test_verbose_does_not_say_the_counts_twice(self, graph):
+        """Under -v they head the list, so stderr keeps quiet."""
+        proc = self.run("-t", str(graph), "--top-level", "-v")
+        assert "entries ->" in proc.stdout
+        assert "entries ->" not in proc.stderr
 
     def test_top_level_of_a_requirements_file(self, graph, tmp_path):
         req = tmp_path / "req.txt"

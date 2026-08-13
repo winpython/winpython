@@ -112,13 +112,15 @@ Those two lines are commented although they go to stderr, so folding both stream
 one file (`> new.txt 2>&1`) still leaves a file pip can read.
 
 The notes the source file carried are kept, since they are its author's. `-v` adds the
-reasoning: where the list came from, and every dropped entry commented out with what
-pulls it in, so re-asking for one is uncommenting it.
+reasoning: what the list is made from and when, the same counts, and every dropped entry
+commented out with what pulls it in, so re-asking for one is uncommenting it. stderr then
+keeps quiet, the counts being in the file already.
 
 ```console
 $ wppm requirements_slim.txt -tl -v -t D:\WPy64\python
-# requirements_slim.txt, sorted, with every entry
-# another one already pulls in commented out: 160 entries -> 112.
+# requirements_slim.txt, sorted, 2026-08-13 19:22:43
+# 160 entries -> 112 kept, 48 already pulled in
+# 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
 
 ...
 #numpy  # <- baresql, clarabel, cvxpy, dask[array,dataframe,diagnostics], datashader, ...

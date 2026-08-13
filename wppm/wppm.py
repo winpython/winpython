@@ -12,6 +12,7 @@ import sys
 import shutil
 import subprocess
 import json
+from datetime import datetime
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
 from . import utils, piptree, diff, __version__
@@ -286,17 +287,18 @@ def top_level_as_requirements(result, comments=(), source=None, verbose=False):
 
     Plainly, it is that file and nothing else: the entries, plus the notes the
     source itself carried, so redirecting the output replaces the source
-    without losing what its author wrote in it. -v adds the reasoning -- where
-    the list came from, and every dropped entry commented out with what pulls
-    it in, so re-asking for one is uncommenting it.
+    without losing what its author wrote in it. -v adds the reasoning -- what
+    the list is made from and when, the same counts stderr gives, and every
+    dropped entry commented out with what pulls it in, so re-asking for one is
+    uncommenting it.
     """
-    kept, dropped = result["kept"], result["dropped"]
     lines = []
     if verbose:
-        lines += [f"# {Path(source).name if source else 'installed packages'}, sorted, with every entry",
-                  f"# another one already pulls in commented out: {len(kept) + len(dropped)} entries -> {len(kept)}.",
-                  ""]
-    lines += kept
+        lines += [f"# {Path(source).name if source else 'installed packages'}, sorted,"
+                  f" {datetime.now():%Y-%m-%d %H:%M:%S}"]
+        lines += top_level_summary(result) + [""]
+    lines += result["kept"]
+    dropped = result["dropped"]
     if verbose and dropped:
         lines += ["", "# ---- already pulled in by an entry above ----"]
         for text, pullers in dropped.items():
@@ -308,8 +310,10 @@ def top_level_as_requirements(result, comments=(), source=None, verbose=False):
 def top_level_summary(result):
     """What the caller should know about the answer, rather than of it.
 
-    Commented, though it goes to stderr: someone will fold the two streams
-    into one file sooner or later, and a comment costs nothing.
+    Goes to stderr, so a redirected list stays a list -- and heads the list
+    itself under -v, where the reasoning belongs in the file. Commented either
+    way: someone will fold the two streams into one file sooner or later, and a
+    comment costs nothing.
     """
     kept, dropped = result["kept"], result["dropped"]
     notes = [f"{len(kept) + len(dropped)} entries -> {len(kept)} kept, {len(dropped)} already pulled in"]
@@ -384,8 +388,9 @@ def main(test=False):
             sys.exit()
         for line in top_level_as_requirements(result, comments, source, args.verbose):
             print(line)
-        for note in top_level_summary(result):   # stderr: a redirected list stays a list
-            print(note, file=sys.stderr)
+        if not args.verbose:   # -v already heads the list with them; don't say it twice
+            for note in top_level_summary(result):
+                print(note, file=sys.stderr)
         sys.exit()
     elif args.list:
         pip = piptree.PipData(targetpython, args.wheelsource)
