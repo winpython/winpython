@@ -277,8 +277,8 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         package = Package(fname)
         self._print_done()
 
-def roots_as_requirements(result, comments=(), source=None, verbose=False):
-    """Render piptree.roots() as a requirements file that says why it is short.
+def top_level_as_requirements(result, comments=(), source=None, verbose=False):
+    """Render piptree.top_level() as a requirements file that says why it is short.
 
     Dropped entries stay as comments, so re-asking for one is uncommenting it.
     """
@@ -326,9 +326,9 @@ def main(test=False):
     parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
-    parser.add_argument("-roots", "--roots", action="store_true", help="keep only what no other entry pulls in, sorted: wppm --roots, wppm requirements.txt --roots -v")
+    parser.add_argument("-tl", "--top-level", action="store_true", help="keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v")
     parser.add_argument("-l", dest="levels", type=int, default=-1, help="show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1")
-    parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md, --roots): wppm -p pandas[.] -j")
+    parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md, -tl): wppm -p pandas[.] -j")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
@@ -357,15 +357,15 @@ def main(test=False):
             pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
             print(pip.up(pack, extra, args.levels if args.levels>=0 else 1, verbose=args.verbose, format="json" if args.json else "text"))
         sys.exit()
-    elif args.roots:
+    elif args.top_level:
         pip = piptree.PipData(targetpython, args.wheelsource)
         source = next((Path(f) for f in args.fname if f and Path(f).is_file()), None)
         entries, comments = utils.read_requirements(source) if source else (None, [])
-        result = pip.roots(entries)
+        result = pip.top_level(entries)
         if args.json:
             print(json.dumps(result, indent=4))
             sys.exit()
-        for line in roots_as_requirements(result, comments, source, args.verbose):
+        for line in top_level_as_requirements(result, comments, source, args.verbose):
             print(line)
         sys.exit()
     elif args.list:

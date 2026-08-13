@@ -353,7 +353,7 @@ class PipData:
         reached.discard(key)
         return reached
 
-    def roots(self, entries: Optional[List[str]] = None) -> Dict:
+    def top_level(self, entries: Optional[List[str]] = None) -> Dict:
         """Which entries no other entry already pulls in.
 
         `entries` are requirement strings ("dask[array]", "numpy==2.0"); given
