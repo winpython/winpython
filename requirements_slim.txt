@@ -69,7 +69,7 @@ prince
 psycopg2
 ptpython
 pybind11
-pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,mistral,openai,vertexai]==1.12.0
+pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,mistral,openai,vertexai]==1.106.0
 pympler
 pyodbc
 pyomo
