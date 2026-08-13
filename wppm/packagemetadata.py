@@ -40,17 +40,20 @@ def get_installed_metadata(path = None) -> List[PackageMetadata]:
     return pkgs
 
 def get_directory_metadata(directory: str) -> List[PackageMetadata]:
-    # For each .whl/.tar.gz file in directory, extract metadata
+    """Metadata of every wheel and sdist in *directory*.
+
+    An archive that carries no metadata (a plain source tarball, say) is
+    skipped: a wheelhouse holds what it holds, and one odd file in it must not
+    cost the caller the other three thousand.
+    """
     pkgs = []
     for fname in os.listdir(directory):
-        if fname.endswith('.whl'):
-            # Extract METADATA from wheel
-            meta = extract_metadata_from_wheel(os.path.join(directory, fname))
-            pkgs.append(meta)
-        elif fname.endswith('.tar.gz'):
-            # Extract PKG-INFO from sdist
-            meta = extract_metadata_from_sdist(os.path.join(directory, fname))
-            pkgs.append(meta)
+        extract = extract_metadata_from_wheel if fname.endswith('.whl') else extract_metadata_from_sdist
+        if fname.endswith(('.whl', '.tar.gz')):
+            try:
+                pkgs.append(extract(os.path.join(directory, fname)))
+            except (ValueError, KeyError, OSError, tarfile.TarError, zipfile.BadZipFile) as e:
+                print(f"skipped {fname}: {e}", file=sys.stderr)
     return pkgs
 
 def extract_metadata_from_wheel(path: str) -> PackageMetadata:

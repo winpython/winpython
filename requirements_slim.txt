@@ -1,0 +1,179 @@
+# requirements_slim.txt, sorted, 2026-08-13 19:15:35
+# 160 entries -> 112 kept, 48 already pulled in
+# 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, pywavelets, sympy, xlsxwriter
+
+adbc_driver_manager
+aiosqlite
+anywidget
+array-api-compat
+azure-cosmos
+baresql
+brotli
+build
+cvxopt
+cvxpy
+cython
+cytoolz
+dask[array,dataframe,diagnostics]
+datasette_graphql
+datashader
+deap
+duckdb
+faker
+fastapi
+flit
+folium
+foundry-local-sdk
+fuzzywuzzy
+geopy
+hatchling
+html5lib
+httpie
+hvplot
+hypothesis
+imbalanced-learn
+ipycanvas
+ipyleaflet
+ipympl
+ipython_sql
+julia
+jupyter
+jupyter_bokeh
+keras
+langchain
+lmfit
+lxml
+markitdown
+maturin
+mercantile
+missingno
+mlxtend
+mpld3
+mssql-python
+mypy[mypyc]
+mysql_connector_python
+nltk
+onnxruntime_genai
+opencv-python
+openpyxl
+optuna
+papermill
+pep8
+pg8000
+pipdeptree
+plotly
+plotnine
+plotpy
+polars
+prince
+psycopg2
+ptpython
+pybind11
+pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,mistral,openai,vertexai]==1.12.0
+pympler
+pyodbc
+pyomo
+pypandoc
+pypdf
+pyqtgraph
+pyserial
+pytest
+python-barcode
+pyusb
+pyvisa
+pywavelets
+qrcode
+quantecon
+quart
+redis
+reportlab
+requests_ntlm
+rx
+shapely
+simplejson
+simpy
+skrub
+sounddevice
+soundfile
+sphinx_rtd_theme
+spyder
+sqlite_bro
+squarify
+streamlit-bokeh
+termcolor
+thefuzz
+tiktoken
+trio
+twine
+typer
+tzlocal
+umap-learn
+vega_datasets
+waitress
+wheel
+wordcloud
+xlsxwriter
+yt_dlp
+
+# ---- already pulled in by an entry above ----
+#alembic  # <- optuna
+#Altair  # <- prince, streamlit, streamlit-bokeh
+#appdirs  # <- ptpython
+#azure-core  # <- azure-cosmos, azure-identity, mssql-python
+#azure-identity  # <- mssql-python
+#black  # <- spyder
+#clarabel  # <- cvxpy
+#datasette  # <- datasette-graphql
+#fasta2a  # <- pydantic-ai-slim
+#flatbuffers  # <- markitdown, onnxruntime, onnxruntime-genai
+#groq  # <- pydantic-ai-slim
+#guidata  # <- PlotPy
+#holoviews  # <- hvplot
+#huggingface_hub  # <- pydantic-ai-slim
+#imageio  # <- PlotPy, scikit-image
+#jupyterlab  # <- jupyter
+#markdownify  # <- markitdown
+#matplotlib  # <- ipympl, missingno, mlxtend, mpld3, plotnine, ...
+#mistralai  # <- pydantic-ai-slim
+#networkx  # <- PlotPy, scikit-image
+#numba  # <- datashader, quantecon, umap-learn
+#numpy  # <- baresql, clarabel, cvxpy, dask, datashader, ...
+#onnxruntime  # <- markitdown, onnxruntime-genai
+#openai  # <- pydantic-ai-slim
+#pandas  # <- baresql, dask, datashader, holoviews, hvplot, ...
+#protobuf  # <- markitdown, onnxruntime, onnxruntime-genai, streamlit, streamlit-bokeh
+#pyct  # <- datashader
+#pydeck  # <- streamlit, streamlit-bokeh
+#pysocks  # <- httpie
+#PythonQwt  # <- PlotPy
+#pywin32  # <- pydantic-ai-slim, Pympler
+#pyzmq  # <- jupyter, jupyterlab, papermill, spyder
+#requests  # <- azure-core, azure-cosmos, azure-identity, datashader, flit, ...
+#scikit-image  # <- PlotPy
+#scikit-learn  # <- imbalanced-learn, mlxtend, prince, skrub, umap-learn
+#scipy  # <- clarabel, cvxpy, datashader, imbalanced-learn, lmfit, ...
+#scs  # <- cvxpy
+#seaborn  # <- missingno
+#setuptools  # <- cvxpy, datasette, datasette-graphql, httpie, mypy
+#SQLalchemy  # <- alembic, ipython-sql, optuna
+#sqlite-utils  # <- datasette-graphql
+#statsmodels  # <- plotnine
+#streamlit  # <- streamlit-bokeh
+#sympy  # <- quantecon
+#tifffile  # <- PlotPy, scikit-image
+#websockets  # <- langchain, pydantic-ai-slim, streamlit, streamlit-bokeh
+#whatthepatch  # <- spyder
+#zstandard  # <- langchain
+
+# ---- notes kept from the source ----
+# for WinPython-3.14 slim
+# 2026-07-12 
+#   switch geopandas for opencv
+# 2026-08-03: 
+#   astropy, django, distributed removed (place)
+#   pymongo removed
+# 2027-08-07
+#   remove geopandas (and so pyogrio, pyproj)
+# 2026-08-08 
+#   pydub unmaintained
+

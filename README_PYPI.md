@@ -95,6 +95,51 @@ levels deep — is one command:
 $ wppm -p ".[.]" -l9
 ```
 
+## What did you actually ask for?
+
+`-p` and `-r` answer for one package. `-tl` answers for a whole list: it keeps only the
+entries nothing else in that list already pulls in. Plainly, it prints that list and
+nothing else -- so the output *is* the new file, and the counts go to stderr where a
+redirection leaves them behind:
+
+```console
+$ wppm requirements_slim.txt -tl -t D:\WPy64\python > requirements_slim_new.txt
+# 160 entries -> 112 kept, 48 already pulled in
+# 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
+```
+
+Those two lines are commented although they go to stderr, so folding both streams into
+one file (`> new.txt 2>&1`) still leaves a file pip can read.
+
+The notes the source file carried are kept, since they are its author's. `-v` adds the
+reasoning: what the list is made from and when, the same counts, and every dropped entry
+commented out with what pulls it in, so re-asking for one is uncommenting it. stderr then
+keeps quiet, the counts being in the file already.
+
+```console
+$ wppm requirements_slim.txt -tl -v -t D:\WPy64\python
+# requirements_slim.txt, sorted, 2026-08-13 19:22:43
+# 160 entries -> 112 kept, 48 already pulled in
+# 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
+
+...
+#numpy  # <- baresql, clarabel, cvxpy, dask[array,dataframe,diagnostics], datashader, ...
+#scikit-learn  # <- imbalanced-learn, mlxtend, prince, skrub, umap-learn
+#whatthepatch  # <- spyder
+```
+
+With no file, the question becomes "of everything installed here, what did anything
+actually ask for?":
+
+```console
+$ wppm --top-level -t D:\WPy64\python
+```
+
+An optional dependency only counts where its extra is asked for, and a mutual pair keeps
+both members -- dropping either would take the other with it. With `-ws` the facts come
+from a wheelhouse instead of an installation, so a list can be pruned before anything is
+built; where the wheelhouse holds several versions of a package, the newest one answers.
+
 ## Everything is available as JSON
 
 Any of `-p`, `-r`, `-ls`, `-md` accepts `-j` / `--json`, so the same answers can gate a
@@ -185,10 +230,10 @@ anything into it.
 ```text
 usage: wppm [-h] [-v] [--register] [--unregister] [--fix] [--movable]
             [-ws WHEELSOURCE] [-wd WHEELDRAIN] [-ls] [-lsa] [-md] [-p] [-r]
-            [-l LEVELS] [-j] [-t TARGET] [-i] [-u]
+            [-tl] [-l LEVELS] [-j] [-t TARGET] [-i] [-u]
             [package(s) or lockfile ...]
 
-WinPython Package Manager: handle a Python distribution (WinPython or not) and its packages (17.10.20260808)
+WinPython Package Manager: handle a Python distribution (WinPython or not) and its packages (17.11.20260813)
 
 positional arguments:
   package(s) or lockfile
@@ -208,8 +253,9 @@ options:
   -md                   markdown summary of the installation
   -p                    show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]
   -r                    show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]
+  -tl, --top-level      keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v
   -l LEVELS             show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1
-  -j, --json            machine-readable JSON output (with -p, -r, -ls, -md): wppm -p pandas[.] -j
+  -j, --json            machine-readable JSON output (with -p, -r, -ls, -md, -tl): wppm -p pandas[.] -j
   -t TARGET             path to target Python distribution (default: current environment)
   -i, --install         install a given package wheel or pylock file (use pip for more features)
   -u, --uninstall       uninstall package  (use pip for more features)

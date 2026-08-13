@@ -22,8 +22,10 @@ from collections import OrderedDict
 from typing import Dict, List, Optional, Tuple, Union
 try:
     from packaging.markers import Marker
+    from packaging.version import Version
 except  ModuleNotFoundError:
     from pip._vendor.packaging.markers import Marker
+    from pip._vendor.packaging.version import Version
 from importlib.metadata import Distribution, distributions
 from pathlib import Path
 from . import utils
@@ -96,13 +98,34 @@ class PipData:
     def _get_packages(self, search_path: str, wheelhouse) -> List[Distribution]:
         """Retrieve installed packages from the specified path."""
         if wheelhouse:
-            return pm.get_directory_metadata(wheelhouse)
+            return self._newest_of_each(pm.get_directory_metadata(wheelhouse))
         if sys.executable == search_path:
             return pm.get_installed_metadata() #Distribution.discover()
         else:
             # get_site_packages_path resolves from the distribution root, so it copes
             # with the venv layout (python.exe in Scripts, site-packages at the root)
             return pm.get_installed_metadata(path=[utils.get_site_packages_path(search_path)])
+
+    @staticmethod
+    def _newest_of_each(packages: List) -> List:
+        """One distribution per name, the highest version.
+
+        A wheelhouse commonly holds several versions of a package; the
+        environment PipData models holds one, and reading whichever the
+        directory listing returned last would make the answer arbitrary.
+        """
+        def version_of(package):
+            try:
+                return Version(package.version)
+            except Exception:   # a local or malformed version still sorts, just last
+                return Version("0")
+
+        newest = {}
+        for package in packages:
+            key = PipData.normalize(package.name)
+            if key not in newest or version_of(package) > version_of(newest[key]):
+                newest[key] = package
+        return list(newest.values())
 
     def _process_packages(self, packages: List[Distribution]) -> None:
         """Process packages metadata and store them in the distro dictionary."""
@@ -297,6 +320,81 @@ class PipData:
             return ret_all
         else:
             return []
+
+    @staticmethod
+    def split_requirement(text: str) -> Tuple[str, List[str]]:
+        """'dask[array,dataframe]>=2.0' -> ('dask', ['array', 'dataframe'])."""
+        name_extras = re.split(r"[=<>~!;@ ]", text.strip(), maxsplit=1)[0]
+        name, _, extras = name_extras.partition("[")
+        return PipData.normalize(name), [e.strip() for e in extras.rstrip("]").split(",") if e.strip()]
+
+    def dependency_closure(self, package: str, extra: str = "") -> set:
+        """Every installed package reachable from `package[extra]`, itself excluded.
+
+        An optional dependency counts only where its extra is asked for: a
+        requirement gated on `extra == "test"` is not followed for a bare
+        package, since nothing installed it on that account.
+        """
+        key = self.normalize(package)
+        reached, seen = set(), set()
+        stack = [(key, e) for e in extra.split(",") if e] + [(key, "")]
+        while stack:
+            pkg, pkg_extra = stack.pop()
+            if (pkg, pkg_extra) in seen or pkg not in self.distro:
+                continue
+            seen.add((pkg, pkg_extra))
+            for req in self.distro[pkg]["requires_dist"]:
+                marker = req.get("req_marker")
+                if marker and not self._marker_true(marker, pkg_extra):
+                    continue
+                if req["req_key"] in self.distro:
+                    reached.add(req["req_key"])
+                    stack.append((req["req_key"], req["req_extra"]))
+        reached.discard(key)
+        return reached
+
+    def top_level(self, entries: Optional[List[str]] = None) -> Dict:
+        """Which entries no other entry already pulls in.
+
+        `entries` are requirement strings ("dask[array]", "numpy==2.0"); given
+        none, every installed package is an entry. Returns the entries to keep
+        in alphabetical order, and for each dropped one the entries that pull
+        it in -- a requirements file saying what it means, rather than what a
+        dependency would have installed anyway.
+
+        A mutual pair (a needs b, b needs a) keeps both: dropping either would
+        take the other with it. An entry the target has never installed cannot
+        be resolved, so it is kept and reported apart.
+        """
+        if entries is None:
+            entries = [pkg["name"] for pkg in self.distro.values()]
+        asked: Dict[str, Tuple[str, List[str]]] = {}   # key -> (as written, extras)
+        duplicates = []
+        for text in entries:
+            key, extras = self.split_requirement(text)
+            if key in asked:
+                duplicates.append(text)
+                if len(text) <= len(asked[key][0]):
+                    continue   # keep the fuller spelling: extras and pins matter
+            asked[key] = (text, extras)
+        reach = {key: self.dependency_closure(key, ",".join(extras)) if key in self.distro else set()
+                 for key, (_, extras) in asked.items()}
+        dropped = {}
+        for key, (text, _) in asked.items():
+            # named plainly: what pulls a package in is the package, not the
+            # extras and pin the entry happened to be written with
+            pullers = sorted((self.distro[other]["name"] if other in self.distro else other
+                              for other in asked
+                              if other != key and key in reach[other] and other not in reach[key]),
+                             key=str.lower)
+            if pullers:
+                dropped[text] = pullers
+        return {
+            "kept": sorted((text for text, _ in asked.values() if text not in dropped), key=str.lower),
+            "dropped": dict(sorted(dropped.items(), key=lambda item: item[0].lower())),
+            "duplicates": sorted(duplicates, key=str.lower),
+            "unknown": sorted((text for key, (text, _) in asked.items() if key not in self.distro), key=str.lower),
+        }
 
     def _node_text(self, node: Dict) -> str:
         """Render a tree node dict as its one-line text form."""

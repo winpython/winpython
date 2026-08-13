@@ -12,6 +12,7 @@ import sys
 import shutil
 import subprocess
 import json
+from datetime import datetime
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter
 from . import utils, piptree, diff, __version__
@@ -277,6 +278,51 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         package = Package(fname)
         self._print_done()
 
+def few(names, limit=6):
+    """First few names of a list, and how many more there were."""
+    return ", ".join(names[:limit]) + (f", and {len(names) - limit} more" if len(names) > limit else "")
+
+def top_level_as_requirements(result, comments=(), source=None, verbose=False):
+    """Render piptree.top_level() as the requirements file it proposes.
+
+    Plainly, it is that file and nothing else: the entries, plus the notes the
+    source itself carried, so redirecting the output replaces the source
+    without losing what its author wrote in it. -v adds the reasoning -- what
+    the list is made from and when, the same counts stderr gives, and every
+    dropped entry commented out with what pulls it in, so re-asking for one is
+    uncommenting it.
+    """
+    lines = []
+    if verbose:
+        lines += [f"# {Path(source).name if source else 'installed packages'}, sorted,"
+                  f" {datetime.now():%Y-%m-%d %H:%M:%S}"]
+        lines += top_level_summary(result) + [""]
+    lines += result["kept"]
+    dropped = result["dropped"]
+    if verbose and dropped:
+        lines += ["", "# ---- already pulled in by an entry above ----"]
+        for text, pullers in dropped.items():
+            lines.append(f"#{text}  # <- {', '.join(pullers[:5])}{', ...' if len(pullers) > 5 else ''}")
+    if comments:
+        lines += ["", "# ---- notes kept from the source ----"] + list(comments)
+    return lines
+
+def top_level_summary(result):
+    """What the caller should know about the answer, rather than of it.
+
+    Goes to stderr, so a redirected list stays a list -- and heads the list
+    itself under -v, where the reasoning belongs in the file. Commented either
+    way: someone will fold the two streams into one file sooner or later, and a
+    comment costs nothing.
+    """
+    kept, dropped = result["kept"], result["dropped"]
+    notes = [f"{len(kept) + len(dropped)} entries -> {len(kept)} kept, {len(dropped)} already pulled in"]
+    if result["duplicates"]:
+        notes.append(f"{len(result['duplicates'])} repeated, collapsed: {few(result['duplicates'], 12)}")
+    if result["unknown"]:
+        notes.append(f"{len(result['unknown'])} not installed in the target, so left unresolved: {few(result['unknown'])}")
+    return [f"# {note}" for note in notes]
+
 def main(test=False):
     # package summaries may contain characters the console codepage can't encode (emoji): don't crash
     if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -301,8 +347,9 @@ def main(test=False):
     parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
+    parser.add_argument("-tl", "--top-level", action="store_true", help="keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v")
     parser.add_argument("-l", dest="levels", type=int, default=-1, help="show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1")
-    parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md): wppm -p pandas[.] -j")
+    parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md, -tl): wppm -p pandas[.] -j")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
@@ -330,6 +377,20 @@ def main(test=False):
         for args_fname in args.fname:
             pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
             print(pip.up(pack, extra, args.levels if args.levels>=0 else 1, verbose=args.verbose, format="json" if args.json else "text"))
+        sys.exit()
+    elif args.top_level:
+        pip = piptree.PipData(targetpython, args.wheelsource)
+        source = next((Path(f) for f in args.fname if f and Path(f).is_file()), None)
+        entries, comments = utils.read_requirements(source) if source else (None, [])
+        result = pip.top_level(entries)
+        if args.json:
+            print(json.dumps(result, indent=4))
+            sys.exit()
+        for line in top_level_as_requirements(result, comments, source, args.verbose):
+            print(line)
+        if not args.verbose:   # -v already heads the list with them; don't say it twice
+            for note in top_level_summary(result):
+                print(note, file=sys.stderr)
         sys.exit()
     elif args.list:
         pip = piptree.PipData(targetpython, args.wheelsource)
