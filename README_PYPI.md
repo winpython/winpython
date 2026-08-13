@@ -104,9 +104,12 @@ redirection leaves them behind:
 
 ```console
 $ wppm requirements_slim.txt -tl -t D:\WPy64\python > requirements_slim_new.txt
-160 entries -> 112 kept, 48 already pulled in
-8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
+# 160 entries -> 112 kept, 48 already pulled in
+# 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
 ```
+
+Those two lines are commented although they go to stderr, so folding both streams into
+one file (`> new.txt 2>&1`) still leaves a file pip can read.
 
 The notes the source file carried are kept, since they are its author's. `-v` adds the
 reasoning: where the list came from, and every dropped entry commented out with what

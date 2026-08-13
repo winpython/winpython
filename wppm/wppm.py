@@ -306,14 +306,18 @@ def top_level_as_requirements(result, comments=(), source=None, verbose=False):
     return lines
 
 def top_level_summary(result):
-    """What the caller should know about the answer, rather than of it."""
+    """What the caller should know about the answer, rather than of it.
+
+    Commented, though it goes to stderr: someone will fold the two streams
+    into one file sooner or later, and a comment costs nothing.
+    """
     kept, dropped = result["kept"], result["dropped"]
     notes = [f"{len(kept) + len(dropped)} entries -> {len(kept)} kept, {len(dropped)} already pulled in"]
     if result["duplicates"]:
         notes.append(f"{len(result['duplicates'])} repeated, collapsed: {few(result['duplicates'], 12)}")
     if result["unknown"]:
         notes.append(f"{len(result['unknown'])} not installed in the target, so left unresolved: {few(result['unknown'])}")
-    return notes
+    return [f"# {note}" for note in notes]
 
 def main(test=False):
     # package summaries may contain characters the console codepage can't encode (emoji): don't crash

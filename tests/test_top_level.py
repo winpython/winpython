@@ -155,7 +155,13 @@ class TestRendering:
 class TestSummary:
     def test_counts_what_happened(self, pip):
         notes = wppm_module.top_level_summary(pip.top_level(["app", "lib", "orphan"]))
-        assert "3 entries -> 2 kept, 1 already pulled in" in notes[0]
+        assert notes[0] == "# 3 entries -> 2 kept, 1 already pulled in"
+
+    def test_every_note_is_a_comment(self, pip):
+        """stdout and stderr may well end up in the same file."""
+        notes = wppm_module.top_level_summary(pip.top_level(["orphan", "orphan", "nosuchpackage"]))
+        assert len(notes) == 3
+        assert all(note.startswith("# ") for note in notes)
 
     def test_reports_repeats(self, pip):
         notes = wppm_module.top_level_summary(pip.top_level(["orphan", "orphan"]))
