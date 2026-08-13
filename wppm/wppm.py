@@ -277,6 +277,31 @@ if "%WINPYDIR%"=="" call "%~dp0..\..\scripts\env.bat"
         package = Package(fname)
         self._print_done()
 
+def roots_as_requirements(result, comments=(), source=None, verbose=False):
+    """Render piptree.roots() as a requirements file that says why it is short.
+
+    Dropped entries stay as comments, so re-asking for one is uncommenting it.
+    """
+    def few(names, limit=6):
+        return ", ".join(names[:limit]) + (f", and {len(names) - limit} more" if len(names) > limit else "")
+
+    kept, dropped = result["kept"], result["dropped"]
+    lines = [f"# {Path(source).name if source else 'installed packages'}, sorted, with every entry",
+             f"# another one already pulls in commented out: {len(kept) + len(dropped)} entries -> {len(kept)}."]
+    if result["unknown"]:
+        lines.append(f"# {len(result['unknown'])} not installed in the target, so left unresolved: {few(result['unknown'])}")
+    if result["duplicates"]:
+        lines.append(f"# repeated in the source: {few(result['duplicates'], 12)}")
+    lines += [""] + kept
+    if dropped:
+        lines += ["", "# ---- already pulled in by an entry above ----"]
+        for text, pullers in dropped.items():
+            why = f"  # <- {', '.join(pullers[:5])}{', ...' if len(pullers) > 5 else ''}" if verbose else ""
+            lines.append(f"#{text}{why}")
+    if comments:
+        lines += ["", "# ---- notes kept from the source ----"] + list(comments)
+    return lines
+
 def main(test=False):
     # package summaries may contain characters the console codepage can't encode (emoji): don't crash
     if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -301,8 +326,9 @@ def main(test=False):
     parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
+    parser.add_argument("-roots", "--roots", action="store_true", help="keep only what no other entry pulls in, sorted: wppm --roots, wppm requirements.txt --roots -v")
     parser.add_argument("-l", dest="levels", type=int, default=-1, help="show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1")
-    parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md): wppm -p pandas[.] -j")
+    parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md, --roots): wppm -p pandas[.] -j")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
@@ -330,6 +356,17 @@ def main(test=False):
         for args_fname in args.fname:
             pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
             print(pip.up(pack, extra, args.levels if args.levels>=0 else 1, verbose=args.verbose, format="json" if args.json else "text"))
+        sys.exit()
+    elif args.roots:
+        pip = piptree.PipData(targetpython, args.wheelsource)
+        source = next((Path(f) for f in args.fname if f and Path(f).is_file()), None)
+        entries, comments = utils.read_requirements(source) if source else (None, [])
+        result = pip.roots(entries)
+        if args.json:
+            print(json.dumps(result, indent=4))
+            sys.exit()
+        for line in roots_as_requirements(result, comments, source, args.verbose):
+            print(line)
         sys.exit()
     elif args.list:
         pip = piptree.PipData(targetpython, args.wheelsource)

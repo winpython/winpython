@@ -95,6 +95,36 @@ levels deep — is one command:
 $ wppm -p ".[.]" -l9
 ```
 
+## What did you actually ask for?
+
+`-p` and `-r` answer for one package. `--roots` answers for a whole list: it keeps only
+the entries nothing else in that list already pulls in, sorted, and comments out the rest
+with the reason.
+
+```console
+$ wppm requirements_slim.txt --roots -v -t D:\WPy64\python
+# requirements_slim.txt, sorted, with every entry
+# another one already pulls in commented out: 160 entries -> 112.
+
+...
+#numpy  # <- baresql, clarabel, cvxpy, dask[array,dataframe,diagnostics], datashader, ...
+#scikit-learn  # <- imbalanced-learn, mlxtend, prince, skrub, umap-learn
+#whatthepatch  # <- spyder
+```
+
+Dropped entries come back as comments, so re-asking for one is uncommenting it, and the
+notes in the source file are carried over. With no file, the question becomes "of
+everything installed here, what did anything actually ask for?":
+
+```console
+$ wppm --roots -t D:\WPy64\python
+```
+
+An optional dependency only counts where its extra is asked for, and a mutual pair keeps
+both members -- dropping either would take the other with it. With `-ws` the facts come
+from a wheelhouse instead of an installation, so a list can be pruned before anything is
+built; where the wheelhouse holds several versions of a package, the newest one answers.
+
 ## Everything is available as JSON
 
 Any of `-p`, `-r`, `-ls`, `-md` accepts `-j` / `--json`, so the same answers can gate a
@@ -185,7 +215,7 @@ anything into it.
 ```text
 usage: wppm [-h] [-v] [--register] [--unregister] [--fix] [--movable]
             [-ws WHEELSOURCE] [-wd WHEELDRAIN] [-ls] [-lsa] [-md] [-p] [-r]
-            [-l LEVELS] [-j] [-t TARGET] [-i] [-u]
+            [-roots] [-l LEVELS] [-j] [-t TARGET] [-i] [-u]
             [package(s) or lockfile ...]
 
 WinPython Package Manager: handle a Python distribution (WinPython or not) and its packages (17.10.20260808)
@@ -208,8 +238,9 @@ options:
   -md                   markdown summary of the installation
   -p                    show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]
   -r                    show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]
+  -roots, --roots       keep only what no other entry pulls in, sorted: wppm --roots, wppm requirements.txt --roots -v
   -l LEVELS             show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1
-  -j, --json            machine-readable JSON output (with -p, -r, -ls, -md): wppm -p pandas[.] -j
+  -j, --json            machine-readable JSON output (with -p, -r, -ls, -md, --roots): wppm -p pandas[.] -j
   -t TARGET             path to target Python distribution (default: current environment)
   -i, --install         install a given package wheel or pylock file (use pip for more features)
   -u, --uninstall       uninstall package  (use pip for more features)

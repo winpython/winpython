@@ -53,6 +53,15 @@ def get_site_packages_path(path=None):
     """Return the path to the Python site-packages directory."""
     return str(get_install_root(path) / 'Lib' / 'site-packages')
 
+def read_requirements(path):
+    """Split a pip requirements file into its entries and its comment lines."""
+    entries, comments = [], []
+    for line in Path(path).read_text(encoding='utf-8').splitlines():
+        text = line.strip()
+        if text:
+            (comments if text.startswith('#') else entries).append(text)
+    return entries, comments
+
 def first_line(text, default="?"):
     """Return the first non-empty line of *text*, or *default* if there is none."""
     for line in text.splitlines():

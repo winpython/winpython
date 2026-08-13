@@ -118,6 +118,41 @@ class TestMarkerEnvironment:
         }
 
 
+class TestWheelhouse:
+    """Reading a directory of wheels instead of an installation."""
+
+    @pytest.fixture
+    def wheelhouse(self, tmp_path):
+        import zipfile
+        house = tmp_path / "wheels"
+        house.mkdir()
+
+        def wheel(name, version, requires=()):
+            with zipfile.ZipFile(house / f"{name}-{version}-py3-none-any.whl", "w") as zf:
+                lines = ["Metadata-Version: 2.1", f"Name: {name}", f"Version: {version}"]
+                lines += [f"Requires-Dist: {r}" for r in requires]
+                zf.writestr(f"{name}-{version}.dist-info/METADATA", "\n".join(lines) + "\n")
+
+        wheel("solo", "1.0")
+        wheel("twice", "1.0", requires=["solo"])
+        wheel("twice", "2.0")
+        (house / "not-a-package.tar.gz").write_bytes(b"not a tarball at all")
+        return house
+
+    def test_an_unreadable_archive_does_not_lose_the_others(self, wheelhouse):
+        pip = piptree.PipData(None, str(wheelhouse))
+        assert {"solo", "twice"} <= set(pip.distro)
+
+    def test_only_the_newest_version_of_a_package_is_kept(self, wheelhouse):
+        pip = piptree.PipData(None, str(wheelhouse))
+        assert pip.distro["twice"]["version"] == "2.0"
+
+    def test_the_newest_version_brings_its_own_dependencies(self, wheelhouse):
+        """twice 1.0 needs solo, twice 2.0 does not: the answer must be 2.0's."""
+        pip = piptree.PipData(None, str(wheelhouse))
+        assert pip.dependency_closure("twice") == set()
+
+
 class TestCycles:
     def test_mutual_dependency_terminates(self, tmp_path):
         """A <-> B must not recurse forever."""
