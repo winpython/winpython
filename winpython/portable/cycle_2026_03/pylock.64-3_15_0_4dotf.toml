@@ -1,0 +1,90 @@
+lock-version = "1.0"
+created-by = "pip"
+
+[[packages]]
+name = "build"
+version = "1.5.0"
+
+[[packages.wheels]]
+name = "build-1.5.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/0d/fe/6bea5c9162869c5beba5d9c8abbed835ec85bf1ec1fba05a3822325c45f3/build-1.5.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "13f3eecb844759ab66efec90ca17639bbf14dc06cb2fdf37a9010322d9c50a6f"
+
+[[packages]]
+name = "colorama"
+version = "0.4.6"
+
+[[packages.wheels]]
+name = "colorama-0.4.6-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"
+
+[[packages]]
+name = "packaging"
+version = "26.2"
+
+[[packages.wheels]]
+name = "packaging-26.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/df/b2/87e62e8c3e2f4b32e5fe99e0b86d576da1312593b39f47d8ceef365e95ed/packaging-26.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e"
+
+[[packages]]
+name = "pyproject-hooks"
+version = "1.2.0"
+
+[[packages.wheels]]
+name = "pyproject_hooks-1.2.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db45963dbcb85150324092410c8b49405e42/pyproject_hooks-1.2.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913"
+
+[[packages]]
+name = "setuptools"
+version = "83.0.0"
+
+[[packages.wheels]]
+name = "setuptools-83.0.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/5d/40/e1e72872c6354b306daef1703549e8e83b4d43cfea356311bf722a043752/setuptools-83.0.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3"
+
+[[packages]]
+name = "sqlite-bro"
+version = "1.3.2"
+
+[[packages.wheels]]
+name = "sqlite_bro-1.3.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/17/ce/51e2a8e3e11cfd7f8dffcdbbf080721322a1ad62533b58ebc26162a16038/sqlite_bro-1.3.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "0ecda886fbd9c9536cbc7192662be0a0b7d963e9df506dcc788cf1e37e572034"
+
+[[packages]]
+name = "wheel"
+version = "0.47.0"
+
+[[packages.wheels]]
+name = "wheel-0.47.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/87/1b/9e33c09813d65e248f7f773119148a612516a4bea93e9c6f545f78455b7c/wheel-0.47.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "212281cab4dff978f6cedd499cd893e1f620791ca6ff7107cf270781e587eced"
+
+[[packages]]
+name = "wppm"
+version = "17.11.20260813"
+
+[[packages.wheels]]
+name = "wppm-17.11.20260813-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/84/58/c60a6fa021b5682640f14798664549e1e36618e743db093ededa54cce829/wppm-17.11.20260813-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "3e575f3c389b98398b54847a39ca9cf08bac1f89eaf29df69648fa03db1618a5"
