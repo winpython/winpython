@@ -146,14 +146,14 @@ sha256 = "1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"
 
 [[packages]]
 name = "anthropic"
-version = "0.120.2"
+version = "0.121.0"
 
 [[packages.wheels]]
-name = "anthropic-0.120.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/63/af/0f5db57b9397a0f3b7fc204cbef143401a7cadaf982330f97f1ce3d39f34/anthropic-0.120.2-py3-none-any.whl"
+name = "anthropic-0.121.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/fa/91/b3d41643f1f639927e8c5fb02c3bd8bffe6f1f29e219b3bd4c61e267b15c/anthropic-0.121.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "0f0bc2b381dc0eb41c8d886b815d79c2041cd2374f83aed36f574b6dc9c579c1"
+sha256 = "6048713fa441e59e1cba8363171cd2a86273b25bd213e9c7ac70a523af88b011"
 
 [[packages]]
 name = "anyio"
@@ -1356,14 +1356,14 @@ sha256 = "8ec438808f813ad034535000261eed1067475d229d05bbf4216e78c3f2362e53"
 
 [[packages]]
 name = "google-genai"
-version = "2.17.0"
+version = "2.18.0"
 
 [[packages.wheels]]
-name = "google_genai-2.17.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/b3/37/71e397a5b93d9a3c139e95acdcb00b4169ed59ae20e16616f2875170abb7/google_genai-2.17.0-py3-none-any.whl"
+name = "google_genai-2.18.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/99/63/84160760f74e6c74bab322afc26d064240f42b45a4150f184f7f2605d535/google_genai-2.18.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a4835563c60aee646c9c4b261c507aa4a624710d25017012d20dc65abf3d9a54"
+sha256 = "4c5e60ccaed3ed35ac2ee81e87c5bebf7280cd49b81526d872a526e97ce25f46"
 
 [[packages]]
 name = "graphene"
@@ -2302,25 +2302,25 @@ sha256 = "0bf3acf1419fa93064a4c2189ac0b58e3be7872bf6ee6177b0d4c63dc4cea276"
 
 [[packages]]
 name = "langchain"
-version = "1.3.13"
+version = "1.3.15"
 
 [[packages.wheels]]
-name = "langchain-1.3.13-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/95/c6/dc676c632f3d20c88789b0726c43ad5e039c25338cc3bb7090fc247d1522/langchain-1.3.13-py3-none-any.whl"
+name = "langchain-1.3.15-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/09/8d/ae721f4d68ff79a17110cabc9cb39b4568b0e3f1fe0a379b926c3f81d175/langchain-1.3.15-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "20a8fe4b1dea7db74356f7d2b5455c4970099b9f7f53c2122ea97f115c907fbd"
+sha256 = "c0d2d0d51ed7da249e8ab7487173872059a9dd46fb071d905957485b7334f987"
 
 [[packages]]
 name = "langchain-core"
-version = "1.4.9"
+version = "1.5.5"
 
 [[packages.wheels]]
-name = "langchain_core-1.4.9-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/84/70/ade2fada52772798ef815b6352b59e71b116aa0c32c3aef5be3dc2cbed12/langchain_core-1.4.9-py3-none-any.whl"
+name = "langchain_core-1.5.5-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/e7/09/9f29e62e99118865d092acda6143a1ba6ce1893e3dcb72388a75b798e37d/langchain_core-1.5.5-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "28e3909e2a10cc81504952d795ac0a9e014c0018121ef89d48dd396fa09ec624"
+sha256 = "537037fd44ead7c1ffb9621011029ad2e347e051519d17f112d7bf7be12f4365"
 
 [[packages]]
 name = "langchain-protocol"
@@ -2335,14 +2335,14 @@ sha256 = "70b53a86fbf9cedc863555effe44da192ab02d556ddbf2cf95b8873adcf41b5a"
 
 [[packages]]
 name = "langgraph"
-version = "1.2.9"
+version = "1.2.11"
 
 [[packages.wheels]]
-name = "langgraph-1.2.9-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/41/16/0b8dc48823f1326f3e0c8012a3c07a40da6f194299e2ec080df236287baf/langgraph-1.2.9-py3-none-any.whl"
+name = "langgraph-1.2.11-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/0a/7f/c5c30e4be99ff821029c7ac872a480676bb179c9f3df85ea3f38d13f86d4/langgraph-1.2.11-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c2d98ad94333937922ba04148641c1da2bfe45b5b8e55d7b6dcb0bb2df809e76"
+sha256 = "8bab70de7b2d00b5300fb289bcf38d8b241400f3184c1e95e8ce706fb0e8686b"
 
 [[packages]]
 name = "langgraph-checkpoint"
@@ -2379,14 +2379,14 @@ sha256 = "75fa5096c1177ce39c847096a8fe3745ffd480ddb412995f836e9f5f884c43dd"
 
 [[packages]]
 name = "langsmith"
-version = "0.10.2"
+version = "0.11.0"
 
 [[packages.wheels]]
-name = "langsmith-0.10.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ee/17/cc8eaf4e82e4bb22009bdde20085ff91719dce643d355fed94d523300130/langsmith-0.10.2-py3-none-any.whl"
+name = "langsmith-0.11.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/c8/aa/18d334f04c12bb9154568747539a1143a93d0c34b894662c065454f396c8/langsmith-0.11.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "c2a3929055758ac1831582f0939fafc0973cc08432365bbad335c336338ec37c"
+sha256 = "e87a3929915936c066b3fa3283ec3f3f0013e2ef7f98a443a7fbe3fab8e784a3"
 
 [[packages]]
 name = "lazy-loader"
@@ -3050,14 +3050,14 @@ sha256 = "a528761e81176dcf0988a9aab0637fc4ba5cb44fdb65a164e4398930a97e2ec8"
 
 [[packages]]
 name = "openai"
-version = "3.0.0"
+version = "3.1.0"
 
 [[packages.wheels]]
-name = "openai-3.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/7b/0d/9850e7eddb5e66da4439ed503e78e09ad1fd0195e6df51e4236c75763581/openai-3.0.0-py3-none-any.whl"
+name = "openai-3.1.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d3/45/84b9e909968c0f4c3112a828bba9aa8be6a5ee322fcb3d781145ee53d88e/openai-3.1.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "8d32ac3a6647a66910d6cb8a64f0fa5a6c823604b6e82db83d9d055c6709bd51"
+sha256 = "f06d5a5c8d06a0aead3a67d33fe5a3c3c31540a0f7a8017b02ba8cd99bc5c736"
 
 [[packages]]
 name = "opencv-python"
@@ -5734,14 +5734,14 @@ sha256 = "3d3c5b0b5f66a385300dacb5ba2c2dba67c18c332b934fdac08261c1c7ee7d7a"
 
 [[packages]]
 name = "wppm"
-version = "17.11.20260813"
+version = "17.12.20260816"
 
 [[packages.wheels]]
-name = "wppm-17.11.20260813-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/84/58/c60a6fa021b5682640f14798664549e1e36618e743db093ededa54cce829/wppm-17.11.20260813-py3-none-any.whl"
+name = "wppm-17.12.20260816-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7a/b9/82f5e3fc98810e8349fb26b89cb36619f3f8f09f46796516b2c19cd62bf5/wppm-17.12.20260816-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "3e575f3c389b98398b54847a39ca9cf08bac1f89eaf29df69648fa03db1618a5"
+sha256 = "c41a205f17dbef6b752d89ce3497a99253f1c3b927d8bc3674c04a36dcd741b0"
 
 [[packages]]
 name = "wsproto"

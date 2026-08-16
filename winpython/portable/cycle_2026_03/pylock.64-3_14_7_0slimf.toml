@@ -135,14 +135,14 @@ sha256 = "1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"
 
 [[packages]]
 name = "anthropic"
-version = "0.120.2"
+version = "0.121.0"
 
 [[packages.wheels]]
-name = "anthropic-0.120.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/63/af/0f5db57b9397a0f3b7fc204cbef143401a7cadaf982330f97f1ce3d39f34/anthropic-0.120.2-py3-none-any.whl"
+name = "anthropic-0.121.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/fa/91/b3d41643f1f639927e8c5fb02c3bd8bffe6f1f29e219b3bd4c61e267b15c/anthropic-0.121.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "0f0bc2b381dc0eb41c8d886b815d79c2041cd2374f83aed36f574b6dc9c579c1"
+sha256 = "6048713fa441e59e1cba8363171cd2a86273b25bd213e9c7ac70a523af88b011"
 
 [[packages]]
 name = "anyio"
@@ -1180,14 +1180,14 @@ sha256 = "8ec438808f813ad034535000261eed1067475d229d05bbf4216e78c3f2362e53"
 
 [[packages]]
 name = "google-genai"
-version = "2.17.0"
+version = "2.18.0"
 
 [[packages.wheels]]
-name = "google_genai-2.17.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/b3/37/71e397a5b93d9a3c139e95acdcb00b4169ed59ae20e16616f2875170abb7/google_genai-2.17.0-py3-none-any.whl"
+name = "google_genai-2.18.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/99/63/84160760f74e6c74bab322afc26d064240f42b45a4150f184f7f2605d535/google_genai-2.18.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "a4835563c60aee646c9c4b261c507aa4a624710d25017012d20dc65abf3d9a54"
+sha256 = "4c5e60ccaed3ed35ac2ee81e87c5bebf7280cd49b81526d872a526e97ce25f46"
 
 [[packages]]
 name = "graphene"
@@ -2654,14 +2654,14 @@ sha256 = "3149da9874af890bcc2a82ef7aae5484e5aa81cb2778f08e3c307ba6d963721b"
 
 [[packages]]
 name = "openai"
-version = "3.0.0"
+version = "3.1.0"
 
 [[packages.wheels]]
-name = "openai-3.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/7b/0d/9850e7eddb5e66da4439ed503e78e09ad1fd0195e6df51e4236c75763581/openai-3.0.0-py3-none-any.whl"
+name = "openai-3.1.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d3/45/84b9e909968c0f4c3112a828bba9aa8be6a5ee322fcb3d781145ee53d88e/openai-3.1.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "8d32ac3a6647a66910d6cb8a64f0fa5a6c823604b6e82db83d9d055c6709bd51"
+sha256 = "f06d5a5c8d06a0aead3a67d33fe5a3c3c31540a0f7a8017b02ba8cd99bc5c736"
 
 [[packages]]
 name = "openpyxl"
@@ -5085,14 +5085,14 @@ sha256 = "22cf91490bcc0fa23585acbab1906a44a438fa7dd4d9a2b2663f39c8650634a6"
 
 [[packages]]
 name = "wppm"
-version = "17.11.20260813"
+version = "17.12.20260816"
 
 [[packages.wheels]]
-name = "wppm-17.11.20260813-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/84/58/c60a6fa021b5682640f14798664549e1e36618e743db093ededa54cce829/wppm-17.11.20260813-py3-none-any.whl"
+name = "wppm-17.12.20260816-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7a/b9/82f5e3fc98810e8349fb26b89cb36619f3f8f09f46796516b2c19cd62bf5/wppm-17.12.20260816-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "3e575f3c389b98398b54847a39ca9cf08bac1f89eaf29df69648fa03db1618a5"
+sha256 = "c41a205f17dbef6b752d89ce3497a99253f1c3b927d8bc3674c04a36dcd741b0"
 
 [[packages]]
 name = "wsproto"
