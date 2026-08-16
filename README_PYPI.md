@@ -1,6 +1,6 @@
-# wppm — the dependency questions `pip` won't answer
+# wppm — Manage your Python packages
 
-`wppm` is a small companion to `pip`, for **any** Python environment (it was born in
+`wppm` is a complement to `pip`, for **any** Python environment (it was born in
 [WinPython](https://winpython.github.io/), the portable Windows distribution, but does
 not require it). Keep using `pip` to install and remove things — use `wppm` to *see*
 what is actually there.
@@ -9,10 +9,88 @@ what is actually there.
 pip install wppm
 ```
 
-## Which extras of a package are actually usable here?
+## Global navigation commands
 
-You installed `flit`. Its `[doc]` and `[test]` extras promise more. What is missing?
+**What packages are there?** package version and summary
 
+```console
+$ wppm -ls
+Package            Version        Summary
+__________________ ______________ ______________________________________________________________________
+build              1.5.0          A simple, correct Python build frontend
+certifi            2026.6.17      Python package for providing Mozilla's CA Bundle.
+charset-normalizer 3.4.9          The Real First Universal Charset Detector. Open, modern and actively m
+...
+```
+
+**What did I actually ask for?** Nothing in an environment records which packages you
+chose and which merely came along. `-tl` keeps only the entries nothing else pulls in:
+
+```console
+$ wppm -tl
+build
+duckdb
+flake8
+flit
+pandas
+pillow
+pipdeptree
+pytest
+PyYAML
+wppm
+# 32 entries -> 10 kept, 22 already pulled in
+```
+
+**What are the dependencies?**
+
+```console
+$ wppm -tl -p
+build==1.5.0 ,
+    colorama==0.4.6 ;os_name==nt
+    packaging==26.2 >=24.0
+    pyproject-hooks==1.2.0
+duckdb==1.5.4
+flake8==7.1.1 ,
+    mccabe==0.7.0 (<0.8.0,>=0.7.0)
+...
+```
+
+## Navigation per package(s)
+
+**What does a package need?** `-p` walks downwards, `-l` says how many levels:
+
+```console
+$ wppm -p pandas -l2
+pandas==3.0.3 ,
+    numpy==2.4.6 >=2.3.3;python_version>=3.14
+    python-dateutil==2.9.0.post0 >=2.8.2,
+        six==1.17.0 >=1.5
+    tzdata==2025.3 ;sys_platform==win32
+```
+
+**What packages are upgrade constrained?** `-r` walks upwards, and `!` keeps only the packages
+that *pin or cap* the one you name, `.` means to look for *every package*:
+
+```console
+$ wppm -r  ".!"
+charset-normalizer==3.4.9 ,
+    requests==2.34.2 [requires: charset-normalizer<4,>=2]
+idna==3.18 ,
+    requests==2.34.2 [requires: idna<4,>=2.5]
+...
+```
+
+> Quoting: `!` and `[` are shell metacharacters in POSIX shells, so quote any argument
+> containing them (`wppm -r "pluggy!"`). In `cmd.exe` the quotes are optional.
+
+
+## Package [Extras] analysis
+
+use brackets to specify extra(s) `[extra]`, `[.]` means *every extra*,
+and `!` narrows the answer to what is **missing** — `==?` marks a requirement that is
+not installed:
+
+**What am I missing, per flit extra?**
 ```console
 $ wppm -p "flit![.]"
 flit[doc]==3.12.0 ,
@@ -26,182 +104,91 @@ flit[test]==3.12.0 ,
     tomli==? ;extra==test
 ```
 
-`[.]` means *every extra*, `!` means *only show what is missing*, and `==?` marks a
-requirement that is not installed. Extras with nothing missing are simply not printed —
-so an empty answer means "everything this package offers is ready to use".
-
-Drop the `!` to see the whole picture instead, installed versions included:
+**Which package[extra] may want numpy?**
 
 ```console
-$ wppm -p "requests[.]" -l1
-requests==2.34.2 ,
-    certifi==2026.6.17 >=2023.5.7
-    charset-normalizer==3.4.9 <4,>=2
-    idna==3.18 <4,>=2.5
-    urllib3==2.7.0 <3,>=1.26
-requests[socks]==2.34.2 ,
-    certifi==2026.6.17 >=2023.5.7
-    charset-normalizer==3.4.9 <4,>=2
-    idna==3.18 <4,>=2.5
-    pysocks==? !=1.5.7,>=1.5.6;extra==socks
-    urllib3==2.7.0 <3,>=1.26
-requests[use-chardet-on-py3]==2.34.2 ,
-    certifi==2026.6.17 >=2023.5.7
-    chardet==? <8,>=3.0.2;extra==use-chardet-on-py3
-    charset-normalizer==3.4.9 <4,>=2
-    idna==3.18 <4,>=2.5
-    urllib3==2.7.0 <3,>=1.26
+$ wppm -r "numpy[.]"
+numpy==2.4.6 ,
+    pandas==3.0.3 [requires: numpy>=2.3.3;python_version>=3.14]
+numpy[all]==2.4.6 ,
+    duckdb[all]==1.5.4 [requires: numpy;extra==all]
 ```
 
-## Who pulls in `pytest`, and through which extra?
+## Pruning a requirements file
 
-The reverse direction, `-r`, is extras-aware too — it tells you *why* something is in
-your environment, down to the extra that asked for it:
-
-```console
-$ wppm -r "pytest[.]"
-pytest==9.0.3
-pytest[all]==9.0.3 ,
-    idna[all]==3.18 [requires: pytest>=8.3.2;extra==all]
-    pandas[all]==3.0.3 [requires: pytest>=8.3.4;extra==all]
-pytest[dev]==9.0.3
-pytest[test]==9.0.3 ,
-    flit[test]==3.12.0 [requires: pytest>=2.7.3;extra==test]
-    pandas[test]==3.0.3 [requires: pytest>=8.3.4;extra==test]
-pytest[testing]==9.0.3 ,
-    pluggy[testing]==1.6.0 [requires: pytest;extra==testing]
-pytest[tests]==9.0.3 ,
-    pillow[tests]==12.3.0 [requires: pytest;extra==tests]
-```
-
-## What will break when I upgrade?
-
-With `-r`, the `!` filter keeps only the packages that *pin or cap* the one you name —
-the handful that will actually fight your next upgrade, instead of the long list of
-packages that merely depend on it:
+Given a file, `-tl` answers for that file's entries. Plainly, it prints the pruned list
+and nothing else — so the output is a reduced requirement file, `-v` will include the
+reason for each pruned package:
 
 ```console
-$ wppm -r "pluggy!"
-pluggy==1.6.0 ,
-    pytest==9.0.3 [requires: pluggy<2,>=1.5]
-```
-
-An empty answer here is good news: nothing constrains it, upgrade away.
-
-And the whole constraint web of an environment — every package, every extra, nine
-levels deep — is one command:
-
-```console
-$ wppm -p ".[.]" -l9
-```
-
-## What did you actually ask for?
-
-`-p` and `-r` answer for one package. `-tl` answers for a whole list: it keeps only the
-entries nothing else in that list already pulls in. Plainly, it prints that list and
-nothing else -- so the output *is* the new file, and the counts go to stderr where a
-redirection leaves them behind:
-
-```console
-$ wppm requirements_slim.txt -tl -t D:\WPy64\python > requirements_slim_new.txt
+$ wppm requirements.txt -tl > requirements_new.txt
 # 160 entries -> 112 kept, 48 already pulled in
 # 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
 ```
 
-Those two lines are commented although they go to stderr, so folding both streams into
-one file (`> new.txt 2>&1`) still leaves a file pip can read.
-
-The notes the source file carried are kept, since they are its author's. `-v` adds the
-reasoning: what the list is made from and when, the same counts, and every dropped entry
-commented out with what pulls it in, so re-asking for one is uncommenting it. stderr then
-keeps quiet, the counts being in the file already.
-
 ```console
-$ wppm requirements_slim.txt -tl -v -t D:\WPy64\python
-# requirements_slim.txt, sorted, 2026-08-13 19:22:43
+$ wppm requirements.txt -tl -v
+# requirements.txt, sorted, 2026-08-13 19:22:43
 # 160 entries -> 112 kept, 48 already pulled in
-# 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, ...
-
 ...
 #numpy  # <- baresql, clarabel, cvxpy, dask[array,dataframe,diagnostics], datashader, ...
 #scikit-learn  # <- imbalanced-learn, mlxtend, prince, skrub, umap-learn
 #whatthepatch  # <- spyder
 ```
 
-With no file, the question becomes "of everything installed here, what did anything
-actually ask for?":
+## Answers a script can read
 
-```console
-$ wppm --top-level -t D:\WPy64\python
-```
-
-An optional dependency only counts where its extra is asked for, and a mutual pair keeps
-both members -- dropping either would take the other with it. With `-ws` the facts come
-from a wheelhouse instead of an installation, so a list can be pruned before anything is
-built; where the wheelhouse holds several versions of a package, the newest one answers.
-
-## Everything is available as JSON
-
-Any of `-p`, `-r`, `-ls`, `-md` accepts `-j` / `--json`, so the same answers can gate a
-CI job or be diffed between two environments:
-
-```console
-$ wppm -p pluggy -j
-[
-    {
-        "package": "pluggy",
-        "extra": "",
-        "version": "1.6.0",
-        "installed": true,
-        "constraint": "",
-        "depends": []
-    }
-]
-```
+`-p`, `-r`, `-tl`, `-ls` and `-md` all accept `-j` / `--json`, so the same answers can
+gate a CI job or be diffed between two environments:
 
 ```console
 $ wppm -p myapp -j | python -c "import sys,json; s=json.load(sys.stdin); [s.extend(n['depends']) for n in s]; sys.exit(1 if any(not n['installed'] for n in s) else 0)"
 ```
 
-## Or use it from Python
-
-The tree engine is a plain importable module — no subprocess, no parsing of terminal
-output. `down()` walks dependencies, `up()` walks them backwards, and both return
-indented text by default or a JSON string with `format="json"`:
+Better still, skip the terminal: the tree engine is a plain importable module — no
+subprocess, no parsing of terminal output.
 
 ```python
-import json
-from wppm import piptree
-
-pip = piptree.PipData()                 # or PipData(target=r"D:\WPy64\python")
-
-tree = json.loads(pip.down("pandas", "mysql", format="json"))
-missing = [d["package"] for d in tree[0]["depends"] if not d["installed"]]
-print(f"pandas[mysql] needs: {missing}")
-```
-
-```console
-pandas[mysql] needs: ['pymysql', 'sqlalchemy']
-```
-
-```python
->>> print(pip.up("pluggy!"))     # who caps pluggy?
-pluggy==1.6.0 ,
-    pytest==9.0.3 [requires: pluggy<2,>=1.5]
+>>> from wppm import piptree
+>>> pip = piptree.PipData()             # or PipData(target=r"D:\WPy64\python")
+>>> print(pip.down("pandas", "mysql"))
+pandas[mysql]==3.0.3 ,
+    numpy==2.4.6 >=2.3.3;python_version>=3.14
+    pymysql==? >=1.1.1;extra==mysql
+    python-dateutil==2.9.0.post0 >=2.8.2,
+        six==1.17.0 >=1.5
+    sqlalchemy==? >=2.0.36;extra==mysql
+    tzdata==2025.3 ;sys_platform==win32
 >>> pip.summary("pandas")
 'Powerful data structures for data analysis, time series, and statistics'
 ```
 
-## It also works on environments you have not installed anything into
+`down()` and `up()` return indented text by default, or a JSON string with
+`format="json"`; both take `top_level=True` to start from the top-level entries.
+`top_level()` itself returns plain data — `kept`, and `dropped` mapping each dropped
+entry to whatever pulls it in:
+
+```python
+>>> pip.top_level()["kept"]
+['build', 'duckdb', 'flake8', 'flit', 'pandas', 'pillow', 'pipdeptree', 'pytest', 'PyYAML', 'wppm']
+>>> pip.top_level(["pandas", "numpy", "requests[socks]", "pytest"])["dropped"]
+{'numpy': ['pandas']}
+```
+
+## Environments you have not installed anything into
 
 `-t` points `wppm` at *another* Python distribution, and `-ws` at a plain directory of
 wheels — so you can inspect a portable distribution, or an offline bundle, without
 installing it first:
 
 ```console
-$ wppm -ls -ws .\wheelhouse\included.wheels --json
 $ wppm -p "pandas[.]" -t D:\WPy64\python
+$ wppm -ls -ws .\wheelhouse\included.wheels --json
 ```
+
+With `-ws` the facts come from the wheelhouse rather than an installation, so a
+requirements list can be pruned before anything is built; where several versions of a
+package are present, the newest one answers.
 
 Beyond inspection, `wppm` installs from a wheelhouse or a `pylock.toml` (`-i`, `-ws`,
 `-wd`), emits a one-document environment manifest — distribution, tools, packages,
@@ -215,51 +202,7 @@ menu entries with the target Python. Each distribution gets its own start menu f
 so registering one never disturbs another — but note that the target is declared under
 the `WinPython` PEP-514 vendor key.
 
-## Compared with `pipdeptree`
-
-`wppm` adds per-`[extra]` granularity in **both** directions, the `!` filter (missing
-dependencies forward, constraining dependencies backward), and the ability to inspect
-another environment (`-t`) or a bare directory of wheels (`-ws`) without installing
-anything into it.
-
-> Quoting: `!` and `[` are shell metacharacters in POSIX shells, so quote the argument
-> (`wppm -p "flit![.]"`). In `cmd.exe` the quotes are optional.
-
-## Command line
-
-```text
-usage: wppm [-h] [-v] [--register] [--unregister] [--fix] [--movable]
-            [-ws WHEELSOURCE] [-wd WHEELDRAIN] [-ls] [-lsa] [-md] [-p] [-r]
-            [-tl] [-l LEVELS] [-j] [-t TARGET] [-i] [-u]
-            [package(s) or lockfile ...]
-
-WinPython Package Manager: handle a Python distribution (WinPython or not) and its packages (17.11.20260813)
-
-positional arguments:
-  package(s) or lockfile
-                        optional package names, wheels, or lockfile
-
-options:
-  -h, --help            show this help message and exit
-  -v, --verbose         show more details on packages and actions
-  --register            Register the target Python in Windows (file extensions, icons, context menu, start menu), under the 'WinPython' PEP-514 vendor key
-  --unregister          Unregister the target Python from Windows: de-associate file extensions, icons and context menu, and remove its start menu folder
-  --fix                 make the target Python use absolute (fixed) paths in launchers and shebangs
-  --movable             make the target Python (any Windows Python) movable/portable: relative paths in launchers and shebangs
-  -ws WHEELSOURCE       wheels location, ('.' = WheelHouse): wppm pylock.toml -ws source_of_wheels, wppm -ls -ws .
-  -wd WHEELDRAIN        wheels destination: wppm pylock.toml -wd destination_of_wheels
-  -ls, --list           list installed packages matching [optional] expression: wppm -ls, wppm -ls pand
-  -lsa                  list details of packages matching [optional]  expression: wppm -lsa pandas -l1
-  -md                   markdown summary of the installation
-  -p                    show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]
-  -r                    show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]
-  -tl, --top-level      keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v
-  -l LEVELS             show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1
-  -j, --json            machine-readable JSON output (with -p, -r, -ls, -md, -tl): wppm -p pandas[.] -j
-  -t TARGET             path to target Python distribution (default: current environment)
-  -i, --install         install a given package wheel or pylock file (use pip for more features)
-  -u, --uninstall       uninstall package  (use pip for more features)
-```
+`wppm -h` lists every option.
 
 ## Links
 
