@@ -347,7 +347,7 @@ def main(test=False):
     parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
-    parser.add_argument("-tl", "--top-level", action="store_true", help="keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v")
+    parser.add_argument("-tl", "--top-level", action="store_true", help="keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v\nwith -p or -r, start the tree from them instead of every package: wppm -tl -p")
     parser.add_argument("-l", dest="levels", type=int, default=-1, help="show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1")
     parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md, -tl): wppm -p pandas[.] -j")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
@@ -366,17 +366,20 @@ def main(test=False):
         raise RuntimeError("Incompatible arguments: --install and --uninstall")
     if args.registerWinPython and args.unregisterWinPython:
         raise RuntimeError("Incompatible arguments: --install and --uninstall")
-    if args.pipdown:
+    if args.pipdown or args.pipup:
         pip = piptree.PipData(targetpython, args.wheelsource)
-        for args_fname in args.fname:
+        # -tl is then a root filter, not a list of its own: "." asked for implicitly,
+        # since the top-level entries are the only sensible roots of a whole-environment forest
+        names = args.fname if any(args.fname) else (["."] if args.top_level else args.fname)
+        walk, default_depth = (pip.down, 2) if args.pipdown else (pip.up, 1)
+        if args.top_level:
+            # a forest of roots is only worth reading whole, and any round number is a
+            # limit someone hits: go deeper than any real tree, -l says otherwise
+            default_depth = 99
+        for args_fname in names:
             pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
-            print(pip.down(pack, extra, args.levels if args.levels>=0 else 2, verbose=args.verbose, format="json" if args.json else "text"))
-        sys.exit()
-    elif args.pipup:
-        pip = piptree.PipData(targetpython, args.wheelsource)
-        for args_fname in args.fname:
-            pack, extra, *other = (args_fname + "[").replace("]", "[").split("[")
-            print(pip.up(pack, extra, args.levels if args.levels>=0 else 1, verbose=args.verbose, format="json" if args.json else "text"))
+            print(walk(pack, extra, args.levels if args.levels>=0 else default_depth, verbose=args.verbose,
+                       format="json" if args.json else "text", top_level=args.top_level))
         sys.exit()
     elif args.top_level:
         pip = piptree.PipData(targetpython, args.wheelsource)

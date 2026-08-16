@@ -396,6 +396,21 @@ class PipData:
             "unknown": sorted((text for key, (text, _) in asked.items() if key not in self.distro), key=str.lower),
         }
 
+    def _roots(self, pp: str, top_level: bool = False) -> List[str]:
+        """Where a tree starts: the one package named, or "." for every installed one.
+
+        `top_level` narrows "." to the entries no other installed package pulls
+        in -- the same answer `top_level()` gives, used as the roots of a
+        forest. The whole environment then reads as a handful of trees instead
+        of one tree per package, most of them a branch of another.
+        """
+        if pp != ".":
+            return [pp] if pp in self.distro else []
+        if not top_level:
+            return list(self.distro)
+        return [key for key in (self.split_requirement(text)[0] for text in self.top_level()["kept"])
+                if key in self.distro]
+
     def _node_text(self, node: Dict) -> str:
         """Render a tree node dict as its one-line text form."""
         if not node["installed"]:
@@ -421,13 +436,11 @@ class PipData:
             return "\n".join(filter(None, lines)).replace('"', "")
         return "\n".join(lines).replace('"', "")
 
-    def down(self, ppw: str = "", extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False, format: str = "text") -> str:
+    def down(self, ppw: str = "", extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False, format: str = "text", top_level: bool = False) -> str:
         """Generate downward dependency tree, as indented text or JSON (format="json")."""
         pp = ppw[:-1] if ppw.endswith('!') else ppw
         ppend = "!" if ppw.endswith('!') else "" #show only downward missing dependancies
-        ppp = [pp] if pp in self.distro else ()
-        if pp == ".":
-           ppp = [p for p in self.distro]
+        ppp = self._roots(pp, top_level)
         results = []
         for p in sorted(ppp):
             if extra == ".":
@@ -439,13 +452,11 @@ class PipData:
                 results += a if a and (a[0]["depends"] or ppend=="") else []
         return self._format_tree(results, indent, format, "down")
 
-    def up(self, ppw: str, extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False, format: str = "text") -> str:
+    def up(self, ppw: str, extra: str = "", depth: int = 20, indent: int = 4, version_req: str = "", verbose: bool = False, format: str = "text", top_level: bool = False) -> str:
         """Generate upward dependency tree, as indented text or JSON (format="json")."""
         pp = ppw[:-1] if ppw.endswith('!') else ppw
         ppend = "!" if ppw.endswith('!') else "" #show only upward limiting dependancies
-        ppp = [pp] if pp in self.distro else ()
-        if pp == ".":
-           ppp = [p for p in self.distro]
+        ppp = self._roots(pp, top_level)
         results = []
         for p in sorted(ppp):
             if extra == ".":
