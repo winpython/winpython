@@ -1,6 +1,6 @@
 ## WinPython 3.15.0.4dotf
 
-The following packages are included in WinPython-64bit v3.15.0.4dotf b3.
+The following packages are included in WinPython-64bit v3.15.0.4dotf .
 
 
 ### Tools
@@ -14,7 +14,7 @@ Name | Version | Description
 
 Name | Version | Description
 -----|---------|------------
-[build](https://pypi.org/project/build) | 1.4.2 | A simple, correct Python build frontend
+[build](https://pypi.org/project/build) | 1.5.0 | A simple, correct Python build frontend
 [colorama](https://pypi.org/project/colorama) | 0.4.6 | Cross-platform colored terminal text.
 [packaging](https://pypi.org/project/packaging) | 26.2 | Core utilities for Python packages
 [pip](https://pypi.org/project/pip) | 26.2.1 | The PyPA recommended tool for installing Python packages.
@@ -22,7 +22,7 @@ Name | Version | Description
 [setuptools](https://pypi.org/project/setuptools) | 83.0.0 | Most extensible Python build backend with support for C/C++ extension modules
 [sqlite-bro](https://pypi.org/project/sqlite-bro) | 1.3.2 | a graphic SQLite and DuckDB Client in 1 Python file
 [wheel](https://pypi.org/project/wheel) | 0.47.0 | Command line tool for manipulating wheel files
-[wppm](https://pypi.org/project/wppm) | 17.9.20260805 | pip companion: extras-aware dependency trees, offline wheelhouses, portable Pythons
+[wppm](https://pypi.org/project/wppm) | 17.12.20260816 | pip companion: extras-aware dependency trees, offline wheelhouses, portable Pythons
 
 
 ### WheelHouse packages
