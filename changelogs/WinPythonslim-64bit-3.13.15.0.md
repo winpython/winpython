@@ -1,6 +1,6 @@
 ## WinPython 3.13.15.0slim
 
-The following packages are included in WinPython-64bit v3.13.15.0slim b3.
+The following packages are included in WinPython-64bit v3.13.15.0slim .
 
 
 ### Tools
@@ -17,6 +17,7 @@ Name | Version | Description
 -----|---------|------------
 [absl-py](https://pypi.org/project/absl-py) | 2.5.0 | Abseil Python Common Libraries, see https://github.com/abseil/abseil-py.
 [adbc-driver-manager](https://pypi.org/project/adbc-driver-manager) | 1.11.0 | A generic entrypoint for ADBC drivers.
+[aiofile](https://pypi.org/project/aiofile) | 3.9.0 | Asynchronous file operations.
 [aiofiles](https://pypi.org/project/aiofiles) | 25.1.0 | File support for asyncio.
 [aiohappyeyeballs](https://pypi.org/project/aiohappyeyeballs) | 2.6.1 | Happy Eyeballs for asyncio
 [aiohttp](https://pypi.org/project/aiohttp) | 3.14.1 | Async http client/server framework (asyncio)
@@ -27,7 +28,7 @@ Name | Version | Description
 [altair](https://pypi.org/project/altair) | 6.2.2 | Vega-Altair: A declarative statistical visualization library for Python.
 [annotated-doc](https://pypi.org/project/annotated-doc) | 0.0.4 | Document parameters, class attributes, return types, and variables inline, with Annotated.
 [annotated-types](https://pypi.org/project/annotated-types) | 0.7.0 | Reusable constraint types to use with typing.Annotated
-[anthropic](https://pypi.org/project/anthropic) | 0.120.2 | The official Python library for the anthropic API
+[anthropic](https://pypi.org/project/anthropic) | 0.121.0 | The official Python library for the anthropic API
 [anyio](https://pypi.org/project/anyio) | 4.14.2 | High-level concurrency and networking framework on top of asyncio or Trio
 [anywidget](https://pypi.org/project/anywidget) | 0.11.0 | custom jupyter widgets made easy
 [appdirs](https://pypi.org/project/appdirs) | 1.4.4 | A small Python module for determining appropriate platform-specific dirs, e.g. a "user data dir".
@@ -41,11 +42,12 @@ Name | Version | Description
 [asn1crypto](https://pypi.org/project/asn1crypto) | 1.5.1 | Fast ASN.1 parser and serializer with definitions for private keys, public keys, certificates, CRL, OCSP, CMS, PKCS#3, PKCS#7, PKCS#8, PKCS#12,
 [ast-serialize](https://pypi.org/project/ast-serialize) | 0.7.0 | Python bindings for mypy AST serialization
 [asteval](https://pypi.org/project/asteval) | 1.0.6 | Safe, minimalistic evaluator of python expression using ast module
-[astroid](https://pypi.org/project/astroid) | 4.0.2 | An abstract syntax tree for Python with inference support.
+[astroid](https://pypi.org/project/astroid) | 4.0.4 | An abstract syntax tree for Python with inference support.
 [asttokens](https://pypi.org/project/asttokens) | 3.0.1 | Annotate AST trees with source code positions
 [async-lru](https://pypi.org/project/async-lru) | 2.3.0 | Simple LRU cache for asyncio
 [asyncssh](https://pypi.org/project/asyncssh) | 2.23.1 | AsyncSSH: Asynchronous SSHv2 client and server library
 [attrs](https://pypi.org/project/attrs) | 26.1.0 | Classes Without Boilerplate
+[authlib](https://pypi.org/project/authlib) | 1.7.2 | The ultimate Python library in building OAuth and OpenID Connect servers and clients.
 [autopep8](https://pypi.org/project/autopep8) | 2.0.4 | A tool that automatically formats Python code to conform to the PEP 8 style guide
 [azure-core](https://pypi.org/project/azure-core) | 1.39.0 | Microsoft Azure Core Library for Python
 [azure-cosmos](https://pypi.org/project/azure-cosmos) | 4.16.1 | Microsoft Azure Cosmos Client Library for Python
@@ -53,6 +55,7 @@ Name | Version | Description
 [babel](https://pypi.org/project/babel) | 2.18.0 | Internationalization utilities
 [baresql](https://pypi.org/project/baresql) | 1.0.0 | playing SQL directly on Python datas
 [bcrypt](https://pypi.org/project/bcrypt) | 5.0.0 | Modern password hashing for your software and your servers
+[beartype](https://pypi.org/project/beartype) | 0.22.9 | Unbearably fast near-real-time pure-Python runtime-static type-checker.
 [beautifulsoup4](https://pypi.org/project/beautifulsoup4) | 4.14.3 | Screen-scraping library
 [binaryornot](https://pypi.org/project/binaryornot) | 0.4.4 | Ultra-lightweight pure Python package to check if a file is binary or text.
 [black](https://pypi.org/project/black) | 26.5.1 | The uncompromising code formatter.
@@ -61,10 +64,12 @@ Name | Version | Description
 [bokeh](https://pypi.org/project/bokeh) | 3.9.1 | Interactive plots and applications in the browser from Python
 [branca](https://pypi.org/project/branca) | 0.8.1 | Generate complex HTML+JS pages with Python
 [brotli](https://pypi.org/project/brotli) | 1.2.0 | Python bindings for the Brotli compression library
-[build](https://pypi.org/project/build) | 1.4.2 | A simple, correct Python build frontend
+[build](https://pypi.org/project/build) | 1.5.0 | A simple, correct Python build frontend
+[cachetools](https://pypi.org/project/cachetools) | 7.0.5 | Extensible memoizing collections and decorators
+[caio](https://pypi.org/project/caio) | 0.9.25 | Asynchronous file IO for Linux MacOS or Windows.
 [cattrs](https://pypi.org/project/cattrs) | 25.3.0 | Composable complex class support for attrs and dataclasses.
 [certifi](https://pypi.org/project/certifi) | 2026.1.4 | Python package for providing Mozilla's CA Bundle.
-[cffi](https://pypi.org/project/cffi) | 2.0.0 | Foreign Function Interface for Python calling C code.
+[cffi](https://pypi.org/project/cffi) | 2.1.1 | Foreign Function Interface for Python calling C code.
 [chardet](https://pypi.org/project/chardet) | 7.4.3 | Universal character encoding detector
 [charset-normalizer](https://pypi.org/project/charset-normalizer) | 3.4.7 | The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet.
 [clarabel](https://pypi.org/project/clarabel) | 0.11.1 | Clarabel Conic Interior Point Solver for Rust / Python
@@ -82,12 +87,12 @@ Name | Version | Description
 [cvxopt](https://pypi.org/project/cvxopt) | 1.3.3 | Convex optimization package
 [cvxpy](https://pypi.org/project/cvxpy) | 1.9.2 | A domain-specific language for modeling convex optimization problems in Python.
 [cycler](https://pypi.org/project/cycler) | 0.12.1 | Composable style cycles
-[cython](https://pypi.org/project/cython) | 3.2.9 | The Cython compiler for writing C extensions in the Python language.
+[cython](https://pypi.org/project/cython) | 3.3.0a1 | The Cython compiler for writing C extensions in the Python language.
 [cytoolz](https://pypi.org/project/cytoolz) | 1.1.0 | Cython implementation of Toolz: High performance functional utilities
 [dask](https://pypi.org/project/dask) | 2026.7.1 | Parallel PyData with Task Scheduling
 [datasette](https://pypi.org/project/datasette) | 0.65.3 | An open source multi-tool for exploring and publishing data
 [datasette-graphql](https://pypi.org/project/datasette-graphql) | 2.2 | Datasette plugin providing an automatic GraphQL API for your SQLite databases
-[datashader](https://pypi.org/project/datashader) | 0.19.0 | Data visualization toolchain based on aggregating into a grid
+[datashader](https://pypi.org/project/datashader) | 0.19.1 | Data visualization toolchain based on aggregating into a grid
 [deap](https://pypi.org/project/deap) | 1.4.4 | Distributed Evolutionary Algorithms in Python
 [debugpy](https://pypi.org/project/debugpy) | 1.8.20 | An implementation of the Debug Adapter Protocol for Python
 [decorator](https://pypi.org/project/decorator) | 5.2.1 | Decorators for Humans
@@ -95,19 +100,23 @@ Name | Version | Description
 [diff-match-patch](https://pypi.org/project/diff-match-patch) | 20241021 | Repackaging of Google's Diff Match and Patch libraries.
 [dill](https://pypi.org/project/dill) | 0.4.1 | serialize all of Python
 [distro](https://pypi.org/project/distro) | 1.9.0 | Distro - an OS platform information API
+[dnspython](https://pypi.org/project/dnspython) | 2.8.0 | DNS toolkit
 [docstring-parser](https://pypi.org/project/docstring-parser) | 0.17.0 | Parse Python docstrings in reST, Google and Numpydoc format
 [docstring-to-markdown](https://pypi.org/project/docstring-to-markdown) | 0.17 | On the fly conversion of Python docstrings to markdown
 [docutils](https://pypi.org/project/docutils) | 0.22.4 | Docutils -- Python Documentation Utilities
 [duckdb](https://pypi.org/project/duckdb) | 1.5.5 | DuckDB in-process database
+[email-validator](https://pypi.org/project/email-validator) | 2.2.0 | A robust email address syntax and deliverability validation library.
 [entrypoints](https://pypi.org/project/entrypoints) | 0.4 | Discover and load entry points from installed packages.
 [et-xmlfile](https://pypi.org/project/et-xmlfile) | 2.0.0 | An implementation of lxml.xmlfile for the standard library
 [eval-type-backport](https://pypi.org/project/eval-type-backport) | 0.3.1 | Like `typing._eval_type`, but lets older Python versions use newer typing features.
+[exceptiongroup](https://pypi.org/project/exceptiongroup) | 1.3.1 | Backport of PEP 654 (exception groups)
 [executing](https://pypi.org/project/executing) | 2.2.1 | Get the currently executing AST node of a frame, and other information
 [faker](https://pypi.org/project/faker) | 40.28.1 | Faker is a Python package that generates fake data for you.
 [fasta2a](https://pypi.org/project/fasta2a) | 0.6.1 | Convert an AI Agent into a A2A server! ✨
-[fastapi](https://pypi.org/project/fastapi) | 0.136.3 | FastAPI framework, high performance, easy to learn, fast to code, ready for production
+[fastapi](https://pypi.org/project/fastapi) | 0.141.1 | FastAPI framework, high performance, easy to learn, fast to code, ready for production
 [fastavro](https://pypi.org/project/fastavro) | 1.12.1 | Fast read/write of AVRO files
 [fastjsonschema](https://pypi.org/project/fastjsonschema) | 2.21.2 | Fastest Python implementation of JSON schema
+[fastmcp-slim](https://pypi.org/project/fastmcp-slim) | 3.4.7 | The dependency-slim FastMCP package.
 [filelock](https://pypi.org/project/filelock) | 3.32.2 | A platform independent file lock.
 [flake8](https://pypi.org/project/flake8) | 7.1.1 | the modular source code checker: pep8 pyflakes and co
 [flask](https://pypi.org/project/flask) | 3.1.3 | A simple framework for building complex web applications.
@@ -128,30 +137,32 @@ Name | Version | Description
 [geopy](https://pypi.org/project/geopy) | 2.4.1 | Python Geocoding Toolbox
 [gitdb](https://pypi.org/project/gitdb) | 4.0.12 | Git Object Database
 [gitpython](https://pypi.org/project/gitpython) | 3.1.46 | GitPython is a Python library used to interact with Git repositories
-[google-auth](https://pypi.org/project/google-auth) | 2.48.0 | Google Authentication Library
-[google-genai](https://pypi.org/project/google-genai) | 1.66.0 | GenAI Python SDK
+[google-auth](https://pypi.org/project/google-auth) | 2.56.3 | Google Authentication Library
+[google-genai](https://pypi.org/project/google-genai) | 2.18.0 | GenAI Python SDK
 [graphene](https://pypi.org/project/graphene) | 3.4.3 | GraphQL Framework for Python
-[graphql-core](https://pypi.org/project/graphql-core) | 3.2.6 | GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL.
+[graphql-core](https://pypi.org/project/graphql-core) | 3.2.11 | GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL.
 [graphql-relay](https://pypi.org/project/graphql-relay) | 3.2.0 | Relay library for graphql-core
 [greenlet](https://pypi.org/project/greenlet) | 3.4.0 | Lightweight in-process concurrent programming
-[griffe](https://pypi.org/project/griffe) | 1.15.0 | Signatures for entire Python programs.
+[griffelib](https://pypi.org/project/griffelib) | 2.1.0 | Signatures for entire Python programs.
 [groq](https://pypi.org/project/groq) | 1.6.0 | The official Python library for the groq API
 [guidata](https://pypi.org/project/guidata) | 3.14.4 | Automatic GUI generation for easy dataset editing and display
 [h11](https://pypi.org/project/h11) | 0.16.0 | A pure-Python, bring-your-own-I/O implementation of HTTP/1.1
 [h2](https://pypi.org/project/h2) | 4.3.0 | Pure-Python HTTP/2 protocol implementation
 [h5py](https://pypi.org/project/h5py) | 3.16.0 | Read and write HDF5 files from Python
-[hatchling](https://pypi.org/project/hatchling) | 1.30.1 | Modern, extensible Python build backend
+[hatchling](https://pypi.org/project/hatchling) | 1.32.0 | Modern, extensible Python build backend
 [hf-xet](https://pypi.org/project/hf-xet) | 1.6.0 | Fast transfer of large files with the Hugging Face Hub.
 [highspy](https://pypi.org/project/highspy) | 1.15.1 | A thin set of pybind11 wrappers to HiGHS
 [holoviews](https://pypi.org/project/holoviews) | 1.23.1 | A high-level plotting API for the PyData ecosystem built on HoloViews.
 [hpack](https://pypi.org/project/hpack) | 4.1.0 | Pure-Python HPACK header encoding
 [html5lib](https://pypi.org/project/html5lib) | 1.1 | HTML parser based on the WHATWG HTML specification
 [httpcore](https://pypi.org/project/httpcore) | 1.0.9 | A minimal low-level HTTP client.
+[httpcore2](https://pypi.org/project/httpcore2) | 2.10.0 | A minimal low-level HTTP client.
 [httpie](https://pypi.org/project/httpie) | 3.2.4 | HTTPie: modern, user-friendly command-line HTTP client for the API era.
-[httptools](https://pypi.org/project/httptools) | 0.7.1 | A collection of framework independent HTTP protocol utils.
+[httptools](https://pypi.org/project/httptools) | 0.8.0 | A collection of framework independent HTTP protocol utils.
 [httpx](https://pypi.org/project/httpx) | 0.28.1 | The next generation HTTP client.
 [httpx-sse](https://pypi.org/project/httpx-sse) | 0.4.3 | Consume Server-Sent Event (SSE) messages with HTTPX.
-[huggingface-hub](https://pypi.org/project/huggingface-hub) | 1.26.1 | Client library to download and publish models, datasets and other repos on the huggingface.co hub
+[httpx2](https://pypi.org/project/httpx2) | 2.10.0 | The next generation HTTP client.
+[huggingface-hub](https://pypi.org/project/huggingface-hub) | 1.27.0 | Client library to download and publish models, datasets and other repos on the huggingface.co hub
 [hupper](https://pypi.org/project/hupper) | 1.12.1 | Integrated process monitor for developing and reloading daemons.
 [hvplot](https://pypi.org/project/hvplot) | 0.12.2 | A high-level plotting API for the PyData ecosystem built on HoloViews.
 [hypercorn](https://pypi.org/project/hypercorn) | 0.18.0 | A ASGI Server based on Hyper libraries and inspired by Gunicorn
@@ -176,7 +187,7 @@ Name | Version | Description
 [ipython-sql](https://pypi.org/project/ipython-sql) | 0.5.0 | RDBMS access via IPython
 [ipywidgets](https://pypi.org/project/ipywidgets) | 8.1.8 | Jupyter interactive widgets
 [isoduration](https://pypi.org/project/isoduration) | 20.11.0 | Operations with ISO 8601 durations
-[isort](https://pypi.org/project/isort) | 7.0.0 | A Python utility / library to sort Python imports.
+[isort](https://pypi.org/project/isort) | 8.0.1 | A Python utility / library to sort Python imports.
 [itsdangerous](https://pypi.org/project/itsdangerous) | 2.2.0 | Safely pass data to untrusted environments and back.
 [janus](https://pypi.org/project/janus) | 2.0.0 | Mixed sync-async queue to interoperate between asyncio tasks and classic threads
 [jaraco-classes](https://pypi.org/project/jaraco-classes) | 3.4.0 | Utility functions for Python class constructs
@@ -187,6 +198,7 @@ Name | Version | Description
 [jinja2](https://pypi.org/project/jinja2) | 3.1.6 | A very fast and expressive template engine.
 [jiter](https://pypi.org/project/jiter) | 0.16.0 | Fast iterable JSON parser.
 [joblib](https://pypi.org/project/joblib) | 1.5.3 | Lightweight pipelining with Python functions
+[joserfc](https://pypi.org/project/joserfc) | 1.6.5 | The ultimate Python library for JOSE RFCs, including JWS, JWE, JWK, JWA, JWT
 [json5](https://pypi.org/project/json5) | 0.14.0 | A Python implementation of the JSON5 data format.
 [jsonpatch](https://pypi.org/project/jsonpatch) | 1.33 | Apply JSON-Patches (RFC 6902)
 [jsonpath-python](https://pypi.org/project/jsonpath-python) | 1.0.6 | A more powerful JSONPath implementation in modern python
@@ -205,25 +217,25 @@ Name | Version | Description
 [jupyter-lsp](https://pypi.org/project/jupyter-lsp) | 2.3.0 | Multi-Language Server WebSocket proxy for Jupyter Notebook/Lab server
 [jupyter-server](https://pypi.org/project/jupyter-server) | 2.20.0 | The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications.
 [jupyter-server-terminals](https://pypi.org/project/jupyter-server-terminals) | 0.5.4 | A Jupyter Server Extension Providing Terminals.
-[jupyterlab](https://pypi.org/project/jupyterlab) | 4.6.1 | JupyterLab computational environment
+[jupyterlab](https://pypi.org/project/jupyterlab) | 4.6.2 | JupyterLab computational environment
 [jupyterlab-pygments](https://pypi.org/project/jupyterlab-pygments) | 0.3.0 | Pygments theme using JupyterLab CSS variables
 [jupyterlab-server](https://pypi.org/project/jupyterlab-server) | 2.28.0 | A set of server components for JupyterLab and JupyterLab like applications.
 [jupyterlab-widgets](https://pypi.org/project/jupyterlab-widgets) | 3.0.16 | Jupyter interactive widgets for JupyterLab
 [keras](https://pypi.org/project/keras) | 3.15.1 | Multi-backend Keras
 [keyring](https://pypi.org/project/keyring) | 25.7.0 | Store and access your passwords safely.
 [kiwisolver](https://pypi.org/project/kiwisolver) | 1.5.0 | A fast implementation of the Cassowary constraint solver
-[langchain](https://pypi.org/project/langchain) | 1.3.13 | Building applications with LLMs through composability
-[langchain-core](https://pypi.org/project/langchain-core) | 1.4.9 | Building applications with LLMs through composability
+[langchain](https://pypi.org/project/langchain) | 1.3.15 | Building applications with LLMs through composability
+[langchain-core](https://pypi.org/project/langchain-core) | 1.5.5 | Building applications with LLMs through composability
 [langchain-protocol](https://pypi.org/project/langchain-protocol) | 0.0.18 | Python bindings for the LangChain agent streaming protocol
-[langgraph](https://pypi.org/project/langgraph) | 1.2.9 | Building stateful, multi-actor applications with LLMs
+[langgraph](https://pypi.org/project/langgraph) | 1.2.11 | Building stateful, multi-actor applications with LLMs
 [langgraph-checkpoint](https://pypi.org/project/langgraph-checkpoint) | 4.1.1 | Library with base interfaces for LangGraph checkpoint savers.
 [langgraph-prebuilt](https://pypi.org/project/langgraph-prebuilt) | 1.1.0 | Library with high-level APIs for creating and executing LangGraph agents and tools.
 [langgraph-sdk](https://pypi.org/project/langgraph-sdk) | 0.4.2 | SDK for interacting with LangGraph API
-[langsmith](https://pypi.org/project/langsmith) | 0.10.2 | Client library to connect to the LangSmith Observability and Evaluation Platform.
+[langsmith](https://pypi.org/project/langsmith) | 0.11.0 | Client library to connect to the LangSmith Observability and Evaluation Platform.
 [lazy-loader](https://pypi.org/project/lazy-loader) | 0.5 | Makes it easy to load subpackages and functions on demand.
 [librt](https://pypi.org/project/librt) | 0.14.0 | Mypyc runtime library
 [linkify-it-py](https://pypi.org/project/linkify-it-py) | 2.0.3 | Links recognition library with FULL unicode support.
-[llvmlite](https://pypi.org/project/llvmlite) | 0.48.0 | lightweight wrapper around basic LLVM functionality
+[llvmlite](https://pypi.org/project/llvmlite) | 0.49.0 | lightweight wrapper around basic LLVM functionality
 [lmfit](https://pypi.org/project/lmfit) | 1.3.4 | Least-Squares Minimization with Bounds and Constraints
 [locket](https://pypi.org/project/locket) | 1.0.0 | File-based locks for Python on Linux and Windows
 [logfire-api](https://pypi.org/project/logfire-api) | 4.33.0 | Shim for the Logfire SDK which does nothing unless Logfire is installed
@@ -234,13 +246,13 @@ Name | Version | Description
 [markdown](https://pypi.org/project/markdown) | 3.10.2 | Python implementation of John Gruber's Markdown.
 [markdown-it-py](https://pypi.org/project/markdown-it-py) | 4.0.0 | Python port of markdown-it. Markdown parsing, done right!
 [markdownify](https://pypi.org/project/markdownify) | 1.2.2 | Convert HTML to markdown.
-[markitdown](https://pypi.org/project/markitdown) | 0.1.5 | Utility tool for converting various files to Markdown
+[markitdown](https://pypi.org/project/markitdown) | 0.1.6 | Utility tool for converting various files to Markdown
 [markupsafe](https://pypi.org/project/markupsafe) | 3.0.3 | Safely add untrusted strings to HTML/XML markup.
 [matplotlib](https://pypi.org/project/matplotlib) | 3.11.1 | Python plotting package
 [matplotlib-inline](https://pypi.org/project/matplotlib-inline) | 0.2.2 | Inline Matplotlib backend for Jupyter
 [maturin](https://pypi.org/project/maturin) | 1.14.1 | Build and publish crates with pyo3, cffi and uniffi bindings as well as rust binaries as python packages
 [mccabe](https://pypi.org/project/mccabe) | 0.7.0 | McCabe checker, plugin for flake8
-[mcp](https://pypi.org/project/mcp) | 1.27.1 | Model Context Protocol SDK
+[mcp](https://pypi.org/project/mcp) | 1.29.0 | Model Context Protocol SDK
 [mdit-py-plugins](https://pypi.org/project/mdit-py-plugins) | 0.5.0 | Collection of plugins for markdown-it-py
 [mdurl](https://pypi.org/project/mdurl) | 0.1.2 | Markdown URL utilities
 [mercantile](https://pypi.org/project/mercantile) | 1.2.1 | Web mercator XYZ tile utilities
@@ -273,14 +285,14 @@ Name | Version | Description
 [networkx](https://pypi.org/project/networkx) | 3.6.1 | Python package for creating and manipulating graphs and networks
 [nh3](https://pypi.org/project/nh3) | 0.3.3 | Python binding to Ammonia HTML sanitizer Rust crate
 [nltk](https://pypi.org/project/nltk) | 3.9.4 | Natural Language Toolkit
-[notebook](https://pypi.org/project/notebook) | 7.6.0 | Jupyter Notebook - A web-based notebook environment for interactive computing
+[notebook](https://pypi.org/project/notebook) | 7.6.1 | Jupyter Notebook - A web-based notebook environment for interactive computing
 [notebook-shim](https://pypi.org/project/notebook-shim) | 0.2.4 | A shim layer for notebook traits and config
-[numba](https://pypi.org/project/numba) | 0.66.0 | compiling Python code using LLVM
-[numpy](https://pypi.org/project/numpy) | 2.4.6 | Fundamental package for array computing in Python
+[numba](https://pypi.org/project/numba) | 0.67.0 | compiling Python code using LLVM
+[numpy](https://pypi.org/project/numpy) | 2.5.2 | Fundamental package for array computing in Python
 [numpydoc](https://pypi.org/project/numpydoc) | 1.10.0 | Sphinx extension to support docstrings in Numpy format
 [onnxruntime](https://pypi.org/project/onnxruntime) | 1.28.0 | ONNX Runtime is a runtime accelerator for Machine Learning models
 [onnxruntime-genai](https://pypi.org/project/onnxruntime-genai) | 0.15.2 | ONNX Runtime GenAI
-[openai](https://pypi.org/project/openai) | 2.52.0 | The official Python library for the openai API
+[openai](https://pypi.org/project/openai) | 3.1.0 | The official Python library for the openai API
 [opencv-python](https://pypi.org/project/opencv-python) | 5.0.0.93 | Wrapper package for OpenCV python bindings.
 [openpyxl](https://pypi.org/project/openpyxl) | 3.1.5 | A Python library to read/write Excel 2010 xlsx/xlsm files
 [opentelemetry-api](https://pypi.org/project/opentelemetry-api) | 1.39.1 | OpenTelemetry Python API
@@ -289,7 +301,7 @@ Name | Version | Description
 [optuna](https://pypi.org/project/optuna) | 4.7.0 | A hyperparameter optimization framework
 [orjson](https://pypi.org/project/orjson) | 3.11.8 | Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy
 [ormsgpack](https://pypi.org/project/ormsgpack) | 1.12.2 | Fast, correct Python msgpack library supporting dataclasses, datetimes, and numpy
-[osqp](https://pypi.org/project/osqp) | 1.1.1 | OSQP: The Operator Splitting QP Solver
+[osqp](https://pypi.org/project/osqp) | 1.1.3 | OSQP: The Operator Splitting QP Solver
 [outcome](https://pypi.org/project/outcome) | 1.3.0.post0 | Capture the outcome of Python function calls.
 [packaging](https://pypi.org/project/packaging) | 26.2 | Core utilities for Python packages
 [pandas](https://pypi.org/project/pandas) | 3.0.5 | Powerful data structures for data analysis, time series, and statistics
@@ -309,7 +321,7 @@ Name | Version | Description
 [pillow](https://pypi.org/project/pillow) | 12.3.0 | Python Imaging Library (fork)
 [pip](https://pypi.org/project/pip) | 26.2.1 | The PyPA recommended tool for installing Python packages.
 [pipdeptree](https://pypi.org/project/pipdeptree) | 3.1.0 | Command line utility to show dependency tree of packages.
-[platformdirs](https://pypi.org/project/platformdirs) | 4.9.6 | A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`.
+[platformdirs](https://pypi.org/project/platformdirs) | 4.10.0 | A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`.
 [plotly](https://pypi.org/project/plotly) | 6.9.0 | An open-source interactive data visualization library for Python
 [plotnine](https://pypi.org/project/plotnine) | 0.15.7 | A Grammar of Graphics for Python
 [plotpy](https://pypi.org/project/plotpy) | 2.10.0 | Curve and image plotting tools for Python/Qt applications
@@ -329,6 +341,7 @@ Name | Version | Description
 [ptpython](https://pypi.org/project/ptpython) | 3.0.32 | Python REPL build on top of prompt_toolkit
 [ptyprocess](https://pypi.org/project/ptyprocess) | 0.7.0 | Run a subprocess in a pseudo terminal
 [pure-eval](https://pypi.org/project/pure-eval) | 0.2.3 | Safely evaluate AST nodes without side effects
+[py-key-value-aio](https://pypi.org/project/py-key-value-aio) | 0.4.4 | Async Key-Value Store - A pluggable interface for KV Stores
 [pyarrow](https://pypi.org/project/pyarrow) | 24.0.0 | Python library for Apache Arrow
 [pyasn1](https://pypi.org/project/pyasn1) | 0.6.3 | Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)
 [pyasn1-modules](https://pypi.org/project/pyasn1-modules) | 0.4.2 | A collection of ASN.1-based protocols modules
@@ -337,20 +350,19 @@ Name | Version | Description
 [pycparser](https://pypi.org/project/pycparser) | 3.0 | C parser in Python
 [pyct](https://pypi.org/project/pyct) | 0.6.0 | Python package common tasks for users (e.g. copy examples, fetch data, ...)
 [pydantic](https://pypi.org/project/pydantic) | 2.13.4 | Data validation using Python type hints
-[pydantic-ai-slim](https://pypi.org/project/pydantic-ai-slim) | 1.12.0 | Agent Framework / shim to use Pydantic with LLMs, slim package
+[pydantic-ai-slim](https://pypi.org/project/pydantic-ai-slim) | 1.106.0 | Agent Framework / shim to use Pydantic with LLMs, slim package
 [pydantic-core](https://pypi.org/project/pydantic-core) | 2.46.4 | Core functionality for Pydantic validation and serialization
-[pydantic-evals](https://pypi.org/project/pydantic-evals) | 1.12.0 | Framework for evaluating stochastic code execution, especially code making use of LLMs
-[pydantic-graph](https://pypi.org/project/pydantic-graph) | 1.12.0 | Graph and state machine library
+[pydantic-evals](https://pypi.org/project/pydantic-evals) | 1.106.0 | Framework for evaluating stochastic code execution, especially code making use of LLMs
+[pydantic-graph](https://pypi.org/project/pydantic-graph) | 1.106.0 | Graph and state machine library
 [pydantic-settings](https://pypi.org/project/pydantic-settings) | 2.14.1 | Settings management using Pydantic
 [pydeck](https://pypi.org/project/pydeck) | 0.9.3 | Widget for deck.gl maps
 [pydocstyle](https://pypi.org/project/pydocstyle) | 6.3.0 | Python docstring style checker
 [pydot](https://pypi.org/project/pydot) | 4.0.1 | Python interface to Graphviz's Dot
-[pydub](https://pypi.org/project/pydub) | 0.25.1 | Manipulate audio with an simple and easy high level interface
 [pyflakes](https://pypi.org/project/pyflakes) | 3.2.0 | passive checker of Python programs
 [pygithub](https://pypi.org/project/pygithub) | 2.8.1 | Use the full Github API v3
 [pygments](https://pypi.org/project/pygments) | 2.19.2 | Pygments is a syntax highlighting package written in Python.
 [pyjwt](https://pypi.org/project/pyjwt) | 2.10.1 | JSON Web Token implementation in Python
-[pylint](https://pypi.org/project/pylint) | 4.0.5 | python code static checker
+[pylint](https://pypi.org/project/pylint) | 4.0.6 | python code static checker
 [pylint-venv](https://pypi.org/project/pylint-venv) | 3.0.4 | pylint-venv provides a Pylint init-hook to use the same Pylint installation with different virtual environments.
 [pyls-spyder](https://pypi.org/project/pyls-spyder) | 0.4.0 | Spyder extensions for the python-lsp-server
 [pympler](https://pypi.org/project/pympler) | 1.1 | A development tool to measure, monitor and analyze the memory behavior of Python objects.
@@ -421,7 +433,6 @@ Name | Version | Description
 [roman-numerals](https://pypi.org/project/roman-numerals) | 4.1.0 | Manipulate well-formed Roman numerals
 [rope](https://pypi.org/project/rope) | 1.14.0 | a python refactoring library...
 [rpds-py](https://pypi.org/project/rpds-py) | 2026.6.3 | Python bindings to Rust's persistent data structures (rpds)
-[rsa](https://pypi.org/project/rsa) | 4.9.1 | Pure-Python RSA implementation
 [rtree](https://pypi.org/project/rtree) | 1.4.1 | R-Tree spatial index for Python GIS
 [ruff](https://pypi.org/project/ruff) | 0.16.1 | An extremely fast Python linter and code formatter, written in Rust.
 [rx](https://pypi.org/project/rx) | 3.2.0 | Reactive Extensions (Rx) for Python
@@ -489,14 +500,15 @@ Name | Version | Description
 [tokenizers](https://pypi.org/project/tokenizers) | 0.22.2 | 
 [toml](https://pypi.org/project/toml) | 0.10.2 | Python Library for Tom's Obvious, Minimal Language
 [tomli-w](https://pypi.org/project/tomli-w) | 1.2.0 | A lil' TOML writer
-[tomlkit](https://pypi.org/project/tomlkit) | 0.14.0 | Style preserving TOML library
+[tomlkit](https://pypi.org/project/tomlkit) | 0.15.0 | Style preserving TOML library
 [toolz](https://pypi.org/project/toolz) | 1.1.0 | List processing tools and functional utilities
 [tornado](https://pypi.org/project/tornado) | 6.5.7 | Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed.
 [tqdm](https://pypi.org/project/tqdm) | 4.67.3 | Fast, Extensible Progress Meter
 [traitlets](https://pypi.org/project/traitlets) | 5.14.3 | Traitlets Python configuration system
 [traittypes](https://pypi.org/project/traittypes) | 0.2.3 | Scipy trait types
-[trio](https://pypi.org/project/trio) | 0.33.0 | A friendly Python library for async concurrency and I/O
+[trio](https://pypi.org/project/trio) | 0.34.0 | A friendly Python library for async concurrency and I/O
 [trove-classifiers](https://pypi.org/project/trove-classifiers) | 2026.1.14.14 | Canonical source for classifiers on PyPI (pypi.org).
+[truststore](https://pypi.org/project/truststore) | 0.10.4 | Verify certificates using native system trust stores
 [twine](https://pypi.org/project/twine) | 6.2.0 | Collection of utilities for publishing packages on PyPI
 [typer](https://pypi.org/project/typer) | 0.25.1 | Typer, build great CLIs. Easy to code. Based on Python type hints.
 [types-requests](https://pypi.org/project/types-requests) | 2.33.0.20260712 | Typing stubs for requests
@@ -525,14 +537,14 @@ Name | Version | Description
 [wheel](https://pypi.org/project/wheel) | 0.47.0 | Command line tool for manipulating wheel files
 [widgetsnbextension](https://pypi.org/project/widgetsnbextension) | 4.0.15 | Jupyter interactive widgets for Jupyter Notebook
 [wordcloud](https://pypi.org/project/wordcloud) | 1.9.6 | A little word cloud generator
-[wppm](https://pypi.org/project/wppm) | 17.9.20260805 | pip companion: extras-aware dependency trees, offline wheelhouses, portable Pythons
+[wppm](https://pypi.org/project/wppm) | 17.12.20260816 | pip companion: extras-aware dependency trees, offline wheelhouses, portable Pythons
 [wsproto](https://pypi.org/project/wsproto) | 1.3.2 | Pure-Python WebSocket protocol implementation
 [xarray](https://pypi.org/project/xarray) | 2026.7.0 | N-D labeled arrays and datasets in Python
 [xlsxwriter](https://pypi.org/project/xlsxwriter) | 3.2.9 | A Python module for creating Excel XLSX files.
 [xxhash](https://pypi.org/project/xxhash) | 3.7.0 | Python binding for xxHash
 [xyzservices](https://pypi.org/project/xyzservices) | 2025.11.0 | Source of XYZ tiles providers
 [yapf](https://pypi.org/project/yapf) | 0.43.0 | A formatter for Python code
-[yarl](https://pypi.org/project/yarl) | 1.24.2 | Yet another URL library
+[yarl](https://pypi.org/project/yarl) | 1.24.5 | Yet another URL library
 [yt-dlp](https://pypi.org/project/yt-dlp) | 2026.3.17 | A feature-rich command-line audio/video downloader
 [zipp](https://pypi.org/project/zipp) | 3.23.0 | Backport of pathlib-compatible object wrapper for zip files
 [zstandard](https://pypi.org/project/zstandard) | 0.25.0 | Zstandard bindings for Python
