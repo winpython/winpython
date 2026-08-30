@@ -90,6 +90,8 @@ def run_build(build, python_versions, dry_run=False):
     wheelhousereq = must_exist(build.get("wheelhousereq", ""), build, "wheelhousereq")
     # "pip" (default, what ships) | "none" | "parallel" | "parallel-N"
     my_bytecode = build.get("bytecode", "pip")
+    # wheels only, unless a flavor still has a package with no wheel for its target
+    my_only_binary = "yes" if build.get("only_binary", True) else "no"
 
     # Get Python release info from TOML [pythons]
     py_target = my_python_target
@@ -134,6 +136,7 @@ def run_build(build, python_versions, dry_run=False):
         "--find-links", my_find_links,
         "--wheelhousereq", wheelhousereq,
         "--bytecode", my_bytecode,
+        "--only-binary", my_only_binary,
         "--create-installer", my_create_installer,
     ]
 
