@@ -69,7 +69,7 @@ prince
 psycopg2
 ptpython
 pybind11
-pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,mistral,openai,vertexai]==1.106.0
+pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,openai,vertexai]==1.106.0
 pympler
 pyodbc
 pyomo
@@ -134,7 +134,7 @@ yt_dlp
 #jupyterlab  # <- jupyter
 #markdownify  # <- markitdown
 #matplotlib  # <- ipympl, missingno, mlxtend, mpld3, plotnine, ...
-#mistralai  # <- pydantic-ai-slim
+#mistralai  # mistralai get security problematic crpytography-47
 #networkx  # <- PlotPy, scikit-image
 #numba  # <- datashader, quantecon, umap-learn
 #numpy  # <- baresql, clarabel, cvxpy, dask, datashader, ...
