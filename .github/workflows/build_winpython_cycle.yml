@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       ver2: ${{ steps.cfg.outputs.ver2 }}
+      build_location: ${{ steps.cfg.outputs.build_location }}
+      destwheelhouse: ${{ steps.cfg.outputs.destwheelhouse }}
       src: ${{ steps.cfg.outputs.src }}
       sha: ${{ steps.cfg.outputs.sha }}
-      cycle_dir: ${{ steps.cfg.outputs.cycle_dir }}
-      release_level: ${{ steps.cfg.outputs.release_level }}
       pandoc_source: ${{ steps.cfg.outputs.pandoc_source }}
       pandoc_sha256: ${{ steps.cfg.outputs.pandoc_sha256 }}
       matrix: ${{ steps.cfg.outputs.matrix }}
@@ -58,97 +58,19 @@ jobs:
       matrix: ${{ fromJSON(needs.config.outputs.matrix) }}
 
     env:
-      PYTHON_VERSIONF: ${{ inputs.python_versionf }}
       WINPYFLAVOR: ${{ matrix.flavor.name }}
-      PANDOC: ${{ matrix.flavor.PANDOC }}
-      WINPYARCHDET: ${{ matrix.flavor.WINPYARCHDET }}
-      my_cycle: ${{ needs.config.outputs.cycle_dir }}
-      my_release_level: ${{ needs.config.outputs.release_level }}
+      WINPYVER: ${{ matrix.flavor.winpyver }}
+      WINPYVER2: ${{ needs.config.outputs.ver2 }}
+      build_location: ${{ needs.config.outputs.build_location }}
+      destwheelhouse: ${{ needs.config.outputs.destwheelhouse }}
+      WINPYLOCKFILE: ${{ matrix.flavor.lockfile }}
+      WINPYLOCKFILEwhl: ${{ matrix.flavor.lockfile_wheels }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set static and matrix variables based on selected Python version
-        shell: pwsh
-        env:
-          PYTHON_VERSIONF: ${{ env.PYTHON_VERSIONF }}
-          WINPYARCHDET: ${{ env.WINPYARCHDET }}
-          WINPYVER2: ${{ needs.config.outputs.ver2 }}
-          my_cycle: ${{ env.my_cycle }}
-          my_release_level: ${{ env.my_release_level }}
-          FLAVOR_NAME: ${{ matrix.flavor.name }}
-        run: |
-          # Normalize PYTHON_VERSION by removing trailing 'F' if present
-          $PYTHON_VERSION = $env:PYTHON_VERSIONF -replace 'F$',''
-          Add-Content -Path $env:GITHUB_ENV -Value "PYTHON_VERSION=$PYTHON_VERSION"
-
-          # Detect architecture (64 or 64F)
-          $detected_arch = if ($env:PYTHON_VERSIONF -like '*F') { '64F' } else { '64' }
-
-          $WINPYVER2 = $env:WINPYVER2
-          $BUILD_LOCATION = "WPy64-" + ($WINPYVER2 -replace '[.]', "")
-          Add-Content -Path $env:GITHUB_ENV -Value "build_location=$BUILD_LOCATION"
-
-          # ver2-vs-source consistency is checked in cycle_config.py
-
-          $WINPYREQUIREMENTS = ''
-          $WINPYREQUIREMENTSwhl = ''
-
-          # Generate requirement files expected names dynamically
-          $V_TAG = $env:WINPYVER2 -replace '\.', '_'
-          $testreq = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).txt"
-          $testwhl = "$($env:my_cycle)/requir.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level)_wheels.txt"
-
-          Write-Host "Checking for requirements files: $testreq and $testwhl (expected arch $detected_arch)"
-
-          if ($env:WINPYARCHDET -eq $detected_arch -and (Test-Path $testreq)) {
-            $WINPYREQUIREMENTS = $testreq
-            Write-Host "Found $WINPYREQUIREMENTS"
-            if (Test-Path $testwhl) {
-              $WINPYREQUIREMENTSwhl = $testwhl
-              Write-Host "Found also $WINPYREQUIREMENTSwhl"
-            }
-          }
-
-          Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTS=$WINPYREQUIREMENTS"
-          Add-Content -Path $env:GITHUB_ENV -Value "WINPYREQUIREMENTSwhl=$WINPYREQUIREMENTSwhl"
-
-          $WINPYLOCKFILE = ''
-          $WINPYLOCKFILEwhl = ''
-
-          # Generate pylock files expected names dynamically
-          $testreq = "$($env:my_cycle)/pylock.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level).toml"
-          $testwhl = "$($env:my_cycle)/pylock.64-$($V_TAG)$($env:FLAVOR_NAME)$($env:my_release_level)_wheels.toml"
-
-          Write-Host "Checking for pylock files: $testreq and $testwhl (expected arch $detected_arch)"
-
-          if ($env:WINPYARCHDET -eq $detected_arch -and (Test-Path $testreq)) {
-            $WINPYLOCKFILE = $testreq
-            Write-Host "Found $WINPYLOCKFILE"
-            if (Test-Path $testwhl) {
-              $WINPYLOCKFILEwhl = $testwhl
-              Write-Host "Found also $WINPYLOCKFILEwhl"
-            }
-          }
-
-          Add-Content -Path $env:GITHUB_ENV -Value "WINPYLOCKFILE=$WINPYLOCKFILE"
-          Add-Content -Path $env:GITHUB_ENV -Value "WINPYLOCKFILEwhl=$WINPYLOCKFILEwhl"
-
-          $ARTIFACT_NAME = "publish_${PYTHON_VERSION}$($env:FLAVOR_NAME)"
-          Add-Content -Path $env:GITHUB_ENV -Value "ARTIFACT_NAME=$ARTIFACT_NAME"
-
-          $destwheelhouse = "$BUILD_LOCATION\wheelhouse\included.wheels"
-          Add-Content -Path $env:GITHUB_ENV -Value "destwheelhouse=$destwheelhouse"
-
-          $WINPYVER = "${WINPYVER2}$($env:FLAVOR_NAME)$($env:my_release_level)"
-          Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER=$WINPYVER"
-
-          # Store WINPYVER2 in env for later steps
-          Add-Content -Path $env:GITHUB_ENV -Value "WINPYVER2=$WINPYVER2"
-
       - name: Download, verify and extract python standalone
-        if: env.WINPYLOCKFILE != ''
         uses: ./.github/actions/python-setup
         with:
           python_source: ${{ needs.config.outputs.src }}
@@ -156,7 +78,7 @@ jobs:
           build_location: ${{ env.build_location }}
 
       - name: Download, checking hash and integrating pandoc binary
-        if: env.WINPYLOCKFILE != '' && env.PANDOC == '1'
+        if: matrix.flavor.PANDOC == '1'
         uses: ./.github/actions/pandoc-setup
         with:
           pandoc_source: ${{ needs.config.outputs.pandoc_source }}
@@ -164,14 +86,12 @@ jobs:
           build_location: ${{ env.build_location }}
 
       - name: Upgrade pip and patch launchers
-        if: env.WINPYLOCKFILE != ''
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --upgrade --force-reinstall pip --no-warn-script-location
           & "$env:build_location\python\python.exe" -c "from wppm import wppm;dist=wppm.Distribution();dist.patch_standard_packages('pip', to_movable=True)"
 
       - name: Download all requirements
-        if: ${{ env.WINPYLOCKFILE != '' }}
         shell: pwsh
         run: |
           $py = "$env:build_location\python\python.exe"
@@ -181,13 +101,11 @@ jobs:
           }
 
       - name: Install lockfile
-        if: env.WINPYLOCKFILE != ''
         shell: pwsh
         run: |
           & "$env:build_location\python\python.exe" -m pip install --no-deps --require-hashes -r $env:WINPYLOCKFILE --no-warn-script-location
 
       - name: Generate Assets and Hashes
-        if: env.WINPYLOCKFILE != ''
         uses: ./.github/actions/publish-winpython
         with:
           build_location: ${{ env.build_location }}
@@ -196,15 +114,14 @@ jobs:
           winpy_ver: ${{ env.WINPYVER }}
           winpy_ver2: ${{ env.WINPYVER2 }}
           dotwheelhouse: ${{ env.dotwheelhouse }}
-          winpy_requirements_whl: ${{ env.WINPYREQUIREMENTSwhl }}
+          winpy_requirements_whl: ${{ matrix.flavor.requirements_wheels }}
           format_zip: ${{ matrix.flavor.formats.zip }}
           format_7z: ${{ matrix.flavor.formats['7z'] }}
           format_exe: ${{ matrix.flavor.formats.exe }}
 
       - name: Upload artifacts
-        if: env.WINPYLOCKFILE != ''
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: ${{ matrix.flavor.artifact_name }}
           path: publish_output
           retention-days: 66  # keeps artifact for 66 days
