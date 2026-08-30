@@ -230,6 +230,11 @@ def main():
     parser.add_argument('--log-dir', default='WinPython_build_logs', help='Directory for logs')
     parser.add_argument('--mandatory-req', help='Mandatory requirements file')
     parser.add_argument('--wheelhousereq', help='Wheelhouse requirements file')
+    parser.add_argument('--only-binary', default='yes', choices=['yes', 'no'],
+                        help="'yes' (default) installs from wheels only, so a missing "
+                             "wheel fails here instead of quietly compiling third-party "
+                             "code on the build machine; 'no' for a flavor that still "
+                             "needs an sdist fallback")
     parser.add_argument('--bytecode', default='pip',
                         help="byte-compilation: 'pip' (inline, the default and what ships), "
                              "'none' (no .pyc -- for throwaway builds such as pylock generation "
@@ -277,6 +282,8 @@ def main():
 
     no_compile, compile_jobs = parse_bytecode_mode(args.bytecode)
     pip_options = ["--force-reinstall"] + (["--no-compile"] if no_compile else [])
+    if args.only_binary == "yes":
+        pip_options.append("--only-binary=:all:")
     for label, req in [
         ("Mandatory", args.mandatory_req),
         ("Main", args.requirements),

@@ -78,6 +78,11 @@ builds = ["dot", "dotf", "slim", "slimf"]
 
 [pythons."314".overrides.slimf]
 bytecode = "none"
+# tornado ships one cp39-abi3 wheel, which no free-threaded interpreter matches,
+# so this flavor alone still needs the sdist fallback. The maintainer expects
+# free-threaded wheels during the 2026-04 cycle (tornadoweb/tornado#3501):
+# drop this line then, and every build is wheels-only.
+only_binary = false
 
 # [pythons."314".overrides.slim]
 # create_installer = ".7z-mx7"
