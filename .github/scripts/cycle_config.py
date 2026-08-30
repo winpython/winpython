@@ -5,12 +5,39 @@
 Writes to $GITHUB_OUTPUT when set, otherwise stdout, so it can be run locally
 to see exactly what a workflow run would get. tomllib is stdlib from 3.11, and
 GitHub runners are newer than that, so this needs no dependency.
+
+The emitted matrix holds only the flavors this Python can actually build: the
+right architecture, and a pylock file present in the cycle directory. A flavor
+the cycle declares but has no lockfile for -- `whl` today -- costs nothing, so
+it can stay declared until it comes back. Paths are relative to the working
+directory, which in CI is the checkout root.
 """
 import json
 import os
 import sys
 import tomllib
 from pathlib import Path
+
+
+def buildable_flavors(cfg: dict, requested: str, ver2: str) -> list[dict]:
+    """Flavors with the right architecture and a lockfile on disk.
+
+    Same two conditions the build job used to re-test in PowerShell, one per
+    matrix leg. Deciding here instead means a leg with nothing to do never
+    starts a runner, and a cycle with no lockfiles at all fails loudly rather
+    than going green having built nothing.
+    """
+    arch = "64F" if requested.endswith("F") else "64"
+    cycle_dir = Path(cfg["cycle_dir"])
+    level = cfg.get("release_level", "")
+    tag = ver2.replace(".", "_")
+    kept = []
+    for flavor in cfg["flavors"]:
+        if str(flavor.get("WINPYARCHDET", "")) != arch:
+            continue
+        if (cycle_dir / f"pylock.64-{tag}{flavor['name']}{level}.toml").is_file():
+            kept.append(flavor)
+    return kept
 
 
 def build_config(cfg: dict, requested: str) -> dict:
@@ -27,6 +54,14 @@ def build_config(cfg: dict, requested: str) -> dict:
     if short not in entry["src"]:
         raise SystemExit(f"{requested}: '{short}' not found in src {entry['src']}")
 
+    flavors = buildable_flavors(cfg, requested, entry["ver2"])
+    if not flavors:
+        raise SystemExit(
+            f"{requested}: no pylock.64-{entry['ver2'].replace('.', '_')}<flavor>"
+            f"{cfg.get('release_level', '')}.toml under {cfg['cycle_dir']}; "
+            "commit the lockfiles for this cycle before dispatching"
+        )
+
     return {
         "ver2": entry["ver2"],
         "src": entry["src"],
@@ -36,7 +71,7 @@ def build_config(cfg: dict, requested: str) -> dict:
         "pandoc_source": cfg["pandoc"]["source"],
         "pandoc_sha256": cfg["pandoc"]["sha256"],
         # consumed by the build job as strategy.matrix via fromJSON
-        "matrix": json.dumps({"flavor": cfg["flavors"]}, separators=(",", ":")),
+        "matrix": json.dumps({"flavor": flavors}, separators=(",", ":")),
     }
 
 
