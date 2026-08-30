@@ -1,16 +1,22 @@
 """Read a cycle TOML and emit its build configuration as GITHUB_OUTPUT lines.
 
-    python .github/scripts/cycle_config.py cycles/2026_03.toml 3.14
+    python .github/scripts/cycle_config.py cycles/2026_04.toml 3.14
 
 Writes to $GITHUB_OUTPUT when set, otherwise stdout, so it can be run locally
 to see exactly what a workflow run would get. tomllib is stdlib from 3.11, and
 GitHub runners are newer than that, so this needs no dependency.
 
-The emitted matrix holds only the flavors this Python can actually build: the
-right architecture, and a pylock file present in the cycle directory. A flavor
-the cycle declares but has no lockfile for -- `whl` today -- costs nothing, so
-it can stay declared until it comes back. Paths are relative to the working
-directory, which in CI is the checkout root.
+Everything the build job needs is decided here rather than re-derived per
+matrix leg in PowerShell:
+
+  * which flavors this Python can build -- right architecture, and a pylock
+    present in the cycle directory. A flavor the cycle declares but has no
+    lockfile for costs nothing, so it can stay declared until it comes back.
+  * the file names those flavors use, so a leg never has to look one up.
+  * a cycle with no lockfiles at all fails here, loudly, instead of starting
+    runners whose every step is then skipped.
+
+Paths are relative to the working directory, which in CI is the checkout root.
 """
 import json
 import os
@@ -19,25 +25,34 @@ import tomllib
 from pathlib import Path
 
 
-def buildable_flavors(cfg: dict, requested: str, ver2: str) -> list[dict]:
-    """Flavors with the right architecture and a lockfile on disk.
+def flavor_entry(cfg: dict, flavor: dict, ver2: str, python_version: str) -> dict | None:
+    """One matrix leg, or None when this flavor has no lockfile to build.
 
-    Same two conditions the build job used to re-test in PowerShell, one per
-    matrix leg. Deciding here instead means a leg with nothing to do never
-    starts a runner, and a cycle with no lockfiles at all fails loudly rather
-    than going green having built nothing.
+    Names follow the layout the publish step writes: pylock.64-<ver2 with
+    underscores><flavor><release level>.toml, plus the _wheels variants the
+    wheelhouse flavor adds.
     """
-    arch = "64F" if requested.endswith("F") else "64"
     cycle_dir = Path(cfg["cycle_dir"])
     level = cfg.get("release_level", "")
-    tag = ver2.replace(".", "_")
-    kept = []
-    for flavor in cfg["flavors"]:
-        if str(flavor.get("WINPYARCHDET", "")) != arch:
-            continue
-        if (cycle_dir / f"pylock.64-{tag}{flavor['name']}{level}.toml").is_file():
-            kept.append(flavor)
-    return kept
+    stem = f"64-{ver2.replace('.', '_')}{flavor['name']}{level}"
+
+    lockfile = cycle_dir / f"pylock.{stem}.toml"
+    if not lockfile.is_file():
+        return None
+
+    def optional(path: Path) -> str:
+        return path.as_posix() if path.is_file() else ""
+
+    return {
+        "name": flavor["name"],
+        "PANDOC": flavor["PANDOC"],
+        "formats": flavor["formats"],
+        "lockfile": lockfile.as_posix(),
+        "lockfile_wheels": optional(cycle_dir / f"pylock.{stem}_wheels.toml"),
+        "requirements_wheels": optional(cycle_dir / f"requir.{stem}_wheels.txt"),
+        "winpyver": f"{ver2}{flavor['name']}{level}",
+        "artifact_name": f"publish_{python_version}{flavor['name']}",
+    }
 
 
 def build_config(cfg: dict, requested: str) -> dict:
@@ -50,24 +65,39 @@ def build_config(cfg: dict, requested: str) -> dict:
 
     # the check the PowerShell version did: ver2's first 3 parts must appear in
     # the tarball URL, so a copy-paste slip between the two cannot go unnoticed
-    short = ".".join(entry["ver2"].split(".")[:3])
+    ver2 = entry["ver2"]
+    short = ".".join(ver2.split(".")[:3])
     if short not in entry["src"]:
         raise SystemExit(f"{requested}: '{short}' not found in src {entry['src']}")
 
-    flavors = buildable_flavors(cfg, requested, entry["ver2"])
+    # a trailing F marks the free-threaded build; it is not part of the version
+    python_version = requested[:-1] if requested.endswith("F") else requested
+    arch = "64F" if requested.endswith("F") else "64"
+
+    flavors = []
+    for flavor in cfg["flavors"]:
+        if str(flavor.get("WINPYARCHDET", "")) != arch:
+            continue
+        leg = flavor_entry(cfg, flavor, ver2, python_version)
+        if leg is not None:
+            flavors.append(leg)
     if not flavors:
         raise SystemExit(
-            f"{requested}: no pylock.64-{entry['ver2'].replace('.', '_')}<flavor>"
+            f"{requested}: no pylock.64-{ver2.replace('.', '_')}<flavor>"
             f"{cfg.get('release_level', '')}.toml under {cfg['cycle_dir']}; "
             "commit the lockfiles for this cycle before dispatching"
         )
 
+    build_location = f"WPy64-{ver2.replace('.', '')}"
     return {
-        "ver2": entry["ver2"],
+        "ver2": ver2,
+        "python_version": python_version,
         "src": entry["src"],
         "sha": entry["sha"],
         "cycle_dir": cfg["cycle_dir"],
         "release_level": cfg.get("release_level", ""),
+        "build_location": build_location,
+        "destwheelhouse": f"{build_location}\\wheelhouse\\included.wheels",
         "pandoc_source": cfg["pandoc"]["source"],
         "pandoc_sha256": cfg["pandoc"]["sha256"],
         # consumed by the build job as strategy.matrix via fromJSON
