@@ -34,6 +34,7 @@ from pathlib import Path
 
 PYPI = "https://pypi.org/pypi"
 TIMEOUT = 30
+QUOTES = "\"'"
 PRERELEASE = re.compile(r"(a|b|rc|dev)\d", re.I)
 
 
@@ -101,7 +102,8 @@ def wheel_note(files: list[dict], target: str) -> str:
 
 def inspect(name: str, installed: str, target: str, now: datetime) -> dict:
     row = {"name": name, "installed": installed, "state": "unknown",
-           "candidate": "", "days": 0, "since": 0, "wheels": "", "note": ""}
+           "candidate": "", "days": 0, "since": 0, "wheels": "", "note": "",
+           "requires": []}
 
     meta = fetch(f"{PYPI}/{name}/json")
     vuln = fetch(f"{PYPI}/{name}/{installed}/json")
@@ -109,6 +111,7 @@ def inspect(name: str, installed: str, target: str, now: datetime) -> dict:
         row["note"] = "not on PyPI (or fetch failed)"
         return row
 
+    row["requires"] = ((vuln or {}).get("info") or {}).get("requires_dist") or []
     advisories = (vuln or {}).get("vulnerabilities") or []
     releases = meta.get("releases", {})
     usable = {v: f for v, f in releases.items()
@@ -138,6 +141,42 @@ def inspect(name: str, installed: str, target: str, now: datetime) -> dict:
         row["wheels"] = wheel_note(releases[row["candidate"]], target)
     row["since"] = len(newer)
     return row
+
+
+def caps_from(rows: list[dict]) -> dict[str, list[tuple]]:
+    """Who caps whom, extras included.
+
+    A cap hidden behind an extra is the kind that is hardest to see by hand --
+    it is absent from constraints.txt, from `pip list -o`, and from a reverse
+    dependency tree that evaluates markers with no extra set. It is exactly the
+    kind that quietly holds a package down, so record it and say who.
+    """
+    try:
+        from packaging.requirements import InvalidRequirement, Requirement
+    except ImportError:
+        return {}
+    caps: dict[str, list[tuple]] = {}
+    for row in rows:
+        for text in row["requires"]:
+            try:
+                requirement = Requirement(text)
+            except InvalidRequirement:
+                continue
+            if not requirement.specifier:
+                continue
+            marker = str(requirement.marker) if requirement.marker else ""
+            extra = ""
+            if "extra" in marker:
+                # markers stringify as: extra == "autopep8"
+                extra = marker.split("==")[-1].strip().strip(QUOTES) if "==" in marker else "?"
+            caps.setdefault(normalize(requirement.name), []).append(
+                (row["name"], row["installed"], requirement.specifier, extra,
+                 set(requirement.extras)))
+    return caps
+
+
+def normalize(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
 
 
 def main(argv: list[str]) -> int:
@@ -171,11 +210,37 @@ def main(argv: list[str]) -> int:
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         rows = list(pool.map(lambda kv: inspect(*kv, args.target, now), installed.items()))
 
+    caps = caps_from(rows)
     for row in rows:
         if row["state"] == "ready" and row["days"] < args.min_days:
             row["state"] = "too new"
+        if row["state"] in ("ready", "security") and row["candidate"]:
+            blockers = [(who, ver, spec, extra)
+                        for who, ver, spec, extra, _ in caps.get(normalize(row["name"]), [])
+                        if not spec.contains(row["candidate"], prereleases=True)]
+            if blockers:
+                who, ver, spec, extra = blockers[0]
+                row["state"] = "blocked"
+                via = f"[{extra}]" if extra else ""
+                # one hop further: the capping package is rarely the one to argue
+                # with -- name whoever asked for it, since that is what must change.
+                # When the cap is gated on an extra, only a dependant that asked
+                # for that extra actually triggers it.
+                asked = [w for w, _, _, _, extras in caps.get(normalize(who), [])
+                         if w.lower() != row["name"].lower()
+                         and (not extra or extra in extras)]
+                if asked:
+                    origin = f", pulled in by {asked[0]}"
+                elif extra:
+                    # nothing in the set asks for that extra, so the cap is
+                    # declared but probably inert -- worth checking, not obeying
+                    origin = f", but nothing requests [{extra}] -- may not bind"
+                else:
+                    origin = ""
+                row["note"] = (f"capped by {who} {ver}{via} requiring {row['name']}{spec}{origin}"
+                               + (f" -- {row['note']}" if row["note"] else ""))
 
-    order = {"security": 0, "ready": 1, "too new": 2, "unknown": 3, "current": 4}
+    order = {"security": 0, "ready": 1, "blocked": 2, "too new": 3, "unknown": 4, "current": 5}
     rows.sort(key=lambda r: (order[r["state"]], -r["days"], r["name"]))
     groups = {s: [r for r in rows if r["state"] == s] for s in order}
 
@@ -188,6 +253,7 @@ def main(argv: list[str]) -> int:
              ""]
     for state, title in (("security", "SECURITY -- advisory against the installed version"),
                          ("ready", "READY -- aged, unreplaced, still has a wheel"),
+                         ("blocked", "BLOCKED -- something in the set caps it"),
                          ("too new", "TOO NEW -- revisit when aged"),
                          ("unknown", "COULD NOT CHECK")):
         entries = groups[state]
