@@ -3,7 +3,7 @@
 WinPython License Agreement (MIT License)
 -----------------------------------------
 
-Copyright (c) 2012-2013 Pierre Raybaut
+Copyright (c) 2009-2013 Pierre Raybaut
 Copyright (c) 2014-2026+  The Winpython development team https://github.com/winpython/
 
 Permission is hereby granted, free of charge, to any person
