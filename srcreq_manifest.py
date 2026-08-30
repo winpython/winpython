@@ -36,10 +36,31 @@ WHEEL = ".whl"
 SDIST = (".tar.gz", ".zip", ".tar.bz2")
 REQUIREMENT_FILES = ("constraints.txt", "requirements_slim.txt", "requirements_slimf.txt",
                      "dot_requirements.txt", "requirements_whl.txt", "mandatory_requirements.txt")
-# A lockfile whose name still carries a release level (b0, b1, ...) is from a
-# superseded build of its cycle; the shipped ones have none.
-SUPERSEDED_LOCK = re.compile(r"b\d+(_wheels)?\.toml$")
-BUCKETS = ("superseded", "dead", "unparsed")
+# A cycle accumulates lockfiles as it converges: several Python patch levels
+# (3_13_13_1, 3_13_14_0, 3_13_15_0) and several release levels (b0, b1, ... then
+# none once it ships). Only the newest per flavor counts, so rank rather than
+# exclude -- a cycle still in progress has nothing but levelled files.
+LOCK_NAME = re.compile(
+    r"^pylock\.64-(?P<ver>\d+(?:_\d+)+?)(?P<flavor>[a-z]+?)(?:b(?P<level>\d+))?"
+    r"(?P<wheels>_wheels)?\.toml$"
+)
+# What a prune may take. `pending` is deliberately absent: a version newer than
+# anything locked is a candidate staged for the next cycle, not leftovers.
+PRUNABLE = ("superseded", "dead", "unparsed")
+REPORTED = ("used", "pending", *PRUNABLE)
+
+
+def version_key(text: str):
+    """Sortable version key, tolerating anything unparseable."""
+    try:
+        from packaging.version import InvalidVersion, Version
+        try:
+            return (1, Version(text))
+        except InvalidVersion:
+            pass
+    except ImportError:
+        pass
+    return (0, tuple(int(p) if p.isdigit() else p for p in re.split(r"[._-]", text)))
 
 
 def normalize(name: str) -> str:
@@ -75,10 +96,30 @@ def parse_filename(path: Path, known: set[str]) -> tuple[str, str] | None:
     return (normalize(match.group(1)), match.group(2)) if match else None
 
 
+def newest_locks(cycle_dirs: list[Path]) -> list[Path]:
+    """The newest lockfile per (cycle, Python minor, flavor).
+
+    Ranked by version then release level, with an absent level ranking highest
+    because that is the one a cycle ships.
+    """
+    best: dict[tuple, tuple[tuple, Path]] = {}
+    for directory in cycle_dirs:
+        for path in directory.glob("pylock.*.toml"):
+            match = LOCK_NAME.match(path.name)
+            if match is None:
+                continue
+            parts = tuple(int(n) for n in match["ver"].split("_"))
+            level = float(match["level"]) if match["level"] else float("inf")
+            key = (directory, parts[:2], match["flavor"], match["wheels"] or "")
+            rank = (parts, level)
+            if key not in best or rank > best[key][0]:
+                best[key] = (rank, path)
+    return sorted(path for _, path in best.values())
+
+
 def read_locks(cycle_dirs: list[Path]) -> tuple[dict, dict, list[Path]]:
     """Artifacts the shipped lockfiles install, and which were built from sdist."""
-    locks = sorted(p for d in cycle_dirs for p in d.glob("pylock.*.toml")
-                   if not SUPERSEDED_LOCK.search(p.name))
+    locks = newest_locks(cycle_dirs)
     wanted: dict[tuple[str, str], set[str]] = defaultdict(set)
     from_sdist: dict[tuple[str, str], set[str]] = defaultdict(set)
     for lock in locks:
@@ -123,7 +164,7 @@ def main(argv: list[str]) -> int:
                              "defaults to the two newest under winpython/portable")
     parser.add_argument("--repo", type=Path, default=Path("."))
     parser.add_argument("--out", type=Path, default=Path("."))
-    parser.add_argument("--delete", choices=BUCKETS, action="append", dest="delete",
+    parser.add_argument("--delete", choices=PRUNABLE, action="append", dest="delete",
                         help="remove the files in this bucket; repeatable")
     args = parser.parse_args(argv)
 
@@ -141,6 +182,11 @@ def main(argv: list[str]) -> int:
         print(f"no lockfiles found under {', '.join(map(str, cycles))}", file=sys.stderr)
         return 2
     live = {name for name, _ in wanted} | read_declared(args.repo)
+    newest_locked: dict[str, tuple] = {}
+    for name, version in wanted:
+        key = version_key(version)
+        if name not in newest_locked or key > newest_locked[name]:
+            newest_locked[name] = key
 
     files = sorted(p for p in args.srcreq.iterdir() if p.is_file())
     buckets: dict[str, list[Path]] = defaultdict(list)
@@ -152,8 +198,15 @@ def main(argv: list[str]) -> int:
             continue
         labels[path] = parsed
         name, version = parsed
-        buckets["used" if (name, version) in wanted
-                else "superseded" if name in live else "dead"].append(path)
+        if (name, version) in wanted:
+            bucket = "used"
+        elif name not in live:
+            bucket = "dead"
+        elif name in newest_locked and version_key(version) > newest_locked[name]:
+            bucket = "pending"
+        else:
+            bucket = "superseded"
+        buckets[bucket].append(path)
 
     on_disk = set(labels.values())
     absent = sorted(set(wanted) - on_disk)
@@ -186,6 +239,7 @@ def main(argv: list[str]) -> int:
     reasons = {
         "superseded": "older version of a package still in use",
         "dead": "no lockfile and no requirement file names this project",
+        "pending": "newer than anything locked -- staged for a coming cycle, NOT listed",
         "unparsed": "not a wheel or sdist name -- look before removing",
     }
     lines = [
@@ -196,7 +250,7 @@ def main(argv: list[str]) -> int:
         "# Safe to remove: every pylock is in git, so any past distribution refetches",
         "# with pip download --require-hashes. Remove with --delete <bucket>.",
     ]
-    for bucket in BUCKETS:
+    for bucket in PRUNABLE:
         if entries := buckets[bucket]:
             lines += ["", f"# --- {bucket}: {reasons[bucket]}",
                       f"# {len(entries)} files, {gigabytes(entries):.2f} GB", ""]
@@ -209,10 +263,10 @@ def main(argv: list[str]) -> int:
     for name, version in absent[:10]:
         print(f"                   missing {name}=={version}")
     print(f"wheelhouse       : {len(files)} files, {gigabytes(files):.1f} GB")
-    for bucket in ("used", *BUCKETS):
+    for bucket in REPORTED:
         entries = buckets[bucket]
         print(f"  {bucket:<13}: {len(entries):>5} files, {gigabytes(entries):>5.2f} GB")
-    reclaimable = [p for b in BUCKETS for p in buckets[b]]
+    reclaimable = [p for b in PRUNABLE for p in buckets[b]]
     if reclaimable:
         print(f"reclaimable      : {gigabytes(reclaimable):.1f} GB "
               f"({gigabytes(reclaimable) / max(gigabytes(files), 1e-9):.0%})")
