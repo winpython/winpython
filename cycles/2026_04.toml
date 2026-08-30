@@ -4,7 +4,7 @@
 # is a new file rather than a copy of the workflow.
 
 cycle_dir     = "winpython/portable/cycle_2026_04"
-release_level = ""
+release_level = "b1"
 
 [pandoc]
 source = "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"

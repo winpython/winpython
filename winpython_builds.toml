@@ -62,8 +62,8 @@ wheelhousereq = "requirements_whl.txt"
 
 [pythons."313"]
 python_target_release = "31315"
-release = "0"
-my_release_level = "b3"
+release = "1"
+my_release_level = "b1"
 builds = ["dot", "slim"]
 
 # A Python that names a requirements file its own way says so here:
@@ -72,8 +72,8 @@ builds = ["dot", "slim"]
 
 [pythons."314"]
 python_target_release = "3147"
-release = "0"
-my_release_level = "b3"
+release = "1"
+my_release_level = "b1"
 builds = ["dot", "dotf", "slim", "slimf"]
 
 [pythons."314".overrides.slimf]
@@ -89,8 +89,8 @@ only_binary = false
 
 [pythons."315"]
 python_target_release = "3150"
-release = "4"
-my_release_level = "b3"
+release = "5"
+my_release_level = "b1"
 builds = ["dot", "dotf", "slim", "slimf"]
 
 # [pythons."315".overrides.slim]
