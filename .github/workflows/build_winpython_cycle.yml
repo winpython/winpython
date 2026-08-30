@@ -10,7 +10,7 @@ on:
       cycle:
         description: 'Build cycle (file name in cycles/, without .toml)'
         required: true
-        default: '2026_03'
+        default: '2026_04'
         type: string
       python_versionf:
         description: 'Python version to build; must exist in that cycle file'

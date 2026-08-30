@@ -1,0 +1,72 @@
+# WinPython 2026-04 build cycle.
+#
+# Everything that changes from one cycle to the next lives here, so a new cycle
+# is a new file rather than a copy of the workflow.
+
+cycle_dir     = "winpython/portable/cycle_2026_04"
+release_level = ""
+
+[pandoc]
+source = "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
+sha256 = "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
+
+# The python-build-standalone tarball for each version offered by the workflow.
+# ver2 is the WinPython 4-part version; its first 3 parts must appear in src.
+
+[pythons."3.13"]
+ver2 = "3.13.15.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.13.15+20260825-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "c1dc1e267f2a81493ce6e94837263f648f1eb6d0df73a1492469c1fed025ce8f"
+
+[pythons."3.14"]
+ver2 = "3.14.7.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.14.7+20260825-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "dec3faa3445d9efc4979e6c74a839be0d1039877367db32ee9c5f6bc91fae3c8"
+
+[pythons."3.14F"]
+ver2 = "3.14.7.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.14.7+20260825-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
+sha  = "485cf42bdd3e49389e754a9cd1dd65e974f9934c883c478f752024a674fc1056"
+
+[pythons."3.15"]
+ver2 = "3.15.0.5"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.15.0rc1+20260825-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "3c8fa74403a891aeb6e6116154882ef17ad891b6f12aa52f9dda6d29400bedd6"
+
+[pythons."3.15F"]
+ver2 = "3.15.0.5"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.15.0rc1+20260825-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
+sha  = "36fd8350ebaf8a577f311099a6683870d0d83f23085b7087159dd53ee03e28cf"
+
+# Flavors become the job matrix. 2026-02 renamed "free" to "dotf", so this
+# varies per cycle too and belongs in the cycle file.
+
+[[flavors]]
+name         = "dot"
+PANDOC       = "0"
+WINPYARCHDET = "64"
+formats      = { zip = true, "7z" = false, exe = true }
+
+[[flavors]]
+name         = "slim"
+PANDOC       = "1"
+WINPYARCHDET = "64"
+formats      = { zip = false, "7z" = true, exe = true }
+
+[[flavors]]
+name         = "whl"
+PANDOC       = "0"
+WINPYARCHDET = "64"
+formats      = { zip = false, "7z" = true, exe = false }
+
+[[flavors]]
+name         = "dotf"
+PANDOC       = "0"
+WINPYARCHDET = "64F"
+formats      = { zip = true, "7z" = false, exe = true }
+
+[[flavors]]
+name         = "slimf"
+PANDOC       = "1"
+WINPYARCHDET = "64F"
+formats      = { zip = false, "7z" = true, exe = true }
