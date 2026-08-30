@@ -48,7 +48,11 @@ def pip_install(python_exe: Path, req_file: str, constraints: str, find_links: s
         cmd = [
             str(python_exe), "-m", "pip", "install",
             "-r", req_file, "-c", constraints,
-            "--pre", "--no-index", f"--find-links={find_links}",
+            # No --pre. pip accepts a prerelease when the specifier itself names
+            # one, so a prerelease reaches a build because the constraints ask
+            # for it on that target, not because it happened to be the newest
+            # file in the wheelhouse.
+            "--no-index", f"--find-links={find_links}",
             "--upgrade", "--no-warn-script-location"
         ]
         if options:
@@ -173,7 +177,8 @@ def process_wheelhouse_requirements(target_python: Path, winpydirbase: Path,args
     if wheelhousereq.is_file():
         # Generate pylock from wheelhousereq
         cmd = [
-            str(target_python), "-m", "pip", "lock", "--no-index", "--trusted-host=None", "--pre", 
+            # no --pre here either: same rule as pip_install()
+            str(target_python), "-m", "pip", "lock", "--no-index", "--trusted-host=None",
             "--find-links", args.find_links, "-c", args.constraints, "-r", str(wheelhousereq),
             "-o", str(out)
         ]
