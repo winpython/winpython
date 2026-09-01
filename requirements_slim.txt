@@ -28,7 +28,7 @@ fuzzywuzzy
 geopy
 hatchling
 html5lib
-httpie
+#httpie httpie-3.2.4 outdated and vulnerable
 hvplot
 hypothesis
 imbalanced-learn
