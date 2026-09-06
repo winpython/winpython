@@ -208,3 +208,68 @@ jobs:
           name: ${{ matrix.leg.artifact_name }}
           path: publish_output
           retention-days: 66  # keeps artifact for 66 days
+
+  changelogs:
+    # A cycle's changelogs, filed and offered as one reviewable pull request.
+    #
+    # Whole-cycle builds only. A re-run of a single leg would otherwise reduce
+    # the branch to that leg's files, and it has nothing to add anyway: the
+    # same lockfile produces the same package list, so a rebuilt leg cannot
+    # change a changelog.
+    needs: [config, build-winpython]
+    if: ${{ inputs.publish && inputs.python_versionf == 'all' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        # credentials are kept here, unlike in the build legs: this job pushes
+        uses: actions/checkout@v6
+
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install pinned dependencies
+        # the same hash-pinned set the test suite uses; diff.py wants packaging
+        run: python -m pip install --no-deps --require-hashes -r tests/requir.wppmtest.txt
+
+      - name: Collect the metadata every leg produced
+        uses: actions/download-artifact@v6
+        with:
+          pattern: publish_*
+          merge-multiple: true
+          path: release_metadata
+
+      - name: File the changelogs and write the histories
+        run: python .github/scripts/changelog_files.py release_metadata changelogs
+
+      - name: Open the changelog pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.config.outputs.release_tag }}
+          TITLE: ${{ needs.config.outputs.release_title }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          branch="changelogs/$TAG"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add changelogs
+          if git diff --cached --quiet; then
+            echo "changelogs/ already holds this cycle; nothing to open"
+            exit 0
+          fi
+          git commit -m "Changelogs for $TITLE"
+          # the branch is generated wholly by this job, so a re-run replaces it
+          git push --force origin "$branch"
+          if gh pr view "$branch" --json number >/dev/null 2>&1; then
+            echo "pull request for $branch is open; the push updated it"
+          else
+            gh pr create --base "$BASE" --head "$branch" \
+              --title "Changelogs for $TITLE" \
+              --body "Package indexes, lock files and requirements for every leg of \`$TAG\`, with the \`_History.md\` companions written against the previous release. Filed by the build that produced them, rather than copied by hand."
+          fi
