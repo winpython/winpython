@@ -1389,14 +1389,14 @@ sha256 = "c9b22bd28b170ba1fe674c74384a8ff30a76c8e26f88ac3aa1584dd3179953e5"
 
 [[packages]]
 name = "greenlet"
-version = "3.4.0"
+version = "3.5.5"
 
 [[packages.wheels]]
-name = "greenlet-3.4.0-cp314-cp314-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/63/45/c1ca4a1ad975de4727e52d3ffe641ae23e1d7a8ffaa8ff7a0477e1827b92/greenlet-3.4.0-cp314-cp314-win_amd64.whl"
+name = "greenlet-3.5.5-cp314-cp314-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/2e/3d/5cc9701117ea4dc0eb7bf1f4f9b7888a6e2e5277ddfae095805ace50f2b6/greenlet-3.5.5-cp314-cp314-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "207ba5b97ea8b0b60eb43ffcacf26969dd83726095161d676aac03ff913ee50d"
+sha256 = "7dffc5c859fe6059974df1e37d7923d654a83e2ae18fdd616994270e001115e1"
 
 [[packages]]
 name = "griffelib"
@@ -2192,14 +2192,14 @@ sha256 = "55be353fc74a80bc7f3b20e6be50a55a61cd525626f578dcb66a5708e2007d14"
 
 [[packages]]
 name = "jupyterlab"
-version = "4.6.2"
+version = "4.6.3"
 
 [[packages.wheels]]
-name = "jupyterlab-4.6.2-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/63/1f/e39b248c76bb3736bc05a9491a6aa1315414c32dea12f548ecc1b24c758e/jupyterlab-4.6.2-py3-none-any.whl"
+name = "jupyterlab-4.6.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/e9/47/242f46de028074651c9bd6d8000fc340ed0d3cdd1a0eae4387826123413a/jupyterlab-4.6.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "5964447036629adfcd3fc0969effc1da6f47d2cbd0a60b2c2eea7c31be0ec6a8"
+sha256 = "0a1ebc6567186f1eabd99536e94df7ed9e96d1e7c5ddf3e4406ae16e88abacb7"
 
 [[packages]]
 name = "jupyterlab-pygments"
@@ -2940,14 +2940,14 @@ sha256 = "ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c"
 
 [[packages]]
 name = "notebook"
-version = "7.6.1"
+version = "7.6.2"
 
 [[packages.wheels]]
-name = "notebook-7.6.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/3c/19/003ac39eae3a88b80631f93eb954b61d0f1fc1dce4c84602eb0bf4802466/notebook-7.6.1-py3-none-any.whl"
+name = "notebook-7.6.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/5c/fd/3e552ff5b24dd305c6e9a10e8645e29c03091c317429f326ae10dbae1ac6/notebook-7.6.2-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "6ea1e4c926f0dc490444ddcc335797a3dacda470a805d01031872fb119988ba2"
+sha256 = "5fe9e09c335cb4b7de21627b860f77210e70e54b1fb1276ad942a4a7e1d858d3"
 
 [[packages]]
 name = "notebook-shim"
@@ -3171,14 +3171,14 @@ sha256 = "46e8d82541b7ae47d2c2393dd746800b95fa7ad8eb545cc39ab5f366ba00a664"
 
 [[packages]]
 name = "panel-material-ui"
-version = "0.12.0"
+version = "0.14.0"
 
 [[packages.wheels]]
-name = "panel_material_ui-0.12.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/d5/d7/be740070860e2b749a26dcbcc294e50f7926d514ba4d4ec8764c38960f4b/panel_material_ui-0.12.0-py3-none-any.whl"
+name = "panel_material_ui-0.14.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/36/f2/4dac7c73673dd2b824aa9c539cbcbec3fadb5b602009ac3fa634f8d00438/panel_material_ui-0.14.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "f3afd910d479fa2ebb89283b23c26bc031639e09e408566b665a020c6c03e4ad"
+sha256 = "152e09fc0b903e37d3b45bf8d3018cc3360b9112588a80c1254c3da3f3c2f22d"
 
 [[packages]]
 name = "papermill"
@@ -3875,14 +3875,14 @@ sha256 = "850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d"
 
 [[packages]]
 name = "pypdf"
-version = "6.15.0"
+version = "6.16.2"
 
 [[packages.wheels]]
-name = "pypdf-6.15.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/af/72/ce3067ac31e214a66388159f8462ddb8c13dd00170f24d555a1f1ae8ee91/pypdf-6.15.0-py3-none-any.whl"
+name = "pypdf-6.16.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/13/f1/a2da3b55acd4ab737bf728c97edaaed5ec1d3c1236acb639dcdfa97e42c7/pypdf-6.16.2-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "14e001d6504822cb1ca9c7ed9a69bccb320f59b320730f55af804361abe4d5ee"
+sha256 = "c8b09a59399062fb45a1b8156c18a787a10a3dae03ac9674397a226712c94604"
 
 [[packages]]
 name = "pyperclip"
@@ -5316,14 +5316,14 @@ sha256 = "15ccc861ac51c53696de0a5d6d4607f99c210739caf987b5d2054f3efed429d8"
 
 [[packages]]
 name = "tornado"
-version = "6.5.7"
+version = "6.5.8"
 
 [[packages.wheels]]
-name = "tornado-6.5.7-cp39-abi3-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/c9/a4/b393076ffb21b469eec5b328a0534cf03a3b90bfc6b1f09507cdd075d938/tornado-6.5.7-cp39-abi3-win_amd64.whl"
+name = "tornado-6.5.8-cp39-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/cb/e1/468ad54333e92ccb62627e62cb88e5fc14a2171daa67ed47b1b8542d5b86/tornado-6.5.8-cp39-abi3-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "de942f843533a039ef9fa3d9c88c7cd8a7c94553fb5ad0154270989b3d99a2c4"
+sha256 = "11881db6b7c168494be2c2d12e65931451bdf7ee718535418ae1d8855dd5a0ee"
 
 [[packages]]
 name = "tqdm"

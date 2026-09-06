@@ -250,8 +250,8 @@ graphql-core==3.2.11 \
     --hash=sha256:0b3e35ff41e9adba53021ab0cef475eb18f57c7f53f0f2ca55567fbf3c537ea0
 graphql-relay==3.2.0 \
     --hash=sha256:c9b22bd28b170ba1fe674c74384a8ff30a76c8e26f88ac3aa1584dd3179953e5
-greenlet==3.4.0 \
-    --hash=sha256:849f8bc17acd6295fcb5de8e46d55cc0e52381c56eaf50a2afd258e97bc65940
+greenlet==3.5.5 \
+    --hash=sha256:95c5b1f4b3a193f8a0c2de4bfdcb48d119f7f1063941f1de1f2168051b3e52dd
 griffelib==2.1.0 \
     --hash=sha256:cc7b3d2d2865ad0b909fcc38086e3f554b5ea7acbaa7bbb7ecaa3f5dfb7d9f00
 groq==1.6.0 \
@@ -396,8 +396,8 @@ jupyter-server==2.20.0 \
     --hash=sha256:c3b67c93c471e947c18b5026f04f21614218adb706df8f48227d3ee8e0a7cdcc
 jupyter-server-terminals==0.5.4 \
     --hash=sha256:55be353fc74a80bc7f3b20e6be50a55a61cd525626f578dcb66a5708e2007d14
-jupyterlab==4.6.2 \
-    --hash=sha256:5964447036629adfcd3fc0969effc1da6f47d2cbd0a60b2c2eea7c31be0ec6a8
+jupyterlab==4.6.3 \
+    --hash=sha256:0a1ebc6567186f1eabd99536e94df7ed9e96d1e7c5ddf3e4406ae16e88abacb7
 jupyterlab-pygments==0.3.0 \
     --hash=sha256:841a89020971da1d8693f1a99997aefc5dc424bb1b251fd6322462a1b8842780
 jupyterlab-server==2.28.0 \
@@ -532,8 +532,8 @@ nh3==0.3.3 \
     --hash=sha256:2efd17c0355d04d39e6d79122b42662277ac10a17ea48831d90b46e5ef7e4fc0
 nltk==3.10.3 \
     --hash=sha256:ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c
-notebook==7.6.1 \
-    --hash=sha256:6ea1e4c926f0dc490444ddcc335797a3dacda470a805d01031872fb119988ba2
+notebook==7.6.2 \
+    --hash=sha256:5fe9e09c335cb4b7de21627b860f77210e70e54b1fb1276ad942a4a7e1d858d3
 notebook-shim==0.2.4 \
     --hash=sha256:411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef
 numba==0.67.0 \
@@ -574,8 +574,8 @@ pandocfilters==1.5.1 \
     --hash=sha256:93be382804a9cdb0a7267585f157e5d1731bbe5545a85b268d6f5fe6232de2bc
 panel==1.9.3 \
     --hash=sha256:46e8d82541b7ae47d2c2393dd746800b95fa7ad8eb545cc39ab5f366ba00a664
-panel-material-ui==0.12.0 \
-    --hash=sha256:f3afd910d479fa2ebb89283b23c26bc031639e09e408566b665a020c6c03e4ad
+panel-material-ui==0.14.0 \
+    --hash=sha256:152e09fc0b903e37d3b45bf8d3018cc3360b9112588a80c1254c3da3f3c2f22d
 papermill==2.7.0 \
     --hash=sha256:e1855e6670100a02bb4f8a6870484a5c10b84a8d2e49c49921c90209940c7514
 param==2.4.1 \
@@ -702,8 +702,8 @@ pypandoc==1.15 \
     --hash=sha256:4ededcc76c8770f27aaca6dff47724578428eca84212a31479403a9731fc2b16
 pyparsing==3.3.2 \
     --hash=sha256:850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d
-pypdf==6.15.0 \
-    --hash=sha256:14e001d6504822cb1ca9c7ed9a69bccb320f59b320730f55af804361abe4d5ee
+pypdf==6.16.2 \
+    --hash=sha256:c8b09a59399062fb45a1b8156c18a787a10a3dae03ac9674397a226712c94604
 pyperclip==1.11.0 \
     --hash=sha256:299403e9ff44581cb9ba2ffeed69c7aa96a008622ad0c46cb575ca75b5b84273
 pyproject-hooks==1.2.0 \
@@ -962,8 +962,8 @@ tomlkit==0.15.1 \
     --hash=sha256:177a05aece5a8ca5266fd3c448abb47b8d352f09d477d3ca8332db4d89b24304
 toolz==1.1.0 \
     --hash=sha256:15ccc861ac51c53696de0a5d6d4607f99c210739caf987b5d2054f3efed429d8
-tornado==6.5.7 \
-    --hash=sha256:de942f843533a039ef9fa3d9c88c7cd8a7c94553fb5ad0154270989b3d99a2c4
+tornado==6.5.8 \
+    --hash=sha256:11881db6b7c168494be2c2d12e65931451bdf7ee718535418ae1d8855dd5a0ee
 tqdm==4.70.0 \
     --hash=sha256:7f585706bfddbdebf89daac705b2dfcc16890130727d3197ca62c732b4310953
 traitlets==5.15.1 \
