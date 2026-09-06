@@ -308,6 +308,16 @@ class TestWorkflowMatchesConfig:
         assert "if: ${{ inputs.publish }}" in workflow_text
         assert "if: ${{ !inputs.publish }}" in workflow_text
 
+    def test_the_changelog_pr_is_whole_cycle_only(self, workflow_text):
+        """A single-leg re-run would reduce the branch to that leg's files.
+
+        It has nothing to add either way: the same lockfile builds the same
+        package list, so a rebuilt leg cannot change a changelog.
+        """
+        assert "if: ${{ inputs.publish && inputs.python_versionf == 'all' }}" in workflow_text
+        assert ".github/scripts/changelog_files.py release_metadata changelogs" in workflow_text
+        assert (REPO / ".github/scripts/changelog_files.py").is_file()
+
     def test_the_release_title_is_built_by_the_script(self, workflow_text):
         """Ordinal dates are miserable in shell, and untestable there."""
         assert 'TITLE: ${{ needs.config.outputs.release_title }}' in workflow_text
