@@ -112,12 +112,38 @@ def compare_files(file1, file2, mode="full", header1=None, header2=None, header_
 
 # --- ORIGINAL/HISTORICAL VERSION-TO-VERSION COMPARISON ---
 
+def changelog_versions(searchdir, flavor="", architecture=64):
+    """The changelogs on disk, as (parsed version, version string, file name).
+
+    The file name is the only source of the version, so the pattern has to
+    accept everything a WinPython version can be. It used to be digits and
+    dots, which silently dropped any release level: 3.14.7.1b1 is a perfectly
+    ordinary PEP 440 version -- it sorts after 3.14.7.0 and before 3.14.7.1 --
+    but no b1 changelog was ever visible to the comparison. Now the name is
+    handed to the version parser, which also drops the _History companions and
+    anything else in the directory that is not a changelog, since they do not
+    parse as versions.
+    """
+    pattern = re.compile(rf"WinPython{re.escape(flavor)}-{architecture}bit-(.+)\.(?:txt|md)$")
+    found = []
+    for name in os.listdir(searchdir):
+        match = pattern.match(name)
+        if not match:
+            continue
+        try:
+            found.append((version.parse(match.group(1)), match.group(1), name))
+        except version.InvalidVersion:
+            continue
+    return found
+
 def find_previous_version(target_version, searchdir=None, flavor="", architecture=64):
     search_dir = Path(searchdir) if searchdir else CHANGELOGS_DIR
-    pattern = re.compile(rf"WinPython{flavor}-{architecture}bit-([0-9\.]+)\.(txt|md)")
-    versions = [pattern.match(f).group(1) for f in os.listdir(search_dir) if pattern.match(f)]
-    versions = [v for v in versions if version.parse(v) < version.parse(target_version)]
-    return max(versions, key=version.parse, default=target_version)
+    target = version.parse(target_version)
+    earlier = [
+        (parsed, raw) for parsed, raw, _ in changelog_versions(search_dir, flavor, architecture)
+        if parsed < target
+    ]
+    return max(earlier, default=(None, target_version))[1]
 
 def load_version_markdown(version, searchdir, flavor="", architecture=64):
     filename = Path(searchdir) / f"WinPython{flavor}-{architecture}bit-{version}.md"
@@ -142,13 +168,16 @@ def compare_package_indexes(version2, version1=None, searchdir=None, flavor="", 
         result += compare_markdown_sections(md1, md2, k, k, version1, version2) + "\n"
     return result+ "\n\n* * *\n"
 
-def copy_changelogs(version, searchdir, flavor="", architecture=64, basedir=None):
-    """Copy all changelogs for a major.minor version into basedir."""
-    basever = ".".join(str(version).split(".")[:2])
-    pattern = re.compile(rf"WinPython{flavor}-{architecture}bit-{basever}[0-9\.]*\.(txt|md)")
+def copy_changelogs(target_version, searchdir, flavor="", architecture=64, basedir=None):
+    """Copy all changelogs for a major.minor version into basedir.
+
+    Selected on the parsed version rather than a string prefix, so a release
+    level comes along and 3.1 cannot pick up 3.15.
+    """
+    basever = version.parse(str(target_version)).release[:2]
     dest = Path(basedir)
-    for fname in os.listdir(searchdir):
-        if pattern.match(fname):
+    for parsed, _, fname in changelog_versions(searchdir, flavor, architecture):
+        if parsed.release[:2] == basever:
             shutil.copyfile(Path(searchdir) / fname, dest / fname)
 
 def write_changelog(version2, version1=None, searchdir=None, flavor="", architecture=64, basedir=None):
