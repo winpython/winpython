@@ -27,6 +27,7 @@ matrix leg in PowerShell:
 
 Paths are relative to the working directory, which in CI is the checkout root.
 """
+import datetime
 import json
 import os
 import sys
@@ -128,6 +129,31 @@ def release_tag(cfg: dict, cycle_name: str) -> str:
     return tag
 
 
+def ordinal(day: int) -> str:
+    """1st, 2nd, 3rd, 4th ... and the 11th/12th/13th exceptions."""
+    if 11 <= day % 100 <= 13:
+        return f"{day}th"
+    return f"{day}{ {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th') }"
+
+
+def release_title(cfg: dict, cycle_name: str, today: datetime.date | None = None) -> str:
+    """"WinPython 2026-04 b1 of September 6th 2026", the shape releases have used.
+
+    Kept deliberately close to the titles written by hand before this: cycle,
+    then the level after a space -- the tag runs them together, the title does
+    not -- then the date, no comma, which is how all but one of them read.
+
+    The date is the day the draft is opened, since that is the only day the
+    build knows about. A cycle publishing much later than it was built can
+    still have the title edited; the tag, which is what URLs are built on,
+    does not move.
+    """
+    today = today or datetime.date.today()
+    level = cfg.get("release_level", "")
+    name = f"{cycle_name.replace('_', '-')} {level}".strip()
+    return f"WinPython {name} of {today:%B} {ordinal(today.day)} {today.year}"
+
+
 def build_config(cfg: dict, requested: str, cycle_name: str) -> dict:
     pythons = cfg["pythons"]
     if requested == "all":
@@ -156,6 +182,7 @@ def build_config(cfg: dict, requested: str, cycle_name: str) -> dict:
         "cycle_dir": cfg["cycle_dir"],
         "release_level": cfg.get("release_level", ""),
         "release_tag": release_tag(cfg, cycle_name),
+        "release_title": release_title(cfg, cycle_name),
         "pandoc_source": cfg["pandoc"]["source"],
         "pandoc_sha256": cfg["pandoc"]["sha256"],
         # consumed by the build job as strategy.matrix via fromJSON

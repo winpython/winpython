@@ -52,6 +52,7 @@ jobs:
       pandoc_sha256: ${{ steps.cfg.outputs.pandoc_sha256 }}
       release_level: ${{ steps.cfg.outputs.release_level }}
       release_tag: ${{ steps.cfg.outputs.release_tag }}
+      release_title: ${{ steps.cfg.outputs.release_title }}
       matrix: ${{ steps.cfg.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
@@ -78,15 +79,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.config.outputs.release_tag }}
+          TITLE: ${{ needs.config.outputs.release_title }}
           CYCLE: ${{ inputs.cycle }}
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
-            # re-running one missing flavor is normal; say which release its files land on
+            # re-running one missing flavor is normal; say which release its files
+            # land on, and leave the title alone in case it was edited by hand
             state=$(gh release view "$TAG" --json isDraft --jq 'if .isDraft then "still a draft" else "ALREADY PUBLISHED" end')
             echo "release $TAG exists ($state); this run adds its files to it"
           else
             gh release create "$TAG" --draft \
-              --title "WinPython $TAG" \
+              --title "$TITLE" \
               --notes "Draft opened by the build workflow for cycle $CYCLE. Files land as each build finishes; publish once they are all here."
             echo "opened draft release $TAG"
           fi

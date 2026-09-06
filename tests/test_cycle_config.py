@@ -193,6 +193,54 @@ class TestReleaseTag:
 
 
 @needs_script
+class TestReleaseTitle:
+    """The title people actually read on the releases page.
+
+    Reproduced from the titles written by hand for years rather than invented:
+    cycle, then the level after a space -- the tag runs them together, the
+    title does not -- then the date with no comma, which is how all but one of
+    the previous titles read.
+    """
+
+    @pytest.mark.parametrize("cycle,level,date,expected", [
+        # the real titles of these releases, to the letter
+        ("2026_03", "", (2026, 8, 22), "WinPython 2026-03 of August 22nd 2026"),
+        ("2026_03", "b3", (2026, 8, 8), "WinPython 2026-03 b3 of August 8th 2026"),
+        ("2026_02", "b2", (2026, 5, 1), "WinPython 2026-02 b2 of May 1st 2026"),
+        ("2026_01", "final", (2026, 3, 10), "WinPython 2026-01 final of March 10th 2026"),
+        ("2025_05", "rc", (2025, 12, 22), "WinPython 2025-05 rc of December 22nd 2025"),
+        ("2026_01", "b3", (2026, 2, 24), "WinPython 2026-01 b3 of February 24th 2026"),
+    ])
+    def test_matches_the_titles_used_before(self, cycle_config, cycle, level, date, expected):
+        import datetime
+
+        cfg = {"release_level": level} if level else {}
+        assert cycle_config.release_title(cfg, cycle, datetime.date(*date)) == expected
+
+    def test_no_double_space_when_there_is_no_level(self, cycle_config):
+        """Some older titles read "2026-02  of May 17th": a level that was empty."""
+        import datetime
+
+        title = cycle_config.release_title({"release_level": ""}, "2026_04", datetime.date(2026, 5, 17))
+        assert "  " not in title
+
+    @pytest.mark.parametrize("day,expected", [
+        (1, "1st"), (2, "2nd"), (3, "3rd"), (4, "4th"),
+        (11, "11th"), (12, "12th"), (13, "13th"),  # not 11st/12nd/13rd
+        (21, "21st"), (22, "22nd"), (23, "23rd"), (30, "30th"), (31, "31st"),
+    ])
+    def test_ordinals(self, cycle_config, day, expected):
+        assert cycle_config.ordinal(day) == expected
+
+    @needs_cycles
+    @pytest.mark.parametrize("cycle_file", cycle_files, ids=lambda p: p.stem)
+    def test_every_cycle_produces_a_title(self, cycle_config, at_repo_root, cycle_file):
+        title = config_for(cycle_config, cycle_file)["release_title"]
+        assert title.startswith("WinPython ") and " of " in title
+        assert "\n" not in title, "a GITHUB_OUTPUT value has to stay on one line"
+
+
+@needs_script
 @needs_workflow
 @needs_cycles
 class TestWorkflowMatchesConfig:
@@ -259,6 +307,11 @@ class TestWorkflowMatchesConfig:
         """
         assert "if: ${{ inputs.publish }}" in workflow_text
         assert "if: ${{ !inputs.publish }}" in workflow_text
+
+    def test_the_release_title_is_built_by_the_script(self, workflow_text):
+        """Ordinal dates are miserable in shell, and untestable there."""
+        assert 'TITLE: ${{ needs.config.outputs.release_title }}' in workflow_text
+        assert '--title "$TITLE"' in workflow_text
 
     def test_the_changelog_name_carries_the_release_level(self, workflow_text):
         """A beta and the final it becomes share a ver2.
