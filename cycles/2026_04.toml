@@ -6,6 +6,10 @@
 cycle_dir     = "winpython/portable/cycle_2026_04"
 release_level = "b1"
 
+# The build publishes under "<this file's name with dashes><release level>", so
+# this cycle releases as 2026-04b1 and a respin is a release_level bump rather
+# than a new tag to invent. Add release_tag = "..." to override that.
+
 [pandoc]
 source = "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
 sha256 = "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
