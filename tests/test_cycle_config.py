@@ -260,6 +260,19 @@ class TestWorkflowMatchesConfig:
         assert "if: ${{ inputs.publish }}" in workflow_text
         assert "if: ${{ !inputs.publish }}" in workflow_text
 
+    def test_the_changelog_name_carries_the_release_level(self, workflow_text):
+        """A beta and the final it becomes share a ver2.
+
+        Without the level in the name, a b1's package list is written to the
+        file the final release wants, and `changelogs/` briefly describes a
+        beta under the final's name. The level has to reach the composite
+        action for that, so both halves are checked.
+        """
+        assert "release_level: ${{ needs.config.outputs.release_level }}" in workflow_text
+        action = (REPO / ".github/actions/publish-winpython/action.yml").read_text(encoding="utf-8")
+        assert re.search(r"^  release_level:$", action, re.MULTILINE), "action input is missing"
+        assert "${{ inputs.winpy_ver2 }}${{ inputs.release_level }}.md" in action
+
     def test_the_release_tag_is_never_taken_from_a_dispatch_input(self, workflow_text):
         """One source of truth: the cycle file. An input would let them disagree."""
         assert "inputs.release_tag" not in workflow_text

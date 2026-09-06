@@ -50,6 +50,7 @@ jobs:
     outputs:
       pandoc_source: ${{ steps.cfg.outputs.pandoc_source }}
       pandoc_sha256: ${{ steps.cfg.outputs.pandoc_sha256 }}
+      release_level: ${{ steps.cfg.outputs.release_level }}
       release_tag: ${{ steps.cfg.outputs.release_tag }}
       matrix: ${{ steps.cfg.outputs.matrix }}
     steps:
@@ -158,6 +159,7 @@ jobs:
           winpy_arch: ${{ env.WINPYARCH }}
           winpy_ver: ${{ env.WINPYVER }}
           winpy_ver2: ${{ env.WINPYVER2 }}
+          release_level: ${{ needs.config.outputs.release_level }}
           dotwheelhouse: ${{ env.dotwheelhouse }}
           winpy_requirements_whl: ${{ matrix.leg.requirements_wheels }}
           format_zip: ${{ matrix.leg.formats.zip }}
