@@ -14,6 +14,11 @@ on:
       - 'tests/**'
       - 'pyproject.toml'
       - '.github/workflows/test_wppm.yml'
+      # tests/test_cycle_config.py checks these two agree with each other,
+      # which is worth knowing on the commit that changes one of them
+      - '.github/scripts/**'
+      - '.github/workflows/build_winpython_cycle.yml'
+      - 'cycles/**'
   pull_request:
     paths:
       - 'wppm/**'
@@ -21,6 +26,11 @@ on:
       - 'tests/**'
       - 'pyproject.toml'
       - '.github/workflows/test_wppm.yml'
+      # tests/test_cycle_config.py checks these two agree with each other,
+      # which is worth knowing on the commit that changes one of them
+      - '.github/scripts/**'
+      - '.github/workflows/build_winpython_cycle.yml'
+      - 'cycles/**'
   workflow_dispatch:
 
 permissions: {}
