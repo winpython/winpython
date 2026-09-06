@@ -309,9 +309,13 @@ def main():
     generate_lockfiles(target_python, winpydirbase, args.constraints, args.find_links, file_postfix)
 
 
-    log_section(f"🙏 Step 7: generate changelog") 
-    mdn = f"WinPython{args.flavor}-{args.arch}bit-{winpyver2}.md"
-    out = f"WinPython{args.flavor}-{args.arch}bit-{winpyver2}_History.md"
+    log_section(f"🙏 Step 7: generate changelog")
+    # the release level belongs in the name: a b1 and the final it becomes share
+    # a winpyver2, so without it the beta's package list occupies the final's
+    # file. 3.15.0.5b1 is a PEP 440 version, and sorts where it should.
+    changelog_version = f"{winpyver2}{args.release_level}"
+    mdn = f"WinPython{args.flavor}-{args.arch}bit-{changelog_version}.md"
+    out = f"WinPython{args.flavor}-{args.arch}bit-{changelog_version}_History.md"
     changelog_dir = log_dir.parent/ "changelogs"
     
     cmd = ["set", f"WINPYVER2={winpyver2}&",  "set",  f"WINPYFLAVOR={args.flavor}&",
@@ -328,7 +332,7 @@ def main():
     cmd = [str(target_python), "-X", "utf8", "-c",
         (
         "from wppm import diff;"
-        f"result = diff.compare_package_indexes('{winpyver2}', searchdir=r'{changelog_dir}', flavor=r'{args.flavor}', architecture={args.arch});"
+        f"result = diff.compare_package_indexes('{changelog_version}', searchdir=r'{changelog_dir}', flavor=r'{args.flavor}', architecture={args.arch});"
         f"open(r'{winpydirbase.parent / out}', 'w', encoding='utf-8').write(result)" 
         )]
     run_command(cmd, check=False)

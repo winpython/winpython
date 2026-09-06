@@ -13,6 +13,10 @@ inputs:
     required: true
   winpy_ver2:
     required: true
+  release_level:
+    required: false
+    default: ""
+    description: 'b1, rc2, ... appended to winpy_ver2 in the changelog name'
   dotwheelhouse:
     required: true
   winpy_requirements_whl:
@@ -51,8 +55,11 @@ runs:
         $env:PYTHONIOENCODING="utf-8"
         $pythonExe = Join-Path "${{ inputs.build_location }}" "python\python.exe"
 
-        # Markdown Metadata
-        $destfile_md = "publish_output\WinPython${{ inputs.winpy_flavor }}-${{ inputs.winpy_arch }}bit-${{ inputs.winpy_ver2 }}.md" 
+        # Markdown Metadata. The release level is part of the name: a b1 and the
+        # final it becomes share a winpy_ver2, so without it the beta's package
+        # list occupies the final's file. 3.15.0.5b1 is a PEP 440 version, and
+        # sorts where find_previous_version needs it to.
+        $destfile_md = "publish_output\WinPython${{ inputs.winpy_flavor }}-${{ inputs.winpy_arch }}bit-${{ inputs.winpy_ver2 }}${{ inputs.release_level }}.md"
         & $pythonExe -m wppm -md | Out-File -FilePath $destfile_md -Encoding utf8
         gc $destfile_md
 
