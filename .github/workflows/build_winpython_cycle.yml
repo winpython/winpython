@@ -1,8 +1,13 @@
 name: Build WinPython (cycle file)
-# Draft, sitting beside github_workflows_build-YYYY_NN.yml for comparison.
+# One dispatch builds a whole cycle. Everything cycle-specific comes from
+# cycles/<cycle>.toml, so a new cycle is a new TOML rather than a copy of this
+# workflow, and "all" builds every Python that cycle has lockfiles for.
 #
-# Same build as those, but everything cycle-specific comes from cycles/<cycle>.toml
-# instead of being copied into a new workflow each time. A new cycle is a new TOML.
+# Leave publish on and each leg uploads its own output straight to a draft
+# release, instead of leaving gigabytes of artifacts to download and re-upload
+# by hand. The tag comes from the cycle file, so re-running one missing flavor
+# adds it to the release the others are already on. Turn publish off and the
+# output stays artifacts, as before.
 
 on:
   workflow_dispatch:
@@ -13,16 +18,24 @@ on:
         default: '2026_04'
         type: string
       python_versionf:
-        description: 'Python version to build; must exist in that cycle file'
+        description: 'Python to build; "all" takes every one this cycle has lockfiles for'
         required: true
-        default: '3.14'
+        default: 'all'
         type: choice
         options:
+          - 'all'
           - '3.13'
           - '3.14'
           - '3.14F'
           - '3.15'
           - '3.15F'
+      publish:
+        description: 'Upload to the draft release the cycle file names; off keeps the output as artifacts'
+        required: false
+        default: true
+        type: boolean
+
+permissions: {}
 
 env:
   WINPYARCH: "64"
@@ -32,14 +45,12 @@ jobs:
   config:
     # reads the cycle file once, instead of once per matrix leg
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
-      ver2: ${{ steps.cfg.outputs.ver2 }}
-      build_location: ${{ steps.cfg.outputs.build_location }}
-      destwheelhouse: ${{ steps.cfg.outputs.destwheelhouse }}
-      src: ${{ steps.cfg.outputs.src }}
-      sha: ${{ steps.cfg.outputs.sha }}
       pandoc_source: ${{ steps.cfg.outputs.pandoc_source }}
       pandoc_sha256: ${{ steps.cfg.outputs.pandoc_sha256 }}
+      release_tag: ${{ steps.cfg.outputs.release_tag }}
       matrix: ${{ steps.cfg.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
@@ -48,37 +59,71 @@ jobs:
 
       - name: Read cycle configuration
         id: cfg
-        run: python .github/scripts/cycle_config.py "cycles/${{ inputs.cycle }}.toml" "${{ inputs.python_versionf }}"
+        env:
+          CYCLE: ${{ inputs.cycle }}
+          PYTHON_VERSIONF: ${{ inputs.python_versionf }}
+        run: python .github/scripts/cycle_config.py "cycles/$CYCLE.toml" "$PYTHON_VERSIONF"
+
+  release-draft:
+    # one job opens the draft, so the build legs cannot race to create it
+    needs: config
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Open the draft release
+        if: ${{ inputs.publish }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.config.outputs.release_tag }}
+          CYCLE: ${{ inputs.cycle }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            # re-running one missing flavor is normal; say which release its files land on
+            state=$(gh release view "$TAG" --json isDraft --jq 'if .isDraft then "still a draft" else "ALREADY PUBLISHED" end')
+            echo "release $TAG exists ($state); this run adds its files to it"
+          else
+            gh release create "$TAG" --draft \
+              --title "WinPython $TAG" \
+              --notes "Draft opened by the build workflow for cycle $CYCLE. Files land as each build finishes; publish once they are all here."
+            echo "opened draft release $TAG"
+          fi
 
   build-winpython:
-    needs: config
+    needs: [config, release-draft]
+    name: ${{ matrix.leg.python_versionf }} ${{ matrix.leg.name }}
     runs-on: windows-latest
+    permissions:
+      contents: write  # gh release upload; the checkout itself only reads
     strategy:
-      fail-fast: true
+      fail-fast: false  # a cycle is eight legs or more: one bad flavor must not bin the rest
       matrix: ${{ fromJSON(needs.config.outputs.matrix) }}
 
     env:
-      WINPYFLAVOR: ${{ matrix.flavor.name }}
-      WINPYVER: ${{ matrix.flavor.winpyver }}
-      WINPYVER2: ${{ needs.config.outputs.ver2 }}
-      build_location: ${{ needs.config.outputs.build_location }}
-      destwheelhouse: ${{ needs.config.outputs.destwheelhouse }}
-      WINPYLOCKFILE: ${{ matrix.flavor.lockfile }}
-      WINPYLOCKFILEwhl: ${{ matrix.flavor.lockfile_wheels }}
+      WINPYFLAVOR: ${{ matrix.leg.name }}
+      WINPYVER: ${{ matrix.leg.winpyver }}
+      WINPYVER2: ${{ matrix.leg.ver2 }}
+      build_location: ${{ matrix.leg.build_location }}
+      destwheelhouse: ${{ matrix.leg.destwheelhouse }}
+      WINPYLOCKFILE: ${{ matrix.leg.lockfile }}
+      WINPYLOCKFILEwhl: ${{ matrix.leg.lockfile_wheels }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Download, verify and extract python standalone
         uses: ./.github/actions/python-setup
         with:
-          python_source: ${{ needs.config.outputs.src }}
-          python_sha256: ${{ needs.config.outputs.sha }}
+          python_source: ${{ matrix.leg.src }}
+          python_sha256: ${{ matrix.leg.sha }}
           build_location: ${{ env.build_location }}
 
       - name: Download, checking hash and integrating pandoc binary
-        if: matrix.flavor.PANDOC == '1'
+        if: matrix.leg.PANDOC == '1'
         uses: ./.github/actions/pandoc-setup
         with:
           pandoc_source: ${{ needs.config.outputs.pandoc_source }}
@@ -114,14 +159,47 @@ jobs:
           winpy_ver: ${{ env.WINPYVER }}
           winpy_ver2: ${{ env.WINPYVER2 }}
           dotwheelhouse: ${{ env.dotwheelhouse }}
-          winpy_requirements_whl: ${{ matrix.flavor.requirements_wheels }}
-          format_zip: ${{ matrix.flavor.formats.zip }}
-          format_7z: ${{ matrix.flavor.formats['7z'] }}
-          format_exe: ${{ matrix.flavor.formats.exe }}
+          winpy_requirements_whl: ${{ matrix.leg.requirements_wheels }}
+          format_zip: ${{ matrix.leg.formats.zip }}
+          format_7z: ${{ matrix.leg.formats['7z'] }}
+          format_exe: ${{ matrix.leg.formats.exe }}
 
-      - name: Upload artifacts
+      - name: Upload to the draft release
+        if: ${{ inputs.publish }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.config.outputs.release_tag }}
+        run: |
+          shopt -s nullglob
+          # the metadata is worth little on its own: fail the leg if no binary came out
+          binaries=(publish_output/*.exe publish_output/*.zip publish_output/*.7z)
+          if [ ${#binaries[@]} -eq 0 ]; then
+            echo "::error::no binary in publish_output for $WINPYVER"
+            exit 1
+          fi
+          files=(publish_output/*)
+          # --clobber so re-running a leg replaces its files instead of erroring
+          gh release upload "$TAG" "${files[@]}" --clobber
+
+      - name: Upload metadata artifact
+        # the binaries are on the release; this is what the changelog commit needs
+        if: ${{ inputs.publish }}
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ matrix.flavor.artifact_name }}
+          name: ${{ matrix.leg.artifact_name }}
+          path: |
+            publish_output/*.md
+            publish_output/*.toml
+            publish_output/*.txt
+          retention-days: 66  # keeps artifact for 66 days
+
+      - name: Upload artifacts
+        # no release to upload to, so the binaries have nowhere else to go
+        if: ${{ !inputs.publish }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.leg.artifact_name }}
           path: publish_output
           retention-days: 66  # keeps artifact for 66 days
