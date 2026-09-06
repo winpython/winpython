@@ -11,6 +11,7 @@ by the build, because a history compares against the *previous* release, which
 only the repository has.
 """
 import importlib.util
+import os
 import shutil
 import subprocess
 import sys
@@ -87,6 +88,19 @@ class TestSelection:
         ]
 
 
+def run_script(*args, cwd, env=None):
+    """The script by absolute path, from an unrelated directory.
+
+    It must not need to be run from the checkout: the workflow's own step and
+    these tests both invoke it as a path, which puts .github/scripts on
+    sys.path rather than the repository root.
+    """
+    return subprocess.run(
+        [sys.executable, str(SCRIPT), *map(str, args)],
+        cwd=str(cwd), capture_output=True, text=True, env=env,
+    )
+
+
 @needs_script
 class TestEndToEnd:
     """Run the script the way the workflow runs it."""
@@ -111,12 +125,30 @@ class TestEndToEnd:
         (source / "hashes_3.15.0.5slimb1.md").write_text("x", encoding="utf-8")
         return source, changelogs
 
-    def test_files_the_three_and_writes_the_history(self, cycle):
+    def test_wppm_comes_from_the_checkout(self, cycle, tmp_path):
+        """A decoy wppm on PYTHONPATH must lose to the one being released.
+
+        Running a script puts the script's directory on sys.path, not the
+        checkout root, so without a deliberate insert the import falls through
+        to whatever else is reachable. On a machine with wppm installed that
+        looks fine -- which is how it once slipped past a green local run --
+        and on a CI runner, which installs none, it is ModuleNotFoundError.
+        The decoy makes the difference visible either way.
+        """
         source, changelogs = cycle
-        proc = subprocess.run(
-            [sys.executable, ".github/scripts/changelog_files.py", str(source), str(changelogs)],
-            cwd=REPO, capture_output=True, text=True,
+        decoy = tmp_path / "decoy"
+        (decoy / "wppm").mkdir(parents=True)
+        (decoy / "wppm" / "__init__.py").write_text(
+            "raise RuntimeError('decoy wppm imported')", encoding="utf-8"
         )
+        env = {**os.environ, "PYTHONPATH": str(decoy)}
+        proc = run_script(source, changelogs, cwd=tmp_path, env=env)
+        assert proc.returncode == 0, proc.stderr
+        assert "decoy" not in proc.stderr
+
+    def test_files_the_three_and_writes_the_history(self, cycle, tmp_path):
+        source, changelogs = cycle
+        proc = run_script(source, changelogs, cwd=tmp_path)
         assert proc.returncode == 0, proc.stderr
         landed = sorted(p.name for p in changelogs.iterdir())
         assert landed == [
@@ -127,12 +159,10 @@ class TestEndToEnd:
             "requir.64-3_15_0_5slimb1.txt",
         ]
 
-    def test_the_history_names_the_release_it_compares_against(self, cycle):
+    def test_the_history_names_the_release_it_compares_against(self, cycle, tmp_path):
         source, changelogs = cycle
-        subprocess.run(
-            [sys.executable, ".github/scripts/changelog_files.py", str(source), str(changelogs)],
-            cwd=REPO, capture_output=True, text=True, check=True,
-        )
+        proc = run_script(source, changelogs, cwd=tmp_path)
+        assert proc.returncode == 0, proc.stderr
         history = (changelogs / "WinPythonslim-64bit-3.15.0.5b1_History.md").read_text(
             encoding="utf-8"
         )
@@ -144,18 +174,11 @@ class TestEndToEnd:
         source, changelogs = tmp_path / "src", tmp_path / "changelogs"
         source.mkdir()
         changelogs.mkdir()
-        proc = subprocess.run(
-            [sys.executable, ".github/scripts/changelog_files.py", str(source), str(changelogs)],
-            cwd=REPO, capture_output=True, text=True,
-        )
+        proc = run_script(source, changelogs, cwd=tmp_path)
         assert proc.returncode != 0
         assert "held no changelog" in proc.stdout + proc.stderr
 
     def test_a_missing_directory_is_an_error(self, tmp_path):
-        proc = subprocess.run(
-            [sys.executable, ".github/scripts/changelog_files.py",
-             str(tmp_path / "nope"), str(tmp_path)],
-            cwd=REPO, capture_output=True, text=True,
-        )
+        proc = run_script(tmp_path / "nope", tmp_path, cwd=tmp_path)
         assert proc.returncode != 0
         assert "no such directory" in proc.stdout + proc.stderr

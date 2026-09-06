@@ -13,16 +13,21 @@ build, because a history is a comparison against the *previous* release, and
 only a checkout of the repository has that to compare against. Ordering is
 `wppm.diff`'s job; this decides what to hand it.
 
-Run from the checkout root, so `from wppm import diff` finds the wppm being
-released rather than an installed one.
 """
 import re
 import shutil
 import sys
 from pathlib import Path
 
-from wppm import diff
-from wppm.diff import version  # packaging, or pip's vendored copy
+# Running a script puts the script's own directory on sys.path, not the
+# checkout root, so wppm has to be found deliberately: this file is
+# .github/scripts/changelog_files.py, hence two levels up. Without it the
+# import finds whatever wppm happens to be installed, or -- as on a CI runner,
+# which installs none -- nothing at all.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from wppm import diff  # noqa: E402  the path above has to be set first
+from wppm.diff import version  # noqa: E402  packaging, or pip's vendored copy
 
 # WinPythonslim-64bit-3.15.0.5b1.md -- the flavor may be empty, and the version
 # may carry a release level, which is why the parser decides and not the regex
