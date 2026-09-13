@@ -94,17 +94,31 @@ def compare_markdown_section_pairs(md1, md2, header_pairs, label1="Input1", labe
             text += f"\n## {label1} [{h1}] vs {label2} [{h2}]\n\n{diff}\n"
     return text
 
+def index_title(file1, file2):
+    """## Changes from <first index> to <second index>.
+
+    Comparing two files says nothing about which two, and the direction
+    matters: every upgrade line is written "old -> new", so a reader who has
+    the pair the wrong way round sees every upgrade as a downgrade. The version
+    mode gets this from the versions it was handed; the file mode has only the
+    names, so it uses them, without directory or extension.
+    """
+    name = lambda f: Path(f).stem
+    return f"## Changes from {name(file1)} to {name(file2)}\n"
+
+
 def compare_files(file1, file2, mode="full", header1=None, header2=None, header_pairs=None):
     with open(file1, encoding=utils.guess_encoding(file1)[0]) as f1, \
          open(file2, encoding=utils.guess_encoding(file2)[0]) as f2:
         md1, md2 = f1.read(), f2.read()
     if mode == "full":
-        result = ""
+        result = index_title(file1, file2) + "\n"
         for k in PackageIndex.HEADERS:
             result += compare_markdown_sections(md1, md2, k, k, file1, file2) + "\n"
         return result
     elif mode == "section":
-        return compare_markdown_sections(md1, md2, header1, header2, file1, file2)
+        return (index_title(file1, file2) + "\n"
+                + compare_markdown_sections(md1, md2, header1, header2, file1, file2))
     elif mode == "pairs":
         return compare_markdown_section_pairs(md1, md2, header_pairs, file1, file2)
     else:
@@ -158,7 +172,6 @@ def compare_package_indexes(version2, version1=None, searchdir=None, flavor="", 
     flavor1 = flavor1 or flavor
     md1 = load_version_markdown(version1, searchdir, flavor1, architecture)
     md2 = load_version_markdown(version2, searchdir, flavor, architecture)
-    result = f"# WinPython {architecture}bit {version2}{flavor} vs {version1}{flavor1}\n"
     result = (
         f"## History of changes for WinPython-{architecture}bit {version2 + flavor}\r\n\r\n"
         f"The following changes were made to WinPython-{architecture}bit distribution since version {version1 + flavor1}.\n\n\n"
@@ -193,19 +206,25 @@ def write_changelog(version2, version1=None, searchdir=None, flavor="", architec
         shutil.copyfile(output_file, Path(basedir) / output_file.name)
 
 def print_usage():
+    # "python diff.py" cannot work -- the relative imports need the package --
+    # so every line says how it is really run
     print("Usage:")
-    print("  python diff.py file1.md file2.md")
-    print("    - Compare all sections of two markdown files.")
-    print("  python diff.py file1.md file2.md --section header1 header2")
+    print("  wppm -diff file1.md file2.md   (or: python -m wppm.diff file1.md file2.md)")
+    print("    - Compare all sections of two package indexes, in any order or flavor.")
+    print("  python -m wppm.diff file1.md file2.md --section header1 header2")
     print("    - Compare section 'header1' of file1 with section 'header2' of file2.")
-    print("  python diff.py file1.md file2.md --pairs header1a header2a [header1b header2b ...]")
-    print("    - Compare pairs of sections. Example: python diff.py f1.md f2.md --pairs python wheelhouse tools tools")
-    print("  python diff.py <version2> <version1> [searchdir] [flavor] [architecture]")
-    print("    - Compare WinPython markdown changelogs by version (historical mode).")
-    print("  python diff.py --write-changelog <version2> <version1> [searchdir] [flavor] [architecture] [basedir]")
-    print("    - Write changelog between version1 and version2 to file (and optionally copy to basedir).")
+    print("  python -m wppm.diff file1.md file2.md --pairs header1a header2a [header1b header2b ...]")
+    print("    - Compare pairs of sections. Example: --pairs python wheelhouse tools tools")
+    print("  python -m wppm.diff <version2> <version1> [searchdir] [flavor] [architecture]")
+    print("    - Compare WinPython package indexes by version, from a changelogs directory.")
+    print("  python -m wppm.diff --write-changelog <version2> <version1> [searchdir] [flavor] [architecture] [basedir]")
+    print("    - Write that comparison to a file (and optionally copy it to basedir).")
 
 if __name__ == "__main__":
+    # every upgraded package prints an arrow, and a Windows console is cp1252,
+    # so the default encoding turned "compare two releases" into a traceback
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     args = sys.argv
     if len(args) >= 3 and all(arg.lower().endswith('.md') for arg in args[1:3]):
         file1, file2 = args[1], args[2]

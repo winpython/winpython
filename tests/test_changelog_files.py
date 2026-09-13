@@ -6,9 +6,11 @@ A leg produces four metadata files. Three belong in `changelogs/`; the fourth,
 and has never been kept there. Getting that wrong is quiet: the wrong file is
 committed and nothing complains, so the selection is pinned here.
 
-The `_History.md` companions are written from the checkout rather than shipped
-by the build, because a history compares against the *previous* release, which
-only the repository has.
+No `_History.md` companion is written. A history compares a release against
+the one immediately before it, and that chain carries no meaning: flavors come
+and go between cycles, and readers upgrade about once a year rather than every
+cycle. The comparison that is wanted is between two indexes of the reader's own
+choosing -- `wppm -diff a.md b.md` -- so the absence is pinned here too.
 """
 import importlib.util
 import os
@@ -146,28 +148,25 @@ class TestEndToEnd:
         assert proc.returncode == 0, proc.stderr
         assert "decoy" not in proc.stderr
 
-    def test_files_the_three_and_writes_the_history(self, cycle, tmp_path):
+    def test_files_the_three_and_nothing_else(self, cycle, tmp_path):
         source, changelogs = cycle
         proc = run_script(source, changelogs, cwd=tmp_path)
         assert proc.returncode == 0, proc.stderr
         landed = sorted(p.name for p in changelogs.iterdir())
         assert landed == [
-            "WinPythonslim-64bit-3.15.0.4.md",           # was already there
-            "WinPythonslim-64bit-3.15.0.5b1.md",         # filed
-            "WinPythonslim-64bit-3.15.0.5b1_History.md",  # written
+            "WinPythonslim-64bit-3.15.0.4.md",    # was already there
+            "WinPythonslim-64bit-3.15.0.5b1.md",  # filed
             "pylock.64-3_15_0_5slimb1.toml",
             "requir.64-3_15_0_5slimb1.txt",
         ]
 
-    def test_the_history_names_the_release_it_compares_against(self, cycle, tmp_path):
+    def test_no_history_is_written_against_the_previous_release(self, cycle, tmp_path):
+        """Deliberate: see the module docstring. Not an oversight to restore."""
         source, changelogs = cycle
         proc = run_script(source, changelogs, cwd=tmp_path)
         assert proc.returncode == 0, proc.stderr
-        history = (changelogs / "WinPythonslim-64bit-3.15.0.5b1_History.md").read_text(
-            encoding="utf-8"
-        )
-        assert "since version 3.15.0.4slim" in history
-        assert "3.15.0.5b1slim" in history
+        assert not list(changelogs.glob("*_History.md"))
+        assert "history" not in proc.stdout.lower()
 
     def test_an_empty_metadata_directory_is_an_error(self, tmp_path):
         """Silence here would commit nothing and call it a success."""

@@ -243,7 +243,7 @@ jobs:
           merge-multiple: true
           path: release_metadata
 
-      - name: File the changelogs and write the histories
+      - name: File the changelogs
         run: python .github/scripts/changelog_files.py release_metadata changelogs
 
       - name: Open the changelog pull request
@@ -271,5 +271,5 @@ jobs:
           else
             gh pr create --base "$BASE" --head "$branch" \
               --title "Changelogs for $TITLE" \
-              --body "Package indexes, lock files and requirements for every leg of \`$TAG\`, with the \`_History.md\` companions written against the previous release. Filed by the build that produced them, rather than copied by hand."
+              --body "Package indexes, lock files and requirements for every leg of \`$TAG\`, filed by the build that produced them rather than copied by hand. Compare any two of them with \`wppm -diff <a>.md <b>.md\`."
           fi
