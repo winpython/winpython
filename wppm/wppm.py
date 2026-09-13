@@ -81,8 +81,8 @@ class Distribution:
         return md
     
     def get_package_index_data(self, python_executable_directory: str|None = None, winpyver2: str|None = None,
-                                         flavor: str|None = None, architecture_bits: int|None = None
-                                         , release_level: str|None = None, wheeldir: str|None = None) -> dict:
+                                         flavor: str|None = None, release_level: str|None = None,
+                                         wheeldir: str|None = None) -> dict:
         """Collects the package index data: distribution identity, tools, packages, wheelhouse."""
         my_ver , my_arch = utils.get_python_infos(python_executable_directory or self.target)
         my_winpyver2 = winpyver2 or os.getenv("WINPYVER2","")
@@ -114,10 +114,10 @@ class Distribution:
         }
 
     def generate_package_index_markdown(self, python_executable_directory: str|None = None, winpyver2: str|None = None,
-                                         flavor: str|None = None, architecture_bits: int|None = None
-                                         , release_level: str|None = None, wheeldir: str|None = None) -> str:
+                                         flavor: str|None = None, release_level: str|None = None,
+                                         wheeldir: str|None = None) -> str:
         """Generates a Markdown formatted package index page."""
-        data = self.get_package_index_data(python_executable_directory, winpyver2, flavor, architecture_bits, release_level, wheeldir)
+        data = self.get_package_index_data(python_executable_directory, winpyver2, flavor, release_level, wheeldir)
         d = data["distribution"]
         as_tuples = lambda items: [(i["name"], i["url"], i["version"], i["summary"]) for i in items]
 
