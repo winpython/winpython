@@ -328,15 +328,23 @@ def main():
         )]
     run_command(cmd, shell=True)
     shutil.copyfile (winpydirbase.parent / mdn, changelog_dir / mdn)
-    
+
+    # What moved since the previous build of this flavor -- for the person
+    # running the build, who wants to see it before publishing anything. It
+    # stays beside the build output and is NOT copied into changelogs/: the
+    # archive keeps the package indexes, and a diff against the immediately
+    # previous release is not a useful thing to publish, since flavors come and
+    # go between cycles and readers upgrade about once a year. Anyone wanting a
+    # comparison picks their own two indexes with `wppm -diff <a>.md <b>.md`.
+    # The previous index is still read from changelog_dir, which holds them all.
     cmd = [str(target_python), "-X", "utf8", "-c",
         (
         "from wppm import diff;"
         f"result = diff.compare_package_indexes('{changelog_version}', searchdir=r'{changelog_dir}', flavor=r'{args.flavor}', architecture={args.arch});"
-        f"open(r'{winpydirbase.parent / out}', 'w', encoding='utf-8').write(result)" 
+        f"open(r'{winpydirbase.parent / out}', 'w', encoding='utf-8').write(result)"
         )]
     run_command(cmd, check=False)
-    shutil.copyfile (winpydirbase.parent / out, changelog_dir / out)
+    logging.info(f"changes since the previous {args.flavor or 'plain'} build: {winpydirbase.parent / out}")
 
     if args.create_installer != "":
         log_section("🙏 Step 8: Create Installer")

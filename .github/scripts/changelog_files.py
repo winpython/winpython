@@ -1,4 +1,4 @@
-"""File a cycle's build output into changelogs/, and write the histories.
+"""File a cycle's build output into changelogs/.
 
     python .github/scripts/changelog_files.py <downloaded metadata> changelogs
 
@@ -8,10 +8,13 @@ and are copied there as they are: the package index
 The fourth, hashes_<winpyver>.md, describes the binaries of one build rather
 than the release, and stays out.
 
-The _History.md companions are then written here rather than shipped from the
-build, because a history is a comparison against the *previous* release, and
-only a checkout of the repository has that to compare against. Ordering is
-`wppm.diff`'s job; this decides what to hand it.
+No _History.md companion is written. A history compares a release against the
+one immediately before it, and that chain carries no meaning: flavors are not
+stable across cycles -- one may appear while another goes away -- and people
+upgrade about once a year rather than every cycle, so a diff against the
+predecessor answers a question almost nobody asks. What is useful is comparing
+two package indexes of the reader's own choosing, which `wppm -diff` does
+against any two of the files this script files.
 
 """
 import re
@@ -26,7 +29,6 @@ from pathlib import Path
 # which installs none -- nothing at all.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from wppm import diff  # noqa: E402  the path above has to be set first
 from wppm.diff import version  # noqa: E402  packaging, or pip's vendored copy
 
 # WinPythonslim-64bit-3.15.0.5b1.md -- the flavor may be empty, and the version
@@ -42,7 +44,7 @@ def parse_changelog_name(name: str):
     try:
         version.parse(match.group("version"))
     except version.InvalidVersion:
-        return None  # the _History companions land here, as they should
+        return None  # anything whose tail is not a version is not an index
     return match.group("flavor"), int(match.group("arch")), match.group("version")
 
 
@@ -78,22 +80,8 @@ def main(argv: list[str]) -> None:
         raise SystemExit(f"{source} held no changelog, lock file or requirements")
     for name in filed:
         print(f"filed {name}")
-
-    # every package index has to be in place before any history is written: a
-    # history reads the index of the release it compares against, which for the
-    # second flavor of a cycle may well be the one just copied
-    histories = 0
-    for name in filed:
-        parsed = parse_changelog_name(name)
-        if not parsed:
-            continue
-        flavor, architecture, ver = parsed
-        previous = diff.find_previous_version(ver, changelogs, flavor, architecture)
-        diff.write_changelog(ver, None, changelogs, flavor, architecture)
-        histories += 1
-        against = "nothing earlier" if previous == ver else previous
-        print(f"history WinPython{flavor}-{architecture}bit-{ver} vs {against}")
-    print(f"\n{len(filed)} file(s) filed, {histories} history file(s) written")
+    indexes = sum(1 for name in filed if parse_changelog_name(name))
+    print(f"\n{len(filed)} file(s) filed, {indexes} package index(es)")
 
 
 if __name__ == "__main__":
