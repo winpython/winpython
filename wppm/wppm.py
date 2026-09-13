@@ -345,6 +345,8 @@ def main(test=False):
     parser.add_argument("-ls", "--list", action="store_true", help="list installed packages matching [optional] expression: wppm -ls, wppm -ls pand")
     parser.add_argument("-lsa", dest="all", action="store_true",help=f"list details of packages matching [optional]  expression: wppm -lsa pandas -l1")
     parser.add_argument("-md", dest="markdown", action="store_true",help=f"markdown summary of the installation")
+    parser.add_argument("-diff", dest="diff", nargs=2, metavar=("INDEX1", "INDEX2"), default=None,
+                        help="compare two package indexes, whichever two you choose: wppm -diff WinPythonslim-64bit-3.13.5.0.md WinPythonslim-64bit-3.14.7.0.md\nany two releases or flavors, in either direction -- they need not be consecutive")
     parser.add_argument("-p",dest="pipdown",action="store_true",help="show Package (!= missing) dependencies of the given package[option], [.]=all: wppm -p pandas[.]")
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
     parser.add_argument("-tl", "--top-level", action="store_true", help="keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v\nwith -p or -r, start the tree from them instead of every package: wppm -tl -p")
@@ -355,6 +357,17 @@ def main(test=False):
     parser.add_argument("-u", "--uninstall", action="store_true", help="uninstall package  (use pip for more features)")
 
     args = parser.parse_args()
+    if args.diff:
+        # no distribution involved: this reads two files. The indexes are in
+        # the changelogs/ directory of the winpython repository, one per
+        # release and flavor, and any two of them can be compared.
+        # utf-8 here and not just errors="replace": an upgrade is written
+        # "1.2.3 → 1.2.4", and replacing that arrow with "?" is most of the
+        # output on a page whose whole subject is upgrades.
+        if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        print(diff.compare_files(*args.diff))
+        sys.exit()
     targetpython = None
     if args.target and args.target != sys.prefix:
         targetpython = args.target if args.target.lower().endswith('.exe') else str(Path(args.target) / 'python.exe')
