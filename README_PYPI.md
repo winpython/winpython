@@ -175,6 +175,31 @@ entry to whatever pulls it in:
 {'numpy': ['pandas']}
 ```
 
+## Comparing two package lists
+
+`-md` writes a package index. `-diff` compares two:
+
+```console
+$ wppm -diff WinPythonslim-64bit-3.13.5.0.md WinPythonslim-64bit-3.14.7.0.md
+## Changes from WinPythonslim-64bit-3.13.5.0 to WinPythonslim-64bit-3.14.7.0
+
+### Python packages
+
+New packages:
+  * aiofile 3.9.0 (Asynchronous file operations.)
+
+Upgraded packages:
+  * numpy 2.2.6 → 2.5.2 (Fundamental package for array computing in Python)
+
+Removed packages:
+  * astropy 6.1.6 (Astronomy and astrophysics core library)
+```
+
+Any two indexes, in any order: two releases a year apart, or two flavors of the same
+one. No distribution is involved, so two downloaded files are enough. WinPython
+publishes one index per release and flavor, in
+[changelogs/](https://github.com/winpython/winpython/tree/master/changelogs).
+
 ## Environments you have not installed anything into
 
 `-t` points `wppm` at *another* Python distribution, and `-ws` at a plain directory of
