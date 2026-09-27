@@ -34,6 +34,11 @@ on:
         required: false
         default: true
         type: boolean
+      overwrite_published:
+        description: 'Tick ONLY to replace the files of an already-published release; normally a release_level bump is what you want'
+        required: false
+        default: false
+        type: boolean
 
 permissions: {}
 
@@ -81,10 +86,20 @@ jobs:
           TAG: ${{ needs.config.outputs.release_tag }}
           TITLE: ${{ needs.config.outputs.release_title }}
           CYCLE: ${{ inputs.cycle }}
+          OVERWRITE: ${{ inputs.overwrite_published }}
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
-            # re-running one missing flavor is normal; say which release its files
-            # land on, and leave the title alone in case it was edited by hand
+            # Adding a missing flavor to a draft is the normal path. Landing on
+            # a release that is already published is almost always a forgotten
+            # release_level bump, and the upload replaces files people have
+            # downloaded -- so stop here, before an hour of build time.
+            published=$(gh release view "$TAG" --json isDraft --jq '.isDraft | not')
+            if [ "$published" = "true" ] && [ "$OVERWRITE" != "true" ]; then
+              echo "::error::$TAG is already published. Bump release_level in cycles/$CYCLE.toml, or re-dispatch with overwrite_published ticked to replace its files."
+              exit 1
+            fi
+            # say which release the files land on, and leave the title alone in
+            # case it was edited by hand
             state=$(gh release view "$TAG" --json isDraft --jq 'if .isDraft then "still a draft" else "ALREADY PUBLISHED" end')
             echo "release $TAG exists ($state); this run adds its files to it"
           else
