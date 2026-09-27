@@ -4,7 +4,7 @@
 # is a new file rather than a copy of the workflow.
 
 cycle_dir     = "winpython/portable/cycle_2026_04"
-release_level = "b1"
+release_level = "b2"
 
 # The build publishes under "<this file's name with dashes><release level>", so
 # this cycle releases as 2026-04b1 and a respin is a release_level bump rather
