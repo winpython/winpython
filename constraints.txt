@@ -183,7 +183,7 @@ jaraco.classes>=3.4.0
 jaraco.context>=6.0.1
 jaraco.functools>=4.3.0
 jedi>=0.19.2
-jellyfish>=1.2.1
+jellyfish>=0.8.7
 Jinja2>=3.1.6
 jiter>=0.11.1
 joblib>=1.5.2
@@ -273,9 +273,6 @@ onnxruntime>=1.23.2
 openai>=2.7.1
 openpyxl>=3.1.5
 opentelemetry-api>=1.34.1
-# 2026-08-30 this project publishes betas only, so the specifier names one.
-# That is what lets pip take it now that the build no longer passes --pre.
-opentelemetry-semantic-conventions>=0.60b1
 optree>=0.17.0
 optuna>=4.2.1
 orjson>=3.11.4
@@ -326,7 +323,7 @@ pycodestyle>=2.12.0
 pycparser>=2.23
 pyct>=0.5.0
 pydantic>=2.12.4
-pydantic-ai-slim>=1.106.0
+pydantic-ai-slim>=1.12.0
 pydantic-evals>=1.12.0
 pydantic-graph>=1.12.0
 pydantic-settings>=2.11.0
