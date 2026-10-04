@@ -4,7 +4,7 @@
 # is a new file rather than a copy of the workflow.
 
 cycle_dir     = "winpython/portable/cycle_2026_04"
-release_level = "b2"
+release_level = "b3"
 
 # The build publishes under "<this file's name with dashes><release level>", so
 # this cycle releases as 2026-04b1 and a respin is a release_level bump rather
@@ -18,29 +18,29 @@ sha256 = "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
 # ver2 is the WinPython 4-part version; its first 3 parts must appear in src.
 
 [pythons."3.13"]
-ver2 = "3.13.15.1"
-src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.13.15+20260924-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-sha  = "e42fa944748a50e9ff481cbb817ef8a6e3da6fbcf0cf6f29b554e1acb8c7384d"
+ver2 = "3.13.16.0"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261001/cpython-3.13.16+20261001-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "c402eb9a35aba90de319bbc87d23e6d887eca1551a05cfa80775f92dcf3ebc08"
 
 [pythons."3.14"]
-ver2 = "3.14.7.1"
-src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7+20260924-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-sha  = "1493fc4185edf84bbd4305c15c5fbac2d4fcd4ddd7eb6273903669a5d3106178"
+ver2 = "3.14.8.0"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261001/cpython-3.14.8+20261001-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "b7ff8b700995379e425b39abce9b087d84a45aa265ea465c0069c2747ea5b2ea"
 
 [pythons."3.14F"]
-ver2 = "3.14.7.1"
-src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.14.7+20260924-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
-sha  = "fab023c3ab6c67539c31f0204139dc8f23816ff9a316c90ca2632d48865db1f5"
+ver2 = "3.14.8.0"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261001/cpython-3.14.8+20261001-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
+sha  = "54e9c8f043096138307b8d6b2c9ac43c19a3815a42f5cfb5b0e3e63cebe4fcbe"
 
 [pythons."3.15"]
 ver2 = "3.15.0.5"
-src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.15.0rc2+20260924-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-sha  = "2a55fddfc90f1340c8149a56bfa3cd0184e4d918ba2f1a392f3d2fec5bf12fc3"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261001/cpython-3.15.0rc2+20261001-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "eeb52e6b8507b118103654b111a662b7b4fd86ea1a56aba840ec84a15b6d8d39"
 
 [pythons."3.15F"]
 ver2 = "3.15.0.5"
-src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20260924/cpython-3.15.0rc2+20260924-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
-sha  = "0593f21d424e2e4f144996c826bbf4e34c275a7598f1a7fd53d34889e33c7c3b"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261001/cpython-3.15.0rc2+20261001-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
+sha  = "acbce6861f62b9fbcde459433d9e8e4d596c6a81da84632700f0170b6d6c9404"
 
 # Flavors become the job matrix. 2026-02 renamed "free" to "dotf", so this
 # varies per cycle too and belongs in the cycle file.
