@@ -2,6 +2,8 @@
 # Local builds are made with Python 3.11 or later.
 import os
 import sys
+import shutil
+import argparse
 import tomllib  # stdlib since 3.11; we choose toml over yaml, more python standard
 import subprocess
 from pathlib import Path
@@ -74,7 +76,28 @@ def declared_file(build, key, default):
     declared = build.get(key)
     return str(default) if declared is None else must_exist(str(declared), build, key)
 
-def run_build(build, python_versions, dry_run=False):
+def copy_lockfiles(build_dir, lock_dir, overwrite=False, dry_run=False):
+    """Copy the build's pylock and requir files to lock_dir, e.g. a cycle_XXXX_XX.
+
+    A file already there is kept unless overwrite: a published lock must not be
+    replaced by accident. The _wheels locks are build scaffolding, not copied.
+    """
+    lock_dir = Path(lock_dir)
+    files = [f for pattern in ("pylock.*.toml", "requir.*.txt")
+             for f in sorted(Path(build_dir).glob(pattern)) if "_wheels" not in f.name]
+    if not files:
+        print(f"no lockfile to copy in {build_dir}")
+    for f in files:
+        dest = lock_dir / f.name
+        if dest.exists() and not overwrite:
+            print(f"kept existing {dest} (use --lock-overwrite to replace)")
+            continue
+        print(f"{'would copy' if dry_run else 'copy'} {f} -> {dest}")
+        if not dry_run:
+            lock_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, dest)
+
+def run_build(build, python_versions, dry_run=False, lock_dir=None, lock_overwrite=False):
     print(f"\n=== Building WinPython: {build['python_target']} {build['name']} ===")
     print(build)
 
@@ -143,15 +166,25 @@ def run_build(build, python_versions, dry_run=False):
     print("Dry run, build command:" if dry_run else "Running build command:")
     print(" ".join(build_cmd))
     if not dry_run:
-        subprocess.run(build_cmd, check=False)
+        returncode = subprocess.run(build_cmd, check=False).returncode
+        if returncode:
+            print(f"build failed ({returncode}), no lockfile copied")
+            return
+    if lock_dir:
+        copy_lockfiles(Path(my_WINPYDIRBASE).parent, lock_dir, lock_overwrite, dry_run)
 
 def main():
-    args = [a for a in sys.argv[1:] if a != "--dry-run"]
-    dry_run = len(args) != len(sys.argv) - 1
-    config_file = args[0] if args else "winpython_builds.toml"
-    builds, python_versions = load_builds(config_file)
-    for build in select_builds(builds, args[1:]):
-        run_build(build, python_versions, dry_run)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("config", nargs="?", default="winpython_builds.toml")
+    parser.add_argument("builds", nargs="*", help='"315", "315:slim", ":slim"')
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--lock-dir", help="copy the pylock and requir files there")
+    parser.add_argument("--lock-overwrite", action="store_true",
+                        help="replace files already in --lock-dir")
+    args = parser.parse_args()
+    builds, python_versions = load_builds(args.config)
+    for build in select_builds(builds, args.builds):
+        run_build(build, python_versions, args.dry_run, args.lock_dir, args.lock_overwrite)
 
 if __name__ == "__main__":
     main()

@@ -61,9 +61,9 @@ wheelhousereq = "requirements_whl.txt"
 # ---- pythons: what gets built -----------------------------------------------
 
 [pythons."313"]
-python_target_release = "31315"
-release = "1"
-my_release_level = "b1"
+python_target_release = "31316"
+release = "0"
+my_release_level = ""
 builds = ["dot", "slim"]
 
 # A Python that names a requirements file its own way says so here:
@@ -71,13 +71,14 @@ builds = ["dot", "slim"]
 # requirements = "requirements64_slim.txt"
 
 [pythons."314"]
-python_target_release = "3147"
-release = "1"
-my_release_level = "b1"
+python_target_release = "3148"
+release = "0"
+my_release_level = ""
 builds = ["dot", "dotf", "slim", "slimf"]
 
+
 [pythons."314".overrides.slimf]
-bytecode = "none"
+# bytecode = "none"
 # tornado ships one cp39-abi3 wheel, which no free-threaded interpreter matches,
 # so this flavor alone still needs the sdist fallback. The maintainer expects
 # free-threaded wheels during the 2026-04 cycle (tornadoweb/tornado#3501):
@@ -90,10 +91,11 @@ only_binary = false
 [pythons."315"]
 python_target_release = "3150"
 release = "5"
-my_release_level = "b1"
+my_release_level = ""
 builds = ["dot", "dotf", "slim", "slimf"]
 
-# [pythons."315".overrides.slim]
+[pythons."315".overrides.slim]
+requirements = "requirements_slim315.txt"
 # bytecode = "none"
 
 # [pythons."315".overrides.slimf]

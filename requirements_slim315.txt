@@ -1,0 +1,344 @@
+# requirements_slim.txt, sorted, 2026-10-11 12:31:07
+# 325 entries -> 187 kept, 138 already pulled in
+# 8 repeated, collapsed: argon2-cffi, cython, mypy, pandocfilters, partd, patsy, pep8, pyspnego
+
+absl-py
+aiofile
+aiohttp
+aiosqlite
+alembic
+anthropic
+anywidget
+argcomplete
+argon2-cffi
+array-api-compat
+asgi-csrf
+asgiref
+async-lru
+asyncssh
+authlib
+azure-cosmos
+azure-identity
+baresql
+bcrypt
+binaryornot
+build
+chardet
+clarabel
+colorlog
+cython
+cytoolz
+datashader
+deap
+entrypoints
+eval-type-backport
+exceptiongroup
+faker
+fasta2a
+fastapi
+fastavro
+fastmcp-slim
+filelock
+flatbuffers
+flexcache
+flexparser
+flit
+folium
+foundry-local-sdk
+fqdn
+fsspec
+fuzzywuzzy
+geopy
+google-genai
+graphene
+griffe
+groq
+hatchling
+hf-xet
+html5lib
+httpie
+hupper
+hypothesis
+imageio
+imbalanced-learn
+intervaltree
+ipycanvas
+ipyleaflet
+ipympl
+ipython-sql
+isoduration
+janus
+jellyfish
+json5
+jsonpatch
+jsonpath-python
+julia
+jupyter-builder
+lazy-loader
+linkify-it-py
+lmfit
+lxml
+markdown
+markdownify
+maturin
+mcp
+mdit-py-plugins
+mercantile
+mergedeep
+missingno
+ml-dtypes
+mlxtend
+mpld3
+mypy
+mysql-connector-python
+namex
+nbconvert
+networkx
+nltk
+numpydoc
+opencv-python
+openpyxl
+opentelemetry-semantic-conventions
+optree
+orjson
+partd
+pep8
+pexpect
+pg8000
+pickleshare
+pipdeptree
+plotly
+plotnine
+polars
+prince
+prometheus-client
+psycopg2
+ptpython
+py-key-value-aio
+pybind11
+pydantic-ai-slim
+pygithub
+pylint-venv
+pyls-spyder
+pympler
+pyomo
+pypandoc
+pypdf
+pyperclip
+pyqtwebengine
+pyserial
+pytest
+python-barcode
+python-json-logger
+python-lsp-black
+python-lsp-ruff
+python-slugify
+pyuca
+pyusb
+pyvisa
+pyviz-comms
+pywavelets
+qdarkstyle
+qrcode
+qstylizer
+qtawesome
+qtconsole
+quantecon
+quart
+reportlab
+requests-ntlm
+rfc3339-validator
+rfc3986-validator
+rfc3987-syntax
+rsa
+rtree
+rx
+scs
+send2trash
+shapely
+simplejson
+simpy
+skrub
+sounddevice
+soundfile
+spyder-kernels
+sqlite-utils
+sqlite_bro
+squarify
+streamlit
+superqt
+termcolor
+textdistance
+thefuzz
+three-merge
+tifffile
+tiktoken
+trio
+twine
+typer
+types-requests
+tzlocal
+umap-learn
+uri-template
+uuid-utils
+vega-datasets
+waitress
+webcolors
+websocket-client
+wheel
+xlsxwriter
+xxhash
+yt-dlp
+
+# ---- notes kept from the source ----
+# for WinPython-3.14 slim
+# 2026-07-12 
+#   switch geopandas for opencv
+# 2026-08-03: 
+#   astropy, django, distributed removed (place)
+#   pymongo removed
+# 2027-08-07
+#   remove geopandas (and so pyogrio, pyproj)
+# 2026-08-08 
+#   pydub unmaintained
+
+
+# ---- already pulled in by an entry above ----
+#aiofiles  # <- Quart
+#aiohappyeyeballs  # <- aiohttp
+#aiosignal  # <- aiohttp
+#alabaster  # <- numpydoc
+#altair  # <- prince, streamlit
+#annotated-types  # <- anthropic, fasta2a, fastapi, fastmcp-slim, foundry-local-sdk, ...
+#appdirs  # <- ptpython
+#asteval  # <- lmfit
+#autopep8  # <- python-lsp-server
+#azure-core  # <- azure-cosmos, azure-identity
+#babel  # <- numpydoc
+#beartype  # <- py-key-value-aio
+#beautifulsoup4  # <- markdownify, nbconvert
+#black  # <- pyls-spyder, python-lsp-black, python-lsp-ruff, python-lsp-server
+#bleach  # <- nbconvert
+#blinker  # <- Quart, streamlit
+#cachetools  # <- streamlit
+#caio  # <- aiofile
+#cattrs  # <- lsprotocol, python-lsp-ruff
+#cffi  # <- argon2-cffi, asyncssh, Authlib, azure-identity, clarabel, ...
+#cloudpickle  # <- skrub, spyder-kernels
+#colorcet  # <- datashader
+#cycler  # <- ipympl, matplotlib, missingno, mlxtend, mpld3, ...
+#distro  # <- google-genai, groq
+#dnspython  # <- email-validator, fastmcp-slim
+#docstring-parser  # <- anthropic
+#docstring-to-markdown  # <- pyls-spyder, python-lsp-black, python-lsp-ruff, python-lsp-server
+#email-validator  # <- fastmcp-slim
+#et-xmlfile  # <- openpyxl
+#executing  # <- anywidget, ipycanvas, ipykernel, ipyleaflet, ipympl, ...
+#fastjsonschema  # <- nbclient, nbconvert, nbformat
+#flake8  # <- python-lsp-server
+#gitpython  # <- streamlit
+#google-auth  # <- google-genai
+#httptools  # <- streamlit
+#httpx  # <- foundry-local-sdk, google-genai, groq, mcp, pydantic-ai-slim
+#httpx-sse  # <- mcp
+#httpx2  # <- anthropic
+#hypercorn  # <- Quart
+#id  # <- twine
+#imagesize  # <- numpydoc
+#inflection  # <- qstylizer
+#iniconfig  # <- pytest
+#ipykernel  # <- qtconsole, spyder-kernels
+#ipython-genutils  # <- ipython-sql
+#jaraco-classes  # <- keyring, twine
+#jaraco-context  # <- keyring, twine
+#jaraco-functools  # <- keyring, twine
+#jiter  # <- anthropic
+#joblib  # <- imbalanced-learn, mlxtend, nltk, prince, pynndescent, ...
+#joserfc  # <- Authlib
+#jsonschema  # <- altair, mcp, nbclient, nbconvert, nbformat, ...
+#jupyterlab-pygments  # <- nbconvert
+#keyring  # <- twine
+#lark  # <- rfc3987-syntax
+#logfire-api  # <- pydantic-ai-slim
+#lsprotocol  # <- python-lsp-ruff
+#matplotlib  # <- ipympl, missingno, mlxtend, mpld3, plotnine, ...
+#mistune  # <- nbconvert
+#msal  # <- azure-identity
+#multipledispatch  # <- datashader
+#nbclient  # <- nbconvert
+#nbformat  # <- nbclient, nbconvert
+#nest-asyncio  # <- ipykernel, qtconsole, spyder-kernels
+#numba  # <- datashader, pynndescent, quantecon, umap-learn
+#numpy  # <- baresql, clarabel, datashader, deap, folium, ...
+#outcome  # <- trio
+#pandocfilters  # <- nbconvert
+#patsy  # <- plotnine
+#pillow  # <- ImageIO, ipycanvas, ipympl, matplotlib, missingno, ...
+#pluggy  # <- hatchling, pyls-spyder, pytest, python-lsp-black, python-lsp-ruff, ...
+#priority  # <- Hypercorn, Quart
+#prompt-toolkit  # <- anywidget, ipycanvas, ipykernel, ipyleaflet, ipympl, ...
+#protobuf  # <- streamlit
+#psygnal  # <- anywidget
+#pyasn1-modules  # <- google-auth, google-genai
+#pyct  # <- datashader
+#pydantic  # <- anthropic, fasta2a, fastapi, fastmcp-slim, foundry-local-sdk, ...
+#pydocstyle  # <- python-lsp-server
+#pydot  # <- skrub
+#pyjwt  # <- azure-identity, mcp, msal, PyGithub
+#pylint  # <- python-lsp-server
+#pynacl  # <- PyGithub
+#pynndescent  # <- umap-learn
+#pyparsing  # <- ipympl, matplotlib, missingno, mlxtend, mpld3, ...
+#pyqt5  # <- PyQtWebEngine
+#pysocks  # <- httpie
+#pyspnego  # <- requests_ntlm
+#python-dotenv  # <- fastmcp-slim, mcp
+#python-lsp-server[all]  # <- pyls-spyder, python-lsp-black, python-lsp-ruff
+#python-multipart  # <- asgi-csrf, mcp, streamlit
+#pytokens  # <- black, pyls-spyder, python-lsp-black, python-lsp-ruff, python-lsp-server
+#pywin32  # <- mcp, Pympler
+#pyzmq  # <- ipykernel, nbclient, nbconvert, qtconsole, spyder-kernels
+#rapidfuzz  # <- thefuzz
+#readme-renderer  # <- twine
+#referencing  # <- altair, jsonschema, mcp, nbclient, nbconvert, ...
+#regex  # <- nltk, tiktoken
+#requests-toolbelt  # <- httpie, twine
+#rfc3986  # <- twine
+#roman-numerals  # <- numpydoc
+#rope  # <- python-lsp-server
+#rpds-py  # <- altair, jsonschema, mcp, nbclient, nbconvert, ...
+#ruff  # <- python-lsp-ruff
+#scikit-learn  # <- imbalanced-learn, mlxtend, prince, pynndescent, skrub, ...
+#scipy  # <- clarabel, datashader, imbalanced-learn, lmfit, missingno, ...
+#setuptools  # <- httpie
+#six  # <- baresql, datashader, graphene, html5lib, ipykernel, ...
+#smmap  # <- GitPython, streamlit
+#sqlalchemy  # <- alembic, ipython-sql
+#sqlparse  # <- ipython-sql
+#sse-starlette  # <- mcp
+#stack-data  # <- anywidget, ipycanvas, ipykernel, ipyleaflet, ipympl, ...
+#sympy  # <- quantecon
+#tenacity  # <- google-genai, streamlit
+#text-unidecode  # <- python-slugify
+#threadpoolctl  # <- imbalanced-learn, mlxtend, prince, pynndescent, scikit-learn, ...
+#tinycss2  # <- nbconvert, qstylizer
+#toml  # <- streamlit
+#toolz  # <- cytoolz, datashader, partd
+#tornado  # <- ipykernel, nbclient, nbconvert, qtconsole, spyder-kernels
+#tqdm  # <- foundry-local-sdk, nltk, umap-learn
+#traittypes  # <- ipyleaflet
+#trove-classifiers  # <- hatchling
+#truststore  # <- anthropic, httpx2
+#typing-inspection  # <- anthropic, fasta2a, fastapi, fastmcp-slim, foundry-local-sdk, ...
+#ujson  # <- pyls-spyder, python-lsp-black, python-lsp-ruff, python-lsp-server
+#uncertainties  # <- lmfit
+#uvicorn  # <- mcp, streamlit
+#watchdog  # <- streamlit
+#wcwidth  # <- anywidget, ipycanvas, ipykernel, ipyleaflet, ipympl, ...
+#websockets  # <- google-genai, streamlit
+#whatthepatch  # <- python-lsp-server
+#xarray  # <- datashader
+#xyzservices  # <- folium, ipyleaflet
+#yapf  # <- python-lsp-server
+#yarl  # <- aiohttp
+#zipp  # <- docstring-to-markdown, fasta2a, opentelemetry-semantic-conventions, pydantic-ai-slim, pyls-spyder, ...
