@@ -1,5 +1,5 @@
-# requirements_slim.txt, sorted, 2026-08-13 19:15:35
-# 160 entries -> 112 kept, 48 already pulled in
+# requirements_slim.txt, sorted, 2026-10-11 16:31:34
+# 159 entries -> 112 kept, 47 already pulled in
 # 8 repeated, collapsed: brotli, openai, pympler, pytest, python-barcode, pywavelets, sympy, xlsxwriter
 
 adbc_driver_manager
@@ -28,7 +28,6 @@ fuzzywuzzy
 geopy
 hatchling
 html5lib
-#httpie httpie-3.2.4 outdated and vulnerable
 hvplot
 hypothesis
 imbalanced-learn
@@ -38,6 +37,7 @@ ipympl
 ipython_sql
 julia
 jupyter
+jupyter-ai
 jupyter_bokeh
 keras
 langchain
@@ -69,7 +69,7 @@ prince
 psycopg2
 ptpython
 pybind11
-pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,openai,vertexai]==1.106.0
+pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,openai,vertexai]
 pympler
 pyodbc
 pyomo
@@ -77,6 +77,7 @@ pypandoc
 pypdf
 pyqtgraph
 pyserial
+pysocks
 pytest
 python-barcode
 pyusb
@@ -102,7 +103,6 @@ squarify
 streamlit-bokeh
 termcolor
 thefuzz
-tiktoken
 trio
 twine
 typer
@@ -134,7 +134,6 @@ yt_dlp
 #jupyterlab  # <- jupyter
 #markdownify  # <- markitdown
 #matplotlib  # <- ipympl, missingno, mlxtend, mpld3, plotnine, ...
-#mistralai  # mistralai get security problematic crpytography-47
 #networkx  # <- PlotPy, scikit-image
 #numba  # <- datashader, quantecon, umap-learn
 #numpy  # <- baresql, clarabel, cvxpy, dask, datashader, ...
@@ -144,7 +143,6 @@ yt_dlp
 #protobuf  # <- markitdown, onnxruntime, onnxruntime-genai, streamlit, streamlit-bokeh
 #pyct  # <- datashader
 #pydeck  # <- streamlit, streamlit-bokeh
-#pysocks  # <- httpie
 #PythonQwt  # <- PlotPy
 #pywin32  # <- pydantic-ai-slim, Pympler
 #pyzmq  # <- jupyter, jupyterlab, papermill, spyder
@@ -154,26 +152,39 @@ yt_dlp
 #scipy  # <- clarabel, cvxpy, datashader, imbalanced-learn, lmfit, ...
 #scs  # <- cvxpy
 #seaborn  # <- missingno
-#setuptools  # <- cvxpy, datasette, datasette-graphql, httpie, mypy
+#setuptools  # <- cvxpy, datasette, datasette-graphql, mypy
 #SQLalchemy  # <- alembic, ipython-sql, optuna
 #sqlite-utils  # <- datasette-graphql
 #statsmodels  # <- plotnine
 #streamlit  # <- streamlit-bokeh
 #sympy  # <- quantecon
 #tifffile  # <- PlotPy, scikit-image
+#tiktoken  # <- pydantic-ai-slim
 #websockets  # <- langchain, pydantic-ai-slim, streamlit, streamlit-bokeh
 #whatthepatch  # <- spyder
 #zstandard  # <- langchain
 
 # ---- notes kept from the source ----
-# for WinPython-3.14 slim
-# 2026-07-12 
-#   switch geopandas for opencv
-# 2026-08-03: 
-#   astropy, django, distributed removed (place)
-#   pymongo removed
+#3.14
+# todo 2026-06-21: streamlit-1.53.1 temporarly remove to allow pandas3
+#2026-08-03: astropy, django, distributed removed (place)
+#pymongo removed
 # 2027-08-07
-#   remove geopandas (and so pyogrio, pyproj)
-# 2026-08-08 
-#   pydub unmaintained
-
+# remove geopandas (and so pyogrio, pyproj)
+#2026-08-08 pydub unmaintained
+# the essential
+#sv-ttk
+##msvc_runtime
+# end of requirements.txt
+#waiting rc
+#pymongo
+# mistralai get security problematic crpytography-47
+#httpie httpie-3.2.4 outdated and vulnerable
+#azure
+#workarounds
+#pyqt5   or 6 not for free-threading
+#waitress may be dropped
+# onnxruntime, markitdown, magika, onnxruntime_genai
+#waiting numba
+# until onnxruntime stops using pyreadline3-3.5.4, to avoid bug
+# 2026-07-12 switch geopandas for opencv

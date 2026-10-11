@@ -201,14 +201,14 @@ sha256 = "fdc8b074db390fccb6eb4a3604ae7231f219aa669a2652e0f20e16ba513d5741"
 
 [[packages]]
 name = "argon2-cffi-bindings"
-version = "25.1.0"
+version = "26.1.0"
 
 [[packages.wheels]]
-name = "argon2_cffi_bindings-25.1.0-cp39-abi3-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/e2/c6/a759ece8f1829d1f162261226fbfd2c6832b3ff7657384045286d2afa384/argon2_cffi_bindings-25.1.0-cp39-abi3-win_amd64.whl"
+name = "argon2_cffi_bindings-26.1.0-cp310-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/6d/3a/0cc14a05810e6add9bce5e87693334baa2222de5f647fa31781885b6573f/argon2_cffi_bindings-26.1.0-cp310-abi3-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "a98cd7d17e9f7ce244c0803cad3c23a7d379c301ba618a5fa76a67d116618b98"
+sha256 = "2c36ff87b5dfaa477d0bd51e9d7f6abdae7c8955d2983c97419085d842154b3e"
 
 [[packages]]
 name = "array-api-compat"
@@ -288,17 +288,6 @@ url = "https://files.pythonhosted.org/packages/fe/d7/a71b12b625c44cfcb95d4139775
 sha256 = "60513ea5d608d27bdb0cf3785dc993a6c3adeaee45f1bded0953a09e904e461f"
 
 [[packages]]
-name = "astroid"
-version = "4.0.4"
-
-[[packages.wheels]]
-name = "astroid-4.0.4-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/b0/cf/1c5f42b110e57bc5502eb80dbc3b03d256926062519224835ef08134f1f9/astroid-4.0.4-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "52f39653876c7dec3e3afd4c2696920e05c83832b9737afc21928f2d2eb7a753"
-
-[[packages]]
 name = "asttokens"
 version = "3.0.2"
 
@@ -352,17 +341,6 @@ url = "https://files.pythonhosted.org/packages/fb/95/adcb68e20c34162e9135f370d6e
 
 [packages.wheels.hashes]
 sha256 = "3e1faedc9d87e7d56a164eca3ccb6ace0d61b94abe83e92242f8dc8bba9b4a9f"
-
-[[packages]]
-name = "autopep8"
-version = "2.3.2"
-
-[[packages.wheels]]
-name = "autopep8-2.3.2-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/9e/43/53afb8ba17218f19b77c7834128566c5bbb100a0ad9ba2e8e89d089d7079/autopep8-2.3.2-py2.py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "ce8ad498672c845a0c3de2629c15b635ec2b05ef8177a6e7c91c74f3e9b51128"
 
 [[packages]]
 name = "azure-core"
@@ -1014,17 +992,6 @@ url = "https://files.pythonhosted.org/packages/c1/e8/72f8cef9fdfeffe06213fe85080
 sha256 = "87dd94cf281e586d135fa51132b8e3d9a598b316e90377a288663c9321036c82"
 
 [[packages]]
-name = "flake8"
-version = "7.3.0"
-
-[[packages.wheels]]
-name = "flake8-7.3.0-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/9f/56/13ab06b4f93ca7cac71078fbe37fcea175d3216f31f85c3168a6bbd0bb9a/flake8-7.3.0-py2.py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "b9696257b9ce8beb888cdbe31cf885c90d31928fe202be0889a7cdafad32f01e"
-
-[[packages]]
 name = "flask"
 version = "3.1.3"
 
@@ -1180,14 +1147,14 @@ sha256 = "928244b28db720d1e0ee7587acf660ea49d7e4c632569cad4f1cd7e68a5f0993"
 
 [[packages]]
 name = "genai-prices"
-version = "0.0.60"
+version = "0.1.9"
 
 [[packages.wheels]]
-name = "genai_prices-0.0.60-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/6e/b9/73b151d5cb6068581d5f618f8f15ccebaf48b7143b2e2e2d1e29ccc1ac8b/genai_prices-0.0.60-py3-none-any.whl"
+name = "genai_prices-0.1.9-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/1b/e0/57d07f653813b7ea9e3a82064a2b6a112f63004530ac665e0934829473c7/genai_prices-0.1.9-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "096a5c31963687e99d752789382b9e8e71c0a56f9569b9760fd0de402f8b084a"
+sha256 = "3da8faa0a126e4df7be36696b90abe2be1fea8826bfcf45d39d91bc397fa9d1d"
 
 [[packages]]
 name = "geographiclib"
@@ -1642,14 +1609,14 @@ sha256 = "8a2f48e1e079355d3e7d5683e5c6e7684a87c15c3750c8d8cd2289c95383ee3e"
 
 [[packages]]
 name = "ipykernel"
-version = "7.2.0"
+version = "6.31.0"
 
 [[packages.wheels]]
-name = "ipykernel-7.2.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/82/b9/e73d5d9f405cba7706c539aa8b311b49d4c2f3d698d9c12f815231169c71/ipykernel-7.2.0-py3-none-any.whl"
+name = "ipykernel-6.31.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/f6/d8/502954a4ec0efcf264f99b65b41c3c54e65a647d9f0d6f62cd02227d242c/ipykernel-6.31.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "3bbd4420d2b3cc105cbdf3756bfc04500b1e52f090a90716851f3916c62e1661"
+sha256 = "abe5386f6ced727a70e0eb0cf1da801fa7c5fa6ff82147747d5a0406cd8c94af"
 
 [[packages]]
 name = "ipyleaflet"
@@ -1738,17 +1705,6 @@ url = "https://files.pythonhosted.org/packages/7b/55/e5326141505c5d5e34c5e0935d2
 
 [packages.wheels.hashes]
 sha256 = "b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042"
-
-[[packages]]
-name = "isort"
-version = "8.0.1"
-
-[[packages.wheels]]
-name = "isort-8.0.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/3e/95/c7c34aa53c16353c56d0b802fba48d5f5caa2cdee7958acbcb795c830416/isort-8.0.1-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "28b89bc70f751b559aeca209e6120393d43fbe2490de0559662be7a9787e3d75"
 
 [[packages]]
 name = "itsdangerous"
@@ -2115,14 +2071,14 @@ sha256 = "b6c819a722f7b6bd955b80781788e4a66a55628b858d347536b7e81325a3a5e3"
 
 [[packages]]
 name = "logfire-api"
-version = "4.33.0"
+version = "4.40.0"
 
 [[packages.wheels]]
-name = "logfire_api-4.33.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/d4/58/dc21672e0d5294668f4d35aaba4d839d031f096b4cf6802399c4b411b5fc/logfire_api-4.33.0-py3-none-any.whl"
+name = "logfire_api-4.40.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/8e/be/ebe35d94e7d567b58d79bd7e1085fe85195ad4b8c8df8882a5a46caa4984/logfire_api-4.40.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "b992727bab71412b5a00f54453eec18e559232c83d7120cf5c6a9edd33fb0c4e"
+sha256 = "f8b7309235a942368b927f00e0a1869ff0820833f264a30e77a35f1da829c130"
 
 [[packages]]
 name = "lsprotocol"
@@ -2233,17 +2189,6 @@ url = "https://files.pythonhosted.org/packages/63/4b/585adeb9167b08d3cdff0032a93
 
 [packages.wheels.hashes]
 sha256 = "3c9f94640ecc4895e94abaf834a0684430032c865b2748a36c12461fd9252fdd"
-
-[[packages]]
-name = "mccabe"
-version = "0.7.0"
-
-[[packages.wheels]]
-name = "mccabe-0.7.0-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3aad8395a3d6dd7921c0686e23853ff5a9/mccabe-0.7.0-py2.py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e"
 
 [[packages]]
 name = "mcp"
@@ -2423,14 +2368,14 @@ sha256 = "96d3de4d034504e969ac5e85bae8106c8373b5c6568e4c8fa7af2eca9dbe6bca"
 
 [[packages]]
 name = "multidict"
-version = "6.7.1"
+version = "6.9.1"
 
 [[packages.wheels]]
-name = "multidict-6.7.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/81/08/7036c080d7117f28a4af526d794aab6a84463126db031b007717c1a6676e/multidict-6.7.1-py3-none-any.whl"
+name = "multidict-6.9.1-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/d4/77/1fa118386deeae4e7a48870fa5cb073e748b0ac5265a6990651cefc48068/multidict-6.9.1-cp315-cp315-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "55d97cc6dae627efa6a6e548885712d4864b81110ac76fa4e534c03819fa4a56"
+sha256 = "59c123d0e948d760a5f930f316cfefa07e8d632ab84327c0693ee6a88171154f"
 
 [[packages]]
 name = "multipledispatch"
@@ -2555,14 +2500,14 @@ sha256 = "d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762"
 
 [[packages]]
 name = "nh3"
-version = "0.3.3"
+version = "0.3.7"
 
 [[packages.wheels]]
-name = "nh3-0.3.3-cp38-abi3-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/73/88/1ce287ef8649dc51365b5094bd3713b76454838140a32ab4f8349973883c/nh3-0.3.3-cp38-abi3-win_amd64.whl"
+name = "nh3-0.3.7-cp38-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/b4/b9/34433ccb1f0fe6968dabbb7d4bf5721c6221878ef07832748c06655a6a80/nh3-0.3.7-cp38-abi3-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "2efd17c0355d04d39e6d79122b42662277ac10a17ea48831d90b46e5ef7e4fc0"
+sha256 = "618e3059caf41ccdf5dcccb3fa9df4cf6e4efe23d1382a8bbfca272a8a4f8bfc"
 
 [[packages]]
 name = "nltk"
@@ -2588,14 +2533,14 @@ sha256 = "a2d21bb9c4b4818a1e71721ebd19172f488591d548f08453593348b7048ba1fb"
 
 [[packages]]
 name = "numpy"
-version = "2.5.2"
+version = "2.5.3"
 
 [[packages.wheels]]
-name = "numpy-2.5.2-cp315-cp315-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/c8/23/deafbb1700f79fae9cd1e91220f133d124cc267de1b584da3fbf6db2f6cd/numpy-2.5.2-cp315-cp315-win_amd64.whl"
+name = "numpy-2.5.3-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/37/ea/780748fd3985109075514ef8fc64cd25f943e40dde13a6d59141eb268fc8/numpy-2.5.3-cp315-cp315-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "07d4e89f3a9ab0a9ba24264ccdb642b3dd951b2281e8883a5481a4aa79cc31a7"
+sha256 = "e931e4f499e0dc7ef29d269a8e5b35dd722e5d14be07df6240166ea7c6532fae"
 
 [[packages]]
 name = "numpydoc"
@@ -3104,17 +3049,6 @@ url = "https://files.pythonhosted.org/packages/33/fd/8762f7ee3e4e4be6d1d846cffb4
 sha256 = "b8488090f8acffbcb6b5d6a85571a6827a0a2981ffb75e5a0b27b87c4a6b7dd0"
 
 [[packages]]
-name = "pycodestyle"
-version = "2.14.0"
-
-[[packages.wheels]]
-name = "pycodestyle-2.14.0-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/d7/27/a58ddaf8c588a3ef080db9d0b7e0b97215cee3a45df74f3a94dbbf5c893a/pycodestyle-2.14.0-py2.py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "dd6bf7cb4ee77f8e016f9c8e74a35ddd9f67e1d5fd4184d86c3b98e07099f42d"
-
-[[packages]]
 name = "pycparser"
 version = "3.0"
 
@@ -3149,14 +3083,14 @@ sha256 = "15fab1bea6f1dc5003b54fc2ecab230c1fd1dbade2acd4addc52d81e32416d4b"
 
 [[packages]]
 name = "pydantic-ai-slim"
-version = "1.106.0"
+version = "2.55.0"
 
 [[packages.wheels]]
-name = "pydantic_ai_slim-1.106.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/72/d9/a2785c576e3519a72a5bbc0e12027c542b265ef6eea1aa72b9c440ac2531/pydantic_ai_slim-1.106.0-py3-none-any.whl"
+name = "pydantic_ai_slim-2.55.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/93/cc/16c6bc21748e3705a4c1f8e7d71dfc54228dbf142f8506a36689acb1e9c9/pydantic_ai_slim-2.55.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "0dd7a99ea3fa89b490098406c2240ba7d75c327eea094c3fd057dd7aa9f3d163"
+sha256 = "7fcea628e78c2f247af94504534f0577151496166998d74ec145505040b19c68"
 
 [[packages]]
 name = "pydantic-core"
@@ -3171,14 +3105,14 @@ sha256 = "8447678b49412294801c9ea15ae31ea3bae7da65425268c92d40e032c38eac6f"
 
 [[packages]]
 name = "pydantic-graph"
-version = "1.106.0"
+version = "2.55.0"
 
 [[packages.wheels]]
-name = "pydantic_graph-1.106.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/9b/e9/0058f0b98f5992e715a0a50128f6c3cc7946cc242d471f6e850efdf03f0c/pydantic_graph-1.106.0-py3-none-any.whl"
+name = "pydantic_graph-2.55.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/59/b5/630fc830897cfb0e458dea8ffcac5dd58791784220255637e99817b04cdd/pydantic_graph-2.55.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "e6bb61aef0fdb49185a81142d311f94fc3315329345471d12cab85ab5845221f"
+sha256 = "774a64db707e759e22a4b2d6f8849986331fac009bb3f36ba3ed0cb8eee7a150"
 
 [[packages]]
 name = "pydantic-settings"
@@ -3203,17 +3137,6 @@ url = "https://files.pythonhosted.org/packages/6f/34/3998411437aff304a9ed4fa37a6
 sha256 = "d8a47c11c81fb12d51b1feb42427ff4f0e13cb599e48931021b2cba98b6849a6"
 
 [[packages]]
-name = "pydocstyle"
-version = "6.3.0"
-
-[[packages.wheels]]
-name = "pydocstyle-6.3.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/36/ea/99ddefac41971acad68f14114f38261c1f27dac0b3ec529824ebc739bdaa/pydocstyle-6.3.0-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "118762d452a49d6b05e194ef344a55822987a462831ade91ec5c06fd2169d019"
-
-[[packages]]
 name = "pydot"
 version = "4.0.1"
 
@@ -3225,26 +3148,15 @@ url = "https://files.pythonhosted.org/packages/7e/32/a7125fb28c4261a627f999d5fb4
 sha256 = "869c0efadd2708c0be1f916eb669f3d664ca684bc57ffb7ecc08e70d5e93fee6"
 
 [[packages]]
-name = "pyflakes"
-version = "3.4.0"
-
-[[packages.wheels]]
-name = "pyflakes-3.4.0-py2.py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/c2/2f/81d580a0fb83baeb066698975cb14a618bdbed7720678566f1b046a95fe8/pyflakes-3.4.0-py2.py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "f742a7dbd0d9cb9ea41e9a24a918996e8170c799fa528688d40dd582c8265f4f"
-
-[[packages]]
 name = "pygithub"
-version = "2.8.1"
+version = "2.9.1"
 
 [[packages.wheels]]
-name = "pygithub-2.8.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/07/ba/7049ce39f653f6140aac4beb53a5aaf08b4407b6a3019aae394c1c5244ff/pygithub-2.8.1-py3-none-any.whl"
+name = "pygithub-2.9.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/77/aa/81a5506f089a26338bff17535e4339b3b22049ebd1bcdeff756c4d7a7559/pygithub-2.9.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "23a0a5bca93baef082e03411bf0ce27204c32be8bfa7abc92fe4a3e132936df0"
+sha256 = "2ec78fca30092d51a42d76f4ddb02131b6f0c666a35dfdf364cf302cdda115b9"
 
 [[packages]]
 name = "pygments"
@@ -3269,17 +3181,6 @@ url = "https://files.pythonhosted.org/packages/50/ca/44de4e75f8aadc457f0634be3b5
 sha256 = "42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193"
 
 [[packages]]
-name = "pylint"
-version = "4.0.6"
-
-[[packages.wheels]]
-name = "pylint-4.0.6-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ab/da/acb2e7d4dbd2dfb792d38c0d850481f29ad7049b356d23f56c687d35203b/pylint-4.0.6-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "d11a0e1fdb7b1cd46ec5d6fc78fee8b95f28695b2d6140e5809925f61e32ea54"
-
-[[packages]]
 name = "pylint-venv"
 version = "3.0.4"
 
@@ -3289,6 +3190,17 @@ url = "https://files.pythonhosted.org/packages/a6/10/040e1928236e3d34b26639e3427
 
 [packages.wheels.hashes]
 sha256 = "31006a3df398f58f962c9e5620e756b284e8b2bc490594ce5ee5da41920cb32c"
+
+[[packages]]
+name = "pyls-spyder"
+version = "0.4.0"
+
+[[packages.wheels]]
+name = "pyls_spyder-0.4.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d0/26/d0975972af1f18c3bb02ec5889191cc09ebb982bcbe45438d90ca763f4ec/pyls_spyder-0.4.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "1505d975f866a343d0554b6dab41b53717f4b4bc6df450dfd7d48f889fe450b9"
 
 [[packages]]
 name = "pympler"
@@ -3390,6 +3302,61 @@ url = "https://files.pythonhosted.org/packages/bd/24/12818598c362d7f300f18e74db4
 sha256 = "9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913"
 
 [[packages]]
+name = "pyqt5"
+version = "5.15.11"
+
+[[packages.wheels]]
+name = "PyQt5-5.15.11-cp38-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/56/d5/68eb9f3d19ce65df01b6c7b7a577ad3bbc9ab3a5dd3491a4756e71838ec9/PyQt5-5.15.11-cp38-abi3-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "bdde598a3bb95022131a5c9ea62e0a96bd6fb28932cc1619fd7ba211531b7517"
+
+[[packages]]
+name = "pyqt5-qt5"
+version = "5.15.2"
+
+[[packages.wheels]]
+name = "PyQt5_Qt5-5.15.2-py3-none-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/37/97/5d3b222b924fa2ed4c2488925155cd0b03fd5d09ee1cfcf7c553c11c9f66/PyQt5_Qt5-5.15.2-py3-none-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "750b78e4dba6bdf1607febedc08738e318ea09e9b10aea9ff0d73073f11f6962"
+
+[[packages]]
+name = "pyqt5-sip"
+version = "12.20.0"
+
+[[packages.wheels]]
+name = "pyqt5_sip-12.20.0-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/16/6d/f2cf237992f97285d1b60f92a015e73debd86318541a9cd200d560edbc35/pyqt5_sip-12.20.0-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "ae4c75570f13f34335a0af6791e3160a183756504ace9542797fe104b3ceb536"
+
+[[packages]]
+name = "pyqtwebengine"
+version = "5.15.7"
+
+[[packages.wheels]]
+name = "PyQtWebEngine-5.15.7-cp38-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/39/67/0dead50889d905fc99f40e61e5ab7f73746605ce8f74c4fa7fb3fc1d6c5e/PyQtWebEngine-5.15.7-cp38-abi3-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "bd5e8c426d6f6b352cd15800d64a89b2a4a11e098460b818c7bdcf5e5612e44f"
+
+[[packages]]
+name = "pyqtwebengine-qt5"
+version = "5.15.2"
+
+[[packages.wheels]]
+name = "PyQtWebEngine_Qt5-5.15.2-py3-none-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e0/db/0f29bd882aee8b5754f3e1ab104d2d09cdd9138a889558b43badcd81ce11/PyQtWebEngine_Qt5-5.15.2-py3-none-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "24231f19e1595018779977de6722b5c69f3d03f34a5f7574ff21cd1e764ef76d"
+
+[[packages]]
 name = "pyserial"
 version = "3.5"
 
@@ -3478,6 +3445,50 @@ url = "https://files.pythonhosted.org/packages/dc/55/6467fde553886cb293e41538f3a
 sha256 = "158a52126fcd6869e09574d2b66272666f3dc8f468c62637ef9a1fa883719cb9"
 
 [[packages]]
+name = "python-lsp-black"
+version = "2.0.0"
+
+[[packages.wheels]]
+name = "python_lsp_black-2.0.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/78/44/fef9b4d027b3d6321e6f30b6b5946bef18cd84a96e1d81012ac0f69ea53c/python_lsp_black-2.0.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "d5efdee45f5fa9e5241f5d4d396cd46127f45c85817916b1fd92c2986652bf7e"
+
+[[packages]]
+name = "python-lsp-jsonrpc"
+version = "1.1.2"
+
+[[packages.wheels]]
+name = "python_lsp_jsonrpc-1.1.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/cb/d9/656659d5b5d5f402b2b174cd0ba9bc827e07ce3c0bf88da65424baf64af8/python_lsp_jsonrpc-1.1.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "7339c2e9630ae98903fdaea1ace8c47fba0484983794d6aafd0bd8989be2b03c"
+
+[[packages]]
+name = "python-lsp-ruff"
+version = "2.3.0"
+
+[[packages.wheels]]
+name = "python_lsp_ruff-2.3.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/85/c0/761e359e255fce641c263a3c3e43f7685d1667139e9d35a376c1cc9f6f70/python_lsp_ruff-2.3.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "b858b698fbaff5670f6d5e6c66afc632908f78639d73dc85dedd33ae5fdd204f"
+
+[[packages]]
+name = "python-lsp-server"
+version = "1.15.0"
+
+[[packages.wheels]]
+name = "python_lsp_server-1.15.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/c2/4a/b4abc04dcc65c985fa66d6486393ad3051ff485ccabd9727aea43a242f88/python_lsp_server-1.15.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "d6ac11b467021310498f2dffb2edf09629bbcfe0d3073156db2337334a60463f"
+
+[[packages]]
 name = "python-multipart"
 version = "0.0.32"
 
@@ -3509,17 +3520,6 @@ url = "https://files.pythonhosted.org/packages/c6/78/397db326746f0a342855b81216a
 
 [packages.wheels.hashes]
 sha256 = "26cef14744a8385f35d0e095dc8b3a7583f6c953c2e3d269c7f82484bf5ad2de"
-
-[[packages]]
-name = "pytoolconfig"
-version = "1.3.1"
-
-[[packages.wheels]]
-name = "pytoolconfig-1.3.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/92/44/da239917f5711ca7105f7d7f9e2765716dd883b241529beafc0f28504725/pytoolconfig-1.3.1-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "5d8cea8ae1996938ec3eaf44567bbc5ef1bc900742190c439a44a704d6e1b62b"
 
 [[packages]]
 name = "pyuca"
@@ -3610,6 +3610,17 @@ url = "https://files.pythonhosted.org/packages/02/8b/b83f7780dad22e0878e4c7bd915
 sha256 = "2c218c6ab8bc447ba62054b581fd30209689d199c6ecb253f79615ca74a38e12"
 
 [[packages]]
+name = "qdarkstyle"
+version = "3.2.3"
+
+[[packages.wheels]]
+name = "QDarkStyle-3.2.3-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/93/7d/c3c10498430dadcea4def5faddf71cd199e577d20a125e7ef1e9d7bdbbfa/QDarkStyle-3.2.3-py2.py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "ea980ee426d594909cf1058306832af71ff6cbad6f69237b036d1550635aefbc"
+
+[[packages]]
 name = "qrcode"
 version = "8.2"
 
@@ -3619,6 +3630,50 @@ url = "https://files.pythonhosted.org/packages/dd/b8/d2d6d731733f51684bbf76bf34d
 
 [packages.wheels.hashes]
 sha256 = "16e64e0716c14960108e85d853062c9e8bba5ca8252c0b4d0231b9df4060ff4f"
+
+[[packages]]
+name = "qstylizer"
+version = "0.2.4"
+
+[[packages.wheels]]
+name = "qstylizer-0.2.4-py2.py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/2d/ba/2a4e51861942c2bc3be60400c69f6713359c3e307aee4696f2ea47f35811/qstylizer-0.2.4-py2.py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "8f384dfe86f9edb0bb596b93663a51f124f0794b94fd54057cc7cf9cea59fb6f"
+
+[[packages]]
+name = "qtawesome"
+version = "1.4.2"
+
+[[packages.wheels]]
+name = "qtawesome-1.4.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/25/b1/da1d826ccc9258674b26dd0abcbbb1c55cab06e7fbf2697518b67edc79fc/qtawesome-1.4.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "dbf08524428fa2df73918ce362153254cd44f089380576d84bfaad8f40eece45"
+
+[[packages]]
+name = "qtconsole"
+version = "5.7.2"
+
+[[packages.wheels]]
+name = "qtconsole-5.7.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/7a/60/aba9f3c3f1f48c7fbdf03bed45b576a916cd09c08242939b5294b85e37b4/qtconsole-5.7.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "e1d1f6a792123363626e643a7a4ee561217773571043992693fba7eccfa89f95"
+
+[[packages]]
+name = "qtpy"
+version = "2.4.3"
+
+[[packages.wheels]]
+name = "QtPy-2.4.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/69/76/37c0ccd5ab968a6a438f9c623aeecc84c202ab2fabc6a8fd927580c15b5a/QtPy-2.4.3-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "72095afe13673e017946cc258b8d5da43314197b741ed2890e563cf384b51aa1"
 
 [[packages]]
 name = "quantecon"
@@ -3688,14 +3743,14 @@ sha256 = "58da726d3e766c0b3f5a3997dfaf0275898a1107b8191cdd6b0437fe45fd817d"
 
 [[packages]]
 name = "reportlab"
-version = "5.0.0"
+version = "5.0.1"
 
 [[packages.wheels]]
-name = "reportlab-5.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/a3/07/70085c17a369605f15e301d10ab902115019b1126c7253d964afc230c7d6/reportlab-5.0.0-py3-none-any.whl"
+name = "reportlab-5.0.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/db/cb/dacbc268cb68d0428ea2cbd85266195a9ab3e677449589ddae59bd7542ac/reportlab-5.0.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "9d5a3affa84919e1111ede580031266a570e93b1ce388219621347965ff1d93c"
+sha256 = "1c36e6bb0e71780c72331eba60da7f602e8d4389a8723825af71342e49d791e8"
 
 [[packages]]
 name = "requests"
@@ -3795,17 +3850,6 @@ url = "https://files.pythonhosted.org/packages/04/54/6f679c435d28e0a568d8e8a7c0a
 
 [packages.wheels.hashes]
 sha256 = "647ba99caddc2cc1e55a51e4360689115551bf4476d90e8162cf8c345fe233c7"
-
-[[packages]]
-name = "rope"
-version = "1.14.0"
-
-[[packages.wheels]]
-name = "rope-1.14.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/75/35/130469d1901da2b3a5a377539b4ffcd8a5c983f1c9e3ba5ffdd8d71ae314/rope-1.14.0-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "00a7ea8c0c376fc0b053b2f2f8ef3bfb8b50fecf1ebf3eb80e4f8bd7f1941918"
 
 [[packages]]
 name = "rpds-py"
@@ -4171,6 +4215,17 @@ url = "https://files.pythonhosted.org/packages/52/a7/d2782e4e3f77c8450f727ba74a8
 sha256 = "6e2cb0eef194e10c27ec0023bfeb25badbbb5868244cf5bc5bdc04e4464bf331"
 
 [[packages]]
+name = "spyder-kernels"
+version = "3.1.6"
+
+[[packages.wheels]]
+name = "spyder_kernels-3.1.6-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/bf/41/3c7242abf72f3f03fddf77e76aba66e3fa30c9e6cfa46202a1dc23b6fa7e/spyder_kernels-3.1.6-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "c4673613efa49e3cba59ec4105c7065b9165c65730f3fdfdfbbba3c3bd227c93"
+
+[[packages]]
 name = "sqlalchemy"
 version = "2.0.51"
 
@@ -4301,6 +4356,17 @@ url = "https://files.pythonhosted.org/packages/49/84/732e4c832a6ec79cc3119aea2da
 
 [packages.wheels.hashes]
 sha256 = "b00d41fa9024d28ab30b81e56ddf07d61cda6ae625231dcb13e0be6c07ef1e0f"
+
+[[packages]]
+name = "superqt"
+version = "0.8.2"
+
+[[packages.wheels]]
+name = "superqt-0.8.2-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/01/b9/748c3cbcdba20ef01c055a35905cad5c771cc1df29be11b9a82da6fd8e0d/superqt-0.8.2-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "ce8400ae7b577d090368aae5bdbabb06cd6bc893f6ca73485bb686835bf20943"
 
 [[packages]]
 name = "sympy"
@@ -4810,25 +4876,14 @@ sha256 = "f7a866fbc1e97b5c617ee4116daaa09b722101d4a3c170c787450ba409f9736f"
 
 [[packages]]
 name = "werkzeug"
-version = "3.1.8"
+version = "3.1.9"
 
 [[packages.wheels]]
-name = "werkzeug-3.1.8-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/93/8c/2e650f2afeb7ee576912636c23ddb621c91ac6a98e66dc8d29c3c69446e1/werkzeug-3.1.8-py3-none-any.whl"
+name = "werkzeug-3.1.9-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/a1/38/df03f564f43cec2684823f3cccae1a652ee7face1cbaa76fb223096e64d7/werkzeug-3.1.9-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "63a77fb8892bf28ebc3178683445222aa500e48ebad5ec77b0ad80f8726b1f50"
-
-[[packages]]
-name = "whatthepatch"
-version = "1.0.7"
-
-[[packages.wheels]]
-name = "whatthepatch-1.0.7-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/8e/93/af1d6ccb69ab6b5a00e03fa0cefa563f9862412667776ea15dd4eece3a90/whatthepatch-1.0.7-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "1b6f655fd31091c001c209529dfaabbabdbad438f5de14e3951266ea0fc6e7ed"
+sha256 = "6392e50c78460ba618e5b21f08a71f59c99ce99cdc6cf6e3dd7e6ccca8754fab"
 
 [[packages]]
 name = "wheel"
@@ -4930,17 +4985,6 @@ url = "https://files.pythonhosted.org/packages/a8/a9/d23012099dc88ec69a29c6407b4
 sha256 = "503183d4b322bfebc3c50cdd21192aa3e81e36c5efbf9133d54ae82143e0576b"
 
 [[packages]]
-name = "yapf"
-version = "0.43.0"
-
-[[packages.wheels]]
-name = "yapf-0.43.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/37/81/6acd6601f61e31cfb8729d3da6d5df966f80f374b78eff83760714487338/yapf-0.43.0-py3-none-any.whl"
-
-[packages.wheels.hashes]
-sha256 = "224faffbc39c428cb095818cf6ef5511fdab6f7430a10783fdfb292ccf2852ca"
-
-[[packages]]
 name = "yarl"
 version = "1.25.1"
 
@@ -4953,14 +4997,14 @@ sha256 = "a2059a2d891bd156bc5184e7ab7a56e78a84dfcfdeac8c501b552533ad1c36ee"
 
 [[packages]]
 name = "yt-dlp"
-version = "2026.7.4"
+version = "2026.8.19"
 
 [[packages.wheels]]
-name = "yt_dlp-2026.7.4-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/f9/8a/cd4c9b02c10c563adfe78118310129641900e1cd6de888cfae2452072696/yt_dlp-2026.7.4-py3-none-any.whl"
+name = "yt_dlp-2026.8.19-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/69/b2/8cd1613f56eed7ceb64fbd4df3f1c01246bfb098e6f398228bafda22b80b/yt_dlp-2026.8.19-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "f11f2b11d5a8ac4059f9bdf29fa4407dc7c6bb00c5097e95ca22a7a9db518266"
+sha256 = "1d57897e94c6665a0a6f9bc54b34e584284e32c034ffab3a7df25d8f7b24eedf"
 
 [[packages]]
 name = "zipp"
