@@ -61,9 +61,9 @@ wheelhousereq = "requirements_whl.txt"
 # ---- pythons: what gets built -----------------------------------------------
 
 [pythons."313"]
-python_target_release = "31316"
+python_target_release = "31318"
 release = "0"
-my_release_level = "b4"
+my_release_level = ""
 builds = ["dot", "slim"]
 
 # A Python that names a requirements file its own way says so here:
@@ -71,9 +71,9 @@ builds = ["dot", "slim"]
 # requirements = "requirements64_slim.txt"
 
 [pythons."314"]
-python_target_release = "3148"
+python_target_release = "31410"
 release = "0"
-my_release_level = "b4"
+my_release_level = ""
 builds = ["dot", "dotf", "slim", "slimf"]
 
 
@@ -89,14 +89,15 @@ only_binary = false
 # create_installer = ".7z-mx7"
 
 [pythons."315"]
-python_target_release = "3150"
-release = "5"
-my_release_level = "b4"
+python_target_release = "3152"
+release = "0"
+my_release_level = ""
 builds = ["dot", "dotf", "slim", "slimf"]
 
 [pythons."315".overrides.slim]
 requirements = "requirements_slim315.txt"
 # bytecode = "none"
 
-# [pythons."315".overrides.slimf]
+[pythons."315".overrides.slimf]
+requirements = "requirements_slimf315.txt"
 # bytecode = "none"
