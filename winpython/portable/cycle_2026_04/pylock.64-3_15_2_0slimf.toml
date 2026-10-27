@@ -135,14 +135,14 @@ sha256 = "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0"
 
 [[packages]]
 name = "anthropic"
-version = "1.11.0"
+version = "2.3.0"
 
 [[packages.wheels]]
-name = "anthropic-1.11.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ab/6f/20edcd2956cac68042b1bcdd13ab3311447519f86b26929ff268dc74c650/anthropic-1.11.0-py3-none-any.whl"
+name = "anthropic-2.3.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/3f/29/eb3558ab6bf252a07ac41c76ac5b0ea24a0aa0c23f87a40aaf31a5f8dba4/anthropic-2.3.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "52f97b2c485cca7ac66058374f5073a3febb7e6849b16989c145d602a3efee21"
+sha256 = "aa6a3984f9276f307933d42dc6f58b6efc821a5ecafbc8d1bb5993a066767622"
 
 [[packages]]
 name = "anyio"
@@ -740,14 +740,14 @@ sha256 = "7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2"
 
 [[packages]]
 name = "dnspython"
-version = "2.8.0"
+version = "2.9.0"
 
 [[packages.wheels]]
-name = "dnspython-2.8.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ba/5a/18ad964b0086c6e62e2e7500f7edc89e3faa45033c71c1893d34eed2b2de/dnspython-2.8.0-py3-none-any.whl"
+name = "dnspython-2.9.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/10/02/cdcc9b7c051786a103c3b09e1003a82fa0c66bcb91ffbdabcfbf7b4163b9/dnspython-2.9.0-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "01d9bbc4a2d76bf0db7c1f729812ded6d912bd318d3b1cf81d30c0f845dbf3af"
+sha256 = "9a4aedb833c3c1b49214d04d44d3032ab7a9135f7c1d29a549b4ff78fd82fda9"
 
 [[packages]]
 name = "docstring-parser"
@@ -894,14 +894,14 @@ sha256 = "0fb3915616adac85ccfdd737d26be1089845d2019819505b42d39888458f74d4"
 
 [[packages]]
 name = "fastmcp-slim"
-version = "3.4.7"
+version = "4.1.4"
 
 [[packages.wheels]]
-name = "fastmcp_slim-3.4.7-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/b4/97/e0e53642cd029a9a7635ae9c548f9f2cc995af5914e487b3df795664e4be/fastmcp_slim-3.4.7-py3-none-any.whl"
+name = "fastmcp_slim-4.1.4-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/4a/d2/bbbf9cb1a92e7f98c34845c8f06f21516fd38efdcd579ecbc0131bb6d4d5/fastmcp_slim-4.1.4-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "6c931a0089705f3f2935428ef9b2bc74ad94140adc64aab84d116d103e694b3a"
+sha256 = "0f611b246504ff0d0ee7ab77123f529b5c9aed68670eaee9c6f960a59bb024da"
 
 [[packages]]
 name = "filelock"
@@ -1169,14 +1169,14 @@ sha256 = "820db6289754c181007a150db1f7fff544b94142b556d12e3ebc777a7bf36c71"
 
 [[packages]]
 name = "graphql-core"
-version = "3.2.11"
+version = "3.2.13"
 
 [[packages.wheels]]
-name = "graphql_core-3.2.11-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/00/15/b92b4e1d88d02c6eff9733c9eea21846ab435cc4d813d84ccc5d335955df/graphql_core-3.2.11-py3-none-any.whl"
+name = "graphql_core-3.2.13-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/1f/b4/b52a324b0b297ddc49b8ea31a51d39fae63132f694a267b9381d94e2e0af/graphql_core-3.2.13-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "0b3e35ff41e9adba53021ab0cef475eb18f57c7f53f0f2ca55567fbf3c537ea0"
+sha256 = "b0eb04f2c31556b2310a77c8fb53c74e8b56570f8fea594d89c6ef7827dbb497"
 
 [[packages]]
 name = "graphql-relay"
@@ -1620,14 +1620,14 @@ sha256 = "b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042"
 
 [[packages]]
 name = "isort"
-version = "8.0.1"
+version = "9.0.2"
 
 [[packages.wheels]]
-name = "isort-8.0.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/3e/95/c7c34aa53c16353c56d0b802fba48d5f5caa2cdee7958acbcb795c830416/isort-8.0.1-py3-none-any.whl"
+name = "isort-9.0.2-cp315-cp315t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/bb/e5/3a1c4748483a05533a065b49dcf64039a68162e84175e08d1d70db7e7413/isort-9.0.2-cp315-cp315t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "28b89bc70f751b559aeca209e6120393d43fbe2490de0559662be7a9787e3d75"
+sha256 = "29669ea6c410528ffe3b632a41835757f08282257e4ddac892a5e6d01bd35201"
 
 [[packages]]
 name = "itsdangerous"
@@ -2005,14 +2005,14 @@ sha256 = "b49638355ea3bebba70da783ccbc630fd72afa16bc46c54474bfa1f9a915bbc6"
 
 [[packages]]
 name = "mako"
-version = "1.3.12"
+version = "1.4.3"
 
 [[packages.wheels]]
-name = "mako-1.3.12-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/bc/b1/a0ec7a5a9db730a08daef1fdfb8090435b82465abbf758a596f0ea88727e/mako-1.3.12-py3-none-any.whl"
+name = "mako-1.4.3-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/6d/a0/053d6af3e8f871e0073b4a36732d9e65be77a72e5434c31b94f6af78a6bb/mako-1.4.3-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "8f61569480282dbf557145ce441e4ba888be453c30989f879f0d652e39f53ea9"
+sha256 = "723296007c870bfd6b3f0c3230dba7198096e5269297ebf5e4eff9e7ffa39d4f"
 
 [[packages]]
 name = "markdown"
@@ -2101,6 +2101,17 @@ url = "https://files.pythonhosted.org/packages/27/1a/1f68f9ba0c207934b35b86a8ca3
 
 [packages.wheels.hashes]
 sha256 = "6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e"
+
+[[packages]]
+name = "mcp-types"
+version = "2.3.0"
+
+[[packages.wheels]]
+name = "mcp_types-2.3.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ce/48/32583066b155bb5d4507e7887dc88ee23118cc4de8e2a12870c49719e2a8/mcp_types-2.3.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "968efdbdaedfab06adae40d378a34395f1090c5921d4be3c9cde283aaf76d91d"
 
 [[packages]]
 name = "mdit-py-plugins"
@@ -2302,14 +2313,14 @@ sha256 = "e2012a474502f1e2251267062aae3114611f07df4224b6e06334c57b0f2ce87c"
 
 [[packages]]
 name = "narwhals"
-version = "2.26.0"
+version = "2.27.1"
 
 [[packages.wheels]]
-name = "narwhals-2.26.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/40/b5/1b84b2c784db76d69442334bc8b8748c840f13ca53be086f4f250ad4a0bc/narwhals-2.26.0-py3-none-any.whl"
+name = "narwhals-2.27.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d1/89/5d4c86da1130d9059681e5b6cd7645df5c10279a6a079c5c37dcb2cc6f3f/narwhals-2.27.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54"
+sha256 = "d057df13f5852b8e157596e82eb5e955fad267425df5e420e0ee9863da483b31"
 
 [[packages]]
 name = "nbformat"
@@ -2555,14 +2566,14 @@ sha256 = "9649af414d74d4df115d5d718f82acb59c9d418196b7b4290ed47a12ce62df56"
 
 [[packages]]
 name = "pillow"
-version = "12.3.0"
+version = "13.0.0"
 
 [[packages.wheels]]
-name = "pillow-12.3.0-cp315-cp315t-win_amd64.whl"
-url = "https://files.pythonhosted.org/packages/e4/04/62bcd9f844984c5938d3b05264a61d797a29d3e0812341a8204af70bbdee/pillow-12.3.0-cp315-cp315t-win_amd64.whl"
+name = "pillow-13.0.0-cp315-cp315t-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/60/d4/0062e6005e9b270b165015aafd343364ac378ec5a685431ea42baad33357/pillow-13.0.0-cp315-cp315t-win_amd64.whl"
 
 [packages.wheels.hashes]
-sha256 = "8cd2f7bdda092d99c9fc2fb7391354f306d01443d22785d0cbfafa2e2c8bb418"
+sha256 = "adb3c2124c68e480f4632d06cb7caa3b48a51678475f483b4edb1c6dee29ea43"
 
 [[packages]]
 name = "pipdeptree"
@@ -2951,14 +2962,14 @@ sha256 = "42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193"
 
 [[packages]]
 name = "pylint"
-version = "4.0.6"
+version = "4.0.10"
 
 [[packages.wheels]]
-name = "pylint-4.0.6-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/ab/da/acb2e7d4dbd2dfb792d38c0d850481f29ad7049b356d23f56c687d35203b/pylint-4.0.6-py3-none-any.whl"
+name = "pylint-4.0.10-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/d7/0e/82aa640aa75f4a3c57d0458eafb2fa71d0f8ebec7ce8ba5cda95bc51b941/pylint-4.0.10-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "d11a0e1fdb7b1cd46ec5d6fc78fee8b95f28695b2d6140e5809925f61e32ea54"
+sha256 = "c259421f734e6262407b6a421a26f9513b13ac2c5ac2c160775c1658afb57fea"
 
 [[packages]]
 name = "pylint-venv"
@@ -3534,14 +3545,14 @@ sha256 = "0da2f112e6d6bb22de6aa6daa7e144831a4febf2a87261451c4ad849fe9a873c"
 
 [[packages]]
 name = "setuptools"
-version = "84.0.0"
+version = "84.2.1"
 
 [[packages.wheels]]
-name = "setuptools-84.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/95/9c/c510029fc6ef33a6275cd2c5d3cecd6613dfd6aa401d57c54f1c18852ccf/setuptools-84.0.0-py3-none-any.whl"
+name = "setuptools-84.2.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ef/55/6dc6d6bb953bdfc52519a0059592c52b6e3b8ad51cf8256dffceb55b0610/setuptools-84.2.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
+sha256 = "ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2"
 
 [[packages]]
 name = "shapely"
@@ -3820,14 +3831,14 @@ sha256 = "38038823fbe86f11e09433b4a0f4af5f102327c3137a1604b002ce3cf722a31f"
 
 [[packages]]
 name = "streamlit"
-version = "1.59.1"
+version = "1.66.1"
 
 [[packages.wheels]]
-name = "streamlit-1.59.1-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/49/84/732e4c832a6ec79cc3119aea2da367bbc00c376a41a063bc477d62e20077/streamlit-1.59.1-py3-none-any.whl"
+name = "streamlit-1.66.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/4a/eb/f12286b0b5c30e3fd8e45ca47f05a6cd14cb6e583d04ef4409974a17d371/streamlit-1.66.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "b00d41fa9024d28ab30b81e56ddf07d61cda6ae625231dcb13e0be6c07ef1e0f"
+sha256 = "29607190a589fe1fa9bd7e154635d335d47dc09b4010c6cc273daa6e4430ee31"
 
 [[packages]]
 name = "sympy"
@@ -4359,14 +4370,14 @@ sha256 = "a31a8774885b96fe825462f5d6496166f0c7cae111195b6465c801d230eb5a4e"
 
 [[packages]]
 name = "wppm"
-version = "17.13.20260913"
+version = "17.14.20261027"
 
 [[packages.wheels]]
-name = "wppm-17.13.20260913-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/05/57/8af04f9c6b162656be21e34464ac7a58ccf88c4ac71fef2d7518c80c19fa/wppm-17.13.20260913-py3-none-any.whl"
+name = "wppm-17.14.20261027-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/97/f4/78a60526b6042f6b4fa354c74138e092e79caa08efa5739b39334795c266/wppm-17.14.20261027-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "86efc07a0c3c0ba9ca90d2f4b9dc6ffef0a258662b52f731b38655d871df76ca"
+sha256 = "adc7266a9535843cc9bc178a4da03bfd9b7c85a2680814d477eb8d59cf5059f5"
 
 [[packages]]
 name = "wrapt"
