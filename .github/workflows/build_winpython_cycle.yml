@@ -281,7 +281,8 @@ jobs:
           git commit -m "Changelogs for $TITLE"
           # the branch is generated wholly by this job, so a re-run replaces it
           git push --force origin "$branch"
-          if gh pr view "$branch" --json number >/dev/null 2>&1; then
+          # gh pr view also finds closed ones, which a re-spin must not reuse
+          if [ "$(gh pr list --head "$branch" --state open --json number --jq length)" != 0 ]; then
             echo "pull request for $branch is open; the push updated it"
           else
             gh pr create --base "$BASE" --head "$branch" \
