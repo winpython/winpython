@@ -67,8 +67,14 @@ my_release_level = ""
 builds = ["dot", "slim"]
 
 # A Python that names a requirements file its own way says so here:
-# [pythons."313".overrides.slim]
+
+[pythons."313".overrides.slim]
 # requirements = "requirements64_slim.txt"
+bytecode = "none"
+
+[pythons."313".overrides.slimf]
+bytecode = "none"
+
 
 [pythons."314"]
 python_target_release = "31410"
@@ -78,7 +84,7 @@ builds = ["dot", "dotf", "slim", "slimf"]
 
 
 [pythons."314".overrides.slimf]
-# bytecode = "none"
+bytecode = "none"
 # tornado ships one cp39-abi3 wheel, which no free-threaded interpreter matches,
 # so this flavor alone still needs the sdist fallback. The maintainer expects
 # free-threaded wheels during the 2026-04 cycle (tornadoweb/tornado#3501):
@@ -96,8 +102,8 @@ builds = ["dot", "dotf", "slim", "slimf"]
 
 [pythons."315".overrides.slim]
 requirements = "requirements_slim315.txt"
-# bytecode = "none"
+#bytecode = "none"
 
 [pythons."315".overrides.slimf]
 requirements = "requirements_slimf315.txt"
-# bytecode = "none"
+bytecode = "none"
