@@ -200,6 +200,21 @@ one. No distribution is involved, so two downloaded files are enough. WinPython
 publishes one index per release and flavor, in
 [changelogs/](https://github.com/winpython/winpython/tree/master/changelogs).
 
+## Security advisories
+
+`-sa` asks [osv.dev](https://osv.dev) about the installed packages, or about the pins of
+a `pylock.toml` or `requirements.txt`. One line per affected package, with the version
+that fixes all its known advisories:
+
+```console
+$ wppm pylock.toml -sa
+mako 1.3.12 -> 1.4.2  GHSA-5639-2j2p-m4mx
+nbconvert 7.17.1 -> 7.17.2  GHSA-pjvx-prjx-h659
+```
+
+`-v` adds each advisory's summary, `-j` gives JSON. The exit code is 1 when anything is
+found, so it can gate a build. It needs network access.
+
 ## Environments you have not installed anything into
 
 `-t` points `wppm` at *another* Python distribution, and `-ws` at a plain directory of
