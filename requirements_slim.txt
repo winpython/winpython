@@ -8,7 +8,7 @@ anywidget
 array-api-compat
 azure-cosmos
 baresql
-brotli
+# brotli unsecure
 build
 cvxopt
 cvxpy
@@ -52,8 +52,9 @@ mpld3
 mssql-python
 mypy[mypyc]
 mysql_connector_python
-nltk
+# nltk -3.10.4 not same sha-256
 onnxruntime_genai
+openai
 opencv-python
 openpyxl
 optuna
@@ -69,7 +70,7 @@ prince
 psycopg2
 ptpython
 pybind11
-pydantic-ai-slim[a2a,anthropic,cli,cohere,evals,google,groq,mcp,openai,vertexai]
+pydantic-ai-slim[anthropic,cli,cohere,evals,google,groq,mcp,openai]
 pympler
 pyodbc
 pyomo
@@ -114,6 +115,12 @@ wheel
 wordcloud
 xlsxwriter
 yt_dlp
+
+
+jupyter-server-terminals
+pyqtgraph
+pylint
+
 
 # ---- already pulled in by an entry above ----
 #alembic  # <- optuna

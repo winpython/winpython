@@ -96,6 +96,7 @@ nbconvert
 networkx
 nltk
 numpydoc
+openai
 opencv-python
 openpyxl
 opentelemetry-semantic-conventions
@@ -189,6 +190,20 @@ wheel
 xlsxwriter
 xxhash
 yt-dlp
+
+jupyter-server-terminals
+jupyter-console
+flake8
+isort
+pyqtgraph
+pylint
+pythonqwt
+pytoolconfig
+redis
+rope
+sparsediffpy
+whatthepatch
+duckdb
 
 # ---- notes kept from the source ----
 # for WinPython-3.14 slim
