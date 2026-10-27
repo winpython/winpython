@@ -351,6 +351,7 @@ def main(test=False):
     parser.add_argument("-r", dest="pipup", action="store_true", help=f"show Reverse (!= constraining) dependancies of the given package[option]: wppm -r pytest![test]")
     parser.add_argument("-tl", "--top-level", action="store_true", help="keep only the entries no other entry pulls in, sorted: wppm -tl, wppm requirements.txt -tl -v\nwith -p or -r, start the tree from them instead of every package: wppm -tl -p")
     parser.add_argument("-l", dest="levels", type=int, default=-1, help="show 'LEVELS' levels of dependencies (with -p, -r): wppm -p pandas -l1")
+    parser.add_argument("-sa", "--audit", action="store_true", help="show known security advisories (osv.dev) of installed packages, or of a pylock.toml / requirements.txt: wppm -sa, wppm pylock.toml -sa")
     parser.add_argument("-j", "--json", dest="json", action="store_true", help="machine-readable JSON output (with -p, -r, -ls, -md, -tl): wppm -p pandas[.] -j")
     parser.add_argument("-t", dest="target", default=sys.prefix, help=f'path to target Python distribution (default: "{sys.prefix}")')
     parser.add_argument("-i", "--install", action="store_true", help="install a given package wheel or pylock file (use pip for more features)")
@@ -379,6 +380,25 @@ def main(test=False):
         raise RuntimeError("Incompatible arguments: --install and --uninstall")
     if args.registerWinPython and args.unregisterWinPython:
         raise RuntimeError("Incompatible arguments: --install and --uninstall")
+    if args.audit:
+        from . import audit
+        source = next((Path(f) for f in args.fname if f and Path(f).is_file()), None)
+        pins = audit.pins_from_file(source) if source else piptree.PipData(targetpython, args.wheelsource).pip_list()
+        rows = audit.audit(pins)
+        if args.json:
+            print(json.dumps(rows, indent=4))
+        else:
+            # one line per package, with the version fixing all its known advisories; -v lists them
+            for package in dict.fromkeys(r["package"] for r in rows):
+                own = [r for r in rows if r["package"] == package]
+                fixes = [r["fixed"] for r in own]
+                fix = f" -> {max(fixes, key=audit.Version)}" if all(fixes) else " (no fix known for all)"
+                print(f"{package} {own[0]['version']}{fix}  {', '.join(r['id'] for r in own)}")
+                if args.verbose:
+                    for r in own:
+                        print(f"    {r['id']} -> {r['fixed'] or '?'}  {utils.sum_up(r['summary'], 90)}")
+            print(f"# {len(pins)} packages checked, {len(rows)} advisories in {len({r['package'] for r in rows})} packages", file=sys.stderr)
+        sys.exit(1 if rows else 0)
     if args.pipdown or args.pipup:
         pip = piptree.PipData(targetpython, args.wheelsource)
         # -tl is then a root filter, not a list of its own: "." asked for implicitly,
