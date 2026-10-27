@@ -39,6 +39,7 @@ keywords = ["dependency","dependencies","dependency-tree","pipdeptree","extras",
 Documentation = "https://winpython.github.io/"
 Source = "https://github.com/winpython/winpython"
 Issues = "https://github.com/winpython/winpython/issues"
+Changelog = "https://github.com/winpython/winpython/releases?q=wppm"
 
 [project.scripts]
 wppm = "wppm.wppm:main"
