@@ -445,7 +445,7 @@ def main(test=False):
         print("continue ? Y/N")
         theAnswer = input()
         if theAnswer == "Y":
-            import associate
+            from . import associate
             associate.register(dist.target, verbose=args.verbose)
             sys.exit()
     if args.unregisterWinPython:
@@ -458,7 +458,7 @@ def main(test=False):
         print("continue ? Y/N")
         theAnswer = input()
         if theAnswer == "Y":
-            import associate
+            from . import associate
             associate.unregister(dist.target, verbose=args.verbose)
             sys.exit()
     if utils.is_python_distribution(args.target):
