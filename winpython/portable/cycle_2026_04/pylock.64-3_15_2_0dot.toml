@@ -47,14 +47,14 @@ sha256 = "9e5c6bfa8dcc30091c74b0cf803c81fdd29d94f01992a7707bc97babb1141913"
 
 [[packages]]
 name = "setuptools"
-version = "84.0.0"
+version = "84.2.1"
 
 [[packages.wheels]]
-name = "setuptools-84.0.0-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/95/9c/c510029fc6ef33a6275cd2c5d3cecd6613dfd6aa401d57c54f1c18852ccf/setuptools-84.0.0-py3-none-any.whl"
+name = "setuptools-84.2.1-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/ef/55/6dc6d6bb953bdfc52519a0059592c52b6e3b8ad51cf8256dffceb55b0610/setuptools-84.2.1-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
+sha256 = "ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2"
 
 [[packages]]
 name = "sqlite-bro"
@@ -80,11 +80,11 @@ sha256 = "3217dcc807155e45db462d7ef2431f5ddda0d7273b700d05a67b271ceb1287ab"
 
 [[packages]]
 name = "wppm"
-version = "17.13.20260913"
+version = "17.14.20261027"
 
 [[packages.wheels]]
-name = "wppm-17.13.20260913-py3-none-any.whl"
-url = "https://files.pythonhosted.org/packages/05/57/8af04f9c6b162656be21e34464ac7a58ccf88c4ac71fef2d7518c80c19fa/wppm-17.13.20260913-py3-none-any.whl"
+name = "wppm-17.14.20261027-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/97/f4/78a60526b6042f6b4fa354c74138e092e79caa08efa5739b39334795c266/wppm-17.14.20261027-py3-none-any.whl"
 
 [packages.wheels.hashes]
-sha256 = "86efc07a0c3c0ba9ca90d2f4b9dc6ffef0a258662b52f731b38655d871df76ca"
+sha256 = "adc7266a9535843cc9bc178a4da03bfd9b7c85a2680814d477eb8d59cf5059f5"
