@@ -94,3 +94,28 @@ def audit(pins):
                      "fixed": _fixed_in(vuln, name, version),
                      "summary": vuln.get("summary") or (vuln.get("details") or "").split("\n")[0]})
     return rows
+
+
+def upgrades(rows):
+    """Per affected package, the version fixing all its advisories, and whether it is clean.
+
+    The highest `fixed` can carry an advisory of its own (pypdf needed eleven
+    releases to get past that), so the suggested versions are audited too: one
+    more batch query. Not clean means a later release is needed; it is not
+    searched for. {package: {"version", "to", "clean"}}, `to` '' and `clean`
+    None when some advisory has no known fix.
+    """
+    result = {}
+    for row in rows:
+        entry = result.setdefault(row["package"], {"version": row["version"], "fixes": []})
+        entry["fixes"].append(row["fixed"])
+    for entry in result.values():
+        fixes = entry.pop("fixes")
+        entry["to"] = max(fixes, key=Version) if all(fixes) else ""
+        entry["clean"] = None
+    proposed = [(name, entry["to"]) for name, entry in result.items() if entry["to"]]
+    still = {row["package"] for row in audit(proposed)} if proposed else set()
+    for name, entry in result.items():
+        if entry["to"]:
+            entry["clean"] = name not in still
+    return result

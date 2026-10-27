@@ -23,3 +23,18 @@ def test_fixed_in_picks_lowest_fix_above_installed():
                                      {"type": "GIT", "events": [{"fixed": "01e0558825b8"}]}]}]}
     assert audit._fixed_in(vuln, "pydantic-ai-slim", "1.106.0") == "1.107.4"
     assert audit._fixed_in(vuln, "other", "1.106.0") == ""
+
+
+def test_upgrades_flags_a_fix_with_advisories_of_its_own(monkeypatch):
+    rows = [{"package": "a", "version": "1.0", "fixed": "1.2"}, {"package": "a", "version": "1.0", "fixed": "1.10"},
+            {"package": "b", "version": "2.0", "fixed": "2.1"}, {"package": "c", "version": "3.0", "fixed": ""}]
+    asked = []
+    def fake_audit(pins):
+        asked.extend(pins)
+        return [{"package": "b"}]
+    monkeypatch.setattr(audit, "audit", fake_audit)
+    result = audit.upgrades(rows)
+    assert sorted(asked) == [("a", "1.10"), ("b", "2.1")]
+    assert result == {"a": {"version": "1.0", "to": "1.10", "clean": True},
+                      "b": {"version": "2.0", "to": "2.1", "clean": False},
+                      "c": {"version": "3.0", "to": "", "clean": None}}

@@ -385,15 +385,19 @@ def main(test=False):
         source = next((Path(f) for f in args.fname if f and Path(f).is_file()), None)
         pins = audit.pins_from_file(source) if source else piptree.PipData(targetpython, args.wheelsource).pip_list()
         rows = audit.audit(pins)
+        upgrades = audit.upgrades(rows)
         if args.json:
-            print(json.dumps(rows, indent=4))
+            print(json.dumps([dict(r, to=upgrades[r["package"]]["to"], clean=upgrades[r["package"]]["clean"]) for r in rows], indent=4))
         else:
             # one line per package, with the version fixing all its known advisories; -v lists them
-            for package in dict.fromkeys(r["package"] for r in rows):
+            for package, up in upgrades.items():
                 own = [r for r in rows if r["package"] == package]
-                fixes = [r["fixed"] for r in own]
-                fix = f" -> {max(fixes, key=audit.Version)}" if all(fixes) else " (no fix known for all)"
-                print(f"{package} {own[0]['version']}{fix}  {', '.join(r['id'] for r in own)}")
+                if not up["to"]:
+                    fix = " (no fix known for all)"
+                else:
+                    fix = f" -> {up['to']}" + ("" if up["clean"] else " (not clean yet: has advisories of its own)")
+                ids = ", ".join(r["id"] for r in own) if len(own) <= 3 else f"{len(own)} advisories"
+                print(f"{package} {up['version']}{fix}  {ids}")
                 if args.verbose:
                     for r in own:
                         print(f"    {r['id']} -> {r['fixed'] or '?'}  {utils.sum_up(r['summary'], 90)}")
