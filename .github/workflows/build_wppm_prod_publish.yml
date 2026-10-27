@@ -91,3 +91,23 @@ jobs:
         with:
           skip-existing: true
           verbose: true  # Enable verbose output
+
+  tag_release:
+    name: Tag the published commit
+    needs: [upload_pypi_test]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: tag wppm-<version>, once
+        shell: bash
+        run: |
+          TAG="wppm-$(sed -n "s/^__version__ = '\(.*\)'/\1/p" wppm/__init__.py)"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
+            echo "$TAG already exists"
+          else
+            git tag "$TAG" "$GITHUB_SHA"
+            git push origin "$TAG"
+          fi
