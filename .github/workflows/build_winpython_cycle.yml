@@ -63,6 +63,7 @@ jobs:
       release_level: ${{ steps.cfg.outputs.release_level }}
       release_tag: ${{ steps.cfg.outputs.release_tag }}
       release_title: ${{ steps.cfg.outputs.release_title }}
+      adds_only: ${{ steps.cfg.outputs.adds_only }}
       matrix: ${{ steps.cfg.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
@@ -93,6 +94,7 @@ jobs:
           TITLE: ${{ needs.config.outputs.release_title }}
           CYCLE: ${{ inputs.cycle }}
           OVERWRITE: ${{ inputs.overwrite_published }}
+          ADDS_ONLY: ${{ needs.config.outputs.adds_only }}
         run: |
           if gh release view "$TAG" >/dev/null 2>&1; then
             # Adding a missing flavor to a draft is the normal path. Landing on
@@ -100,7 +102,8 @@ jobs:
             # release_level bump, and the upload replaces files people have
             # downloaded -- so stop here, before an hour of build time.
             published=$(gh release view "$TAG" --json isDraft --jq '.isDraft | not')
-            if [ "$published" = "true" ] && [ "$OVERWRITE" != "true" ]; then
+            # a post respin only adds new file names, so it may join a published one
+            if [ "$published" = "true" ] && [ "$OVERWRITE" != "true" ] && [ "$ADDS_ONLY" != "true" ]; then
               echo "::error::$TAG is already published. Bump release_level in cycles/$CYCLE.toml, or re-dispatch with overwrite_published ticked to replace its files."
               exit 1
             fi
@@ -183,7 +186,7 @@ jobs:
           winpy_arch: ${{ env.WINPYARCH }}
           winpy_ver: ${{ env.WINPYVER }}
           winpy_ver2: ${{ env.WINPYVER2 }}
-          release_level: ${{ needs.config.outputs.release_level }}
+          release_level: ${{ needs.config.outputs.release_level }}${{ matrix.leg.post }}
           dotwheelhouse: ${{ env.dotwheelhouse }}
           winpy_requirements_whl: ${{ matrix.leg.requirements_wheels }}
           format_zip: ${{ matrix.leg.formats.zip }}
