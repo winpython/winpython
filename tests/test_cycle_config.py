@@ -186,6 +186,31 @@ class TestFlavorFilter:
 
 
 @needs_script
+class TestPostSuffix:
+    """A re-spin of one flavor under new file names, the lockfile unchanged."""
+
+    CFG = {
+        "cycle_dir": "nowhere",
+        "pythons": {},
+        "flavors": [{"name": "slim", "PANDOC": "1", "formats": {}, "post": "_post1"}],
+    }
+    PYTHON = {"ver2": "3.14.10.0", "python_version": "3.14", "archdet": "64"}
+
+    def test_renames_the_output_not_the_lockfile(self, cycle_config, tmp_path):
+        (tmp_path / "pylock.64-3_14_10_0slim.toml").write_text("")
+        cfg = dict(self.CFG, cycle_dir=str(tmp_path))
+        leg = cycle_config.flavor_entry(cfg, cfg["flavors"][0], self.PYTHON)
+        assert leg["winpyver"] == "3.14.10.0slim_post1"
+        assert leg["lockfile"].endswith("pylock.64-3_14_10_0slim.toml")
+
+    def test_a_suffix_unfit_for_a_url_is_refused(self, cycle_config, tmp_path):
+        (tmp_path / "pylock.64-3_14_10_0slim.toml").write_text("")
+        flavor = dict(self.CFG["flavors"][0], post=" post/1")
+        with pytest.raises(SystemExit):
+            cycle_config.flavor_entry(dict(self.CFG, cycle_dir=str(tmp_path)), flavor, self.PYTHON)
+
+
+@needs_script
 class TestReleaseTag:
     """The tag is what the download URLs the website publishes are built on."""
 

@@ -56,6 +56,7 @@ name         = "slim"
 PANDOC       = "1"
 WINPYARCHDET = "64"
 formats      = { zip = false, "7z" = true, exe = true }
+post         = "_post1"  # -mx9 re-spin, to fit VirusTotal's 650 MB
 
 [[flavors]]
 name         = "whl"

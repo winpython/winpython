@@ -25,6 +25,9 @@ matrix leg in PowerShell:
     says so with a release_tag key.
   * a cycle with nothing to build fails here, loudly, instead of starting
     runners whose every step is then skipped.
+  * a flavor's optional post suffix ("_post1"): a rebuild of the same
+    lockfile under new file names. It can join a release that is already
+    published, since nothing there gets replaced.
 
 Paths are relative to the working directory, which in CI is the checkout root.
 """
@@ -39,6 +42,9 @@ from pathlib import Path
 # time, an hour into a build. Not the whole of git-check-ref-format, just the
 # parts a hand-written tag realistically trips over.
 TAG_FORBIDDEN = set(" ~^:?*[\\\x7f") | {chr(c) for c in range(32)}
+
+# a post suffix lands in file names and URLs
+POST_ALLOWED = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-")
 
 
 def python_facts(requested: str, entry: dict) -> dict:
@@ -86,6 +92,10 @@ def flavor_entry(cfg: dict, flavor: dict, python: dict) -> dict | None:
     def optional(path: Path) -> str:
         return path.as_posix() if path.is_file() else ""
 
+    post = flavor.get("post", "")
+    if set(post) - POST_ALLOWED:
+        raise SystemExit(f"{flavor['name']}: post {post!r} must be letters, digits, '.', '_' or '-'")
+
     leg = {key: value for key, value in python.items() if key != "archdet"}
     leg.update(
         name=flavor["name"],
@@ -94,7 +104,8 @@ def flavor_entry(cfg: dict, flavor: dict, python: dict) -> dict | None:
         lockfile=lockfile.as_posix(),
         lockfile_wheels=optional(cycle_dir / f"pylock.{stem}_wheels.toml"),
         requirements_wheels=optional(cycle_dir / f"requir.{stem}_wheels.txt"),
-        winpyver=f"{python['ver2']}{flavor['name']}{level}",
+        post=post,
+        winpyver=f"{python['ver2']}{flavor['name']}{level}{post}",
         artifact_name=f"publish_{python['python_version']}{flavor['name']}",
     )
     return leg
@@ -208,6 +219,8 @@ def build_config(cfg: dict, requested: str, cycle_name: str, flavors: str = "all
         "release_level": cfg.get("release_level", ""),
         "release_tag": release_tag(cfg, cycle_name),
         "release_title": release_title(cfg, cycle_name),
+        # every leg renamed by a post suffix: none of its files can replace one
+        "adds_only": "true" if all(leg["post"] for leg in legs) else "false",
         "pandoc_source": cfg["pandoc"]["source"],
         "pandoc_sha256": cfg["pandoc"]["sha256"],
         # consumed by the build job as strategy.matrix via fromJSON
