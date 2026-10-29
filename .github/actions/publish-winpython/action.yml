@@ -94,11 +94,15 @@ runs:
             Compress-Archive -Path "${{ inputs.build_location }}" -DestinationPath "$baseName.zip" -Force
         }
         if ("${{ inputs.format_7z }}" -eq "true") { 
-            7z a -mx7 "$baseName.7z" "${{ inputs.build_location }}"
+            7z a -mx9 "$baseName.7z" "${{ inputs.build_location }}"
         }
-        if ("${{ inputs.format_exe }}" -eq "true") { 
+        if ("${{ inputs.format_exe }}" -eq "true") {
             $SFXModulePath = "C:\Program Files\7-Zip\7z.sfx"
-            7z a -mx7 -t7z -sfx"$SFXModulePath" "$baseName.exe" "${{ inputs.build_location }}"
+            7z a -mx9 -t7z -sfx"$SFXModulePath" "$baseName.exe" "${{ inputs.build_location }}"
+        }
+        # VirusTotal refuses uploads over 650 MB
+        Get-ChildItem "$baseName.*" | Where-Object Length -gt 650MB | ForEach-Object {
+            Write-Output "::warning::$($_.Name) is $([math]::Round($_.Length / 1MB)) MB, over the VirusTotal 650 MB limit"
         }
 
     - name: Generate Hashes
