@@ -2,6 +2,7 @@
 
     python .github/scripts/cycle_config.py cycles/2026_04.toml all
     python .github/scripts/cycle_config.py cycles/2026_04.toml 3.14
+    python .github/scripts/cycle_config.py cycles/2026_04.toml all slim,slimf
 
 Writes to $GITHUB_OUTPUT when set, otherwise stdout, so it can be run locally
 to see exactly what a workflow run would get. tomllib is stdlib from 3.11, and
@@ -154,8 +155,28 @@ def release_title(cfg: dict, cycle_name: str, today: datetime.date | None = None
     return f"WinPython {name} of {today:%B} {ordinal(today.day)} {today.year}"
 
 
-def build_config(cfg: dict, requested: str, cycle_name: str) -> dict:
+def wanted_flavors(cfg: dict, flavors: str) -> set[str] | None:
+    """The flavor names a comma-separated input asks for; None means all.
+
+    A typo would otherwise filter everything out, or quietly build less than
+    asked, so a name the cycle does not declare is refused.
+    """
+    if flavors.strip() in ("", "all"):
+        return None
+    names = {name.strip() for name in flavors.split(",") if name.strip()}
+    declared = {flavor["name"] for flavor in cfg["flavors"]}
+    unknown = names - declared
+    if unknown:
+        raise SystemExit(
+            f"unknown flavor {', '.join(sorted(unknown))}; this cycle declares "
+            f"{', '.join(sorted(declared))} (or 'all')"
+        )
+    return names
+
+
+def build_config(cfg: dict, requested: str, cycle_name: str, flavors: str = "all") -> dict:
     pythons = cfg["pythons"]
+    only = wanted_flavors(cfg, flavors)
     if requested == "all":
         wanted = list(pythons)
     elif requested in pythons:
@@ -167,6 +188,10 @@ def build_config(cfg: dict, requested: str, cycle_name: str) -> dict:
         )
 
     legs = [leg for python in wanted for leg in legs_for(cfg, python)]
+    if only is not None:
+        legs = [leg for leg in legs if leg["name"] in only]
+    if not legs and only is not None:
+        raise SystemExit(f"{requested}: none of {flavors} can be built for this Python")
     if not legs:
         missing = ", ".join(
             f"pylock.64-{pythons[p]['ver2'].replace('.', '_')}<flavor>"
@@ -191,15 +216,15 @@ def build_config(cfg: dict, requested: str, cycle_name: str) -> dict:
 
 
 def main(argv: list[str]) -> None:
-    if len(argv) != 3:
-        raise SystemExit(f"usage: {Path(argv[0]).name} <cycle.toml> <python_version|all>")
+    if len(argv) not in (3, 4):
+        raise SystemExit(f"usage: {Path(argv[0]).name} <cycle.toml> <python_version|all> [flavors|all]")
     cfg_path = Path(argv[1])
     if not cfg_path.is_file():
         raise SystemExit(f"no such cycle file: {cfg_path}")
     with cfg_path.open("rb") as fh:
         cfg = tomllib.load(fh)
 
-    config = build_config(cfg, argv[2], cfg_path.stem)
+    config = build_config(cfg, argv[2], cfg_path.stem, argv[3] if len(argv) == 4 else "all")
     rendered = "".join(f"{k}={v}\n" for k, v in config.items())
     out = os.environ.get("GITHUB_OUTPUT")
     if out:

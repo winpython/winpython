@@ -153,6 +153,39 @@ class TestDispatchChoices:
 
 
 @needs_script
+@needs_cycles
+@pytest.mark.parametrize("cycle_file", cycle_files, ids=lambda p: p.stem)
+class TestFlavorFilter:
+    """Re-running only some flavors, e.g. slim after a size fix."""
+
+    def test_all_is_no_filter(self, cycle_config, at_repo_root, cycle_file):
+        everything = legs_of(config_for(cycle_config, cycle_file))
+        import tomllib
+
+        with cycle_file.open("rb") as fh:
+            cfg = tomllib.load(fh)
+        assert legs_of(cycle_config.build_config(cfg, "all", cycle_file.stem, "all")) == everything
+
+    def test_keeps_only_the_named_flavors(self, cycle_config, at_repo_root, cycle_file):
+        import tomllib
+
+        with cycle_file.open("rb") as fh:
+            cfg = tomllib.load(fh)
+        built = {leg["name"] for leg in legs_of(config_for(cycle_config, cycle_file))}
+        some = sorted(built)[:2]
+        legs = legs_of(cycle_config.build_config(cfg, "all", cycle_file.stem, ", ".join(some)))
+        assert legs and {leg["name"] for leg in legs} == set(some)
+
+    def test_an_unknown_flavor_is_refused(self, cycle_config, at_repo_root, cycle_file):
+        import tomllib
+
+        with cycle_file.open("rb") as fh:
+            cfg = tomllib.load(fh)
+        with pytest.raises(SystemExit):
+            cycle_config.build_config(cfg, "all", cycle_file.stem, "slimm")
+
+
+@needs_script
 class TestReleaseTag:
     """The tag is what the download URLs the website publishes are built on."""
 
@@ -314,7 +347,10 @@ class TestWorkflowMatchesConfig:
         It has nothing to add either way: the same lockfile builds the same
         package list, so a rebuilt leg cannot change a changelog.
         """
-        assert "if: ${{ inputs.publish && inputs.python_versionf == 'all' }}" in workflow_text
+        assert (
+            "if: ${{ inputs.publish && inputs.python_versionf == 'all' && inputs.flavors == 'all' }}"
+            in workflow_text
+        )
         assert ".github/scripts/changelog_files.py release_metadata changelogs" in workflow_text
         assert (REPO / ".github/scripts/changelog_files.py").is_file()
 
