@@ -29,6 +29,11 @@ on:
           - '3.14F'
           - '3.15'
           - '3.15F'
+      flavors:
+        description: 'Flavors to build, comma-separated (e.g. slim,slimf); "all" builds every one'
+        required: true
+        default: 'all'
+        type: string
       publish:
         description: 'Upload to the draft release the cycle file names; off keeps the output as artifacts'
         required: false
@@ -69,7 +74,8 @@ jobs:
         env:
           CYCLE: ${{ inputs.cycle }}
           PYTHON_VERSIONF: ${{ inputs.python_versionf }}
-        run: python .github/scripts/cycle_config.py "cycles/$CYCLE.toml" "$PYTHON_VERSIONF"
+          FLAVORS: ${{ inputs.flavors }}
+        run: python .github/scripts/cycle_config.py "cycles/$CYCLE.toml" "$PYTHON_VERSIONF" "$FLAVORS"
 
   release-draft:
     # one job opens the draft, so the build legs cannot race to create it
@@ -232,7 +238,7 @@ jobs:
     # same lockfile produces the same package list, so a rebuilt leg cannot
     # change a changelog.
     needs: [config, build-winpython]
-    if: ${{ inputs.publish && inputs.python_versionf == 'all' }}
+    if: ${{ inputs.publish && inputs.python_versionf == 'all' && inputs.flavors == 'all' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
