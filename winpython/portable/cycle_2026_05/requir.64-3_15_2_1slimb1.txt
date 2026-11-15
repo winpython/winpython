@@ -436,6 +436,12 @@ msal==1.39.0 \
     --hash=sha256:2d2577886906cd7293850dffa2da29119966c213bfc6ec0cecf8bf7621e1ca77
 msal-extensions==1.3.1 \
     --hash=sha256:96d3de4d034504e969ac5e85bae8106c8373b5c6568e4c8fa7af2eca9dbe6bca
+mssql-python==1.17.0 \
+    --hash=sha256:622be53a5111384d33f83e9bac069b16e6653881710cfab2097d9f00b7496e71
+mssql-python-odbc==18.6.2.2 \
+    --hash=sha256:dd4926c85ae3eee4bf630758b9500581951acf3481f7a15d6d28ee529763fe99
+mssql-python-rs==0.4.0 \
+    --hash=sha256:05e45ea4720472d9d5b03e2f2ee3196e7ab493ea91e2de3398751dcb1383eebb
 multidict==6.9.1 \
     --hash=sha256:59c123d0e948d760a5f930f316cfefa07e8d632ab84327c0693ee6a88171154f
 multipledispatch==1.0.0 \
@@ -484,6 +490,8 @@ optree==0.20.0 \
     --hash=sha256:8052cd891c418d3f86da3082bf10ebcb7a090d82758ec39f80a2a07ef4a72d99
 orjson==3.12.0 \
     --hash=sha256:2b7bcefb9f40fa242fa6b06377232c048e655747790829609168c01162f60578
+ormsgpack==1.13.0 \
+    --hash=sha256:3caea52fe5d04ff8e926e4ad6d5a3bffdc31db120ac65b35105cea027777fca3
 outcome==1.3.0.post0 \
     --hash=sha256:e771c5ce06d1415e356078d3bdd68523f284b4ce5419828922b6871e65eda82b
 packaging==26.3 \
@@ -498,6 +506,8 @@ parso==0.8.7 \
     --hash=sha256:a8926eb2a1b915486941fdbd31e86a4baf88fe8c210f25f2f35ecec5b574ca1c
 partd==1.4.2 \
     --hash=sha256:978e4ac767ec4ba5b86c6eaa52e5a2a3bc748a2ca839e8cc798f1cc6ce6efb0f
+pathable==0.6.0 \
+    --hash=sha256:82c4ca6c98c502ad12e0d4e9779b6210afee93c38990988c8c5d1b49bdcdf566
 pathspec==1.1.1 \
     --hash=sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189
 patsy==1.0.3 \
@@ -566,6 +576,8 @@ pycodestyle==2.14.0 \
     --hash=sha256:dd6bf7cb4ee77f8e016f9c8e74a35ddd9f67e1d5fd4184d86c3b98e07099f42d
 pycparser==3.0 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
+pycrdt==0.14.10 \
+    --hash=sha256:58e03b97188224e38bdb4300f9ec37792272c20d2e0a3f6e28cecd98b8c94c51
 pyct==0.6.0 \
     --hash=sha256:cfaded7289fca72ddf6579b81459e3ec8db323a508e61c49aa318ee3cd6ff160
 pydantic==2.14.2 \
@@ -736,6 +748,8 @@ ruff==0.16.1 \
     --hash=sha256:09b05e8b90c2cb06ad63464350e7a45e8e44a2dfe52072ebfba6666ca8d3f596
 rx==3.2.0 \
     --hash=sha256:922c5f4edb3aa1beaa47bf61d65d5380011ff6adcd527f26377d05cb73ed8ec8
+scikit-image==0.27.0rc1 \
+    --hash=sha256:d3d49c777af1ec6e98d9e499e3073b9e200dfa32fc889f80476c3b461e9d59bd
 scikit-learn==1.9.1 \
     --hash=sha256:52cfdb1fed3a34362dbc0bd96f2e761a66fd5724d6901629f5a558f1f3bd9849
 scipy==1.18.1 \
