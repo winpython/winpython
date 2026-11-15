@@ -1,0 +1,76 @@
+# WinPython 2026-05 build cycle.
+#
+# Everything that changes from one cycle to the next lives here, so a new cycle
+# is a new file rather than a copy of the workflow.
+
+cycle_dir     = "winpython/portable/cycle_2026_05"
+release_level = "b1"
+
+# The build publishes under "<this file's name with dashes><release level>", so
+# this cycle releases as 2026-05b1 and a respin is a release_level bump rather
+# than a new tag to invent. Add release_tag = "..." to override that.
+
+[pandoc]
+source = "https://github.com/jgm/pandoc/releases/download/3.1.9/pandoc-3.1.9-windows-x86_64.zip"
+sha256 = "11eb6dbe5286c9e5edb0cca4412e7d99ec6578ec04158b0b7fe11f7fd96688e5"
+
+# The python-build-standalone tarball for each version offered by the workflow.
+# ver2 is the WinPython 4-part version; its first 3 parts must appear in src.
+
+[pythons."3.13"]
+ver2 = "3.13.18.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.13.18+20261110-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "2e0fed09d48989f64c9305da9ff2d37a41c0d13ab2aa6283405b2b620dfbf805"
+
+[pythons."3.14"]
+ver2 = "3.14.10.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.14.10+20261110-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "32b6cf90a03e2bc15fda8d2ab7ff78c4870f138887d612932650ce764efaab8f"
+
+[pythons."3.14F"]
+ver2 = "3.14.10.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.14.10+20261110-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
+sha  = "77375670a76c8c859aa14d8e619917238832fef1e3ad130f13e7dc89a02a87ed"
+
+[pythons."3.15"]
+ver2 = "3.15.2.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.15.2+20261110-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+sha  = "ecd90d78accb906e3d47f6cdb409a610da10475f94d15ebdd8cb2e0561b71df6"
+
+[pythons."3.15F"]
+ver2 = "3.15.2.1"
+src  = "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.15.2+20261110-x86_64-pc-windows-msvc-freethreaded-install_only_stripped.tar.gz"
+sha  = "64089b73dcc6ae1d59456d5211a06d377b9743893a769da8df78b4905a84a230"
+
+# Flavors become the job matrix. 2026-02 renamed "free" to "dotf", so this
+# varies per cycle too and belongs in the cycle file.
+
+[[flavors]]
+name         = "dot"
+PANDOC       = "0"
+WINPYARCHDET = "64"
+formats      = { zip = true, "7z" = false, exe = true }
+
+[[flavors]]
+name         = "slim"
+PANDOC       = "1"
+WINPYARCHDET = "64"
+formats      = { zip = false, "7z" = true, exe = true }
+
+[[flavors]]
+name         = "whl"
+PANDOC       = "0"
+WINPYARCHDET = "64"
+formats      = { zip = false, "7z" = true, exe = false }
+
+[[flavors]]
+name         = "dotf"
+PANDOC       = "0"
+WINPYARCHDET = "64F"
+formats      = { zip = true, "7z" = false, exe = true }
+
+[[flavors]]
+name         = "slimf"
+PANDOC       = "1"
+WINPYARCHDET = "64F"
+formats      = { zip = false, "7z" = true, exe = true }

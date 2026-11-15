@@ -15,7 +15,7 @@ on:
       cycle:
         description: 'Build cycle (file name in cycles/, without .toml)'
         required: true
-        default: '2026_04'
+        default: '2026_05'
         type: string
       python_versionf:
         description: 'Python to build; "all" takes every one this cycle has lockfiles for'
