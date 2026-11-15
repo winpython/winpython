@@ -2411,6 +2411,39 @@ url = "https://files.pythonhosted.org/packages/5e/75/bd9b7bb966668920f06b200e844
 sha256 = "96d3de4d034504e969ac5e85bae8106c8373b5c6568e4c8fa7af2eca9dbe6bca"
 
 [[packages]]
+name = "mssql-python"
+version = "1.17.0"
+
+[[packages.wheels]]
+name = "mssql_python-1.17.0-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/3a/40/25b5bb77780d6ea771aedf85684fafbca0234fd2069ed03cbc141af56013/mssql_python-1.17.0-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "622be53a5111384d33f83e9bac069b16e6653881710cfab2097d9f00b7496e71"
+
+[[packages]]
+name = "mssql-python-odbc"
+version = "18.6.2.2"
+
+[[packages.wheels]]
+name = "mssql_python_odbc-18.6.2.2-py3-none-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/5b/4b/8f40d34423d4808f76dd731e6e11bac6f5366b570ef1775ffbf777217c8b/mssql_python_odbc-18.6.2.2-py3-none-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "dd4926c85ae3eee4bf630758b9500581951acf3481f7a15d6d28ee529763fe99"
+
+[[packages]]
+name = "mssql-python-rs"
+version = "0.4.0"
+
+[[packages.wheels]]
+name = "mssql_python_rs-0.4.0-cp310-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/00/29/3e89e992f92ec69d818dba65e0066c0311fc9d721fe52179daaedf6dd0fe/mssql_python_rs-0.4.0-cp310-abi3-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "05e45ea4720472d9d5b03e2f2ee3196e7ab493ea91e2de3398751dcb1383eebb"
+
+[[packages]]
 name = "multidict"
 version = "6.9.1"
 
@@ -2675,6 +2708,17 @@ url = "https://files.pythonhosted.org/packages/64/f7/2723e264aab7248c1ed6ecaad8e
 sha256 = "2b7bcefb9f40fa242fa6b06377232c048e655747790829609168c01162f60578"
 
 [[packages]]
+name = "ormsgpack"
+version = "1.13.0"
+
+[[packages.wheels]]
+name = "ormsgpack-1.13.0-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/1a/d8/5d28464c0b34b71fc79ef7e36533c5e0f8a43fd214e38fdeba2c8c01359a/ormsgpack-1.13.0-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "3caea52fe5d04ff8e926e4ad6d5a3bffdc31db120ac65b35105cea027777fca3"
+
+[[packages]]
 name = "outcome"
 version = "1.3.0.post0"
 
@@ -2750,6 +2794,17 @@ url = "https://files.pythonhosted.org/packages/71/e7/40fb618334dcdf7c5a316c0e734
 
 [packages.wheels.hashes]
 sha256 = "978e4ac767ec4ba5b86c6eaa52e5a2a3bc748a2ca839e8cc798f1cc6ce6efb0f"
+
+[[packages]]
+name = "pathable"
+version = "0.6.0"
+
+[[packages.wheels]]
+name = "pathable-0.6.0-py3-none-any.whl"
+url = "https://files.pythonhosted.org/packages/a2/e8/6d75ffd9784bce2e93d1ae4415649427e39a53bb172d4672b2b59c6f0a7b/pathable-0.6.0-py3-none-any.whl"
+
+[packages.wheels.hashes]
+sha256 = "82c4ca6c98c502ad12e0d4e9779b6210afee93c38990988c8c5d1b49bdcdf566"
 
 [[packages]]
 name = "pathspec"
@@ -3124,6 +3179,17 @@ url = "https://files.pythonhosted.org/packages/0c/c3/44f3fbbfa403ea2a7c779186dc2
 
 [packages.wheels.hashes]
 sha256 = "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"
+
+[[packages]]
+name = "pycrdt"
+version = "0.14.10"
+
+[[packages.wheels]]
+name = "pycrdt-0.14.10-cp311-abi3-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/e2/ad/d787892c2f809c83503cbedd3f9ebce566f336d194cef713694c181349ff/pycrdt-0.14.10-cp311-abi3-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "58e03b97188224e38bdb4300f9ec37792272c20d2e0a3f6e28cecd98b8c94c51"
 
 [[packages]]
 name = "pyct"
@@ -4059,6 +4125,17 @@ url = "https://files.pythonhosted.org/packages/e2/a9/efeaeca4928a9a56d04d609b573
 
 [packages.wheels.hashes]
 sha256 = "922c5f4edb3aa1beaa47bf61d65d5380011ff6adcd527f26377d05cb73ed8ec8"
+
+[[packages]]
+name = "scikit-image"
+version = "0.27.0rc1"
+
+[[packages.wheels]]
+name = "scikit_image-0.27.0rc1-cp315-cp315-win_amd64.whl"
+url = "https://files.pythonhosted.org/packages/09/9a/8cc3236db56436ff05ee079edb8547b28d533acd601dd8aabb50b5d1fe7f/scikit_image-0.27.0rc1-cp315-cp315-win_amd64.whl"
+
+[packages.wheels.hashes]
+sha256 = "d3d49c777af1ec6e98d9e499e3073b9e200dfa32fc889f80476c3b461e9d59bd"
 
 [[packages]]
 name = "scikit-learn"
