@@ -546,8 +546,9 @@ pyct==0.6.0 \
     --hash=sha256:cfaded7289fca72ddf6579b81459e3ec8db323a508e61c49aa318ee3cd6ff160
 pydantic==2.14.0b2 \
     --hash=sha256:4556c932fb3dbb7e9ac773bee241b2eb7058a2f9ff1d850d45d7d11cb6e54b68
-pydantic-ai-slim==1.106.0 \
-    --hash=sha256:0dd7a99ea3fa89b490098406c2240ba7d75c327eea094c3fd057dd7aa9f3d163
+pydantic-ai-slim==1.107.7 \
+    --hash=sha256:92aa6087e190017348f9b6354d30f0e67998992c0273e778930005bc31e04794 \
+    --hash=sha256:ecc02b80dcd9a4e7182e9389d21d6e559bcc324f6793b3f7171a52fb883edb5b
 pydantic-core==2.49.0 \
     --hash=sha256:24ce45e6967bb2ac68f1f1c199dec05399d32bc826342f455035afcbda5ab3f5
 pydantic-graph==1.106.0 \
